@@ -1,0 +1,1697 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CAWI SE2026 - BPS</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f5f5f5;color:#222;font-size:14px}
+/* HEADER */
+.rahasia-bar{background:#fc6c00;color:#fff;text-align:center;font-weight:700;font-size:13px;letter-spacing:3px;padding:5px}
+.header-main{background:#fff;border-bottom:3px solid #fc6c00;padding:10px 20px}
+.header-inner{display:flex;align-items:center;justify-content:space-between;max-width:900px;margin:0 auto;gap:10px}
+.header-logos{display:flex;align-items:center;gap:12px}
+.header-logos img{height:64px;object-fit:contain}
+.header-center{text-align:center;flex:1}
+.header-center .title-main{font-size:15px;font-weight:700;color:#222;line-height:1.4}
+.header-center .title-sub{font-size:13px;color:#fc6c00;font-weight:600;margin-top:2px}
+.header-center .title-cawi{font-size:20px;font-weight:700;color:#fc6c00;letter-spacing:2px}
+/* BLOK NAV */
+.blok-nav{background:#fff;border-bottom:2px solid #eee;display:flex;max-width:900px;margin:0 auto}
+.blok-tab{padding:10px 28px;font-weight:600;font-size:13px;cursor:pointer;border-bottom:3px solid transparent;color:#666;transition:all .2s}
+.blok-tab.active{color:#fc6c00;border-bottom-color:#fc6c00;background:#fff8f3}
+.blok-tab:hover{color:#fc6c00}
+/* MAIN CONTAINER */
+.form-container{max-width:900px;margin:18px auto;padding:0 12px 40px}
+.blok-panel{display:none}
+.blok-panel.active{display:block}
+/* SECTION */
+.section-card{background:#fff;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-bottom:18px;overflow:hidden}
+.section-header{background:#fff3e8;border-left:4px solid #fc6c00;padding:10px 16px;font-weight:700;font-size:14px;color:#8b3a00}
+.section-body{padding:16px}
+/* FORM ELEMENTS */
+.form-group{margin-bottom:14px}
+.form-group:last-child{margin-bottom:0}
+label.field-label{display:block;font-weight:600;margin-bottom:5px;font-size:13px}
+label.field-label .req{color:#e53e3e;margin-left:2px}
+.hint{font-size:12px;color:#888;margin-top:3px;font-style:italic}
+input[type=text],input[type=number],input[type=email],input[type=date],input[type=datetime-local],textarea,select{
+  width:100%;border:1px solid #ccc;border-radius:4px;padding:8px 10px;font-size:13px;font-family:inherit;
+  transition:border-color .2s;background:#fff}
+input:focus,textarea:focus,select:focus{outline:none;border-color:#fc6c00;box-shadow:0 0 0 2px rgba(252,108,0,.15)}
+input[readonly],input[disabled]{background:#f7f7f7;color:#666}
+textarea{resize:vertical;min-height:70px}
+select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+.radio-group,.checkbox-group{display:flex;flex-direction:column;gap:6px;margin-top:4px}
+.radio-item,.checkbox-item{display:flex;align-items:flex-start;gap:8px;cursor:pointer}
+.radio-item input,.checkbox-item input{margin-top:2px;accent-color:#fc6c00;flex-shrink:0}
+.radio-item label,.checkbox-item label{cursor:pointer;font-size:13px;line-height:1.4}
+/* INLINE FIELDS */
+.inline-fields{display:flex;gap:10px;flex-wrap:wrap}
+.inline-fields .form-group{flex:1;min-width:120px}
+/* CURRENCY */
+.currency-input-wrap{position:relative}
+.currency-prefix{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#666;font-size:13px;pointer-events:none}
+.currency-input-wrap input{padding-left:36px}
+/* READONLY TOTAL */
+.total-field{background:#f0f8ff;font-weight:700;color:#0066aa}
+/* AUTOCOMPLETE */
+.autocomplete-wrap{position:relative}
+.autocomplete-list{position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #ccc;border-top:none;border-radius:0 0 4px 4px;max-height:200px;overflow-y:auto;z-index:100;display:none}
+.autocomplete-list.open{display:block}
+.autocomplete-item{padding:8px 10px;cursor:pointer;font-size:13px;border-bottom:1px solid #f0f0f0}
+.autocomplete-item:hover{background:#fff3e8}
+.autocomplete-item .kode{font-weight:700;color:#fc6c00;margin-right:6px}
+/* SPINNER */
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid #ddd;border-top-color:#fc6c00;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-left:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+/* SIGNATURE PAD */
+.sig-wrap{border:2px dashed #ccc;border-radius:6px;background:#fafafa;text-align:center;position:relative}
+canvas#sigCanvas{display:block;cursor:crosshair;touch-action:none}
+.sig-actions{display:flex;gap:8px;margin-top:8px}
+/* BUTTONS */
+.btn{padding:9px 22px;border:none;border-radius:4px;cursor:pointer;font-size:14px;font-weight:600;transition:all .2s}
+.btn-primary{background:#fc6c00;color:#fff}
+.btn-primary:hover{background:#e05e00}
+.btn-secondary{background:#eee;color:#555}
+.btn-secondary:hover{background:#ddd}
+.btn-sm{padding:5px 12px;font-size:12px}
+.btn-danger{background:#e53e3e;color:#fff}
+.btn-danger:hover{background:#c53030}
+.nav-actions{display:flex;justify-content:space-between;margin-top:20px}
+/* KONDISI HIDDEN */
+.hidden{display:none!important}
+/* ALERT */
+.alert{padding:10px 14px;border-radius:4px;margin-bottom:14px;font-size:13px}
+.alert-error{background:#fff5f5;border:1px solid #e53e3e;color:#c53030}
+.alert-success{background:#f0fff4;border:1px solid #38a169;color:#276749}
+/* SUBSECTION */
+.subsection-label{font-weight:700;color:#fc6c00;margin:10px 0 6px;font-size:13px}
+.sub-indent{margin-left:18px}
+/* CATATAN */
+.catatan-group{border:1px solid #eee;border-radius:4px;padding:12px;margin-bottom:12px;background:#fafafa}
+.catatan-group .catatan-title{font-weight:700;margin-bottom:8px;color:#555}
+/* PROGRESS */
+.progress-bar{height:4px;background:#eee;border-radius:2px;margin-bottom:0}
+.progress-fill{height:100%;background:#fc6c00;border-radius:2px;transition:width .4s}
+/* RESPONSIVE */
+@media(max-width:600px){
+  .header-inner{flex-direction:column;text-align:center}
+  .header-logos img{height:48px}
+  .blok-tab{padding:8px 14px;font-size:12px}
+  .inline-fields{flex-direction:column}
+  .inline-fields .form-group{min-width:0}
+}
+</style>
+</head>
+<body>
+
+<!-- RAHASIA BAR -->
+<div class="rahasia-bar">R A H A S I A</div>
+
+<!-- HEADER -->
+<div class="header-main">
+  <div class="header-inner">
+    <div class="header-logos">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/National_emblem_of_Indonesia_Garuda_Pancasila.svg/1280px-National_emblem_of_Indonesia_Garuda_Pancasila.svg.png" alt="Garuda Pancasila" onerror="this.style.display='none'"/>
+    </div>
+    <div class="header-center">
+      <div class="title-main">REPUBLIK INDONESIA</div>
+      <div class="title-sub">SENSUS EKONOMI 2026</div>
+      <div class="title-cawi">CAWI</div>
+      <div style="font-size:12px;color:#888;margin-top:2px">Sosialisasi SE2026</div>
+    </div>
+    <div class="header-logos" style="gap:12px">
+      <img src="https://satudata.mojokertokab.go.id/onedata/global_assets/logo_se2026.png" alt="SE2026" onerror="this.style.display='none'"/>
+      <img src="https://upload.wikimedia.org/wikipedia/commons/2/28/Lambang_Badan_Pusat_Statistik_%28BPS%29_Indonesia.svg" alt="BPS" onerror="this.style.display='none'"/>
+    </div>
+  </div>
+</div>
+
+<!-- BLOK NAV -->
+<div style="background:#fff;border-bottom:2px solid #eee">
+  <div class="blok-nav">
+    <div class="blok-tab active" data-blok="1" onclick="goBlok(1)">BLOK I</div>
+    <div class="blok-tab" data-blok="2" onclick="goBlok(2)">BLOK II</div>
+    <div class="blok-tab" data-blok="3" onclick="goBlok(3)">BLOK III</div>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:33%"></div></div>
+</div>
+
+<!-- MAIN -->
+<div class="form-container">
+<div id="alertBox" class="alert alert-error hidden"></div>
+
+<!-- ==================== BLOK I ==================== -->
+<div class="blok-panel active" id="blok1">
+
+  <!-- Q1 Provinsi -->
+  <div class="section-card">
+    <div class="section-header">1. Provinsi</div>
+    <div class="section-body">
+      <div class="form-group">
+        <label class="field-label">Provinsi <span class="req">*</span></label>
+        <select id="q1_provinsi">
+          <option value="">-- Pilih Provinsi --</option>
+          <option value="51">BALI</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q2 Kabupaten -->
+  <div class="section-card">
+    <div class="section-header">2. Kabupaten/Kota</div>
+    <div class="section-body">
+      <div class="form-group">
+        <label class="field-label">Kabupaten/Kota <span class="req">*</span></label>
+        <select id="q2_kabupaten" onchange="loadKecamatan(this.value)">
+          <option value="">-- Pilih Kabupaten/Kota --</option>
+          <option value="5108">KAB. BULELENG</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q3 Kecamatan -->
+  <div class="section-card">
+    <div class="section-header">3. Kecamatan</div>
+    <div class="section-body">
+      <div class="form-group">
+        <label class="field-label">Kecamatan <span class="req">*</span> <span id="spinner-kec" class="spinner hidden"></span></label>
+        <select id="q3_kecamatan" onchange="loadKelurahan(this.value)" disabled>
+          <option value="">-- Pilih Kecamatan --</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q4 Kelurahan -->
+  <div class="section-card">
+    <div class="section-header">4. Kelurahan/Desa/Nagari</div>
+    <div class="section-body">
+      <div class="form-group">
+        <label class="field-label">Kelurahan/Desa/Nagari <span class="req">*</span> <span id="spinner-kel" class="spinner hidden"></span></label>
+        <select id="q4_kelurahan" disabled>
+          <option value="">-- Pilih Kelurahan/Desa/Nagari --</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q5 Nama dan Alamat -->
+  <div class="section-card">
+    <div class="section-header">5. Nama dan Alamat Perusahaan</div>
+    <div class="section-body">
+
+      <div class="subsection-label">a. Nama Perusahaan</div>
+      <div class="form-group">
+        <label class="field-label">Nama Perusahaan <span class="req">*</span></label>
+        <input type="text" id="q5a_nama_perusahaan" placeholder="Nama perusahaan lengkap beserta status badan usaha"/>
+        <div class="hint">Tuliskan nama perusahaan dengan lengkap, beserta status badan usaha. Contoh: KAWAN BARU, PT TBK</div>
+      </div>
+
+      <div class="subsection-label">b. Nama Komersial Perusahaan</div>
+      <div class="form-group">
+        <label class="field-label">Nama Komersial <span class="req">*</span></label>
+        <input type="text" id="q5b_nama_komersial" placeholder="Nama komersial / merek dagang"/>
+        <div class="hint">Jika tidak memiliki nama komersial, maka tuliskan nama perusahaan</div>
+      </div>
+
+      <div class="subsection-label">c. Alamat Perusahaan</div>
+      <div class="form-group">
+        <label class="field-label">Alamat <span class="req">*</span></label>
+        <input type="text" id="q5c_alamat" placeholder="Jalan, Nomor, dst."/>
+      </div>
+      <div class="inline-fields">
+        <div class="form-group">
+          <label class="field-label">RT</label>
+          <input type="text" id="q5c_rt" maxlength="4" placeholder="000"/>
+        </div>
+        <div class="form-group">
+          <label class="field-label">RW</label>
+          <input type="text" id="q5c_rw" maxlength="4" placeholder="000"/>
+        </div>
+        <div class="form-group">
+          <label class="field-label">Kode Pos <span class="req">*</span></label>
+          <input type="text" id="q5c_kodepos" maxlength="5" placeholder="00000"/>
+        </div>
+      </div>
+      <div class="inline-fields">
+        <div class="form-group">
+          <label class="field-label">Email</label>
+          <input type="email" id="q5c_email" placeholder="email@perusahaan.com"/>
+        </div>
+        <div class="form-group">
+          <label class="field-label">Homepage/Website</label>
+          <input type="text" id="q5c_website" placeholder="www.perusahaan.com"/>
+          <div class="hint">Alamat website diawali dengan www.</div>
+        </div>
+      </div>
+      <div class="subsection-label" style="margin-top:8px">Nomor Telepon</div>
+      <div class="inline-fields">
+        <div class="form-group">
+          <label class="field-label">Kode Area</label>
+          <input type="text" id="q5c_kodearea" maxlength="4" placeholder="021"/>
+        </div>
+        <div class="form-group">
+          <label class="field-label">Nomor Telepon</label>
+          <input type="text" id="q5c_telepon" placeholder="12345678"/>
+        </div>
+        <div class="form-group">
+          <label class="field-label">Ekstensi</label>
+          <input type="text" id="q5c_ext" placeholder="100"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="field-label">Nomor HP/WhatsApp <span class="req">*</span></label>
+        <input type="text" id="q5c_hp" placeholder="08xxxxxxxxxx"/>
+      </div>
+
+      <div class="subsection-label">d. Jenis Kawasan Beroperasi</div>
+      <div class="form-group">
+        <label class="field-label">Jenis Kawasan <span class="req">*</span></label>
+        <div class="radio-group" id="q5d_kawasan_group">
+          <label class="radio-item"><input type="radio" name="q5d" value="1" onchange="handleKawasan()"/> <span>1. Kawasan Ekonomi Khusus (KEK)</span></label>
+          <label class="radio-item"><input type="radio" name="q5d" value="2" onchange="handleKawasan()"/> <span>2. Kawasan Industri (KI)</span></label>
+          <label class="radio-item"><input type="radio" name="q5d" value="3" onchange="handleKawasan()"/> <span>3. Stasiun</span></label>
+          <label class="radio-item"><input type="radio" name="q5d" value="4" onchange="handleKawasan()"/> <span>4. Bandara</span></label>
+          <label class="radio-item"><input type="radio" name="q5d" value="5" onchange="handleKawasan()"/> <span>5. Pelabuhan</span></label>
+          <label class="radio-item"><input type="radio" name="q5d" value="6" onchange="handleKawasan()"/> <span>6. Terminal</span></label>
+          <label class="radio-item"><input type="radio" name="q5d" value="7" onchange="handleKawasan()"/> <span>7. Rest area jalan tol</span></label>
+          <label class="radio-item"><input type="radio" name="q5d" value="8" onchange="handleKawasan()"/> <span>8. Kawasan sentra ekonomi perdesaan/kelurahan</span></label>
+          <label class="radio-item"><input type="radio" name="q5d" value="9" onchange="handleKawasan()"/> <span>9. Kawasan usaha lainnya</span></label>
+          <label class="radio-item"><input type="radio" name="q5d" value="10" onchange="handleKawasan()"/> <span>10. Di luar kawasan</span></label>
+        </div>
+      </div>
+
+      <div class="form-group" id="q5e_wrap">
+        <div class="subsection-label">e. Nama Kawasan</div>
+        <label class="field-label">Nama Kawasan <span class="req">*</span></label>
+        <input type="text" id="q5e_nama_kawasan" placeholder="Nama kawasan"/>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Q6 NIB -->
+  <div class="section-card">
+    <div class="section-header">6. NIB (Nomor Induk Berusaha)</div>
+    <div class="section-body">
+
+      <div class="form-group">
+        <div class="subsection-label">a. Apakah memiliki Nomor Induk Berusaha (NIB)?</div>
+        <label class="field-label">Pilih salah satu <span class="req">*</span></label>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="q6a" value="1" onchange="handleNIB()"/> <span>Ya</span></label>
+          <label class="radio-item"><input type="radio" name="q6a" value="2" onchange="handleNIB()"/> <span>Tidak</span></label>
+        </div>
+      </div>
+
+      <div class="form-group hidden" id="q6b_wrap">
+        <div class="subsection-label">b. Tuliskan NIB</div>
+        <label class="field-label">NIB <span class="req">*</span></label>
+        <input type="text" id="q6b_nib" maxlength="13" placeholder="13 digit NIB"/>
+        <div class="hint">NIB terdiri dari 13 digit</div>
+      </div>
+
+      <div class="hidden" id="q6c_wrap">
+        <div class="form-group">
+          <div class="subsection-label">c. Alasan utama tidak memiliki NIB</div>
+          <label class="field-label">Pilih salah satu <span class="req">*</span></label>
+          <div class="radio-group">
+            <label class="radio-item"><input type="radio" name="q6c" value="1" onchange="handleNIBAlasan()"/> <span>1. Dalam proses pembuatan NIB</span></label>
+            <label class="radio-item"><input type="radio" name="q6c" value="2" onchange="handleNIBAlasan()"/> <span>2. Pengurusan NIB rumit</span></label>
+            <label class="radio-item"><input type="radio" name="q6c" value="3" onchange="handleNIBAlasan()"/> <span>3. Tidak memerlukan NIB</span></label>
+            <label class="radio-item"><input type="radio" name="q6c" value="4" onchange="handleNIBAlasan()"/> <span>4. Tidak tahu tentang NIB</span></label>
+            <label class="radio-item"><input type="radio" name="q6c" value="5" onchange="handleNIBAlasan()"/> <span>5. Lainnya</span></label>
+          </div>
+        </div>
+        <div class="form-group hidden" id="q6c_alasan_wrap">
+          <label class="field-label">Tuliskan alasan <span class="req">*</span></label>
+          <input type="text" id="q6c_alasan" placeholder="Tuliskan alasan lainnya"/>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Q7 Status Badan Usaha -->
+  <div class="section-card">
+    <div class="section-header">7. Status Badan Usaha</div>
+    <div class="section-body">
+
+      <div class="form-group">
+        <div class="subsection-label">a. Status badan usaha</div>
+        <label class="field-label">Pilih salah satu <span class="req">*</span></label>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="q7a" value="1" onchange="handleBadanUsaha()"/> <span>1. Perseroan (PT/NV, PT Persero, PT Tbk, PT Persero Tbk, Perseroan Daerah, Perseroan Perorangan)</span></label>
+          <label class="radio-item"><input type="radio" name="q7a" value="2" onchange="handleBadanUsaha()"/> <span>2. Yayasan</span></label>
+          <label class="radio-item"><input type="radio" name="q7a" value="3" onchange="handleBadanUsaha()"/> <span>3. Koperasi</span></label>
+          <label class="radio-item"><input type="radio" name="q7a" value="4" onchange="handleBadanUsaha()"/> <span>4. Dana Pensiun</span></label>
+          <label class="radio-item"><input type="radio" name="q7a" value="5" onchange="handleBadanUsaha()"/> <span>5. Perum/Perumda</span></label>
+          <label class="radio-item"><input type="radio" name="q7a" value="6" onchange="handleBadanUsaha()"/> <span>6. BUM Desa</span></label>
+          <label class="radio-item"><input type="radio" name="q7a" value="7" onchange="handleBadanUsaha()"/> <span>7. Persekutuan Komanditer (CV)</span></label>
+          <label class="radio-item"><input type="radio" name="q7a" value="8" onchange="handleBadanUsaha()"/> <span>8. Persekutuan Firma (Fa)</span></label>
+          <label class="radio-item"><input type="radio" name="q7a" value="9" onchange="handleBadanUsaha()"/> <span>9. Persekutuan Perdata (Maatschap)</span></label>
+          <label class="radio-item"><input type="radio" name="q7a" value="10" onchange="handleBadanUsaha()"/> <span>10. Kantor Perwakilan Luar Negeri</span></label>
+          <label class="radio-item"><input type="radio" name="q7a" value="11" onchange="handleBadanUsaha()"/> <span>11. Badan Usaha Luar Negeri</span></label>
+          <label class="radio-item"><input type="radio" name="q7a" value="12" onchange="handleBadanUsaha()"/> <span>12. Badan Usaha Lainnya (Contoh: BLU, PTN-BH)</span></label>
+          <label class="radio-item"><input type="radio" name="q7a" value="13" onchange="handleBadanUsaha()"/> <span>13. Bukan Badan Usaha</span></label>
+        </div>
+      </div>
+
+      <div class="hidden" id="q7_koperasi_wrap">
+        <div class="form-group">
+          <div class="subsection-label">b. Apakah merupakan Koperasi Desa/Kelurahan Merah Putih (KDKMP)?</div>
+          <label class="field-label">Pilih salah satu <span class="req">*</span></label>
+          <div class="radio-group">
+            <label class="radio-item"><input type="radio" name="q7b" value="1"/> <span>Ya</span></label>
+            <label class="radio-item"><input type="radio" name="q7b" value="2"/> <span>Tidak</span></label>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="subsection-label">c. Jenis Koperasi</div>
+          <label class="field-label">Pilih salah satu <span class="req">*</span></label>
+          <div class="radio-group">
+            <label class="radio-item"><input type="radio" name="q7c" value="1"/> <span>1. Open Loop (dapat melayani non-anggota)</span></label>
+            <label class="radio-item"><input type="radio" name="q7c" value="2"/> <span>2. Close Loop (hanya melayani anggota)</span></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="subsection-label">d. Apakah mempunyai laporan/catatan keuangan?</div>
+        <label class="field-label">Pilih salah satu <span class="req">*</span></label>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="q7d" value="1"/> <span>Ya</span></label>
+          <label class="radio-item"><input type="radio" name="q7d" value="2"/> <span>Tidak</span></label>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Q8 Keterangan Pengusaha -->
+  <div class="section-card">
+    <div class="section-header">8. Keterangan Pengusaha/Penanggung Jawab</div>
+    <div class="section-body">
+      <div class="form-group">
+        <div class="subsection-label">a. Nama</div>
+        <label class="field-label">Nama <span class="req">*</span></label>
+        <input type="text" id="q8a_nama" placeholder="Nama lengkap"/>
+      </div>
+      <div class="form-group">
+        <div class="subsection-label">b. Jenis Kelamin</div>
+        <label class="field-label">Jenis Kelamin <span class="req">*</span></label>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="q8b" value="1"/> <span>Laki-laki</span></label>
+          <label class="radio-item"><input type="radio" name="q8b" value="2"/> <span>Perempuan</span></label>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="subsection-label">c. Umur</div>
+        <label class="field-label">Umur <span class="req">*</span></label>
+        <input type="number" id="q8c_umur" min="17" max="120" placeholder="Umur (17-120 tahun)"/>
+      </div>
+      <div class="form-group">
+        <div class="subsection-label">d. NIK (Nomor Induk Kependudukan)</div>
+        <label class="field-label">NIK <span class="req">*</span></label>
+        <input type="text" id="q8d_nik" maxlength="16" placeholder="16 digit NIK"/>
+        <div class="hint">NIK terdiri dari 16 digit</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q9 Kegiatan Utama -->
+  <div class="section-card">
+    <div class="section-header">9. Kegiatan Utama</div>
+    <div class="section-body">
+      <div class="form-group">
+        <div class="subsection-label">a. Kegiatan utama usaha/perusahaan</div>
+        <label class="field-label">Deskripsi kegiatan utama <span class="req">*</span></label>
+        <textarea id="q9a_kegiatan" placeholder="Deskripsikan kegiatan utama perusahaan..."></textarea>
+      </div>
+
+      <div class="subsection-label">b. Pilih yang sesuai (minimal salah satu b1-b4 harus "Ya")</div>
+      <div class="form-group sub-indent">
+        <label class="field-label">b1. Apakah memproduksi barang di lokasi ini? <span class="req">*</span></label>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="q9b1" value="1"/> <span>Ya</span></label>
+          <label class="radio-item"><input type="radio" name="q9b1" value="2"/> <span>Tidak</span></label>
+        </div>
+      </div>
+      <div class="form-group sub-indent">
+        <label class="field-label">b2. Apakah menyediakan layanan makan minum? <span class="req">*</span></label>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="q9b2" value="1"/> <span>Ya</span></label>
+          <label class="radio-item"><input type="radio" name="q9b2" value="2"/> <span>Tidak</span></label>
+        </div>
+      </div>
+      <div class="form-group sub-indent">
+        <label class="field-label">b3. Apakah melakukan penjualan barang? <span class="req">*</span></label>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="q9b3" value="1"/> <span>Ya</span></label>
+          <label class="radio-item"><input type="radio" name="q9b3" value="2"/> <span>Tidak</span></label>
+        </div>
+      </div>
+      <div class="form-group sub-indent">
+        <label class="field-label">b4. Apakah melakukan aktivitas jasa atau kegiatan pertanian? <span class="req">*</span></label>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="q9b4" value="1"/> <span>Ya</span></label>
+          <label class="radio-item"><input type="radio" name="q9b4" value="2"/> <span>Tidak</span></label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="subsection-label">c. Di mana usaha dilakukan?</div>
+        <label class="field-label">Pilih salah satu <span class="req">*</span></label>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="q9c" value="1"/> <span>1. Apotek</span></label>
+          <label class="radio-item"><input type="radio" name="q9c" value="2"/> <span>2. Swalayan</span></label>
+          <label class="radio-item"><input type="radio" name="q9c" value="3"/> <span>3. Los Pasar</span></label>
+          <label class="radio-item"><input type="radio" name="q9c" value="4"/> <span>4. Toko, ruko, dan sejenisnya</span></label>
+          <label class="radio-item"><input type="radio" name="q9c" value="5"/> <span>5. Kedai, stan, tenda</span></label>
+          <label class="radio-item"><input type="radio" name="q9c" value="6"/> <span>6. Bar</span></label>
+          <label class="radio-item"><input type="radio" name="q9c" value="7"/> <span>7. Kelab malam, diskotek</span></label>
+          <label class="radio-item"><input type="radio" name="q9c" value="8"/> <span>8. Kafe</span></label>
+          <label class="radio-item"><input type="radio" name="q9c" value="9"/> <span>9. Restoran, warung makan</span></label>
+          <label class="radio-item"><input type="radio" name="q9c" value="10"/> <span>10. Keliling</span></label>
+          <label class="radio-item"><input type="radio" name="q9c" value="11"/> <span>11. Daring (online)</span></label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="subsection-label">d. Input yang digunakan</div>
+        <label class="field-label">Deskripsi input <span class="req">*</span></label>
+        <textarea id="q9d_input" placeholder="Tuliskan input/bahan baku yang digunakan..."></textarea>
+      </div>
+      <div class="form-group">
+        <div class="subsection-label">e. Proses mengubah input menjadi produk</div>
+        <label class="field-label">Deskripsi proses <span class="req">*</span></label>
+        <textarea id="q9e_proses" placeholder="Tuliskan proses produksi..."></textarea>
+      </div>
+      <div class="form-group">
+        <div class="subsection-label">f. Produk utama yang dihasilkan</div>
+        <label class="field-label">Deskripsi produk <span class="req">*</span></label>
+        <textarea id="q9f_produk" placeholder="Tuliskan produk utama..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <div class="subsection-label">g. Pilih Kode Kategori dan KBLI</div>
+        <label class="field-label">Cari KBLI <span class="req">*</span></label>
+        <div class="autocomplete-wrap">
+          <input type="text" id="q9g_kbli_search" placeholder="Ketik kata kunci KBLI 2025..." oninput="searchKBLI(this.value)" autocomplete="off"/>
+          <div class="autocomplete-list" id="kbliDropdown"></div>
+        </div>
+        <input type="hidden" id="q9g_kbli_kode"/>
+        <input type="hidden" id="q9g_kbli_kategori"/>
+      </div>
+
+      <div class="form-group">
+        <div class="subsection-label">h. Kategori Lapangan Usaha</div>
+        <label class="field-label">Kategori (otomatis terisi)</label>
+        <input type="text" id="q9h_kategori" readonly placeholder="Akan terisi setelah KBLI dipilih"/>
+      </div>
+
+      <div class="form-group hidden" id="q9i_hotel_wrap">
+        <div class="subsection-label">i. Klasifikasi Hotel</div>
+        <label class="field-label">Pilih klasifikasi hotel <span class="req">*</span></label>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="q9i" value="1"/> <span>1. Hotel Bintang 1</span></label>
+          <label class="radio-item"><input type="radio" name="q9i" value="2"/> <span>2. Hotel Bintang 2</span></label>
+          <label class="radio-item"><input type="radio" name="q9i" value="3"/> <span>3. Hotel Bintang 3</span></label>
+          <label class="radio-item"><input type="radio" name="q9i" value="4"/> <span>4. Hotel Bintang 4</span></label>
+          <label class="radio-item"><input type="radio" name="q9i" value="5"/> <span>5. Hotel Bintang 5</span></label>
+          <label class="radio-item"><input type="radio" name="q9i" value="6"/> <span>6. Lainnya (hotel melati, vila, dll)</span></label>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Q10 Jaringan Usaha -->
+  <div class="section-card">
+    <div class="section-header">10. Jaringan Usaha</div>
+    <div class="section-body">
+      <div class="form-group">
+        <div class="subsection-label">a. Jaringan usaha</div>
+        <label class="field-label">Pilih salah satu <span class="req">*</span></label>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="q10a" value="1" onchange="handleJaringan()"/> <span>1. Tunggal</span></label>
+          <label class="radio-item"><input type="radio" name="q10a" value="2" onchange="handleJaringan()"/> <span>2. Kantor pusat</span></label>
+          <label class="radio-item"><input type="radio" name="q10a" value="3" onchange="handleJaringan()"/> <span>3. Cabang</span></label>
+          <label class="radio-item"><input type="radio" name="q10a" value="4" onchange="handleJaringan()"/> <span>4. Perwakilan</span></label>
+          <label class="radio-item"><input type="radio" name="q10a" value="5" onchange="handleJaringan()"/> <span>5. Pabrik</span></label>
+          <label class="radio-item"><input type="radio" name="q10a" value="6" onchange="handleJaringan()"/> <span>6. Unit pembantu/penunjang</span></label>
+        </div>
+      </div>
+      <div class="form-group hidden" id="q10b_wrap">
+        <div class="subsection-label">b. Jumlah seluruh kantor cabang dan unit usaha</div>
+        <label class="field-label">Jumlah <span class="req">*</span></label>
+        <input type="number" id="q10b_jumlah" min="0" placeholder="0"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q11 Info Kantor Pusat -->
+  <div class="section-card hidden" id="q11_wrap">
+    <div class="section-header">11. Informasi Kantor Pusat</div>
+    <div class="section-body">
+      <div class="form-group">
+        <div class="subsection-label">a. Nama Kantor Pusat</div>
+        <label class="field-label">Nama <span class="req">*</span></label>
+        <input type="text" id="q11a_nama" placeholder="Nama kantor pusat"/>
+      </div>
+      <div class="form-group">
+        <div class="subsection-label">b. Alamat Kantor Pusat</div>
+        <label class="field-label">Alamat <span class="req">*</span></label>
+        <input type="text" id="q11b_alamat" placeholder="Alamat kantor pusat"/>
+      </div>
+      <div class="form-group">
+        <div class="subsection-label">c. Email</div>
+        <label class="field-label">Email <span class="req">*</span></label>
+        <input type="email" id="q11c_email" placeholder="email@kantor.com"/>
+      </div>
+      <div class="form-group">
+        <div class="subsection-label">d. Negara</div>
+        <label class="field-label">Negara <span class="req">*</span></label>
+        <select id="q11d_negara">
+          <option value="ID">Indonesia</option>
+          <option value="other">Negara Lain</option>
+        </select>
+      </div>
+      <div id="q11_prov_kab_wrap">
+        <div class="form-group">
+          <div class="subsection-label">e. Provinsi</div>
+          <label class="field-label">Provinsi <span class="req">*</span> <span id="spinner-prov-kp" class="spinner hidden"></span></label>
+          <select id="q11e_provinsi" onchange="loadKabupaten(this.value,'q11f_kabupaten','spinner-kab-kp')">
+            <option value="">-- Pilih Provinsi --</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <div class="subsection-label">f. Kabupaten/Kota</div>
+          <label class="field-label">Kabupaten/Kota <span class="req">*</span> <span id="spinner-kab-kp" class="spinner hidden"></span></label>
+          <select id="q11f_kabupaten" disabled>
+            <option value="">-- Pilih Kabupaten/Kota --</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q12 Internet -->
+  <div class="section-card">
+    <div class="section-header">12. Internet</div>
+    <div class="section-body">
+      <div class="form-group">
+        <div class="subsection-label">a. Apakah menggunakan internet?</div>
+        <label class="field-label">Pilih salah satu <span class="req">*</span></label>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="q12a" value="1" onchange="handleInternet()"/> <span>Ya</span></label>
+          <label class="radio-item"><input type="radio" name="q12a" value="2" onchange="handleInternet()"/> <span>Tidak</span></label>
+        </div>
+      </div>
+      <div class="hidden" id="q12b_wrap">
+        <div class="subsection-label">b. Tujuan penggunaan internet</div>
+        <div class="form-group sub-indent">
+          <label class="field-label">b1. Menerima pesanan barang/jasa <span class="req">*</span></label>
+          <div class="radio-group"><label class="radio-item"><input type="radio" name="q12b1" value="1"/> <span>Ya</span></label><label class="radio-item"><input type="radio" name="q12b1" value="2"/> <span>Tidak</span></label></div>
+        </div>
+        <div class="form-group sub-indent">
+          <label class="field-label">b2. Produksi barang/jasa <span class="req">*</span></label>
+          <div class="radio-group"><label class="radio-item"><input type="radio" name="q12b2" value="1"/> <span>Ya</span></label><label class="radio-item"><input type="radio" name="q12b2" value="2"/> <span>Tidak</span></label></div>
+        </div>
+        <div class="form-group sub-indent">
+          <label class="field-label">b3. Distribusi barang/jasa <span class="req">*</span></label>
+          <div class="radio-group"><label class="radio-item"><input type="radio" name="q12b3" value="1"/> <span>Ya</span></label><label class="radio-item"><input type="radio" name="q12b3" value="2"/> <span>Tidak</span></label></div>
+        </div>
+        <div class="form-group sub-indent">
+          <label class="field-label">b4. Membeli bahan baku online <span class="req">*</span></label>
+          <div class="radio-group"><label class="radio-item"><input type="radio" name="q12b4" value="1"/> <span>Ya</span></label><label class="radio-item"><input type="radio" name="q12b4" value="2"/> <span>Tidak</span></label></div>
+        </div>
+        <div class="form-group sub-indent">
+          <label class="field-label">b5. Promosi <span class="req">*</span></label>
+          <div class="radio-group"><label class="radio-item"><input type="radio" name="q12b5" value="1"/> <span>Ya</span></label><label class="radio-item"><input type="radio" name="q12b5" value="2"/> <span>Tidak</span></label></div>
+        </div>
+        <div class="form-group sub-indent">
+          <label class="field-label">b6. Lainnya <span class="req">*</span></label>
+          <div class="radio-group"><label class="radio-item"><input type="radio" name="q12b6" value="1"/> <span>Ya</span></label><label class="radio-item"><input type="radio" name="q12b6" value="2"/> <span>Tidak</span></label></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="subsection-label">c. Apakah memanfaatkan teknologi digital?</div>
+        <label class="field-label">Pilih salah satu <span class="req">*</span></label>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="q12c" value="1"/> <span>Ya</span></label>
+          <label class="radio-item"><input type="radio" name="q12c" value="2"/> <span>Tidak</span></label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q13 Lingkungan -->
+  <div class="section-card">
+    <div class="section-header">13. Lingkungan</div>
+    <div class="section-body">
+      <div class="form-group">
+        <div class="subsection-label">a. Apakah memproduksi barang/jasa ramah lingkungan?</div>
+        <label class="field-label">Pilih salah satu <span class="req">*</span></label>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="q13a" value="1"/> <span>1. Ya, seluruhnya</span></label>
+          <label class="radio-item"><input type="radio" name="q13a" value="2"/> <span>2. Ya, sebagian</span></label>
+          <label class="radio-item"><input type="radio" name="q13a" value="3"/> <span>3. Tidak sama sekali</span></label>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="subsection-label">b. Apakah mengeluarkan biaya/investasi lingkungan?</div>
+        <label class="field-label">Pilih salah satu <span class="req">*</span></label>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="q13b" value="1"/> <span>Ya</span></label>
+          <label class="radio-item"><input type="radio" name="q13b" value="2"/> <span>Tidak</span></label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q14 Produk Kreatif -->
+  <div class="section-card">
+    <div class="section-header">14. Produk Karya Seni/Kreatif</div>
+    <div class="section-body">
+      <div class="form-group">
+        <label class="field-label">Apakah menggunakan produk karya seni, sastra, desain, teknologi kreatif? <span class="req">*</span></label>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="q14" value="1"/> <span>Ya</span></label>
+          <label class="radio-item"><input type="radio" name="q14" value="2"/> <span>Tidak</span></label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q15 Sertifikat Halal -->
+  <div class="section-card">
+    <div class="section-header">15. Sertifikat Halal</div>
+    <div class="section-body">
+      <div class="form-group">
+        <div class="subsection-label">a. Apakah menghasilkan produk bersertifikat halal?</div>
+        <label class="field-label">Pilih salah satu <span class="req">*</span></label>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="q15a" value="1" onchange="handleHalal()"/> <span>1. Ya, oleh BPJPH</span></label>
+          <label class="radio-item"><input type="radio" name="q15a" value="2" onchange="handleHalal()"/> <span>2. Ya, bukan oleh BPJPH</span></label>
+          <label class="radio-item"><input type="radio" name="q15a" value="3" onchange="handleHalal()"/> <span>3. Tidak</span></label>
+        </div>
+      </div>
+      <div class="hidden" id="q15bc_wrap">
+        <div class="form-group">
+          <div class="subsection-label">b. Jumlah varian produk sudah halal BPJPH</div>
+          <label class="field-label">Jumlah varian <span class="req">*</span></label>
+          <input type="number" id="q15b" min="0" placeholder="0"/>
+        </div>
+        <div class="form-group">
+          <div class="subsection-label">c. Jumlah varian produk belum halal BPJPH</div>
+          <label class="field-label">Jumlah varian <span class="req">*</span></label>
+          <input type="number" id="q15c" min="0" placeholder="0"/>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q16 Izin Edar -->
+  <div class="section-card">
+    <div class="section-header">16. Izin Edar</div>
+    <div class="section-body">
+      <div class="form-group">
+        <div class="subsection-label">a. Apakah memiliki izin edar?</div>
+        <label class="field-label">Pilih salah satu <span class="req">*</span></label>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="q16a" value="1" onchange="handleIzinEdar()"/> <span>1. Ya, oleh BPOM</span></label>
+          <label class="radio-item"><input type="radio" name="q16a" value="2" onchange="handleIzinEdar()"/> <span>2. Ya, bukan oleh BPOM</span></label>
+          <label class="radio-item"><input type="radio" name="q16a" value="3" onchange="handleIzinEdar()"/> <span>3. Tidak</span></label>
+        </div>
+      </div>
+      <div class="hidden" id="q16bc_wrap">
+        <div class="form-group">
+          <div class="subsection-label">b. Jumlah varian sudah BPOM</div>
+          <label class="field-label">Jumlah varian <span class="req">*</span></label>
+          <input type="number" id="q16b" min="0" placeholder="0"/>
+        </div>
+        <div class="form-group">
+          <div class="subsection-label">c. Jumlah varian belum BPOM</div>
+          <label class="field-label">Jumlah varian <span class="req">*</span></label>
+          <input type="number" id="q16c" min="0" placeholder="0"/>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q17 Mitra KDKMP -->
+  <div class="section-card">
+    <div class="section-header">17. Kemitraan KDKMP</div>
+    <div class="section-body">
+      <div class="form-group">
+        <label class="field-label">Apakah bermitra dengan KDKMP (Koperasi Desa/Kelurahan Merah Putih)? <span class="req">*</span></label>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="q17" value="1"/> <span>Ya</span></label>
+          <label class="radio-item"><input type="radio" name="q17" value="2"/> <span>Tidak</span></label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q18 MBG -->
+  <div class="section-card">
+    <div class="section-header">18. Program MBG (Makan Bergizi Gratis)</div>
+    <div class="section-body">
+      <div class="form-group">
+        <label class="field-label">Apakah terlibat dalam program MBG? <span class="req">*</span></label>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="q18" value="1"/> <span>1. Ya, sebagai SATUAN PELAYANAN PEMENUHAN GIZI (SPPG)</span></label>
+          <label class="radio-item"><input type="radio" name="q18" value="2"/> <span>2. Ya, sebagai supplier</span></label>
+          <label class="radio-item"><input type="radio" name="q18" value="3"/> <span>3. Ya, sebagai penerima manfaat MBG (Sekolah, Puskesmas, Posyandu, dll)</span></label>
+          <label class="radio-item"><input type="radio" name="q18" value="4"/> <span>4. Ya, peran lainnya</span></label>
+          <label class="radio-item"><input type="radio" name="q18" value="5"/> <span>5. Tidak terlibat MBG</span></label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q19 Transaksi Non-Penduduk -->
+  <div class="section-card">
+    <div class="section-header">19. Transaksi Non-Penduduk</div>
+    <div class="section-body">
+      <div class="form-group">
+        <div class="subsection-label">a. Barang</div>
+        <label class="field-label">Apakah ada transaksi barang dengan non-penduduk? <span class="req">*</span></label>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="q19a" value="1"/> <span>Ya</span></label>
+          <label class="radio-item"><input type="radio" name="q19a" value="2"/> <span>Tidak</span></label>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="subsection-label">b. Jasa</div>
+        <label class="field-label">Apakah ada transaksi jasa dengan non-penduduk? <span class="req">*</span></label>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="q19b" value="1"/> <span>Ya</span></label>
+          <label class="radio-item"><input type="radio" name="q19b" value="2"/> <span>Tidak</span></label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q20 Jumlah Pekerja -->
+  <div class="section-card">
+    <div class="section-header">20. Jumlah Pekerja</div>
+    <div class="section-body">
+      <div class="inline-fields">
+        <div class="form-group">
+          <label class="field-label">a. Laki-laki <span class="req">*</span></label>
+          <input type="number" id="q20a" min="0" placeholder="0" oninput="calcPekerja()"/>
+        </div>
+        <div class="form-group">
+          <label class="field-label">b. Perempuan <span class="req">*</span></label>
+          <input type="number" id="q20b" min="0" placeholder="0" oninput="calcPekerja()"/>
+        </div>
+        <div class="form-group">
+          <label class="field-label">c. Total (a+b)</label>
+          <input type="number" id="q20c" readonly class="total-field" placeholder="0"/>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q21 Tahun Beroperasi -->
+  <div class="section-card">
+    <div class="section-header">21. Tahun Mulai Beroperasi</div>
+    <div class="section-body">
+      <div class="form-group">
+        <label class="field-label">Tahun mulai beroperasi secara komersial <span class="req">*</span></label>
+        <input type="number" id="q21" min="1900" max="2026" placeholder="YYYY"/>
+        <div class="hint">Contoh: 2005</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q22 Pengeluaran -->
+  <div class="section-card">
+    <div class="section-header">22. Nilai Pengeluaran 2025 (Rupiah)</div>
+    <div class="section-body">
+      <div class="form-group">
+        <label class="field-label">a. Total upah dan gaji, serta jaminan sosial pegawai <span class="req">*</span></label>
+        <div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="q22a" class="currency-field" oninput="formatCurrency(this);calcPengeluaran()" placeholder="0"/></div>
+      </div>
+      <div class="form-group">
+        <label class="field-label">b. Biaya produksi <span class="req">*</span></label>
+        <div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="q22b" class="currency-field" oninput="formatCurrency(this);calcPengeluaran()" placeholder="0"/></div>
+      </div>
+      <div class="form-group">
+        <label class="field-label">c. Biaya pembelian barang yang dijual <span class="req">*</span></label>
+        <div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="q22c" class="currency-field" oninput="formatCurrency(this);calcPengeluaran()" placeholder="0"/></div>
+      </div>
+      <div class="form-group">
+        <label class="field-label">d. Biaya operasional (air, listrik, gas, internet, pulsa, pemeliharaan) <span class="req">*</span></label>
+        <div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="q22d" class="currency-field" oninput="formatCurrency(this);calcPengeluaran()" placeholder="0"/></div>
+      </div>
+      <div class="form-group">
+        <label class="field-label">e. Biaya non-operasional <span class="req">*</span></label>
+        <div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="q22e" class="currency-field" oninput="formatCurrency(this);calcPengeluaran()" placeholder="0"/></div>
+      </div>
+      <div class="form-group">
+        <label class="field-label">f. Total pengeluaran (a+b+c+d+e)</label>
+        <div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="q22f" readonly class="total-field" placeholder="0"/></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q23 Pendapatan -->
+  <div class="section-card">
+    <div class="section-header">23. Nilai Pendapatan/Penjualan 2025 (Rupiah)</div>
+    <div class="section-body">
+      <div class="form-group">
+        <label class="field-label">a. Nilai barang dan jasa <span class="req">*</span></label>
+        <div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="q23a" class="currency-field" oninput="formatCurrency(this);calcPendapatan()" placeholder="0"/></div>
+      </div>
+      <div class="form-group">
+        <label class="field-label">b. Pendapatan lainnya</label>
+        <div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="q23b" class="currency-field" oninput="formatCurrency(this);calcPendapatan()" placeholder="0"/></div>
+      </div>
+      <div class="form-group">
+        <label class="field-label">c. Total nilai (a+b)</label>
+        <div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="q23c" readonly class="total-field" placeholder="0"/></div>
+      </div>
+      <div class="form-group">
+        <label class="field-label">d. Persentase pendapatan dari usaha online <span class="req">*</span></label>
+        <div style="display:flex;align-items:center;gap:8px">
+          <input type="number" id="q23d" min="0" max="100" placeholder="0" style="width:120px"/>
+          <span style="color:#666">%</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q24 Aset -->
+  <div class="section-card">
+    <div class="section-header">24. Nilai Aset 2025 (Rupiah)</div>
+    <div class="section-body">
+      <div class="form-group">
+        <label class="field-label">a. Nilai aset tanah dan bangunan pada 31 Desember 2025 <span class="req">*</span></label>
+        <div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="q24a" class="currency-field" oninput="formatCurrency(this);calcAset()" placeholder="0"/></div>
+      </div>
+      <div class="form-group">
+        <label class="field-label">b. Nilai aset selain tanah dan bangunan pada 31 Desember 2025 <span class="req">*</span></label>
+        <div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="q24b" class="currency-field" oninput="formatCurrency(this);calcAset()" placeholder="0"/></div>
+      </div>
+      <div class="form-group">
+        <label class="field-label">c. Nilai total aset pada 31 Desember 2025</label>
+        <div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="q24c" readonly class="total-field" placeholder="0"/></div>
+        <div style="margin-top:10px">
+          <label class="field-label" style="font-size:12px">c1. Jika tidak dapat mengisikan nilai nominal, pilih nilai total aset <span class="req">*</span></label>
+          <div class="radio-group">
+            <label class="radio-item"><input type="radio" name="q24c1" value="1"/> <span>1. s.d. Rp 500 juta</span></label>
+            <label class="radio-item"><input type="radio" name="q24c1" value="2"/> <span>2. Lebih dari Rp 500 juta s.d. Rp 1 miliar</span></label>
+            <label class="radio-item"><input type="radio" name="q24c1" value="3"/> <span>3. Lebih dari Rp 1 miliar s.d. Rp 5 miliar</span></label>
+            <label class="radio-item"><input type="radio" name="q24c1" value="4"/> <span>4. Lebih dari Rp 5 miliar s.d. Rp 10 miliar</span></label>
+            <label class="radio-item"><input type="radio" name="q24c1" value="5"/> <span>5. Lebih dari Rp 10 miliar</span></label>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="field-label">d. Luas tanah yang dikuasai dan digunakan (m²) <span class="req">*</span></label>
+        <input type="number" id="q24d" min="0" placeholder="0"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q25 Kepemilikan Modal -->
+  <div class="section-card">
+    <div class="section-header">25. Susunan Kepemilikan Modal (31 Desember 2025) (%)</div>
+    <div class="section-body">
+      <div class="inline-fields">
+        <div class="form-group">
+          <label class="field-label">a. Pribadi/Perorangan <span class="req">*</span></label>
+          <input type="number" id="q25a" min="0" max="100" placeholder="0" oninput="calcModal()"/>
+        </div>
+        <div class="form-group">
+          <label class="field-label">b. LNPRT <span class="req">*</span></label>
+          <input type="number" id="q25b" min="0" max="100" placeholder="0" oninput="calcModal()"/>
+        </div>
+        <div class="form-group">
+          <label class="field-label">c. Korporasi Publik <span class="req">*</span></label>
+          <input type="number" id="q25c" min="0" max="100" placeholder="0" oninput="calcModal()"/>
+        </div>
+      </div>
+      <div class="inline-fields">
+        <div class="form-group">
+          <label class="field-label">d. Korporasi Non Publik <span class="req">*</span></label>
+          <input type="number" id="q25d" min="0" max="100" placeholder="0" oninput="calcModal()"/>
+        </div>
+        <div class="form-group">
+          <label class="field-label">e. Pemerintah <span class="req">*</span></label>
+          <input type="number" id="q25e" min="0" max="100" placeholder="0" oninput="calcModal()"/>
+        </div>
+        <div class="form-group">
+          <label class="field-label">f. Asing <span class="req">*</span></label>
+          <input type="number" id="q25f" min="0" max="100" placeholder="0" oninput="calcModal()"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="field-label">g. Total (a+b+c+d+e+f) — harus = 100%</label>
+        <div style="display:flex;align-items:center;gap:8px">
+          <input type="number" id="q25g" readonly class="total-field" placeholder="0" style="width:120px"/>
+          <span id="modal-indicator" style="font-size:13px;color:#666">%</span>
+        </div>
+      </div>
+      <div class="hint" style="margin-top:4px">Keterangan: LNPRT = Lembaga Nonprofit yang Melayani Rumah Tangga</div>
+    </div>
+  </div>
+
+  <div class="nav-actions">
+    <div></div>
+    <button class="btn btn-primary" onclick="goBlok(2)">Selanjutnya: BLOK II &rsaquo;</button>
+  </div>
+</div><!-- end blok1 -->
+
+<!-- ==================== BLOK II ==================== -->
+<div class="blok-panel" id="blok2">
+  <div class="section-card">
+    <div class="section-header">BLOK II — Catatan</div>
+    <div class="section-body">
+
+      <div class="catatan-group">
+        <div class="catatan-title">Kunjungan I</div>
+        <div class="form-group">
+          <label class="field-label">Catatan Kunjungan I</label>
+          <textarea id="catatan1" rows="3" placeholder="Catatan kunjungan pertama..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="field-label">Waktu Kunjungan I</label>
+          <input type="datetime-local" id="waktu1"/>
+        </div>
+      </div>
+
+      <div class="catatan-group">
+        <div class="catatan-title">Kunjungan II</div>
+        <div class="form-group">
+          <label class="field-label">Catatan Kunjungan II</label>
+          <textarea id="catatan2" rows="3" placeholder="Catatan kunjungan kedua..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="field-label">Waktu Kunjungan II</label>
+          <input type="datetime-local" id="waktu2"/>
+        </div>
+      </div>
+
+      <div class="catatan-group">
+        <div class="catatan-title">Kunjungan III</div>
+        <div class="form-group">
+          <label class="field-label">Catatan Kunjungan III</label>
+          <textarea id="catatan3" rows="3" placeholder="Catatan kunjungan ketiga..."></textarea>
+        </div>
+        <div class="form-group">
+          <label class="field-label">Waktu Kunjungan III</label>
+          <input type="datetime-local" id="waktu3"/>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="nav-actions">
+    <button class="btn btn-secondary" onclick="goBlok(1)">&lsaquo; Kembali: BLOK I</button>
+    <button class="btn btn-primary" onclick="goBlok(3)">Selanjutnya: BLOK III &rsaquo;</button>
+  </div>
+</div><!-- end blok2 -->
+
+<!-- ==================== BLOK III ==================== -->
+<div class="blok-panel" id="blok3">
+  <div class="section-card">
+    <div class="section-header">BLOK III — Data Responden</div>
+    <div class="section-body">
+
+      <div class="form-group">
+        <label class="field-label">Nama <span class="req">*</span></label>
+        <input type="text" id="r_nama" placeholder="Nama lengkap responden"/>
+      </div>
+      <div class="form-group">
+        <label class="field-label">Nomor HP/Telepon <span class="req">*</span></label>
+        <input type="text" id="r_hp" placeholder="08xxxxxxxxxx"/>
+      </div>
+      <div class="form-group">
+        <label class="field-label">Email <span class="req">*</span></label>
+        <input type="email" id="r_email" placeholder="email@responden.com"/>
+      </div>
+      <div class="form-group">
+        <label class="field-label">Tanggal Pelaksanaan <span class="req">*</span></label>
+        <input type="date" id="r_tanggal"/>
+      </div>
+
+      <div class="form-group">
+        <label class="field-label">Tanda Tangan <span class="req">*</span></label>
+        <div class="sig-wrap">
+          <canvas id="sigCanvas" width="860" height="180" style="max-width:100%"></canvas>
+        </div>
+        <div class="sig-actions">
+          <button type="button" class="btn btn-sm btn-danger" onclick="clearSignature()">Hapus Tanda Tangan</button>
+          <span id="sig-hint" style="font-size:12px;color:#888;line-height:2">Gambar tanda tangan di kotak di atas</span>
+        </div>
+      </div>
+
+      <div id="submitAlert" class="alert alert-error hidden" style="margin-top:14px"></div>
+
+      <div style="margin-top:20px;text-align:center">
+        <button class="btn btn-primary" id="submitBtn" onclick="submitForm()" style="padding:12px 40px;font-size:15px">KIRIM / SUBMIT</button>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="nav-actions">
+    <button class="btn btn-secondary" onclick="goBlok(2)">&lsaquo; Kembali: BLOK II</button>
+    <div></div>
+  </div>
+</div><!-- end blok3 -->
+
+</div><!-- end form-container -->
+
+<script>
+const SCRIPT_URL = "GANTI_DENGAN_URL_APPS_SCRIPT_ANDA"; // ganti dengan URL Google Apps Script Anda
+
+
+function goBlok(n) {
+  const panels = document.querySelectorAll('.blok-panel');
+  const tabs = document.querySelectorAll('.blok-tab');
+  panels.forEach(p => p.classList.remove('active'));
+  tabs.forEach(t => t.classList.remove('active'));
+  document.getElementById('blok' + n).classList.add('active');
+  tabs[n - 1].classList.add('active');
+  document.getElementById('progressFill').style.width = (n * 33.3) + '%';
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+
+const API_BASE = 'https://esurvey.bps.go.id/lookup/api/v1/collections';
+
+async function apiFetch(url) {
+  const r = await fetch(url, {headers:{'Accept':'application/json'}});
+  if (!r.ok) throw new Error('API error: ' + r.status);
+  return r.json();
+}
+
+async function loadProvinsi() {
+  const sp = document.getElementById('spinner-prov-kp');
+  sp.classList.remove('hidden');
+  try {
+    const res = await apiFetch(`${API_BASE}/242f40ad-1a03-41fb-9846-c687e0632b67/filter?version=1`);
+    const data = (res.data || []).sort((a,b)=>a.namaprov.localeCompare(b.namaprov));
+    const sel = document.getElementById('q11e_provinsi');
+    sel.innerHTML = '<option value="">-- Pilih Provinsi --</option>';
+    data.forEach(d => {
+      const o = document.createElement('option');
+      o.value = d.kdprov;
+      o.textContent = d.namaprov;
+      sel.appendChild(o);
+    });
+  } catch(e) {
+    console.error('Gagal memuat provinsi:', e);
+  } finally {
+    sp.classList.add('hidden');
+  }
+}
+
+async function loadKabupaten(kdprov, selectId='q2_kabupaten', spinnerId='spinner-kab') {
+  const sel = document.getElementById(selectId);
+  sel.innerHTML = '<option value="">-- Pilih Kabupaten/Kota --</option>';
+  sel.disabled = true;
+  if (selectId === 'q2_kabupaten') {
+    const selKec = document.getElementById('q3_kecamatan');
+    const selKel = document.getElementById('q4_kelurahan');
+    selKec.innerHTML = '<option value="">-- Pilih Kecamatan --</option>';
+    selKel.innerHTML = '<option value="">-- Pilih Kelurahan/Desa/Nagari --</option>';
+    selKec.disabled = true; selKel.disabled = true;
+  }
+  if (!kdprov) return;
+  const sp = document.getElementById(spinnerId);
+  sp.classList.remove('hidden');
+  try {
+    const res = await apiFetch(`${API_BASE}/668fcfe6-8ef4-4612-968a-d1330c03fe17/filter?version=1&filter=kdprov||eq||${kdprov}`);
+    const data = (res.data || []).sort((a,b)=>a.namakab.localeCompare(b.namakab));
+    data.forEach(d => {
+      const o = document.createElement('option');
+      o.value = d.kdprovkab;
+      o.textContent = d.namakab;
+      sel.appendChild(o);
+    });
+    sel.disabled = false;
+  } catch(e) { console.error('Gagal memuat kabupaten:', e); }
+  finally { sp.classList.add('hidden'); }
+}
+
+async function loadKecamatan(kdprovkab) {
+  const selKec = document.getElementById('q3_kecamatan');
+  const selKel = document.getElementById('q4_kelurahan');
+  selKec.innerHTML = '<option value="">-- Pilih Kecamatan --</option>';
+  selKel.innerHTML = '<option value="">-- Pilih Kelurahan/Desa/Nagari --</option>';
+  selKec.disabled = true; selKel.disabled = true;
+  if (!kdprovkab) return;
+  const sp = document.getElementById('spinner-kec');
+  sp.classList.remove('hidden');
+  try {
+    const res = await apiFetch(`${API_BASE}/417a39ed-fcb4-40d6-bf00-b6715a75c681/filter?version=1&filter=kdprovkab||eq||${kdprovkab}`);
+    const data = (res.data || []).sort((a,b)=>a.namakec.localeCompare(b.namakec));
+    data.forEach(d => {
+      const o = document.createElement('option');
+      o.value = d.kdprovkabkec;
+      o.textContent = d.namakec;
+      selKec.appendChild(o);
+    });
+    selKec.disabled = false;
+  } catch(e) { console.error('Gagal memuat kecamatan:', e); }
+  finally { sp.classList.add('hidden'); }
+}
+
+async function loadKelurahan(kdprovkabkec) {
+  const sel = document.getElementById('q4_kelurahan');
+  sel.innerHTML = '<option value="">-- Pilih Kelurahan/Desa/Nagari --</option>';
+  sel.disabled = true;
+  if (!kdprovkabkec) return;
+  const sp = document.getElementById('spinner-kel');
+  sp.classList.remove('hidden');
+  try {
+    const res = await apiFetch(`${API_BASE}/b1b3a3f1-fb0e-4268-badb-b0bb24128431/filter?version=1&filter=kdprovkabkec||eq||${kdprovkabkec}`);
+    const data = res.data || [];
+    data.sort((a,b)=>{
+      const na = a.namakel || a.namadesa || '';
+      const nb = b.namakel || b.namadesa || '';
+      return na.localeCompare(nb);
+    });
+    data.forEach(d => {
+      const o = document.createElement('option');
+      o.value = d.kdprovkabkeckel || d.kdwilayah || '';
+      o.textContent = d.namakel || d.namadesa || d.namanagari || JSON.stringify(d);
+      sel.appendChild(o);
+    });
+    sel.disabled = false;
+  } catch(e) { console.error('Gagal memuat kelurahan:', e); }
+  finally { sp.classList.add('hidden'); }
+}
+
+
+
+let kbliTimer = null;
+function searchKBLI(q) {
+  clearTimeout(kbliTimer);
+  const dd = document.getElementById('kbliDropdown');
+  if (!q || q.length < 2) { dd.classList.remove('open'); return; }
+  kbliTimer = setTimeout(async () => {
+    try {
+      const url = `${API_BASE}/7ba2604f-61dc-4fb2-9d46-deb56d8b7aa7/filter?version=1&search=Judul||ilike||${encodeURIComponent(q)}&limit=20`;
+      const res = await apiFetch(url);
+      const data = res.data || [];
+      dd.innerHTML = '';
+      if (!data.length) {
+        dd.innerHTML = '<div class="autocomplete-item" style="color:#999">Tidak ditemukan</div>';
+      } else {
+        data.forEach(d => {
+          const item = document.createElement('div');
+          item.className = 'autocomplete-item';
+          item.innerHTML = `<span class="kode">${d.Kode}</span> ${d.Judul} <span style="color:#999;font-size:11px">[${d.Kategori}]</span>`;
+          item.onclick = () => selectKBLI(d);
+          dd.appendChild(item);
+        });
+      }
+      dd.classList.add('open');
+    } catch(e) { console.error('KBLI search error:', e); }
+  }, 400);
+}
+
+function selectKBLI(d) {
+  document.getElementById('q9g_kbli_search').value = `[${d.Kode}] ${d.Judul}`;
+  document.getElementById('q9g_kbli_kode').value = d.Kode;
+  document.getElementById('q9g_kbli_kategori').value = d.Kategori;
+  document.getElementById('q9h_kategori').value = `[${d.Kategori}] ${getKategoriName(d.Kategori)}`;
+  document.getElementById('kbliDropdown').classList.remove('open');
+  // Show hotel classification if kategori = I (accommodation)
+  const isHotel = d.Kategori === 'I' || (d.Kode && d.Kode.startsWith('55'));
+  document.getElementById('q9i_hotel_wrap').classList.toggle('hidden', !isHotel);
+}
+
+function getKategoriName(k) {
+  const map = {
+    'A':'Pertanian, Kehutanan dan Perikanan','B':'Pertambangan dan Penggalian',
+    'C':'Industri Pengolahan','D':'Pengadaan Listrik dan Gas',
+    'E':'Pengadaan Air; Pengelolaan Sampah, Limbah dan Daur Ulang',
+    'F':'Konstruksi','G':'Perdagangan Besar dan Eceran; Reparasi Mobil dan Sepeda Motor',
+    'H':'Transportasi dan Pergudangan','I':'Penyediaan Akomodasi dan Makan Minum',
+    'J':'Informasi dan Komunikasi','K':'Aktivitas Keuangan dan Asuransi',
+    'L':'Real Estat','M':'Aktivitas Profesional, Ilmiah dan Teknis',
+    'N':'Aktivitas Penyewaan dan Sewa Guna Usaha Tanpa Hak Opsi, Ketenagakerjaan, Agen Perjalanan dan Penunjang Usaha Lainnya',
+    'O':'Administrasi Pemerintahan, Pertahanan dan Jaminan Sosial Wajib',
+    'P':'Pendidikan','Q':'Aktivitas Kesehatan Manusia dan Aktivitas Sosial',
+    'R':'Kesenian, Hiburan dan Rekreasi','S':'Aktivitas Jasa Lainnya',
+    'T':'Aktivitas Rumah Tangga Sebagai Pemberi Kerja',
+    'U':'Aktivitas Badan Internasional dan Badan Ekstra Internasional Lainnya'
+  };
+  return map[k] || k;
+}
+
+// Close autocomplete on outside click
+document.addEventListener('click', e => {
+  if (!e.target.closest('.autocomplete-wrap')) {
+    document.getElementById('kbliDropdown').classList.remove('open');
+  }
+});
+
+
+function handleKawasan() {
+  const v = getRadio('q5d');
+  document.getElementById('q5e_wrap').classList.toggle('hidden', v === '10');
+}
+
+function handleNIB() {
+  const v = getRadio('q6a');
+  document.getElementById('q6b_wrap').classList.toggle('hidden', v !== '1');
+  document.getElementById('q6c_wrap').classList.toggle('hidden', v !== '2');
+}
+
+function handleNIBAlasan() {
+  const v = getRadio('q6c');
+  document.getElementById('q6c_alasan_wrap').classList.toggle('hidden', v !== '5');
+}
+
+function handleBadanUsaha() {
+  const v = getRadio('q7a');
+  document.getElementById('q7_koperasi_wrap').classList.toggle('hidden', v !== '3');
+}
+
+function handleJaringan() {
+  const v = getRadio('q10a');
+  document.getElementById('q10b_wrap').classList.toggle('hidden', v !== '2');
+  document.getElementById('q11_wrap').classList.toggle('hidden', !['3','4','5','6'].includes(v));
+}
+
+function handleInternet() {
+  const v = getRadio('q12a');
+  document.getElementById('q12b_wrap').classList.toggle('hidden', v !== '1');
+}
+
+function handleHalal() {
+  const v = getRadio('q15a');
+  document.getElementById('q15bc_wrap').classList.toggle('hidden', v !== '1');
+}
+
+function handleIzinEdar() {
+  const v = getRadio('q16a');
+  document.getElementById('q16bc_wrap').classList.toggle('hidden', v !== '1');
+}
+
+
+function calcPekerja() {
+  const a = parseInt(document.getElementById('q20a').value) || 0;
+  const b = parseInt(document.getElementById('q20b').value) || 0;
+  document.getElementById('q20c').value = a + b;
+}
+
+function parseCurrency(s) {
+  return parseInt((s || '').replace(/\./g,'')) || 0;
+}
+
+function formatCurrency(el) {
+  const raw = el.value.replace(/\D/g,'');
+  if (!raw) { el.value = ''; return; }
+  el.value = parseInt(raw).toLocaleString('id-ID');
+}
+
+function setCurrencyReadonly(id, val) {
+  document.getElementById(id).value = val ? val.toLocaleString('id-ID') : '0';
+}
+
+function calcPengeluaran() {
+  const total = ['q22a','q22b','q22c','q22d','q22e']
+    .map(id => parseCurrency(document.getElementById(id).value))
+    .reduce((a,b)=>a+b, 0);
+  setCurrencyReadonly('q22f', total);
+}
+
+function calcPendapatan() {
+  const total = ['q23a','q23b']
+    .map(id => parseCurrency(document.getElementById(id).value))
+    .reduce((a,b)=>a+b, 0);
+  setCurrencyReadonly('q23c', total);
+}
+
+function calcAset() {
+  const total = ['q24a','q24b']
+    .map(id => parseCurrency(document.getElementById(id).value))
+    .reduce((a,b)=>a+b, 0);
+  setCurrencyReadonly('q24c', total);
+}
+
+function calcModal() {
+  const fields = ['q25a','q25b','q25c','q25d','q25e','q25f'];
+  const total = fields.map(id => parseFloat(document.getElementById(id).value)||0).reduce((a,b)=>a+b,0);
+  const roundedTotal = Math.round(total * 100) / 100;
+  document.getElementById('q25g').value = roundedTotal;
+  const ind = document.getElementById('modal-indicator');
+  if (Math.abs(roundedTotal - 100) < 0.01) {
+    ind.textContent = '% ✓ Total = 100%'; ind.style.color = '#38a169';
+  } else {
+    ind.textContent = `% (harus = 100%)`; ind.style.color = '#e53e3e';
+  }
+}
+
+
+const canvas = document.getElementById('sigCanvas');
+const ctx = canvas.getContext('2d');
+let drawing = false, hasSig = false, canvasRect = null;
+window.addEventListener('resize', () => { canvasRect = null; });
+
+function getPos(e) {
+  if (!canvasRect) canvasRect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / canvasRect.width;
+  const scaleY = canvas.height / canvasRect.height;
+  if (e.touches) {
+    return {x:(e.touches[0].clientX - canvasRect.left)*scaleX, y:(e.touches[0].clientY - canvasRect.top)*scaleY};
+  }
+  return {x:(e.clientX - canvasRect.left)*scaleX, y:(e.clientY - canvasRect.top)*scaleY};
+}
+
+canvas.addEventListener('mousedown', e => { drawing=true; const p=getPos(e); ctx.beginPath(); ctx.moveTo(p.x,p.y); });
+canvas.addEventListener('mousemove', e => { if(!drawing) return; const p=getPos(e); ctx.lineTo(p.x,p.y); ctx.strokeStyle='#000'; ctx.lineWidth=2; ctx.lineCap='round'; ctx.stroke(); hasSig=true; });
+canvas.addEventListener('mouseup', ()=>{ drawing=false; ctx.beginPath(); });
+canvas.addEventListener('mouseleave', ()=>{ drawing=false; ctx.beginPath(); });
+canvas.addEventListener('touchstart', e=>{ e.preventDefault(); drawing=true; const p=getPos(e); ctx.beginPath(); ctx.moveTo(p.x,p.y); }, {passive:false});
+canvas.addEventListener('touchmove', e=>{ e.preventDefault(); if(!drawing) return; const p=getPos(e); ctx.lineTo(p.x,p.y); ctx.strokeStyle='#000'; ctx.lineWidth=2; ctx.lineCap='round'; ctx.stroke(); hasSig=true; }, {passive:false});
+canvas.addEventListener('touchend', ()=>{ drawing=false; ctx.beginPath(); });
+
+function clearSignature() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  hasSig = false;
+}
+
+
+function getRadio(name) {
+  const el = document.querySelector(`input[name="${name}"]:checked`);
+  return el ? el.value : '';
+}
+
+function getVal(id) {
+  const el = document.getElementById(id);
+  return el ? el.value.trim() : '';
+}
+
+function showAlert(id, msg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.remove('hidden');
+  el.scrollIntoView({behavior:'smooth', block:'center'});
+}
+
+function hideAlert(id) {
+  const el = document.getElementById(id);
+  if (el) el.classList.add('hidden');
+}
+
+
+function validateBlok1() {
+  if (!getVal('q1_provinsi')) return 'Pertanyaan 1: Pilih Provinsi';
+  if (!getVal('q2_kabupaten')) return 'Pertanyaan 2: Pilih Kabupaten/Kota';
+  if (!getVal('q3_kecamatan')) return 'Pertanyaan 3: Pilih Kecamatan';
+  if (!getVal('q4_kelurahan')) return 'Pertanyaan 4: Pilih Kelurahan/Desa/Nagari';
+  if (!getVal('q5a_nama_perusahaan')) return 'Pertanyaan 5a: Isi Nama Perusahaan';
+  if (!getVal('q5b_nama_komersial')) return 'Pertanyaan 5b: Isi Nama Komersial';
+  if (!getVal('q5c_alamat')) return 'Pertanyaan 5c: Isi Alamat Perusahaan';
+  const kodepos = getVal('q5c_kodepos');
+  if (!kodepos || kodepos.length !== 5) return 'Pertanyaan 5c: Kode Pos harus 5 digit';
+  if (!getVal('q5c_hp')) return 'Pertanyaan 5c: Isi Nomor HP/WhatsApp';
+  if (!getRadio('q5d')) return 'Pertanyaan 5d: Pilih Jenis Kawasan';
+  const kawasan = getRadio('q5d');
+  if (kawasan !== '10' && !getVal('q5e_nama_kawasan')) return 'Pertanyaan 5e: Isi Nama Kawasan';
+  if (!getRadio('q6a')) return 'Pertanyaan 6a: Apakah memiliki NIB?';
+  if (getRadio('q6a') === '1') {
+    if (!getVal('q6b_nib')) return 'Pertanyaan 6b: Isi NIB';
+    if (getVal('q6b_nib').length !== 13) return 'Pertanyaan 6b: NIB harus 13 digit';
+  }
+  if (getRadio('q6a') === '2' && !getRadio('q6c')) return 'Pertanyaan 6c: Pilih alasan tidak memiliki NIB';
+  if (getRadio('q6c') === '5' && !getVal('q6c_alasan')) return 'Pertanyaan 6c: Isi alasan lainnya';
+  if (!getRadio('q7a')) return 'Pertanyaan 7a: Pilih Status Badan Usaha';
+  if (getRadio('q7a') === '3' && !getRadio('q7b')) return 'Pertanyaan 7b: Pilih apakah KDKMP?';
+  if (getRadio('q7a') === '3' && !getRadio('q7c')) return 'Pertanyaan 7c: Pilih Jenis Koperasi';
+  if (!getRadio('q7d')) return 'Pertanyaan 7d: Apakah memiliki laporan keuangan?';
+  if (!getVal('q8a_nama')) return 'Pertanyaan 8a: Isi Nama Pengusaha';
+  if (!getRadio('q8b')) return 'Pertanyaan 8b: Pilih Jenis Kelamin';
+  if (!getVal('q8c_umur')) return 'Pertanyaan 8c: Isi Umur';
+  const umur = parseInt(getVal('q8c_umur'));
+  if (umur < 17 || umur > 120) return 'Pertanyaan 8c: Umur harus antara 17-120 tahun';
+  const nik = getVal('q8d_nik');
+  if (!nik || nik.length !== 16) return 'Pertanyaan 8d: NIK harus 16 digit';
+  if (!getVal('q9a_kegiatan')) return 'Pertanyaan 9a: Isi Kegiatan Utama';
+  const b1=getRadio('q9b1'), b2=getRadio('q9b2'), b3=getRadio('q9b3'), b4=getRadio('q9b4');
+  if (!b1||!b2||!b3||!b4) return 'Pertanyaan 9b: Jawab semua pertanyaan b1-b4';
+  if (b1==='2'&&b2==='2'&&b3==='2'&&b4==='2') return 'Pertanyaan 9b: Minimal satu dari b1-b4 harus dijawab "Ya"';
+  if (!getRadio('q9c')) return 'Pertanyaan 9c: Pilih lokasi usaha';
+  if (!getVal('q9d_input')) return 'Pertanyaan 9d: Isi input yang digunakan';
+  if (!getVal('q9e_proses')) return 'Pertanyaan 9e: Isi proses produksi';
+  if (!getVal('q9f_produk')) return 'Pertanyaan 9f: Isi produk utama';
+  if (!getVal('q9g_kbli_kode')) return 'Pertanyaan 9g: Pilih KBLI';
+  if (!getRadio('q10a')) return 'Pertanyaan 10a: Pilih Jaringan Usaha';
+  if (getRadio('q10a')==='2' && !getVal('q10b_jumlah')) return 'Pertanyaan 10b: Isi jumlah kantor cabang';
+  if (['3','4','5','6'].includes(getRadio('q10a'))) {
+    if (!getVal('q11a_nama')) return 'Pertanyaan 11a: Isi Nama Kantor Pusat';
+    if (!getVal('q11b_alamat')) return 'Pertanyaan 11b: Isi Alamat Kantor Pusat';
+    if (!getVal('q11c_email')) return 'Pertanyaan 11c: Isi Email Kantor Pusat';
+  }
+  if (!getRadio('q12a')) return 'Pertanyaan 12a: Pilih apakah menggunakan internet?';
+  if (getRadio('q12a') === '1') {
+    if (!getRadio('q12b1')) return 'Pertanyaan 12b1: Pilih tujuan internet (menerima pesanan)';
+    if (!getRadio('q12b2')) return 'Pertanyaan 12b2: Pilih tujuan internet (produksi)';
+    if (!getRadio('q12b3')) return 'Pertanyaan 12b3: Pilih tujuan internet (distribusi)';
+    if (!getRadio('q12b4')) return 'Pertanyaan 12b4: Pilih tujuan internet (beli bahan baku)';
+    if (!getRadio('q12b5')) return 'Pertanyaan 12b5: Pilih tujuan internet (promosi)';
+    if (!getRadio('q12b6')) return 'Pertanyaan 12b6: Pilih tujuan internet (lainnya)';
+  }
+  if (!getRadio('q12c')) return 'Pertanyaan 12c: Pilih apakah memanfaatkan teknologi digital?';
+  if (!getRadio('q13a')) return 'Pertanyaan 13a: Pilih produk ramah lingkungan?';
+  if (!getRadio('q13b')) return 'Pertanyaan 13b: Pilih biaya/investasi lingkungan?';
+  if (!getRadio('q14')) return 'Pertanyaan 14: Pilih apakah menggunakan produk kreatif?';
+  if (!getRadio('q15a')) return 'Pertanyaan 15a: Pilih sertifikat halal?';
+  if (getRadio('q15a') === '1') {
+    if (getVal('q15b') === '') return 'Pertanyaan 15b: Isi jumlah varian sudah halal BPJPH';
+    if (getVal('q15c') === '') return 'Pertanyaan 15c: Isi jumlah varian belum halal BPJPH';
+  }
+  if (!getRadio('q16a')) return 'Pertanyaan 16a: Pilih izin edar?';
+  if (getRadio('q16a') === '1') {
+    if (getVal('q16b') === '') return 'Pertanyaan 16b: Isi jumlah varian sudah izin BPOM';
+    if (getVal('q16c') === '') return 'Pertanyaan 16c: Isi jumlah varian belum izin BPOM';
+  }
+  if (!getRadio('q17')) return 'Pertanyaan 17: Pilih apakah bermitra KDKMP?';
+  if (!getRadio('q18')) return 'Pertanyaan 18: Pilih keterlibatan MBG?';
+  if (!getRadio('q19a')) return 'Pertanyaan 19a: Pilih transaksi barang non-penduduk?';
+  if (!getRadio('q19b')) return 'Pertanyaan 19b: Pilih transaksi jasa non-penduduk?';
+  if (getVal('q20a')==='' || getVal('q20b')==='') return 'Pertanyaan 20: Isi jumlah pekerja';
+  if (!getVal('q21')) return 'Pertanyaan 21: Isi tahun mulai beroperasi';
+  const thn = parseInt(getVal('q21'));
+  if (thn < 1900 || thn > 2026) return 'Pertanyaan 21: Tahun harus antara 1900-2026';
+  if (!getVal('q22a')) return 'Pertanyaan 22a: Isi nilai upah dan gaji';
+  if (!getVal('q22b')) return 'Pertanyaan 22b: Isi biaya produksi';
+  if (!getVal('q22c')) return 'Pertanyaan 22c: Isi biaya pembelian barang';
+  if (!getVal('q22d')) return 'Pertanyaan 22d: Isi biaya operasional';
+  if (!getVal('q22e')) return 'Pertanyaan 22e: Isi biaya non-operasional';
+  if (!getVal('q23a')) return 'Pertanyaan 23a: Isi nilai barang dan jasa';
+  if (getVal('q23d') === '') return 'Pertanyaan 23d: Isi persentase pendapatan online';
+  const pctOnline = parseFloat(getVal('q23d'));
+  if (isNaN(pctOnline) || pctOnline < 0 || pctOnline > 100) return 'Pertanyaan 23d: Persentase harus antara 0-100%';
+  if (!getVal('q24a')) return 'Pertanyaan 24a: Isi nilai aset tanah dan bangunan';
+  if (!getVal('q24b')) return 'Pertanyaan 24b: Isi nilai aset selain tanah';
+  if (!getVal('q24d')) return 'Pertanyaan 24d: Isi luas tanah';
+  const modalFields = ['q25a','q25b','q25c','q25d','q25e','q25f'];
+  for (const f of modalFields) {
+    if (getVal(f) === '') return 'Pertanyaan 25: Isi semua komponen kepemilikan modal';
+  }
+  const totalModal = modalFields.map(id=>parseFloat(getVal(id))||0).reduce((a,b)=>a+b,0);
+  if (Math.abs(totalModal - 100) > 0.01) return `Pertanyaan 25: Total kepemilikan modal harus = 100% (saat ini: ${Math.round(totalModal*100)/100}%)`;
+  return null;
+}
+
+function validateBlok3() {
+  if (!getVal('r_nama')) return 'Nama responden harus diisi';
+  if (!getVal('r_hp')) return 'Nomor HP/Telepon responden harus diisi';
+  if (!getVal('r_email')) return 'Email responden harus diisi';
+  if (!getVal('r_tanggal')) return 'Tanggal pelaksanaan harus diisi';
+  if (!hasSig) return 'Tanda tangan harus diisi';
+  return null;
+}
+
+
+function collectData() {
+  const data = {
+    timestamp: new Date().toLocaleString('id-ID'),
+    // Blok I
+    provinsi: document.getElementById('q1_provinsi').options[document.getElementById('q1_provinsi').selectedIndex]?.text || '',
+    provinsi_kd: getVal('q1_provinsi'),
+    kabupaten: document.getElementById('q2_kabupaten').options[document.getElementById('q2_kabupaten').selectedIndex]?.text || '',
+    kabupaten_kd: getVal('q2_kabupaten'),
+    kecamatan: document.getElementById('q3_kecamatan').options[document.getElementById('q3_kecamatan').selectedIndex]?.text || '',
+    kecamatan_kd: getVal('q3_kecamatan'),
+    kelurahan: document.getElementById('q4_kelurahan').options[document.getElementById('q4_kelurahan').selectedIndex]?.text || '',
+    kelurahan_kd: getVal('q4_kelurahan'),
+    nama_perusahaan: getVal('q5a_nama_perusahaan'),
+    nama_komersial: getVal('q5b_nama_komersial'),
+    alamat: getVal('q5c_alamat'),
+    rt: getVal('q5c_rt'), rw: getVal('q5c_rw'),
+    kode_pos: getVal('q5c_kodepos'),
+    email_perusahaan: getVal('q5c_email'),
+    website: getVal('q5c_website'),
+    telepon: `(${getVal('q5c_kodearea')}) ${getVal('q5c_telepon')} ext ${getVal('q5c_ext')}`,
+    hp: getVal('q5c_hp'),
+    jenis_kawasan: getRadio('q5d'),
+    nama_kawasan: getVal('q5e_nama_kawasan'),
+    punya_nib: getRadio('q6a'),
+    nib: getVal('q6b_nib'),
+    alasan_no_nib: getRadio('q6c'),
+    alasan_no_nib_lain: getVal('q6c_alasan'),
+    badan_usaha: getRadio('q7a'),
+    kdkmp: getRadio('q7b'),
+    jenis_koperasi: getRadio('q7c'),
+    laporan_keuangan: getRadio('q7d'),
+    nama_pengusaha: getVal('q8a_nama'),
+    jenis_kelamin_pengusaha: getRadio('q8b'),
+    umur_pengusaha: getVal('q8c_umur'),
+    nik_pengusaha: getVal('q8d_nik'),
+    kegiatan_utama: getVal('q9a_kegiatan'),
+    produksi_barang: getRadio('q9b1'),
+    layanan_makan: getRadio('q9b2'),
+    penjualan_barang: getRadio('q9b3'),
+    aktivitas_jasa: getRadio('q9b4'),
+    lokasi_usaha: getRadio('q9c'),
+    input_digunakan: getVal('q9d_input'),
+    proses_produksi: getVal('q9e_proses'),
+    produk_utama: getVal('q9f_produk'),
+    kbli_kode: getVal('q9g_kbli_kode'),
+    kbli_judul: getVal('q9g_kbli_search'),
+    kbli_kategori: getVal('q9g_kbli_kategori'),
+    klasifikasi_hotel: getRadio('q9i'),
+    jaringan_usaha: getRadio('q10a'),
+    jumlah_cabang: getVal('q10b_jumlah'),
+    kp_nama: getVal('q11a_nama'),
+    kp_alamat: getVal('q11b_alamat'),
+    kp_email: getVal('q11c_email'),
+    kp_negara: getVal('q11d_negara'),
+    kp_provinsi: getVal('q11e_provinsi'),
+    kp_kabupaten: getVal('q11f_kabupaten'),
+    pakai_internet: getRadio('q12a'),
+    internet_pesanan: getRadio('q12b1'),
+    internet_produksi: getRadio('q12b2'),
+    internet_distribusi: getRadio('q12b3'),
+    internet_beli: getRadio('q12b4'),
+    internet_promosi: getRadio('q12b5'),
+    internet_lain: getRadio('q12b6'),
+    digital: getRadio('q12c'),
+    ramah_lingkungan: getRadio('q13a'),
+    biaya_lingkungan: getRadio('q13b'),
+    produk_kreatif: getRadio('q14'),
+    sertifikat_halal: getRadio('q15a'),
+    varian_halal_bpjph: getVal('q15b'),
+    varian_belum_halal_bpjph: getVal('q15c'),
+    izin_edar: getRadio('q16a'),
+    varian_bpom: getVal('q16b'),
+    varian_belum_bpom: getVal('q16c'),
+    mitra_kdkmp: getRadio('q17'),
+    program_mbg: getRadio('q18'),
+    transaksi_barang_nonpenduduk: getRadio('q19a'),
+    transaksi_jasa_nonpenduduk: getRadio('q19b'),
+    pekerja_laki: getVal('q20a'),
+    pekerja_perempuan: getVal('q20b'),
+    pekerja_total: getVal('q20c'),
+    tahun_beroperasi: getVal('q21'),
+    pengeluaran_upah: parseCurrency(getVal('q22a')),
+    pengeluaran_produksi: parseCurrency(getVal('q22b')),
+    pengeluaran_beli_barang: parseCurrency(getVal('q22c')),
+    pengeluaran_operasional: parseCurrency(getVal('q22d')),
+    pengeluaran_nonoperasional: parseCurrency(getVal('q22e')),
+    pengeluaran_total: parseCurrency(getVal('q22f')),
+    pendapatan_barang_jasa: parseCurrency(getVal('q23a')),
+    pendapatan_lain: parseCurrency(getVal('q23b')),
+    pendapatan_total: parseCurrency(getVal('q23c')),
+    pct_online: getVal('q23d'),
+    aset_tanah_bangunan: parseCurrency(getVal('q24a')),
+    aset_lain: parseCurrency(getVal('q24b')),
+    aset_total: parseCurrency(getVal('q24c')),
+    aset_kategori: getRadio('q24c1'),
+    luas_tanah: getVal('q24d'),
+    modal_perorangan: getVal('q25a'),
+    modal_lnprt: getVal('q25b'),
+    modal_korporasi_publik: getVal('q25c'),
+    modal_korporasi_non: getVal('q25d'),
+    modal_pemerintah: getVal('q25e'),
+    modal_asing: getVal('q25f'),
+    modal_total: getVal('q25g'),
+    // Blok II
+    catatan1: getVal('catatan1'), waktu1: getVal('waktu1'),
+    catatan2: getVal('catatan2'), waktu2: getVal('waktu2'),
+    catatan3: getVal('catatan3'), waktu3: getVal('waktu3'),
+    // Blok III
+    responden_nama: getVal('r_nama'),
+    responden_hp: getVal('r_hp'),
+    responden_email: getVal('r_email'),
+    tanggal_pelaksanaan: getVal('r_tanggal'),
+    tanda_tangan: hasSig ? canvas.toDataURL('image/png') : ''
+  };
+  return data;
+}
+
+
+async function submitForm() {
+  hideAlert('submitAlert');
+
+  // Validate Blok I
+  const errB1 = validateBlok1();
+  if (errB1) {
+    goBlok(1);
+    setTimeout(() => showAlert('alertBox', 'Blok I — ' + errB1), 300);
+    return;
+  }
+
+  // Validate Blok III
+  const errB3 = validateBlok3();
+  if (errB3) {
+    showAlert('submitAlert', errB3);
+    return;
+  }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Mengirim...';
+
+  try {
+    const data = collectData();
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(data),
+      mode: 'no-cors'
+    });
+    // no-cors returns opaque — assume success if no throw
+    btn.textContent = 'TERKIRIM ✓';
+    btn.style.background = '#38a169';
+    document.getElementById('submitAlert').classList.add('hidden');
+    const successDiv = document.createElement('div');
+    successDiv.className = 'alert alert-success';
+    successDiv.innerHTML = '<strong>Data berhasil dikirim!</strong> Terima kasih telah mengisi form CAWI SE2026.';
+    document.getElementById('submitBtn').parentNode.insertBefore(successDiv, document.getElementById('submitBtn'));
+  } catch(e) {
+    btn.disabled = false;
+    btn.textContent = 'KIRIM / SUBMIT';
+    showAlert('submitAlert', 'Gagal mengirim: ' + e.message + '. Pastikan SCRIPT_URL sudah diisi dengan benar.');
+  }
+}
+
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadProvinsi();
+  // Set today's date as default
+  document.getElementById('r_tanggal').value = new Date().toISOString().split('T')[0];
+});
+</script>
+</body>
+</html>

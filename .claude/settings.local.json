@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:esurvey.bps.go.id)",
+      "WebSearch",
+      "Bash(curl -s -L \"https://esurvey.bps.go.id/o/sosialisasiSE2026\" -H \"User-Agent: Mozilla/5.0 \\(Windows NT 10.0; Win64; x64\\) AppleWebKit/537.36 \\(KHTML, like Gecko\\) Chrome/120.0.0.0 Safari/537.36\" --max-time 15)",
+      "Bash(curl -s \"https://esurvey.bps.go.id/api/form-engine/js-umd/2\" -H \"User-Agent: Mozilla/5.0\" --max-time 15)",
+      "Bash(curl -s \"https://esurvey.bps.go.id/assets/index.37e01782.js\" -H \"User-Agent: Mozilla/5.0\" --max-time 15)",
+      "Bash(curl -s \"https://esurvey.bps.go.id/assets/index.37e01782.js\" -H \"User-Agent: Mozilla/5.0\" --max-time 30)",
+      "Bash(curl -s \"https://esurvey.bps.go.id/assets/index.37e01782.js\" --max-time 30)"
+    ]
+  }
+}
