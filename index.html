@@ -6,109 +6,361 @@
 <title>CAWI SE2026 - BPS</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI',Arial,sans-serif;background:#f5f5f5;color:#222;font-size:14px}
-/* HEADER */
-.rahasia-bar{background:#fc6c00;color:#fff;text-align:center;font-weight:700;font-size:13px;letter-spacing:3px;padding:5px}
-.header-main{background:#fff;border-bottom:3px solid #fc6c00;padding:10px 20px}
-.header-inner{display:flex;align-items:center;justify-content:space-between;max-width:900px;margin:0 auto;gap:10px}
-.header-logos{display:flex;align-items:center;gap:12px}
-.header-logos img{height:64px;object-fit:contain}
+body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:#f0ede8;color:#2d2d2d;font-size:14px;line-height:1.5}
+/* ====== HEADER ====== */
+.rahasia-bar{background:#b22222;color:#fff;text-align:center;font-weight:800;font-size:11px;letter-spacing:6px;padding:6px;text-transform:uppercase}
+.header-main{background:#fff;border-bottom:4px solid #fc6c00;padding:12px 20px;box-shadow:0 2px 10px rgba(0,0,0,.1)}
+.header-inner{display:flex;align-items:center;justify-content:space-between;max-width:960px;margin:0 auto;gap:16px}
+.header-logos{display:flex;align-items:center;gap:10px}
+.header-logos img{height:70px;object-fit:contain}
 .header-center{text-align:center;flex:1}
-.header-center .title-main{font-size:15px;font-weight:700;color:#222;line-height:1.4}
-.header-center .title-sub{font-size:13px;color:#fc6c00;font-weight:600;margin-top:2px}
-.header-center .title-cawi{font-size:20px;font-weight:700;color:#fc6c00;letter-spacing:2px}
-/* BLOK NAV */
-.blok-nav{background:#fff;border-bottom:2px solid #eee;display:flex;max-width:900px;margin:0 auto}
-.blok-tab{padding:10px 28px;font-weight:600;font-size:13px;cursor:pointer;border-bottom:3px solid transparent;color:#666;transition:all .2s}
-.blok-tab.active{color:#fc6c00;border-bottom-color:#fc6c00;background:#fff8f3}
-.blok-tab:hover{color:#fc6c00}
-/* MAIN CONTAINER */
-.form-container{max-width:900px;margin:18px auto;padding:0 12px 40px}
-.blok-panel{display:none}
-.blok-panel.active{display:block}
-/* SECTION */
-.section-card{background:#fff;border-radius:6px;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-bottom:18px;overflow:hidden}
-.section-header{background:#fff3e8;border-left:4px solid #fc6c00;padding:10px 16px;font-weight:700;font-size:14px;color:#8b3a00}
-.section-body{padding:16px}
-/* FORM ELEMENTS */
-.form-group{margin-bottom:14px}
+.header-center .title-rep{font-size:11px;font-weight:600;color:#888;letter-spacing:2px;text-transform:uppercase}
+.header-center .title-sensus{font-size:17px;font-weight:800;color:#1a1a1a;letter-spacing:1px;margin-top:2px;text-transform:uppercase}
+.header-center .title-cawi{font-size:32px;font-weight:900;color:#fc6c00;letter-spacing:6px;line-height:1;margin:2px 0}
+.header-center .title-sosialisasi{font-size:11px;color:#aaa;letter-spacing:3px;text-transform:uppercase}
+/* ====== BLOK NAV ====== */
+.blok-nav-wrap{background:#fff;border-bottom:1px solid #ddd;box-shadow:0 2px 6px rgba(0,0,0,.07);position:sticky;top:0;z-index:100}
+.blok-nav{display:flex;max-width:960px;margin:0 auto}
+.blok-tab{padding:13px 36px;font-weight:700;font-size:13px;cursor:pointer;border-bottom:3px solid transparent;color:#aaa;transition:all .2s;user-select:none}
+.blok-tab.active{color:#fc6c00;border-bottom-color:#fc6c00;background:#fff9f5}
+.blok-tab:hover:not(.active){color:#fc6c00;background:#fafafa}
+/* ====== PROGRESS ====== */
+.progress-bar{height:3px;background:#f0e8e0}
+.progress-fill{height:100%;background:linear-gradient(90deg,#fc6c00,#ff8c00);transition:width .5s ease}
+/* ====== MAIN CONTAINER ====== */
+.form-container{max-width:960px;margin:20px auto;padding:0 14px 60px}
+.blok-panel{display:none}.blok-panel.active{display:block;animation:panelIn .35s ease forwards}
+@keyframes panelIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+/* ====== BLOK BANNER ====== */
+.blok-banner{background:linear-gradient(135deg,#fc6c00 0%,#d95a00 100%);color:#fff;padding:18px 24px;border-radius:8px;margin-bottom:24px;display:flex;align-items:center;gap:16px;box-shadow:0 4px 16px rgba(252,108,0,.35)}
+.blok-badge{background:rgba(255,255,255,.22);padding:5px 16px;border-radius:30px;font-size:12px;font-weight:800;letter-spacing:3px;white-space:nowrap;border:1px solid rgba(255,255,255,.3)}
+.blok-title-text{font-size:15px;font-weight:700;letter-spacing:.5px;line-height:1.3}
+.blok-title-sub{font-size:12px;opacity:.85;margin-top:2px;font-weight:400}
+/* ====== SECTION CARD ====== */
+.section-card{background:#fff;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.07),0 0 0 1px rgba(0,0,0,.04);margin-bottom:20px;overflow:visible}
+.section-header{background:linear-gradient(90deg,#fff4ec,#fffaf7);border-left:5px solid #fc6c00;padding:13px 18px;font-weight:700;font-size:13.5px;color:#7a3000;line-height:1.4;border-radius:7px 7px 0 0}
+.section-body{padding:20px}
+/* ====== FORM ELEMENTS ====== */
+.form-group{margin-bottom:16px}
 .form-group:last-child{margin-bottom:0}
-label.field-label{display:block;font-weight:600;margin-bottom:5px;font-size:13px}
-label.field-label .req{color:#e53e3e;margin-left:2px}
-.hint{font-size:12px;color:#888;margin-top:3px;font-style:italic}
+label.field-label{display:block;font-weight:600;margin-bottom:6px;font-size:13px;color:#333;line-height:1.5}
+label.field-label .req{color:#d63031;margin-left:2px;font-size:14px}
+.hint{font-size:11.5px;color:#aaa;margin-top:4px;font-style:italic;line-height:1.5}
 input[type=text],input[type=number],input[type=email],input[type=date],input[type=datetime-local],textarea,select{
-  width:100%;border:1px solid #ccc;border-radius:4px;padding:8px 10px;font-size:13px;font-family:inherit;
-  transition:border-color .2s;background:#fff}
-input:focus,textarea:focus,select:focus{outline:none;border-color:#fc6c00;box-shadow:0 0 0 2px rgba(252,108,0,.15)}
-input[readonly],input[disabled]{background:#f7f7f7;color:#666}
-textarea{resize:vertical;min-height:70px}
-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
-.radio-group,.checkbox-group{display:flex;flex-direction:column;gap:6px;margin-top:4px}
-.radio-item,.checkbox-item{display:flex;align-items:flex-start;gap:8px;cursor:pointer}
-.radio-item input,.checkbox-item input{margin-top:2px;accent-color:#fc6c00;flex-shrink:0}
-.radio-item label,.checkbox-item label{cursor:pointer;font-size:13px;line-height:1.4}
-/* INLINE FIELDS */
-.inline-fields{display:flex;gap:10px;flex-wrap:wrap}
+  width:100%;border:1.5px solid #ddd;border-radius:5px;padding:9px 12px;font-size:13px;font-family:inherit;
+  transition:border-color .2s,box-shadow .2s;background:#fff;color:#2d2d2d}
+input:focus,textarea:focus,select:focus{outline:none;border-color:#fc6c00;box-shadow:0 0 0 3px rgba(252,108,0,.13)}
+input[readonly],input[disabled]{background:#f7f4f0;color:#999;border-color:#e8e3de;cursor:default}
+textarea{resize:vertical;min-height:80px;line-height:1.6}
+select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 12 12'%3E%3Cpath fill='%23aaa' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;cursor:pointer}
+.radio-group,.checkbox-group{display:flex;flex-direction:column;gap:4px;margin-top:6px}
+.radio-item,.checkbox-item{display:flex;align-items:flex-start;gap:10px;cursor:pointer;padding:6px 10px;border-radius:5px;transition:background .15s;border:1px solid transparent}
+.radio-item:hover,.checkbox-item:hover{background:#fff5ee;border-color:#ffd5b3}
+.radio-item input,.checkbox-item input{margin-top:3px;accent-color:#fc6c00;flex-shrink:0;width:15px;height:15px;cursor:pointer}
+.radio-item span,.checkbox-item span{font-size:13px;line-height:1.5;color:#333}
+/* ====== INLINE FIELDS ====== */
+.inline-fields{display:flex;gap:12px;flex-wrap:wrap}
 .inline-fields .form-group{flex:1;min-width:120px}
-/* CURRENCY */
+/* ====== CURRENCY ====== */
 .currency-input-wrap{position:relative}
-.currency-prefix{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#666;font-size:13px;pointer-events:none}
+.currency-prefix{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:#999;font-size:13px;pointer-events:none;font-weight:600}
 .currency-input-wrap input{padding-left:36px}
-/* READONLY TOTAL */
-.total-field{background:#f0f8ff;font-weight:700;color:#0066aa}
-/* AUTOCOMPLETE */
+/* ====== READONLY TOTAL ====== */
+.total-field{background:#f0f7ff!important;font-weight:700!important;color:#1a5fa0!important;border-color:#c8dff5!important}
+/* ====== AUTOCOMPLETE ====== */
 .autocomplete-wrap{position:relative}
-.autocomplete-list{position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #ccc;border-top:none;border-radius:0 0 4px 4px;max-height:200px;overflow-y:auto;z-index:100;display:none}
+.autocomplete-wrap::after{content:'CARI';position:absolute;top:50%;right:10px;transform:translateY(-50%);font-size:9px;font-weight:800;color:#fc6c00;letter-spacing:1.5px;background:#fff4ec;padding:2px 8px;border-radius:10px;border:1px solid #ffd0b0;pointer-events:none;z-index:2}
+#q9g_kbli_search{padding-left:36px;padding-right:52px;border:1.5px solid #ffb38a;border-left:3px solid #fc6c00;background:#fffaf6 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23fc6c00' stroke-width='2.5'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") no-repeat 10px center;box-shadow:0 1px 5px rgba(252,108,0,.10)}
+#q9g_kbli_search:focus{border-color:#fc6c00;border-left-width:3px;box-shadow:0 0 0 3px rgba(252,108,0,.18)}
+.autocomplete-list{position:absolute;top:100%;left:0;right:0;background:#fff;border:1.5px solid #ffb38a;border-top:none;border-radius:0 0 6px 6px;max-height:220px;overflow-y:auto;z-index:200;display:none;box-shadow:0 6px 16px rgba(252,108,0,.13)}
 .autocomplete-list.open{display:block}
-.autocomplete-item{padding:8px 10px;cursor:pointer;font-size:13px;border-bottom:1px solid #f0f0f0}
-.autocomplete-item:hover{background:#fff3e8}
+.autocomplete-item{padding:10px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid #f5f0eb;line-height:1.4}
+.autocomplete-item:hover,.autocomplete-item:focus{background:#fff5ee}
 .autocomplete-item .kode{font-weight:700;color:#fc6c00;margin-right:6px}
-/* SPINNER */
-.spinner{display:inline-block;width:14px;height:14px;border:2px solid #ddd;border-top-color:#fc6c00;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-left:6px}
+/* ====== SEARCHABLE SELECT ====== */
+.ss-wrap{position:relative}
+.ss-wrap::after{content:'CARI';position:absolute;top:50%;right:10px;transform:translateY(-50%);font-size:9px;font-weight:800;color:#fc6c00;letter-spacing:1.5px;background:#fff4ec;padding:2px 8px;border-radius:10px;border:1px solid #ffd0b0;pointer-events:none;z-index:2}
+.ss-input{width:100%;border:1.5px solid #ffb38a;border-left:3px solid #fc6c00;border-radius:5px;padding:9px 52px 9px 36px;font-size:13px;font-family:inherit;transition:border-color .2s,box-shadow .2s;background:#fffaf6 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23fc6c00' stroke-width='2.5'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") no-repeat 10px center;cursor:text;color:#2d2d2d;box-shadow:0 1px 5px rgba(252,108,0,.10)}
+.ss-input:focus{outline:none;border-color:#fc6c00;border-left-width:3px;box-shadow:0 0 0 3px rgba(252,108,0,.18)}
+.ss-input:disabled{background-color:#f7f4f0;color:#aaa;border-color:#e8e3de;border-left-color:#ddd;cursor:default;box-shadow:none}
+.ss-input.has-value{background-color:#fff4ec;border-color:#ffa06e;border-left-color:#fc6c00}
+.ss-dropdown{position:absolute;top:100%;left:0;right:0;background:#fff;border:1.5px solid #ffb38a;border-top:none;border-radius:0 0 6px 6px;max-height:230px;overflow-y:auto;z-index:201;display:none;box-shadow:0 6px 18px rgba(252,108,0,.15)}
+.ss-dropdown.open{display:block}
+.ss-item{padding:9px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid #f5f0eb;line-height:1.4}
+.ss-item:hover,.ss-item.active{background:#fff5ee}
+.ss-item .ss-code{font-weight:700;color:#fc6c00;margin-right:5px;font-size:12px}
+/* ====== SPINNER ====== */
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid #e8e0d8;border-top-color:#fc6c00;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-left:6px}
 @keyframes spin{to{transform:rotate(360deg)}}
-/* SIGNATURE PAD */
-.sig-wrap{border:2px dashed #ccc;border-radius:6px;background:#fafafa;text-align:center;position:relative}
+/* ====== SIGNATURE ====== */
+.sig-wrap{border:2px dashed #d0c8c0;border-radius:8px;background:#fafaf8;position:relative;overflow:hidden}
 canvas#sigCanvas{display:block;cursor:crosshair;touch-action:none}
-.sig-actions{display:flex;gap:8px;margin-top:8px}
-/* BUTTONS */
-.btn{padding:9px 22px;border:none;border-radius:4px;cursor:pointer;font-size:14px;font-weight:600;transition:all .2s}
-.btn-primary{background:#fc6c00;color:#fff}
-.btn-primary:hover{background:#e05e00}
-.btn-secondary{background:#eee;color:#555}
-.btn-secondary:hover{background:#ddd}
-.btn-sm{padding:5px 12px;font-size:12px}
+.sig-actions{display:flex;gap:10px;margin-top:10px;align-items:center}
+/* ====== BUTTONS ====== */
+.btn{padding:10px 26px;border:none;border-radius:6px;cursor:pointer;font-size:13.5px;font-weight:700;transition:all .2s;letter-spacing:.3px}
+.btn-primary{background:#fc6c00;color:#fff;box-shadow:0 3px 8px rgba(252,108,0,.35)}
+.btn-primary:hover{background:#e06000;box-shadow:0 5px 14px rgba(252,108,0,.45);transform:translateY(-1px)}
+.btn-primary:active{transform:translateY(0)}
+.btn-secondary{background:#f0ece6;color:#666;border:1px solid #ddd}
+.btn-secondary:hover{background:#e8e2dc;color:#444}
+.btn-sm{padding:6px 14px;font-size:12px}
 .btn-danger{background:#e53e3e;color:#fff}
 .btn-danger:hover{background:#c53030}
-.nav-actions{display:flex;justify-content:space-between;margin-top:20px}
-/* KONDISI HIDDEN */
+.nav-actions{display:flex;justify-content:space-between;margin-top:24px;padding-top:20px;border-top:1px solid #f0ece6}
+/* ====== HIDDEN ====== */
 .hidden{display:none!important}
-/* ALERT */
-.alert{padding:10px 14px;border-radius:4px;margin-bottom:14px;font-size:13px}
-.alert-error{background:#fff5f5;border:1px solid #e53e3e;color:#c53030}
-.alert-success{background:#f0fff4;border:1px solid #38a169;color:#276749}
-/* SUBSECTION */
-.subsection-label{font-weight:700;color:#fc6c00;margin:10px 0 6px;font-size:13px}
-.sub-indent{margin-left:18px}
-/* CATATAN */
-.catatan-group{border:1px solid #eee;border-radius:4px;padding:12px;margin-bottom:12px;background:#fafafa}
-.catatan-group .catatan-title{font-weight:700;margin-bottom:8px;color:#555}
-/* PROGRESS */
-.progress-bar{height:4px;background:#eee;border-radius:2px;margin-bottom:0}
-.progress-fill{height:100%;background:#fc6c00;border-radius:2px;transition:width .4s}
-/* RESPONSIVE */
-@media(max-width:600px){
-  .header-inner{flex-direction:column;text-align:center}
-  .header-logos img{height:48px}
-  .blok-tab{padding:8px 14px;font-size:12px}
+/* ====== ALERTS ====== */
+.alert{padding:12px 16px;border-radius:6px;margin-bottom:16px;font-size:13px;line-height:1.5}
+.alert-error{background:#fff5f5;border:1.5px solid #f5c6c6;color:#c0392b}
+.alert-success{background:#f0fff4;border:1.5px solid #9ae6b4;color:#276749}
+/* ====== SUBSECTION ====== */
+.subsection-label{font-weight:700;color:#444;margin:14px 0 7px;font-size:13px;line-height:1.5}
+.sub-indent{margin-left:20px;padding-left:16px;border-left:2px solid #f0e8e0}
+/* ====== CATATAN ====== */
+.catatan-group{border:1.5px solid #ede8e2;border-radius:7px;padding:16px;margin-bottom:16px;background:#fafaf8}
+.catatan-group .catatan-title{font-weight:700;margin-bottom:10px;color:#fc6c00;font-size:13px;text-transform:uppercase;letter-spacing:.5px;display:flex;align-items:center;gap:8px}
+.catatan-group .catatan-title::before{content:'';display:inline-block;width:8px;height:8px;background:#fc6c00;border-radius:50%}
+/* ====== RESPONSIVE ====== */
+@media(max-width:640px){
+  .header-inner{flex-direction:column;text-align:center;gap:8px}
+  .header-logos img{height:52px}
+  .blok-tab{padding:10px 16px;font-size:12px}
   .inline-fields{flex-direction:column}
   .inline-fields .form-group{min-width:0}
+  .section-body{padding:14px}
+  .blok-banner{padding:14px 16px;gap:10px}
+  .blok-title-text{font-size:13px}
 }
+/* ====== APP LAYOUT ====== */
+.app-layout{display:flex;min-height:100vh}
+.sidebar{width:240px;background:#1a2332;position:fixed;top:0;left:0;height:100vh;overflow-y:auto;z-index:300;display:flex;flex-direction:column;transition:transform .3s cubic-bezier(.4,0,.2,1);box-shadow:2px 0 20px rgba(0,0,0,.18)}
+.sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:250;opacity:0;pointer-events:none;transition:opacity .3s}
+.sidebar-overlay.open{opacity:1;pointer-events:all}
+.main-content{margin-left:240px;flex:1;min-width:0}
+/* ====== SIDEBAR BRAND ====== */
+.sidebar-brand{padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:10px}
+.sidebar-brand img{height:36px;object-fit:contain;flex-shrink:0}
+.sidebar-brand-text{line-height:1.2}
+.sidebar-brand-title{font-size:20px;font-weight:900;color:#fc6c00;letter-spacing:3px}
+.sidebar-brand-sub{font-size:9px;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase;margin-top:1px}
+.sidebar-rahasia{background:#b22222;color:#fff;text-align:center;font-size:8.5px;font-weight:800;letter-spacing:4px;padding:4px;text-transform:uppercase}
+.sidebar-nav-label{padding:14px 16px 5px;font-size:9px;font-weight:700;color:rgba(255,255,255,.3);letter-spacing:2.5px;text-transform:uppercase}
+/* ====== SIDEBAR NAV ITEMS ====== */
+.sidebar-item{display:flex;align-items:center;gap:11px;padding:11px 16px;cursor:pointer;border-left:3px solid transparent;transition:all .2s;color:rgba(255,255,255,.5);font-size:12.5px;font-weight:500;user-select:none}
+.sidebar-item:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.85);border-left-color:rgba(252,108,0,.4)}
+.sidebar-item.active{background:rgba(252,108,0,.12);color:#fc6c00;border-left-color:#fc6c00;font-weight:700}
+.sidebar-item-num{width:26px;height:26px;border-radius:50%;border:2px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;transition:all .2s}
+.sidebar-item.active .sidebar-item-num{background:#fc6c00;border-color:#fc6c00;color:#fff}
+.sidebar-item-info{flex:1;line-height:1.3}
+.sidebar-item-sub{font-size:10px;color:rgba(255,255,255,.28);font-weight:400;margin-top:1px}
+.sidebar-item.active .sidebar-item-sub{color:rgba(252,108,0,.65)}
+/* ====== SIDEBAR PROGRESS ====== */
+.sidebar-divider{height:1px;background:rgba(255,255,255,.07);margin:6px 0}
+.sidebar-progress-section{padding:12px 16px}
+.sidebar-progress-label{display:flex;justify-content:space-between;font-size:10.5px;color:rgba(255,255,255,.38);margin-bottom:6px}
+.sidebar-progress-pct{font-weight:700;color:#fc6c00}
+.sidebar-progress-bar{height:5px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden}
+.sidebar-progress-fill{height:100%;background:linear-gradient(90deg,#fc6c00,#ff8c00);border-radius:4px;transition:width .5s ease}
+/* ====== SIDEBAR ACTIONS ====== */
+.sidebar-actions{padding:8px 12px}
+.sidebar-btn{display:flex;align-items:center;gap:8px;width:100%;padding:10px 12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:7px;color:rgba(255,255,255,.65);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;margin-bottom:8px;text-align:left;font-family:inherit;letter-spacing:.2px}
+.sidebar-btn:hover{background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.22);transform:translateY(-1px)}
+.sidebar-btn:active{transform:translateY(0)}
+.sidebar-btn-icon{font-size:14px;flex-shrink:0}
+/* ====== MOBILE TOPBAR ====== */
+.mobile-topbar{display:none;position:sticky;top:0;z-index:240;background:#fff;border-bottom:3px solid #fc6c00;padding:0 12px;height:52px;align-items:center;gap:10px;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.hamburger-btn{background:none;border:none;cursor:pointer;padding:6px 8px;color:#2d2d2d;font-size:21px;line-height:1;border-radius:5px;transition:background .15s;flex-shrink:0}
+.hamburger-btn:hover{background:#f0ede8}
+.mobile-title{flex:1;font-weight:800;font-size:14px;color:#1a1a1a;letter-spacing:.5px}
+.mobile-title span{color:#fc6c00}
+.mobile-topbar-actions{display:flex;gap:6px;flex-shrink:0}
+.mobile-action-btn{background:none;border:1px solid #e8e3de;cursor:pointer;padding:5px 9px;color:#666;font-size:11.5px;border-radius:5px;font-family:inherit;font-weight:600;transition:all .15s;white-space:nowrap}
+.mobile-action-btn:hover{background:#fff4ec;color:#fc6c00;border-color:#ffd0b0}
+/* ====== CARD HOVER ====== */
+.section-card{transition:box-shadow .2s}
+.section-card:hover{box-shadow:0 4px 20px rgba(0,0,0,.1),0 0 0 1px rgba(0,0,0,.05)}
+/* ====== REMARK FEATURE ====== */
+.remark-toggle-btn{float:right;background:none;border:1px solid rgba(122,48,0,.2);color:#7a3000;font-size:10px;font-weight:700;padding:2px 9px;border-radius:10px;cursor:pointer;transition:all .15s;letter-spacing:.5px;opacity:.65;font-family:inherit}
+.remark-toggle-btn:hover,.remark-toggle-btn.open,.remark-toggle-btn.has-note{background:#fff4ec;border-color:#fc6c00;color:#fc6c00;opacity:1}
+.remark-area{max-height:0;overflow:hidden;transition:max-height .32s ease,opacity .25s ease,padding .25s ease;opacity:0;background:#fffdf8;border-bottom:2px solid #ffe0c0;border-left:4px solid #fc6c00;padding:0 14px}
+.remark-area.open{max-height:160px;opacity:1;padding:10px 14px 12px}
+.remark-area-label{font-size:10px;font-weight:800;color:#fc6c00;letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:5px}
+.remark-area textarea{width:100%;border:1px solid #ffd0b0;border-radius:5px;padding:7px 10px;font-size:12px;font-family:inherit;resize:vertical;min-height:62px;max-height:120px;background:#fff;color:#2d2d2d;transition:border-color .2s,box-shadow .2s}
+.remark-area textarea:focus{outline:none;border-color:#fc6c00;box-shadow:0 0 0 2px rgba(252,108,0,.12)}
+/* ====== PETUNJUK MODAL ====== */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:400;opacity:0;pointer-events:none;transition:opacity .3s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.petunjuk-modal{position:fixed;top:0;right:-500px;width:min(480px,100vw);height:100vh;background:#fff;z-index:410;display:flex;flex-direction:column;box-shadow:-4px 0 30px rgba(0,0,0,.18);transition:right .35s cubic-bezier(.4,0,.2,1)}
+.petunjuk-modal.open{right:0}
+.petunjuk-header{background:linear-gradient(135deg,#fc6c00,#d95a00);color:#fff;padding:18px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.petunjuk-header h2{font-size:15px;font-weight:800;letter-spacing:.3px;margin:0}
+.modal-close-btn{background:rgba(255,255,255,.2);border:none;color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0;font-family:inherit;line-height:1}
+.modal-close-btn:hover{background:rgba(255,255,255,.35)}
+.petunjuk-body{flex:1;overflow-y:auto;padding:20px}
+.petunjuk-section{margin-bottom:20px}
+.petunjuk-section h3{font-size:12px;font-weight:800;color:#fc6c00;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;padding-bottom:6px;border-bottom:2px solid #fff4ec}
+.petunjuk-section p,.petunjuk-section li{font-size:13px;color:#444;line-height:1.75;margin-bottom:5px}
+.petunjuk-section ul{padding-left:18px}
+.petunjuk-badge{display:inline-block;background:#fc6c00;color:#fff;font-size:10px;font-weight:800;padding:2px 8px;border-radius:10px;letter-spacing:.8px;margin-right:5px;vertical-align:middle}
+/* ====== RECAP MODAL ====== */
+.recap-modal{position:fixed;bottom:-100vh;left:50%;transform:translateX(-50%);width:min(700px,100vw);max-height:88vh;background:#fff;z-index:410;display:flex;flex-direction:column;border-radius:16px 16px 0 0;box-shadow:0 -8px 40px rgba(0,0,0,.22);transition:bottom .38s cubic-bezier(.4,0,.2,1)}
+.recap-modal.open{bottom:0}
+.recap-header{background:linear-gradient(135deg,#1a2332,#2d3a4f);color:#fff;padding:16px 20px;border-radius:16px 16px 0 0;display:flex;align-items:flex-start;justify-content:space-between;flex-shrink:0}
+.recap-header h2{font-size:15px;font-weight:800;margin:0;letter-spacing:.3px}
+.recap-header-sub{font-size:11px;color:rgba(255,255,255,.45);margin-top:2px}
+.recap-tabs{display:flex;border-bottom:2px solid #f0ede8;flex-shrink:0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.recap-tab{padding:11px 18px;font-size:12.5px;font-weight:700;cursor:pointer;border-bottom:2px solid transparent;color:#999;transition:all .2s;white-space:nowrap;margin-bottom:-2px;letter-spacing:.2px;display:flex;align-items:center;gap:6px;user-select:none}
+.recap-tab.active{color:#fc6c00;border-bottom-color:#fc6c00;background:#fff9f5}
+.recap-tab:hover:not(.active){color:#555;background:#fafaf8}
+.recap-tab-badge{background:#e8e3de;color:#888;font-size:10px;font-weight:800;padding:1px 7px;border-radius:8px;min-width:18px;text-align:center;transition:all .2s}
+.recap-tab.active .recap-tab-badge{background:#fc6c00;color:#fff}
+.recap-tab.tab-error .recap-tab-badge.err{background:#c0392b;color:#fff}
+.recap-body{flex:1;overflow-y:auto;padding:14px 18px;min-height:180px}
+.recap-item{padding:10px 14px;border-radius:7px;margin-bottom:8px;border-left:4px solid;cursor:pointer;transition:transform .15s,box-shadow .15s;opacity:0;animation:recapItemIn .25s ease forwards}
+@keyframes recapItemIn{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:translateX(0)}}
+.recap-item:nth-child(2){animation-delay:.04s}.recap-item:nth-child(3){animation-delay:.08s}.recap-item:nth-child(4){animation-delay:.12s}.recap-item:nth-child(5){animation-delay:.16s}
+.recap-item:hover{transform:translateX(3px);box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.recap-item.item-error{background:#fff5f5;border-color:#e53e3e}
+.recap-item.item-warning{background:#fffbf0;border-color:#f6ad55}
+.recap-item.item-empty{background:#f0f7ff;border-color:#90cdf4}
+.recap-item.item-remark{background:#f0fff4;border-color:#38a169}
+.recap-item-label{font-size:12.5px;font-weight:700;margin-bottom:2px}
+.recap-item.item-error .recap-item-label{color:#c0392b}
+.recap-item.item-warning .recap-item-label{color:#7b4a00}
+.recap-item.item-empty .recap-item-label{color:#1a5fa0}
+.recap-item.item-remark .recap-item-label{color:#276749}
+.recap-item-text{font-size:12px;color:#666;line-height:1.4}
+.recap-empty-state{text-align:center;padding:36px 20px;color:#aaa}
+.recap-empty-icon{font-size:40px;margin-bottom:10px}
+.recap-empty-text{font-size:13px;line-height:1.6}
+.recap-footer{padding:14px 18px;border-top:1px solid #f0ede8;display:flex;justify-content:space-between;gap:10px;flex-shrink:0}
+.recap-footer .btn{min-width:140px}
+.recap-footer .btn-primary:disabled{background:#bbb;box-shadow:none;cursor:not-allowed;transform:none}
+/* ====== LAYOUT OVERRIDES ====== */
+.blok-nav-wrap{display:none}
+@media(max-width:767px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .main-content{margin-left:0}
+  .mobile-topbar{display:flex}
+  .header-main{display:none}
+}
+@media(max-width:500px){
+  .recap-tab{padding:9px 11px;font-size:11.5px}
+  .petunjuk-modal{width:100vw}
+  .recap-modal{width:100vw}
+}
+/* ====== FILLED FIELD INDICATOR ====== */
+input[type=text].field-filled,input[type=number].field-filled,input[type=email].field-filled,
+input[type=date].field-filled,input[type=datetime-local].field-filled,textarea.field-filled{
+  background:#f0fff8;border-color:#68d391}
+input[type=text].field-filled:focus,input[type=number].field-filled:focus,
+input[type=email].field-filled:focus,input[type=date].field-filled:focus,
+input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
+  border-color:#38a169;box-shadow:0 0 0 3px rgba(56,161,105,.15)}
+.radio-item.checked{background:#f0fff8!important;border-color:#68d391!important}
+/* ====== INLINE FIELD PETUNJUK ====== */
+.field-pj-btn{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;
+  color:#fff;background:#fc6c00;border:none;border-radius:14px;padding:4px 12px;cursor:pointer;
+  transition:all .15s;margin-top:8px;font-family:inherit;letter-spacing:.3px}
+.field-pj-btn:hover{background:#e06000;transform:translateY(-1px)}
+.field-pj-btn.open{background:#555}
+.field-pj-box{max-height:0;overflow:hidden;
+  transition:max-height .35s ease,opacity .25s ease,padding .25s ease;
+  opacity:0;background:#fffaf5;border-radius:7px;border-left:4px solid #fc6c00;
+  padding:0 14px;margin-top:0}
+.field-pj-box.open{max-height:900px;opacity:1;padding:12px 14px 14px;margin-top:8px}
+.field-pj-title{font-size:10.5px;font-weight:800;color:#fc6c00;letter-spacing:1px;
+  text-transform:uppercase;margin-bottom:8px}
+.field-pj-box p{font-size:12.5px;color:#555;line-height:1.75;margin-bottom:6px}
+.field-pj-box ul{padding-left:18px;margin-bottom:6px}
+.field-pj-box li{font-size:12.5px;color:#555;line-height:1.75;margin-bottom:3px}
+.field-pj-ex{font-size:12px;color:#5a3a20;padding:3px 0 3px 18px;border-bottom:1px solid #ffe8d5;
+  line-height:1.55;position:relative}
+.field-pj-ex:last-child{border-bottom:none}
+.field-pj-ex::before{content:'○';position:absolute;left:0;color:#fc6c00;font-weight:800;font-size:11px}
 </style>
 </head>
 <body>
 
+<!-- MOBILE TOPBAR -->
+<div class="mobile-topbar" id="mobileTopbar">
+  <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleSidebar()">&#9776;</button>
+  <div class="mobile-title">CAWI <span>SE2026</span></div>
+  <div class="mobile-topbar-actions">
+    <button class="mobile-action-btn" onclick="togglePetunjuk()">? Petunjuk</button>
+    <button class="mobile-action-btn" onclick="showRecap()">&#128269; Rekap</button>
+  </div>
+</div>
+
+<!-- SIDEBAR OVERLAY -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<!-- APP LAYOUT -->
+<div class="app-layout">
+
+<!-- ====== SIDEBAR ====== -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/2/28/Lambang_Badan_Pusat_Statistik_%28BPS%29_Indonesia.svg" alt="BPS" onerror="this.style.display='none'" style="height:34px;filter:brightness(10)"/>
+    <div class="sidebar-brand-text">
+      <div class="sidebar-brand-title">CAWI</div>
+      <div class="sidebar-brand-sub">Sensus Ekonomi 2026</div>
+    </div>
+  </div>
+  <div class="sidebar-rahasia">&#x25CF; R A H A S I A &#x25CF;</div>
+  <div class="sidebar-nav-label">NAVIGASI BLOK</div>
+  <div class="sidebar-item active" onclick="goBlok(1)" id="sidebarTab1">
+    <div class="sidebar-item-num">I</div>
+    <div class="sidebar-item-info">
+      <div>Keterangan Tempat &amp; Usaha</div>
+      <div class="sidebar-item-sub">Pertanyaan 1 s.d. 25</div>
+    </div>
+  </div>
+  <div class="sidebar-item" onclick="goBlok(2)" id="sidebarTab2">
+    <div class="sidebar-item-num">II</div>
+    <div class="sidebar-item-info">
+      <div>Catatan Kunjungan</div>
+      <div class="sidebar-item-sub">Kunjungan I, II, III</div>
+    </div>
+  </div>
+  <div class="sidebar-item" onclick="goBlok(3)" id="sidebarTab3">
+    <div class="sidebar-item-num">III</div>
+    <div class="sidebar-item-info">
+      <div>Identitas Responden</div>
+      <div class="sidebar-item-sub">Tanda tangan &amp; Submit</div>
+    </div>
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-progress-section">
+    <div class="sidebar-progress-label">
+      <span>Field Wajib Terisi</span>
+      <span class="sidebar-progress-pct" id="sidebarProgressPct">0%</span>
+    </div>
+    <div class="sidebar-progress-bar">
+      <div class="sidebar-progress-fill" id="sidebarProgressFill" style="width:0%"></div>
+    </div>
+    <div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:5px" id="sidebarProgressDetail">Mulai mengisi form...</div>
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-actions">
+    <button class="sidebar-btn" onclick="togglePetunjuk()">
+      <span class="sidebar-btn-icon">&#128203;</span> Petunjuk Pengisian
+    </button>
+    <button class="sidebar-btn" onclick="showRecap()">
+      <span class="sidebar-btn-icon">&#128269;</span> Rekap &amp; Periksa
+    </button>
+  </div>
+  <div style="padding:12px 16px;margin-top:auto">
+    <div style="font-size:10px;color:rgba(255,255,255,.22);line-height:1.8">BPS Republik Indonesia<br/>&#169; Sensus Ekonomi 2026</div>
+  </div>
+</aside>
+
+<!-- ====== MAIN CONTENT ====== -->
+<div class="main-content" id="mainContent">
+
 <!-- RAHASIA BAR -->
-<div class="rahasia-bar">R A H A S I A</div>
+<div class="rahasia-bar">&#x25CF;&nbsp; R A H A S I A &nbsp;&#x25CF;</div>
 
 <!-- HEADER -->
 <div class="header-main">
@@ -117,12 +369,12 @@ canvas#sigCanvas{display:block;cursor:crosshair;touch-action:none}
       <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/National_emblem_of_Indonesia_Garuda_Pancasila.svg/1280px-National_emblem_of_Indonesia_Garuda_Pancasila.svg.png" alt="Garuda Pancasila" onerror="this.style.display='none'"/>
     </div>
     <div class="header-center">
-      <div class="title-main">REPUBLIK INDONESIA</div>
-      <div class="title-sub">SENSUS EKONOMI 2026</div>
+      <div class="title-rep">Badan Pusat Statistik — Republik Indonesia</div>
+      <div class="title-sensus">Sensus Ekonomi 2026</div>
       <div class="title-cawi">CAWI</div>
-      <div style="font-size:12px;color:#888;margin-top:2px">Sosialisasi SE2026</div>
+      <div class="title-sosialisasi">Sosialisasi &nbsp;|&nbsp; Self-Enumeration</div>
     </div>
-    <div class="header-logos" style="gap:12px">
+    <div class="header-logos" style="gap:10px">
       <img src="https://satudata.mojokertokab.go.id/onedata/global_assets/logo_se2026.png" alt="SE2026" onerror="this.style.display='none'"/>
       <img src="https://upload.wikimedia.org/wikipedia/commons/2/28/Lambang_Badan_Pusat_Statistik_%28BPS%29_Indonesia.svg" alt="BPS" onerror="this.style.display='none'"/>
     </div>
@@ -130,7 +382,7 @@ canvas#sigCanvas{display:block;cursor:crosshair;touch-action:none}
 </div>
 
 <!-- BLOK NAV -->
-<div style="background:#fff;border-bottom:2px solid #eee">
+<div class="blok-nav-wrap">
   <div class="blok-nav">
     <div class="blok-tab active" data-blok="1" onclick="goBlok(1)">BLOK I</div>
     <div class="blok-tab" data-blok="2" onclick="goBlok(2)">BLOK II</div>
@@ -146,9 +398,17 @@ canvas#sigCanvas{display:block;cursor:crosshair;touch-action:none}
 <!-- ==================== BLOK I ==================== -->
 <div class="blok-panel active" id="blok1">
 
+  <div class="blok-banner">
+    <div class="blok-badge">BLOK I</div>
+    <div>
+      <div class="blok-title-text">Keterangan Tempat &amp; Usaha/Perusahaan</div>
+      <div class="blok-title-sub">Pertanyaan 1 s.d. 25 — Isi semua kolom bertanda <strong style="color:#ffe0c0">*</strong></div>
+    </div>
+  </div>
+
   <!-- Q1 Provinsi -->
   <div class="section-card">
-    <div class="section-header">1. Provinsi</div>
+    <div class="section-header">&#9312; Provinsi Lokasi Usaha</div>
     <div class="section-body">
       <div class="form-group">
         <label class="field-label">Provinsi <span class="req">*</span></label>
@@ -162,7 +422,7 @@ canvas#sigCanvas{display:block;cursor:crosshair;touch-action:none}
 
   <!-- Q2 Kabupaten -->
   <div class="section-card">
-    <div class="section-header">2. Kabupaten/Kota</div>
+    <div class="section-header">&#9313; Kabupaten/Kota</div>
     <div class="section-body">
       <div class="form-group">
         <label class="field-label">Kabupaten/Kota <span class="req">*</span></label>
@@ -176,7 +436,7 @@ canvas#sigCanvas{display:block;cursor:crosshair;touch-action:none}
 
   <!-- Q3 Kecamatan -->
   <div class="section-card">
-    <div class="section-header">3. Kecamatan</div>
+    <div class="section-header">&#9314; Kecamatan</div>
     <div class="section-body">
       <div class="form-group">
         <label class="field-label">Kecamatan <span class="req">*</span> <span id="spinner-kec" class="spinner hidden"></span></label>
@@ -189,7 +449,7 @@ canvas#sigCanvas{display:block;cursor:crosshair;touch-action:none}
 
   <!-- Q4 Kelurahan -->
   <div class="section-card">
-    <div class="section-header">4. Kelurahan/Desa/Nagari</div>
+    <div class="section-header">&#9315; Kelurahan / Desa / Nagari</div>
     <div class="section-body">
       <div class="form-group">
         <label class="field-label">Kelurahan/Desa/Nagari <span class="req">*</span> <span id="spinner-kel" class="spinner hidden"></span></label>
@@ -202,7 +462,7 @@ canvas#sigCanvas{display:block;cursor:crosshair;touch-action:none}
 
   <!-- Q5 Nama dan Alamat -->
   <div class="section-card">
-    <div class="section-header">5. Nama dan Alamat Perusahaan</div>
+    <div class="section-header">&#9316; Nama dan Alamat Perusahaan / Usaha</div>
     <div class="section-body">
 
       <div class="subsection-label">a. Nama Perusahaan</div>
@@ -286,7 +546,7 @@ canvas#sigCanvas{display:block;cursor:crosshair;touch-action:none}
         </div>
       </div>
 
-      <div class="form-group" id="q5e_wrap">
+      <div class="form-group hidden" id="q5e_wrap">
         <div class="subsection-label">e. Nama Kawasan</div>
         <label class="field-label">Nama Kawasan <span class="req">*</span></label>
         <input type="text" id="q5e_nama_kawasan" placeholder="Nama kawasan"/>
@@ -297,7 +557,7 @@ canvas#sigCanvas{display:block;cursor:crosshair;touch-action:none}
 
   <!-- Q6 NIB -->
   <div class="section-card">
-    <div class="section-header">6. NIB (Nomor Induk Berusaha)</div>
+    <div class="section-header">&#9317; Nomor Induk Berusaha (NIB)</div>
     <div class="section-body">
 
       <div class="form-group">
@@ -339,7 +599,7 @@ canvas#sigCanvas{display:block;cursor:crosshair;touch-action:none}
 
   <!-- Q7 Status Badan Usaha -->
   <div class="section-card">
-    <div class="section-header">7. Status Badan Usaha</div>
+    <div class="section-header">&#9318; Status Badan Usaha</div>
     <div class="section-body">
 
       <div class="form-group">
@@ -395,7 +655,7 @@ canvas#sigCanvas{display:block;cursor:crosshair;touch-action:none}
 
   <!-- Q8 Keterangan Pengusaha -->
   <div class="section-card">
-    <div class="section-header">8. Keterangan Pengusaha/Penanggung Jawab</div>
+    <div class="section-header">&#9319; Keterangan Pengusaha / Penanggung Jawab</div>
     <div class="section-body">
       <div class="form-group">
         <div class="subsection-label">a. Nama</div>
@@ -426,12 +686,40 @@ canvas#sigCanvas{display:block;cursor:crosshair;touch-action:none}
 
   <!-- Q9 Kegiatan Utama -->
   <div class="section-card">
-    <div class="section-header">9. Kegiatan Utama</div>
+    <div class="section-header">&#9320; Kegiatan Utama Usaha / Perusahaan</div>
     <div class="section-body">
       <div class="form-group">
         <div class="subsection-label">a. Kegiatan utama usaha/perusahaan</div>
         <label class="field-label">Deskripsi kegiatan utama <span class="req">*</span></label>
-        <textarea id="q9a_kegiatan" placeholder="Deskripsikan kegiatan utama perusahaan..."></textarea>
+        <textarea id="q9a_kegiatan" placeholder="Tuliskan kegiatan utama usaha beserta produk dan cara penjualan..."></textarea>
+        <button class="field-pj-btn" onclick="toggleFieldPetunjuk('pj_q9a',this)">&#128203; Lihat Contoh</button>
+        <div class="field-pj-box" id="pj_q9a">
+          <div class="field-pj-title">Penjelasan Rincian 9a — Contoh Kegiatan Utama</div>
+          <p>Tuliskan secara rinci kegiatan utama usaha, termasuk produk/jasa yang dihasilkan dan cara penjualannya:</p>
+          <div class="field-pj-ex">menggiling daging ikan menjadi sosis dan dijual di rumah/online</div>
+          <div class="field-pj-ex">membuat kebab di rumah dan dititipkan di warung</div>
+          <div class="field-pj-ex">jasa borongan/konstruksi rumah</div>
+          <div class="field-pj-ex">menjual mobil bekas di showroom</div>
+          <div class="field-pj-ex">menjual kaset video game yang dibeli dari pihak lain di marketplace</div>
+          <div class="field-pj-ex">angkutan bus antarkota antarprovinsi</div>
+          <div class="field-pj-ex">membuat sosis dari ikan, disajikan dengan pembakaran, dijual di depan rumah/online</div>
+          <div class="field-pj-ex">menyewakan kos bulanan</div>
+          <div class="field-pj-ex">menyewakan kamar hotel bintang 5</div>
+          <div class="field-pj-ex">membuat kebab berdasarkan pesanan langsung di gerobak depan alfamart</div>
+          <div class="field-pj-ex">menjual perangkat lunak video gim yang dikembangkan sendiri</div>
+          <div class="field-pj-ex">penyediaan telekomunikasi internet tanpa kabel</div>
+          <div class="field-pj-ex">membuat rumah kemudian dipasarkan sendiri</div>
+          <div class="field-pj-ex">menyewakan rumah dengan periode tahunan</div>
+          <div class="field-pj-ex">membuat desain kemasan botol minuman</div>
+          <div class="field-pj-ex">sekolah menengah pertama negeri</div>
+          <div class="field-pj-ex">rumah sakit pemerintah</div>
+          <div class="field-pj-ex">membuat seni lukisan yang dipajang untuk dijual</div>
+          <div class="field-pj-ex">membuat kunci duplikat di pinggir jalan</div>
+          <div class="field-pj-ex">menulis cerpen</div>
+          <div class="field-pj-ex">membuat desain interior rumah</div>
+          <div class="field-pj-ex">pengembangan aplikasi video gim</div>
+          <div class="field-pj-ex">meracik jamu secara langsung untuk siap konsumsi di sebuah kedai</div>
+        </div>
       </div>
 
       <div class="subsection-label">b. Pilih yang sesuai (minimal salah satu b1-b4 harus "Ya")</div>
@@ -469,33 +757,73 @@ canvas#sigCanvas{display:block;cursor:crosshair;touch-action:none}
         <label class="field-label">Pilih salah satu <span class="req">*</span></label>
         <div class="radio-group">
           <label class="radio-item"><input type="radio" name="q9c" value="1"/> <span>1. Apotek</span></label>
-          <label class="radio-item"><input type="radio" name="q9c" value="2"/> <span>2. Swalayan</span></label>
-          <label class="radio-item"><input type="radio" name="q9c" value="3"/> <span>3. Los Pasar</span></label>
+          <label class="radio-item"><input type="radio" name="q9c" value="2"/> <span>2. Swalayan / Minimarket</span></label>
+          <label class="radio-item"><input type="radio" name="q9c" value="3"/> <span>3. Los / Kios / Lapak Pasar</span></label>
           <label class="radio-item"><input type="radio" name="q9c" value="4"/> <span>4. Toko, ruko, dan sejenisnya</span></label>
           <label class="radio-item"><input type="radio" name="q9c" value="5"/> <span>5. Kedai, stan, tenda</span></label>
           <label class="radio-item"><input type="radio" name="q9c" value="6"/> <span>6. Bar</span></label>
           <label class="radio-item"><input type="radio" name="q9c" value="7"/> <span>7. Kelab malam, diskotek</span></label>
           <label class="radio-item"><input type="radio" name="q9c" value="8"/> <span>8. Kafe</span></label>
           <label class="radio-item"><input type="radio" name="q9c" value="9"/> <span>9. Restoran, warung makan</span></label>
-          <label class="radio-item"><input type="radio" name="q9c" value="10"/> <span>10. Keliling</span></label>
-          <label class="radio-item"><input type="radio" name="q9c" value="11"/> <span>11. Daring (online)</span></label>
+          <label class="radio-item"><input type="radio" name="q9c" value="10"/> <span>10. Keliling / Gerobak / Kendaraan</span></label>
+          <label class="radio-item"><input type="radio" name="q9c" value="11"/> <span>11. Daring (online, tanpa tempat usaha fisik tetap)</span></label>
+          <label class="radio-item"><input type="radio" name="q9c" value="12"/> <span>12. Gedung / Kantor / Ruko bukan dagang</span></label>
+          <label class="radio-item"><input type="radio" name="q9c" value="13"/> <span>13. Rumah / Tempat tinggal</span></label>
+          <label class="radio-item"><input type="radio" name="q9c" value="14"/> <span>14. Pabrik / Workshop / Bengkel / Gudang</span></label>
+          <label class="radio-item"><input type="radio" name="q9c" value="15"/> <span>15. Lahan pertanian / perkebunan / tambak</span></label>
+          <label class="radio-item"><input type="radio" name="q9c" value="16"/> <span>16. Hotel / Penginapan / Villa</span></label>
+          <label class="radio-item"><input type="radio" name="q9c" value="99"/> <span>99. Lainnya</span></label>
         </div>
       </div>
 
       <div class="form-group">
         <div class="subsection-label">d. Input yang digunakan</div>
         <label class="field-label">Deskripsi input <span class="req">*</span></label>
-        <textarea id="q9d_input" placeholder="Tuliskan input/bahan baku yang digunakan..."></textarea>
+        <textarea id="q9d_input" placeholder="Tuliskan bahan baku/input utama yang digunakan..."></textarea>
+        <button class="field-pj-btn" onclick="toggleFieldPetunjuk('pj_q9d',this)">&#128203; Lihat Contoh</button>
+        <div class="field-pj-box" id="pj_q9d">
+          <div class="field-pj-title">Contoh Pengisian — Input / Bahan Baku (Rincian 9d)</div>
+          <p>Tuliskan bahan baku, bahan penolong, atau input utama yang digunakan dalam proses produksi/kegiatan:</p>
+          <div class="field-pj-ex">tepung terigu, mentega, telur, gula, susu (usaha pembuatan roti/kue)</div>
+          <div class="field-pj-ex">kayu jati, kayu mahoni, baut, plitur (usaha mebel)</div>
+          <div class="field-pj-ex">ikan nila, ikan bandeng, tepung roti, bumbu (usaha pengolahan ikan)</div>
+          <div class="field-pj-ex">pakaian/tekstil dari distributor atau produsen (usaha perdagangan)</div>
+          <div class="field-pj-ex">semen, pasir, bata, besi tulangan (usaha konstruksi)</div>
+          <div class="field-pj-ex">tenaga/waktu pengerjaan (usaha jasa murni seperti konsultasi, salon)</div>
+          <div class="field-pj-ex">tidak ada bahan baku fisik (usaha jasa pendidikan, keuangan, dll.)</div>
+        </div>
       </div>
       <div class="form-group">
         <div class="subsection-label">e. Proses mengubah input menjadi produk</div>
         <label class="field-label">Deskripsi proses <span class="req">*</span></label>
-        <textarea id="q9e_proses" placeholder="Tuliskan proses produksi..."></textarea>
+        <textarea id="q9e_proses" placeholder="Jelaskan bagaimana input diubah menjadi produk/jasa yang dijual..."></textarea>
+        <button class="field-pj-btn" onclick="toggleFieldPetunjuk('pj_q9e',this)">&#128203; Lihat Contoh</button>
+        <div class="field-pj-box" id="pj_q9e">
+          <div class="field-pj-title">Contoh Pengisian — Proses Produksi (Rincian 9e)</div>
+          <p>Jelaskan alur proses dari penerimaan input hingga produk/jasa siap dijual:</p>
+          <div class="field-pj-ex">membeli bahan → mengolah/memasak → mengemas → menjual langsung/online</div>
+          <div class="field-pj-ex">menerima pesanan → memotong/menjahit bahan → finishing → mengirim ke pelanggan</div>
+          <div class="field-pj-ex">membeli barang dari distributor → menyimpan di gudang → menjual eceran</div>
+          <div class="field-pj-ex">menerima pelanggan → mengerjakan jasa → mengecek kualitas → menerima pembayaran</div>
+          <div class="field-pj-ex">mengumpulkan bahan baku → memproses di pabrik → mengemas → mendistribusikan</div>
+        </div>
       </div>
       <div class="form-group">
         <div class="subsection-label">f. Produk utama yang dihasilkan</div>
         <label class="field-label">Deskripsi produk <span class="req">*</span></label>
-        <textarea id="q9f_produk" placeholder="Tuliskan produk utama..."></textarea>
+        <textarea id="q9f_produk" placeholder="Tuliskan produk barang atau jasa utama yang dijual/dihasilkan..."></textarea>
+        <button class="field-pj-btn" onclick="toggleFieldPetunjuk('pj_q9f',this)">&#128203; Lihat Contoh</button>
+        <div class="field-pj-box" id="pj_q9f">
+          <div class="field-pj-title">Contoh Pengisian — Produk Utama (Rincian 9f)</div>
+          <p>Tuliskan produk barang atau jasa utama yang dihasilkan/dijual usaha ini:</p>
+          <div class="field-pj-ex">roti tawar, donat, kue brownies, kue kering (usaha bakery)</div>
+          <div class="field-pj-ex">meja makan, kursi tamu, lemari dari kayu jati (usaha mebel)</div>
+          <div class="field-pj-ex">ikan goreng siap saji, nugget ikan, bakso ikan (usaha pengolahan ikan)</div>
+          <div class="field-pj-ex">pakaian batik, kemeja, celana, kaos (usaha perdagangan tekstil)</div>
+          <div class="field-pj-ex">jasa potong rambut, creambath, warna rambut (usaha salon)</div>
+          <div class="field-pj-ex">jasa perbaikan AC, kulkas, mesin cuci (usaha servis elektronik)</div>
+          <div class="field-pj-ex">bangunan rumah/ruko/gedung sesuai pesanan (usaha konstruksi)</div>
+        </div>
       </div>
 
       <div class="form-group">
@@ -533,7 +861,7 @@ canvas#sigCanvas{display:block;cursor:crosshair;touch-action:none}
 
   <!-- Q10 Jaringan Usaha -->
   <div class="section-card">
-    <div class="section-header">10. Jaringan Usaha</div>
+    <div class="section-header">10. Jaringan / Skala Usaha</div>
     <div class="section-body">
       <div class="form-group">
         <div class="subsection-label">a. Jaringan usaha</div>
@@ -557,7 +885,7 @@ canvas#sigCanvas{display:block;cursor:crosshair;touch-action:none}
 
   <!-- Q11 Info Kantor Pusat -->
   <div class="section-card hidden" id="q11_wrap">
-    <div class="section-header">11. Informasi Kantor Pusat</div>
+    <div class="section-header">11. Informasi Kantor Pusat / Induk</div>
     <div class="section-body">
       <div class="form-group">
         <div class="subsection-label">a. Nama Kantor Pusat</div>
@@ -577,8 +905,27 @@ canvas#sigCanvas{display:block;cursor:crosshair;touch-action:none}
       <div class="form-group">
         <div class="subsection-label">d. Negara</div>
         <label class="field-label">Negara <span class="req">*</span></label>
-        <select id="q11d_negara">
+        <select id="q11d_negara" onchange="handleNegaraKP()">
           <option value="ID">Indonesia</option>
+          <option value="MY">Malaysia</option>
+          <option value="SG">Singapura</option>
+          <option value="JP">Jepang</option>
+          <option value="CN">Tiongkok</option>
+          <option value="US">Amerika Serikat</option>
+          <option value="GB">Inggris</option>
+          <option value="AU">Australia</option>
+          <option value="NL">Belanda</option>
+          <option value="KR">Korea Selatan</option>
+          <option value="DE">Jerman</option>
+          <option value="FR">Prancis</option>
+          <option value="IN">India</option>
+          <option value="SA">Arab Saudi</option>
+          <option value="AE">Uni Emirat Arab</option>
+          <option value="HK">Hong Kong</option>
+          <option value="TW">Taiwan</option>
+          <option value="TH">Thailand</option>
+          <option value="PH">Filipina</option>
+          <option value="VN">Vietnam</option>
           <option value="other">Negara Lain</option>
         </select>
       </div>
@@ -603,7 +950,7 @@ canvas#sigCanvas{display:block;cursor:crosshair;touch-action:none}
 
   <!-- Q12 Internet -->
   <div class="section-card">
-    <div class="section-header">12. Internet</div>
+    <div class="section-header">12. Penggunaan Internet dan Teknologi Digital</div>
     <div class="section-body">
       <div class="form-group">
         <div class="subsection-label">a. Apakah menggunakan internet?</div>
@@ -653,7 +1000,7 @@ canvas#sigCanvas{display:block;cursor:crosshair;touch-action:none}
 
   <!-- Q13 Lingkungan -->
   <div class="section-card">
-    <div class="section-header">13. Lingkungan</div>
+    <div class="section-header">13. Produk / Kegiatan Ramah Lingkungan</div>
     <div class="section-body">
       <div class="form-group">
         <div class="subsection-label">a. Apakah memproduksi barang/jasa ramah lingkungan?</div>
@@ -677,7 +1024,7 @@ canvas#sigCanvas{display:block;cursor:crosshair;touch-action:none}
 
   <!-- Q14 Produk Kreatif -->
   <div class="section-card">
-    <div class="section-header">14. Produk Karya Seni/Kreatif</div>
+    <div class="section-header">14. Produk Karya Seni / Kreatif / Teknologi</div>
     <div class="section-body">
       <div class="form-group">
         <label class="field-label">Apakah menggunakan produk karya seni, sastra, desain, teknologi kreatif? <span class="req">*</span></label>
@@ -691,7 +1038,7 @@ canvas#sigCanvas{display:block;cursor:crosshair;touch-action:none}
 
   <!-- Q15 Sertifikat Halal -->
   <div class="section-card">
-    <div class="section-header">15. Sertifikat Halal</div>
+    <div class="section-header">15. Sertifikasi Halal (BPJPH)</div>
     <div class="section-body">
       <div class="form-group">
         <div class="subsection-label">a. Apakah menghasilkan produk bersertifikat halal?</div>
@@ -719,7 +1066,7 @@ canvas#sigCanvas{display:block;cursor:crosshair;touch-action:none}
 
   <!-- Q16 Izin Edar -->
   <div class="section-card">
-    <div class="section-header">16. Izin Edar</div>
+    <div class="section-header">16. Izin Edar Produk (BPOM)</div>
     <div class="section-body">
       <div class="form-group">
         <div class="subsection-label">a. Apakah memiliki izin edar?</div>
@@ -747,7 +1094,7 @@ canvas#sigCanvas{display:block;cursor:crosshair;touch-action:none}
 
   <!-- Q17 Mitra KDKMP -->
   <div class="section-card">
-    <div class="section-header">17. Kemitraan KDKMP</div>
+    <div class="section-header">17. Kemitraan dengan KDKMP</div>
     <div class="section-body">
       <div class="form-group">
         <label class="field-label">Apakah bermitra dengan KDKMP (Koperasi Desa/Kelurahan Merah Putih)? <span class="req">*</span></label>
@@ -761,7 +1108,7 @@ canvas#sigCanvas{display:block;cursor:crosshair;touch-action:none}
 
   <!-- Q18 MBG -->
   <div class="section-card">
-    <div class="section-header">18. Program MBG (Makan Bergizi Gratis)</div>
+    <div class="section-header">18. Keterlibatan dalam Program MBG (Makan Bergizi Gratis)</div>
     <div class="section-body">
       <div class="form-group">
         <label class="field-label">Apakah terlibat dalam program MBG? <span class="req">*</span></label>
@@ -778,7 +1125,7 @@ canvas#sigCanvas{display:block;cursor:crosshair;touch-action:none}
 
   <!-- Q19 Transaksi Non-Penduduk -->
   <div class="section-card">
-    <div class="section-header">19. Transaksi Non-Penduduk</div>
+    <div class="section-header">19. Transaksi dengan Non-Penduduk (Ekspor/Impor)</div>
     <div class="section-body">
       <div class="form-group">
         <div class="subsection-label">a. Barang</div>
@@ -801,7 +1148,7 @@ canvas#sigCanvas{display:block;cursor:crosshair;touch-action:none}
 
   <!-- Q20 Jumlah Pekerja -->
   <div class="section-card">
-    <div class="section-header">20. Jumlah Pekerja</div>
+    <div class="section-header">20. Jumlah Pekerja (per akhir 2025)</div>
     <div class="section-body">
       <div class="inline-fields">
         <div class="form-group">
@@ -822,7 +1169,7 @@ canvas#sigCanvas{display:block;cursor:crosshair;touch-action:none}
 
   <!-- Q21 Tahun Beroperasi -->
   <div class="section-card">
-    <div class="section-header">21. Tahun Mulai Beroperasi</div>
+    <div class="section-header">21. Tahun Mulai Beroperasi Secara Komersial</div>
     <div class="section-body">
       <div class="form-group">
         <label class="field-label">Tahun mulai beroperasi secara komersial <span class="req">*</span></label>
@@ -834,7 +1181,7 @@ canvas#sigCanvas{display:block;cursor:crosshair;touch-action:none}
 
   <!-- Q22 Pengeluaran -->
   <div class="section-card">
-    <div class="section-header">22. Nilai Pengeluaran 2025 (Rupiah)</div>
+    <div class="section-header">22. Nilai Pengeluaran Tahun 2025 (Rupiah)</div>
     <div class="section-body">
       <div class="form-group">
         <label class="field-label">a. Total upah dan gaji, serta jaminan sosial pegawai <span class="req">*</span></label>
@@ -865,7 +1212,7 @@ canvas#sigCanvas{display:block;cursor:crosshair;touch-action:none}
 
   <!-- Q23 Pendapatan -->
   <div class="section-card">
-    <div class="section-header">23. Nilai Pendapatan/Penjualan 2025 (Rupiah)</div>
+    <div class="section-header">23. Nilai Pendapatan / Penjualan Tahun 2025 (Rupiah)</div>
     <div class="section-body">
       <div class="form-group">
         <label class="field-label">a. Nilai barang dan jasa <span class="req">*</span></label>
@@ -891,7 +1238,7 @@ canvas#sigCanvas{display:block;cursor:crosshair;touch-action:none}
 
   <!-- Q24 Aset -->
   <div class="section-card">
-    <div class="section-header">24. Nilai Aset 2025 (Rupiah)</div>
+    <div class="section-header">24. Nilai Aset per 31 Desember 2025 (Rupiah)</div>
     <div class="section-body">
       <div class="form-group">
         <label class="field-label">a. Nilai aset tanah dan bangunan pada 31 Desember 2025 <span class="req">*</span></label>
@@ -924,7 +1271,7 @@ canvas#sigCanvas{display:block;cursor:crosshair;touch-action:none}
 
   <!-- Q25 Kepemilikan Modal -->
   <div class="section-card">
-    <div class="section-header">25. Susunan Kepemilikan Modal (31 Desember 2025) (%)</div>
+    <div class="section-header">25. Susunan Kepemilikan Modal per 31 Desember 2025 (%)</div>
     <div class="section-body">
       <div class="inline-fields">
         <div class="form-group">
@@ -973,8 +1320,17 @@ canvas#sigCanvas{display:block;cursor:crosshair;touch-action:none}
 
 <!-- ==================== BLOK II ==================== -->
 <div class="blok-panel" id="blok2">
+
+  <div class="blok-banner">
+    <div class="blok-badge">BLOK II</div>
+    <div>
+      <div class="blok-title-text">Catatan Kunjungan Petugas</div>
+      <div class="blok-title-sub">Diisi oleh petugas pencacah — ringkasan kunjungan lapangan</div>
+    </div>
+  </div>
+
   <div class="section-card">
-    <div class="section-header">BLOK II — Catatan</div>
+    <div class="section-header">Catatan Kunjungan</div>
     <div class="section-body">
 
       <div class="catatan-group">
@@ -1024,8 +1380,17 @@ canvas#sigCanvas{display:block;cursor:crosshair;touch-action:none}
 
 <!-- ==================== BLOK III ==================== -->
 <div class="blok-panel" id="blok3">
+
+  <div class="blok-banner">
+    <div class="blok-badge">BLOK III</div>
+    <div>
+      <div class="blok-title-text">Identitas Responden &amp; Tanda Tangan</div>
+      <div class="blok-title-sub">Pengisian akhir — pastikan semua data sudah benar sebelum submit</div>
+    </div>
+  </div>
+
   <div class="section-card">
-    <div class="section-header">BLOK III — Data Responden</div>
+    <div class="section-header">Data Responden / Pengisi Kuesioner</div>
     <div class="section-body">
 
       <div class="form-group">
@@ -1058,8 +1423,11 @@ canvas#sigCanvas{display:block;cursor:crosshair;touch-action:none}
 
       <div id="submitAlert" class="alert alert-error hidden" style="margin-top:14px"></div>
 
-      <div style="margin-top:20px;text-align:center">
-        <button class="btn btn-primary" id="submitBtn" onclick="submitForm()" style="padding:12px 40px;font-size:15px">KIRIM / SUBMIT</button>
+      <div style="margin-top:24px;text-align:center">
+        <p style="font-size:12px;color:#aaa;margin-bottom:12px">Dengan menekan tombol KIRIM, Anda menyatakan bahwa data yang diisikan adalah benar dan dapat dipertanggungjawabkan.</p>
+        <button class="btn btn-primary" id="submitBtn" onclick="showRecap()" style="padding:14px 60px;font-size:16px;letter-spacing:1px;border-radius:8px;box-shadow:0 4px 20px rgba(252,108,0,.45)">
+          &#128228; &nbsp;KIRIM / SUBMIT
+        </button>
       </div>
 
     </div>
@@ -1073,19 +1441,495 @@ canvas#sigCanvas{display:block;cursor:crosshair;touch-action:none}
 
 </div><!-- end form-container -->
 
+<!-- FOOTER -->
+<div style="background:#fff;border-top:3px solid #fc6c00;margin-top:20px;padding:16px 20px;text-align:center">
+  <div style="max-width:960px;margin:0 auto;font-size:12px;color:#aaa;line-height:1.8">
+    <strong style="color:#fc6c00">SENSUS EKONOMI 2026 — CAWI</strong><br/>
+    Badan Pusat Statistik Republik Indonesia &nbsp;|&nbsp; Sosialisasi SE2026<br/>
+    <span style="font-size:11px">Data yang dikumpulkan bersifat <strong>RAHASIA</strong> dan dilindungi oleh Undang-Undang No. 16 Tahun 1997 tentang Statistik</span>
+  </div>
+</div>
+
+</div><!-- end main-content -->
+</div><!-- end app-layout -->
+
+<!-- ====== PETUNJUK MODAL ====== -->
+<div class="modal-overlay" id="petunjukOverlay" onclick="closePetunjuk()"></div>
+<div class="petunjuk-modal" id="petunjukModal">
+  <div class="petunjuk-header">
+    <h2>&#128203; Petunjuk Pengisian CAWI SE2026</h2>
+    <button class="modal-close-btn" onclick="closePetunjuk()">&#10005;</button>
+  </div>
+  <div class="petunjuk-body">
+    <div class="petunjuk-section">
+      <h3>Tentang CAWI SE2026</h3>
+      <p>CAWI (Computer Assisted Web Interviewing) adalah metode pengumpulan data Sensus Ekonomi 2026 secara daring. Data yang Anda isi bersifat <strong>RAHASIA</strong> dan dilindungi oleh UU No. 16 Tahun 1997 tentang Statistik.</p>
+    </div>
+    <div class="petunjuk-section">
+      <h3>Cara Pengisian</h3>
+      <ul>
+        <li>Isi semua kolom bertanda <strong style="color:#d63031">*</strong> (wajib diisi)</li>
+        <li>Gunakan navigasi di sidebar kiri untuk berpindah antar blok</li>
+        <li>Klik <strong>Rekap &amp; Periksa</strong> sebelum submit untuk memeriksa isian</li>
+        <li>Pastikan semua data benar dan dapat dipertanggungjawabkan</li>
+      </ul>
+    </div>
+    <div class="petunjuk-section">
+      <h3>Isi Tiap Blok</h3>
+      <p><span class="petunjuk-badge">BLOK I</span> Keterangan tempat dan usaha/perusahaan — identitas, kegiatan usaha, tenaga kerja, keuangan (Pertanyaan 1–25)</p>
+      <p><span class="petunjuk-badge">BLOK II</span> Catatan kunjungan petugas — diisi oleh petugas pencacah lapangan</p>
+      <p><span class="petunjuk-badge">BLOK III</span> Identitas responden dan tanda tangan digital — konfirmasi dan submit</p>
+    </div>
+    <div class="petunjuk-section">
+      <h3>KBLI 2025</h3>
+      <p>Kode KBLI (Klasifikasi Baku Lapangan Usaha Indonesia) 2025 digunakan untuk mengklasifikasikan kegiatan ekonomi. Ketik kata kunci pada kolom pencarian KBLI untuk menemukan kode yang sesuai.</p>
+    </div>
+    <div class="petunjuk-section">
+      <h3>NIB &amp; NIK</h3>
+      <p><strong>NIB</strong> (Nomor Induk Berusaha) — 13 digit, diperoleh melalui sistem OSS di oss.go.id</p>
+      <p><strong>NIK</strong> (Nomor Induk Kependudukan) — 16 digit sesuai KTP pengusaha/penanggung jawab</p>
+    </div>
+    <div class="petunjuk-section">
+      <h3>Catatan Pendata</h3>
+      <p>Setiap kartu pertanyaan memiliki tombol <strong>+ Catatan</strong> di pojok kanan header. Gunakan ini untuk menambahkan observasi/keterangan lapangan per pertanyaan. Catatan akan tampil di tab <em>Catatan Pendata</em> pada rekap.</p>
+    </div>
+    <div class="petunjuk-section">
+      <h3>Pengiriman Data</h3>
+      <ul>
+        <li>Klik <strong>KIRIM / SUBMIT</strong> di BLOK III — sistem menampilkan rekap isian</li>
+        <li>Periksa tab <strong>Error</strong> dan perbaiki jika ada</li>
+        <li>Jika tidak ada error, tombol <strong>Kirim Data</strong> aktif</li>
+        <li>Konfirmasi untuk mengirim data ke server BPS</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ====== RECAP MODAL ====== -->
+<div class="modal-overlay" id="recapOverlay"></div>
+<div class="recap-modal" id="recapModal">
+  <div class="recap-header">
+    <div>
+      <h2>&#128269; Rekap Isian</h2>
+      <div class="recap-header-sub">Periksa sebelum mengirim data</div>
+    </div>
+    <button class="modal-close-btn" onclick="closeRecap()">&#10005;</button>
+  </div>
+  <div class="recap-tabs" id="recapTabs">
+    <div class="recap-tab tab-error active" data-tab="error" onclick="showRecapTab('error')">
+      Error <span class="recap-tab-badge" id="badge-error">0</span>
+    </div>
+    <div class="recap-tab" data-tab="warning" onclick="showRecapTab('warning')">
+      Peringatan <span class="recap-tab-badge" id="badge-warning">0</span>
+    </div>
+    <div class="recap-tab" data-tab="kosong" onclick="showRecapTab('kosong')">
+      Kosong <span class="recap-tab-badge" id="badge-kosong">0</span>
+    </div>
+    <div class="recap-tab" data-tab="catatan" onclick="showRecapTab('catatan')">
+      Catatan Pendata <span class="recap-tab-badge" id="badge-catatan">0</span>
+    </div>
+  </div>
+  <div class="recap-body" id="recapBody"></div>
+  <div class="recap-footer">
+    <button class="btn btn-secondary" onclick="closeRecap()">&#8592; Kembali &amp; Perbaiki</button>
+    <button class="btn btn-primary" id="confirmSubmitBtn" onclick="confirmSubmit()">&#128228; Kirim Data</button>
+  </div>
+</div>
+
+<script src="data.js"></script>
 <script>
 const SCRIPT_URL = "GANTI_DENGAN_URL_APPS_SCRIPT_ANDA"; // ganti dengan URL Google Apps Script Anda
 
 
 function goBlok(n) {
-  const panels = document.querySelectorAll('.blok-panel');
-  const tabs = document.querySelectorAll('.blok-tab');
-  panels.forEach(p => p.classList.remove('active'));
-  tabs.forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.blok-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sidebar-item').forEach(t => t.classList.remove('active'));
   document.getElementById('blok' + n).classList.add('active');
-  tabs[n - 1].classList.add('active');
-  document.getElementById('progressFill').style.width = (n * 33.3) + '%';
+  const sTab = document.getElementById('sidebarTab' + n);
+  if (sTab) sTab.classList.add('active');
+  updateProgress();
   window.scrollTo({top: 0, behavior: 'smooth'});
+  closeSidebar();
+}
+
+/* ====== SIDEBAR ====== */
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('sidebarOverlay');
+  const hb = document.getElementById('hamburgerBtn');
+  const isOpen = sb.classList.contains('open');
+  sb.classList.toggle('open', !isOpen);
+  ov.classList.toggle('open', !isOpen);
+  if (hb) hb.innerHTML = isOpen ? '&#9776;' : '&#10005;';
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+  const hb = document.getElementById('hamburgerBtn');
+  if (hb) hb.innerHTML = '&#9776;';
+}
+
+/* ====== PETUNJUK ====== */
+function togglePetunjuk() {
+  const modal = document.getElementById('petunjukModal');
+  const ov = document.getElementById('petunjukOverlay');
+  const isOpen = modal.classList.contains('open');
+  modal.classList.toggle('open', !isOpen);
+  ov.classList.toggle('open', !isOpen);
+  if (!isOpen) closeSidebar();
+}
+function closePetunjuk() {
+  document.getElementById('petunjukModal').classList.remove('open');
+  document.getElementById('petunjukOverlay').classList.remove('open');
+}
+
+/* ====== REMARK ====== */
+function toggleRemark(id, btn) {
+  const area = document.getElementById(id);
+  if (!area) return;
+  const isOpen = area.classList.contains('open');
+  area.classList.toggle('open', !isOpen);
+  btn.classList.toggle('open', !isOpen);
+  btn.textContent = isOpen ? '+ Catatan' : '&#10005; Catatan';
+}
+
+/* ====== INLINE PETUNJUK ====== */
+function toggleFieldPetunjuk(id, btn) {
+  const box = document.getElementById(id);
+  if (!box) return;
+  const open = box.classList.toggle('open');
+  btn.classList.toggle('open', open);
+  btn.innerHTML = open ? '&#10005; Tutup Petunjuk' : '&#128203; Lihat Contoh';
+}
+
+/* ====== PROGRESS CALCULATION ====== */
+function calcProgress() {
+  let t = 0, f = 0;
+  const c = ok => { t++; if (ok) f++; };
+  // Q1-Q4 lokasi
+  c(!!getVal('q1_provinsi')); c(!!getVal('q2_kabupaten'));
+  c(!!getVal('q3_kecamatan')); c(!!getVal('q4_kelurahan'));
+  // Q5 identitas perusahaan
+  c(!!getVal('q5a_nama_perusahaan')); c(!!getVal('q5b_nama_komersial'));
+  c(!!getVal('q5c_alamat'));
+  c(getVal('q5c_kodepos').length === 5);
+  const hp5 = getVal('q5c_hp');
+  c(!!hp5 && isValidHP(hp5));
+  c(!!getRadio('q5d'));
+  if (getRadio('q5d') && getRadio('q5d') !== '10') c(!!getVal('q5e_nama_kawasan'));
+  // Q6 NIB
+  c(!!getRadio('q6a'));
+  if (getRadio('q6a') === '1') c(getVal('q6b_nib').length === 13);
+  if (getRadio('q6a') === '2') c(!!getRadio('q6c'));
+  if (getRadio('q6c') === '5') c(!!getVal('q6c_alasan'));
+  // Q7 badan usaha
+  c(!!getRadio('q7a'));
+  if (getRadio('q7a') === '3') { c(!!getRadio('q7b')); c(!!getRadio('q7c')); }
+  c(!!getRadio('q7d'));
+  // Q8 pengusaha
+  c(!!getVal('q8a_nama')); c(!!getRadio('q8b'));
+  const u = parseInt(getVal('q8c_umur'));
+  c(!!getVal('q8c_umur') && u >= 17 && u <= 120);
+  c(getVal('q8d_nik').length === 16);
+  // Q9 kegiatan
+  c(!!getVal('q9a_kegiatan'));
+  ['q9b1','q9b2','q9b3','q9b4'].forEach(n => c(!!getRadio(n)));
+  const bv = ['q9b1','q9b2','q9b3','q9b4'].map(n => getRadio(n));
+  if (bv.every(v => v)) c(!bv.every(v => v === '2'));
+  c(!!getRadio('q9c'));
+  c(!!getVal('q9d_input')); c(!!getVal('q9e_proses')); c(!!getVal('q9f_produk'));
+  c(!!getVal('q9g_kbli_kode'));
+  const hW = document.getElementById('q9i_hotel_wrap');
+  if (hW && !hW.classList.contains('hidden')) c(!!getRadio('q9i'));
+  // Q10 jaringan
+  c(!!getRadio('q10a'));
+  if (getRadio('q10a') === '2') c(!!getVal('q10b_jumlah'));
+  // Q11 kantor pusat (conditional)
+  const qW = document.getElementById('q11_wrap');
+  if (qW && !qW.classList.contains('hidden')) {
+    c(!!getVal('q11a_nama')); c(!!getVal('q11b_alamat'));
+    const e11 = getVal('q11c_email');
+    c(!!e11 && isValidEmail(e11));
+    const n11 = document.getElementById('q11d_negara');
+    if (n11 && n11.value === 'ID') { c(!!getVal('q11e_provinsi')); c(!!getVal('q11f_kabupaten')); }
+  }
+  // Q12-Q19
+  c(!!getRadio('q12a'));
+  if (getRadio('q12a') === '1') ['q12b1','q12b2','q12b3','q12b4','q12b5','q12b6'].forEach(n => c(!!getRadio(n)));
+  c(!!getRadio('q12c'));
+  c(!!getRadio('q13a')); c(!!getRadio('q13b')); c(!!getRadio('q14'));
+  c(!!getRadio('q15a'));
+  if (getRadio('q15a') === '1') { c(getVal('q15b') !== ''); c(getVal('q15c') !== ''); }
+  c(!!getRadio('q16a'));
+  if (getRadio('q16a') === '1') { c(getVal('q16b') !== ''); c(getVal('q16c') !== ''); }
+  c(!!getRadio('q17')); c(!!getRadio('q18'));
+  c(!!getRadio('q19a')); c(!!getRadio('q19b'));
+  // Q20-Q25
+  c(getVal('q20a') !== ''); c(getVal('q20b') !== '');
+  const yr = parseInt(getVal('q21'));
+  c(!!getVal('q21') && yr >= 1900 && yr <= 2026);
+  ['q22a','q22b','q22c','q22d','q22e'].forEach(id => c(!!getVal(id)));
+  c(!!getVal('q23a'));
+  const pO = getVal('q23d');
+  c(pO !== '' && !isNaN(+pO) && +pO >= 0 && +pO <= 100);
+  c(!!getVal('q24a')); c(!!getVal('q24b')); c(!!getVal('q24d'));
+  const mf = ['q25a','q25b','q25c','q25d','q25e','q25f'];
+  mf.forEach(id => c(getVal(id) !== ''));
+  if (mf.every(id => getVal(id) !== '')) {
+    const tot25 = mf.map(id => parseFloat(getVal(id)) || 0).reduce((a,b) => a+b, 0);
+    c(Math.abs(tot25 - 100) < 0.01);
+  }
+  // Blok III responden
+  c(!!getVal('r_nama'));
+  const hp3 = getVal('r_hp'); c(!!hp3 && isValidHP(hp3));
+  const re = getVal('r_email'); c(!!re && isValidEmail(re));
+  c(!!getVal('r_tanggal')); c(hasSig);
+  return { pct: Math.round(f / t * 100), filled: f, total: t };
+}
+
+function updateProgress() {
+  const { pct, filled, total } = calcProgress();
+  const sf = document.getElementById('sidebarProgressFill');
+  const sp = document.getElementById('sidebarProgressPct');
+  const sd = document.getElementById('sidebarProgressDetail');
+  if (sf) sf.style.width = pct + '%';
+  if (sp) sp.textContent = pct + '%';
+  if (sd) sd.textContent = filled + ' dari ' + total + ' field wajib terisi';
+}
+
+/* ====== RECAP ====== */
+let _recapData = {error:[], warning:[], kosong:[], catatan:[]};
+let _curRecapTab = 'error';
+
+function collectAllProblems() {
+  const errors = [], warnings = [], kosong = [];
+  const e = (label, text, blok, field) => errors.push({label, text, blok, field: field || null});
+  const w = (label, text, blok, field) => warnings.push({label, text, blok, field: field || null});
+  const k = (label, text, blok, field) => kosong.push({label, text, blok, field: field || null});
+
+  if (!getVal('q1_provinsi')) e('Pertanyaan 1: Provinsi', 'Belum dipilih', 1, 'q1_provinsi_inp');
+  if (!getVal('q2_kabupaten')) e('Pertanyaan 2: Kabupaten/Kota', 'Belum dipilih', 1, 'q2_kabupaten_inp');
+  if (!getVal('q3_kecamatan')) e('Pertanyaan 3: Kecamatan', 'Belum dipilih', 1, 'q3_kecamatan_inp');
+  if (!getVal('q4_kelurahan')) e('Pertanyaan 4: Kelurahan/Desa', 'Belum dipilih', 1, 'q4_kelurahan_inp');
+  if (!getVal('q5a_nama_perusahaan')) e('Pertanyaan 5a: Nama Perusahaan', 'Harus diisi', 1, 'q5a_nama_perusahaan');
+  if (!getVal('q5b_nama_komersial')) e('Pertanyaan 5b: Nama Komersial', 'Harus diisi', 1, 'q5b_nama_komersial');
+  if (!getVal('q5c_alamat')) e('Pertanyaan 5c: Alamat', 'Harus diisi', 1, 'q5c_alamat');
+  const kodepos = getVal('q5c_kodepos');
+  if (!kodepos || kodepos.length !== 5) e('Pertanyaan 5c: Kode Pos', 'Harus 5 digit', 1, 'q5c_kodepos');
+  if (!getVal('q5c_hp')) e('Pertanyaan 5c: Nomor HP', 'Harus diisi', 1, 'q5c_hp');
+  else if (!isValidHP(getVal('q5c_hp'))) e('Pertanyaan 5c: Nomor HP', 'Format tidak valid (contoh: 081234567890)', 1, 'q5c_hp');
+  const emailP = getVal('q5c_email');
+  if (emailP && !isValidEmail(emailP)) e('Pertanyaan 5c: Email Perusahaan', 'Format email tidak valid', 1, 'q5c_email');
+  if (!emailP) k('Email Perusahaan', 'Tidak diisi (opsional)', 1, 'q5c_email');
+  if (!getVal('q5c_website')) k('Website Perusahaan', 'Tidak diisi (opsional)', 1, 'q5c_website');
+  if (!getVal('q5c_telepon')) k('Nomor Telepon Kantor', 'Tidak diisi (opsional)', 1, 'q5c_telepon');
+  if (!getRadio('q5d')) e('Pertanyaan 5d: Jenis Kawasan', 'Belum dipilih', 1, null);
+  else if (getRadio('q5d') !== '10' && !getVal('q5e_nama_kawasan')) e('Pertanyaan 5e: Nama Kawasan', 'Harus diisi jika bukan di luar kawasan', 1, 'q5e_nama_kawasan');
+  if (!getRadio('q6a')) e('Pertanyaan 6a: Kepemilikan NIB', 'Belum dijawab', 1, null);
+  if (getRadio('q6a') === '1') {
+    if (!getVal('q6b_nib')) e('Pertanyaan 6b: Nomor NIB', 'Harus diisi', 1, 'q6b_nib');
+    else if (getVal('q6b_nib').length !== 13) e('Pertanyaan 6b: Nomor NIB', 'Harus tepat 13 digit', 1, 'q6b_nib');
+  }
+  if (getRadio('q6a') === '2' && !getRadio('q6c')) e('Pertanyaan 6c: Alasan Tidak Punya NIB', 'Belum dipilih', 1, null);
+  if (getRadio('q6c') === '5' && !getVal('q6c_alasan')) e('Pertanyaan 6c: Alasan Lainnya', 'Harus diisi jika memilih Lainnya', 1, 'q6c_alasan');
+  if (!getRadio('q7a')) e('Pertanyaan 7a: Status Badan Usaha', 'Belum dipilih', 1, null);
+  if (getRadio('q7a') === '3' && !getRadio('q7b')) e('Pertanyaan 7b: KDKMP', 'Belum dipilih', 1, null);
+  if (getRadio('q7a') === '3' && !getRadio('q7c')) e('Pertanyaan 7c: Jenis Koperasi', 'Belum dipilih', 1, null);
+  if (!getRadio('q7d')) e('Pertanyaan 7d: Laporan Keuangan', 'Belum dipilih', 1, null);
+  if (!getVal('q8a_nama')) e('Pertanyaan 8a: Nama Pengusaha', 'Harus diisi', 1, 'q8a_nama');
+  if (!getRadio('q8b')) e('Pertanyaan 8b: Jenis Kelamin', 'Belum dipilih', 1, null);
+  const umur = parseInt(getVal('q8c_umur'));
+  if (!getVal('q8c_umur')) e('Pertanyaan 8c: Umur', 'Harus diisi', 1, 'q8c_umur');
+  else if (umur < 17 || umur > 120) e('Pertanyaan 8c: Umur', `${umur} tahun — harus antara 17–120`, 1, 'q8c_umur');
+  else if (umur < 22) w('Pertanyaan 8c: Umur', `Pengusaha umur ${umur} tahun, cukup muda — verifikasi`, 1, 'q8c_umur');
+  else if (umur > 75) w('Pertanyaan 8c: Umur', `Pengusaha umur ${umur} tahun — verifikasi kembali`, 1, 'q8c_umur');
+  const nik = getVal('q8d_nik');
+  if (!nik || nik.length !== 16) e('Pertanyaan 8d: NIK', 'Harus tepat 16 digit', 1, 'q8d_nik');
+  if (!getVal('q9a_kegiatan')) e('Pertanyaan 9a: Kegiatan Utama', 'Harus diisi', 1, 'q9a_kegiatan');
+  const b1=getRadio('q9b1'),b2=getRadio('q9b2'),b3=getRadio('q9b3'),b4=getRadio('q9b4');
+  if (!b1||!b2||!b3||!b4) e('Pertanyaan 9b: Aktivitas Usaha', 'Semua pilihan b1–b4 harus dijawab', 1, null);
+  else if (b1==='2'&&b2==='2'&&b3==='2'&&b4==='2') e('Pertanyaan 9b: Aktivitas Usaha', 'Minimal satu b1–b4 harus "Ya"', 1, null);
+  if (!getRadio('q9c')) e('Pertanyaan 9c: Lokasi Usaha', 'Belum dipilih', 1, null);
+  if (!getVal('q9d_input')) e('Pertanyaan 9d: Input/Bahan Baku', 'Harus diisi', 1, 'q9d_input');
+  if (!getVal('q9e_proses')) e('Pertanyaan 9e: Proses Produksi', 'Harus diisi', 1, 'q9e_proses');
+  if (!getVal('q9f_produk')) e('Pertanyaan 9f: Produk Utama', 'Harus diisi', 1, 'q9f_produk');
+  if (!getVal('q9g_kbli_kode')) e('Pertanyaan 9g: KBLI 2025', 'Belum dipilih dari daftar', 1, 'q9g_kbli_search');
+  const hotelW = document.getElementById('q9i_hotel_wrap');
+  if (hotelW && !hotelW.classList.contains('hidden') && !getRadio('q9i')) e('Pertanyaan 9i: Klasifikasi Hotel', 'Belum dipilih', 1, null);
+  if (!getRadio('q10a')) e('Pertanyaan 10a: Jaringan Usaha', 'Belum dipilih', 1, null);
+  if (getRadio('q10a') === '2' && !getVal('q10b_jumlah')) e('Pertanyaan 10b: Jumlah Cabang', 'Harus diisi', 1, 'q10b_jumlah');
+  const q11w = document.getElementById('q11_wrap');
+  if (q11w && !q11w.classList.contains('hidden')) {
+    if (!getVal('q11a_nama')) e('Pertanyaan 11a: Nama Kantor Pusat', 'Harus diisi', 1, 'q11a_nama');
+    if (!getVal('q11b_alamat')) e('Pertanyaan 11b: Alamat Kantor Pusat', 'Harus diisi', 1, 'q11b_alamat');
+    if (!getVal('q11c_email')) e('Pertanyaan 11c: Email Kantor Pusat', 'Harus diisi', 1, 'q11c_email');
+    else if (!isValidEmail(getVal('q11c_email'))) e('Pertanyaan 11c: Email Kantor Pusat', 'Format email tidak valid', 1, 'q11c_email');
+    if (document.getElementById('q11d_negara').value === 'ID') {
+      if (!getVal('q11e_provinsi')) e('Pertanyaan 11e: Provinsi Kantor Pusat', 'Belum dipilih', 1, 'q11e_provinsi_inp');
+      if (!getVal('q11f_kabupaten')) e('Pertanyaan 11f: Kabupaten/Kota Kantor Pusat', 'Belum dipilih', 1, 'q11f_kabupaten_inp');
+    }
+  }
+  if (!getRadio('q12a')) e('Pertanyaan 12a: Penggunaan Internet', 'Belum dipilih', 1, null);
+  if (getRadio('q12a') === '1') {
+    if (!getRadio('q12b1')||!getRadio('q12b2')||!getRadio('q12b3')||!getRadio('q12b4')||!getRadio('q12b5')||!getRadio('q12b6'))
+      e('Pertanyaan 12b: Tujuan Internet', 'Semua b1–b6 harus dijawab', 1, null);
+  }
+  if (!getRadio('q12c')) e('Pertanyaan 12c: Teknologi Digital', 'Belum dipilih', 1, null);
+  if (!getRadio('q13a')) e('Pertanyaan 13a: Ramah Lingkungan', 'Belum dipilih', 1, null);
+  if (!getRadio('q13b')) e('Pertanyaan 13b: Biaya Lingkungan', 'Belum dipilih', 1, null);
+  if (!getRadio('q14')) e('Pertanyaan 14: Produk Kreatif', 'Belum dipilih', 1, null);
+  if (!getRadio('q15a')) e('Pertanyaan 15a: Sertifikat Halal', 'Belum dipilih', 1, null);
+  if (getRadio('q15a') === '1') {
+    if (!getVal('q15b')) e('Pertanyaan 15b: Jumlah Varian Halal', 'Harus diisi', 1, 'q15b');
+    if (!getVal('q15c')) e('Pertanyaan 15c: Jumlah Varian Belum Halal', 'Harus diisi', 1, 'q15c');
+  }
+  if (!getRadio('q16a')) e('Pertanyaan 16a: Izin Edar BPOM', 'Belum dipilih', 1, null);
+  if (getRadio('q16a') === '1') {
+    if (!getVal('q16b')) e('Pertanyaan 16b: Jumlah Varian BPOM', 'Harus diisi', 1, 'q16b');
+    if (!getVal('q16c')) e('Pertanyaan 16c: Jumlah Varian Belum BPOM', 'Harus diisi', 1, 'q16c');
+  }
+  if (!getRadio('q17')) e('Pertanyaan 17: Mitra KDKMP', 'Belum dipilih', 1, null);
+  if (!getRadio('q18')) e('Pertanyaan 18: Program MBG', 'Belum dipilih', 1, null);
+  if (!getRadio('q19a')) e('Pertanyaan 19a: Transaksi Barang Non-Penduduk', 'Belum dipilih', 1, null);
+  if (!getRadio('q19b')) e('Pertanyaan 19b: Transaksi Jasa Non-Penduduk', 'Belum dipilih', 1, null);
+  if (!getVal('q20a')) e('Pertanyaan 20a: Pekerja Laki-laki', 'Harus diisi (isi 0 jika tidak ada)', 1, 'q20a');
+  if (!getVal('q20b')) e('Pertanyaan 20b: Pekerja Perempuan', 'Harus diisi (isi 0 jika tidak ada)', 1, 'q20b');
+  const totPekerja = (parseInt(getVal('q20a'))||0)+(parseInt(getVal('q20b'))||0);
+  if (getVal('q20a') && getVal('q20b') && totPekerja === 0) w('Pertanyaan 20: Jumlah Pekerja', 'Total 0 pekerja — verifikasi apakah benar', 1, 'q20a');
+  else if (totPekerja > 5000) w('Pertanyaan 20: Jumlah Pekerja', `Total ${totPekerja} pekerja sangat besar — verifikasi`, 1, 'q20a');
+  if (!getVal('q21')) e('Pertanyaan 21: Tahun Beroperasi', 'Harus diisi', 1, 'q21');
+  else {
+    const thn = parseInt(getVal('q21'));
+    if (thn < 1900 || thn > 2026) e('Pertanyaan 21: Tahun Beroperasi', 'Harus antara 1900–2026', 1, 'q21');
+    else if (thn >= 2025) w('Pertanyaan 21: Tahun Beroperasi', `Mulai beroperasi ${thn} (sangat baru) — verifikasi`, 1, 'q21');
+  }
+  if (!getVal('q22a')) e('Pertanyaan 22a: Upah &amp; Gaji', 'Harus diisi (isi 0 jika tidak ada)', 1, 'q22a');
+  if (!getVal('q22b')) e('Pertanyaan 22b: Biaya Produksi', 'Harus diisi', 1, 'q22b');
+  if (!getVal('q22c')) e('Pertanyaan 22c: Biaya Pembelian Barang', 'Harus diisi', 1, 'q22c');
+  if (!getVal('q22d')) e('Pertanyaan 22d: Biaya Operasional', 'Harus diisi', 1, 'q22d');
+  if (!getVal('q22e')) e('Pertanyaan 22e: Biaya Non-Operasional', 'Harus diisi', 1, 'q22e');
+  if (!getVal('q23a')) e('Pertanyaan 23a: Nilai Barang/Jasa', 'Harus diisi', 1, 'q23a');
+  const pctO = getVal('q23d');
+  if (pctO === '') e('Pertanyaan 23d: Persentase Online', 'Harus diisi (isi 0 jika tidak ada)', 1, 'q23d');
+  else if (isNaN(parseFloat(pctO)) || parseFloat(pctO) < 0 || parseFloat(pctO) > 100) e('Pertanyaan 23d: Persentase Online', 'Harus antara 0–100%', 1, 'q23d');
+  if (!getVal('q24a')) e('Pertanyaan 24a: Aset Tanah &amp; Bangunan', 'Harus diisi', 1, 'q24a');
+  if (!getVal('q24b')) e('Pertanyaan 24b: Aset Selain Tanah', 'Harus diisi', 1, 'q24b');
+  if (!getRadio('q24c1')) w('Pertanyaan 24c1: Kategori Aset', 'Belum dipilih (diisi jika tidak tahu nilai nominal)', 1, null);
+  if (!getVal('q24d')) e('Pertanyaan 24d: Luas Tanah', 'Harus diisi (isi 0 jika tidak ada)', 1, 'q24d');
+  const mfs = ['q25a','q25b','q25c','q25d','q25e','q25f'];
+  if (!mfs.every(f => getVal(f) !== '')) e('Pertanyaan 25: Kepemilikan Modal', 'Semua komponen harus diisi', 1, 'q25a');
+  else {
+    const tot = mfs.map(id=>parseFloat(getVal(id))||0).reduce((a,b)=>a+b,0);
+    if (Math.abs(tot-100) > 0.01) e('Pertanyaan 25: Kepemilikan Modal', `Total ${Math.round(tot*100)/100}% — harus = 100%`, 1, 'q25a');
+  }
+  const pen = parseCurrency(getVal('q22f')), pend = parseCurrency(getVal('q23c'));
+  if (pen > 0 && pend > 0 && pend < pen * 0.05) w('Pertanyaan 22–23: Keuangan', 'Pendapatan jauh lebih kecil dari pengeluaran — verifikasi', 1, 'q23a');
+
+  if (!getVal('r_nama')) e('Responden: Nama', 'Harus diisi', 3, 'r_nama');
+  if (!getVal('r_hp')) e('Responden: Nomor HP', 'Harus diisi', 3, 'r_hp');
+  else if (!isValidHP(getVal('r_hp'))) e('Responden: Nomor HP', 'Format tidak valid', 3, 'r_hp');
+  if (!getVal('r_email')) e('Responden: Email', 'Harus diisi', 3, 'r_email');
+  else if (!isValidEmail(getVal('r_email'))) e('Responden: Email', 'Format tidak valid', 3, 'r_email');
+  if (!getVal('r_tanggal')) e('Responden: Tanggal Pelaksanaan', 'Harus diisi', 3, 'r_tanggal');
+  if (!hasSig) e('Tanda Tangan', 'Harus diisi — gambar di kotak tanda tangan', 3, null);
+
+  if (!getVal('catatan1') && !getVal('catatan2') && !getVal('catatan3'))
+    k('Blok II: Catatan Kunjungan', 'Semua catatan kunjungan kosong (opsional untuk CAWI)', 2, 'catatan1');
+
+  return {errors, warnings, kosong};
+}
+
+function collectRemarks() {
+  const remarks = [];
+  document.querySelectorAll('.remark-area textarea').forEach((ta) => {
+    const text = ta.value.trim();
+    if (!text) return;
+    const card = ta.closest('.section-card');
+    const header = card ? card.querySelector('.section-header') : null;
+    const lbl = header ? header.innerText.replace(/[\+✕] Catatan/g,'').trim() : 'Catatan';
+    remarks.push({label: lbl, text});
+  });
+  return remarks;
+}
+
+function showRecap() {
+  const {errors, warnings, kosong} = collectAllProblems();
+  const catatan = collectRemarks();
+  _recapData = {error: errors, warning: warnings, kosong, catatan};
+
+  const badge = (id, count, isError) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = count;
+    if (count > 0) el.classList.add(isError ? 'err' : 'has-count');
+    else el.classList.remove('err','has-count');
+  };
+  badge('badge-error', errors.length, true);
+  badge('badge-warning', warnings.length, false);
+  badge('badge-kosong', kosong.length, false);
+  badge('badge-catatan', catatan.length, false);
+
+  const btn = document.getElementById('confirmSubmitBtn');
+  if (btn) {
+    btn.disabled = errors.length > 0;
+    btn.title = errors.length > 0 ? 'Perbaiki semua Error terlebih dahulu' : '';
+  }
+
+  showRecapTab('error');
+  document.getElementById('recapModal').classList.add('open');
+  document.getElementById('recapOverlay').classList.add('open');
+  closeSidebar();
+  closePetunjuk();
+}
+
+function showRecapTab(tab) {
+  _curRecapTab = tab;
+  document.querySelectorAll('.recap-tab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  const body = document.getElementById('recapBody');
+  const items = _recapData[tab] || [];
+  if (!items.length) {
+    const icons = {error:'&#9989;',warning:'&#128161;',kosong:'&#128203;',catatan:'&#128221;'};
+    const msgs = {
+      error:'Tidak ada error. Semua data wajib sudah terisi dengan benar.',
+      warning:'Tidak ada peringatan.',
+      kosong:'Tidak ada field opsional yang kosong.',
+      catatan:'Belum ada catatan pendata. Tambahkan melalui tombol <strong>+ Catatan</strong> di setiap kartu pertanyaan.'
+    };
+    body.innerHTML = `<div class="recap-empty-state"><div class="recap-empty-icon">${icons[tab]}</div><div class="recap-empty-text">${msgs[tab]}</div></div>`;
+    return;
+  }
+  const cls = {error:'item-error',warning:'item-warning',kosong:'item-empty',catatan:'item-remark'};
+  body.innerHTML = items.map((item, i) => {
+    const dataStr = JSON.stringify(item).replace(/'/g,"&#39;");
+    return `<div class="recap-item ${cls[tab]}" style="animation-delay:${i*0.04}s" onclick='recapNavigate(${dataStr},"${tab}")'>
+      <div class="recap-item-label">${item.label}</div>
+      <div class="recap-item-text">${item.text}</div>
+    </div>`;
+  }).join('');
+}
+
+function recapNavigate(item, tab) {
+  if (tab === 'catatan') return;
+  closeRecap();
+  if (item.blok) {
+    goBlok(item.blok);
+    if (item.field) {
+      setTimeout(() => {
+        const el = document.getElementById(item.field);
+        if (el) { el.focus(); el.scrollIntoView({behavior:'smooth', block:'center'}); }
+      }, 420);
+    }
+  }
+}
+
+function closeRecap() {
+  document.getElementById('recapModal').classList.remove('open');
+  document.getElementById('recapOverlay').classList.remove('open');
+}
+
+async function confirmSubmit() {
+  closeRecap();
+  await submitForm();
 }
 
 
@@ -1097,25 +1941,18 @@ async function apiFetch(url) {
   return r.json();
 }
 
-async function loadProvinsi() {
-  const sp = document.getElementById('spinner-prov-kp');
-  sp.classList.remove('hidden');
-  try {
-    const res = await apiFetch(`${API_BASE}/242f40ad-1a03-41fb-9846-c687e0632b67/filter?version=1`);
-    const data = (res.data || []).sort((a,b)=>a.namaprov.localeCompare(b.namaprov));
-    const sel = document.getElementById('q11e_provinsi');
-    sel.innerHTML = '<option value="">-- Pilih Provinsi --</option>';
-    data.forEach(d => {
-      const o = document.createElement('option');
-      o.value = d.kdprov;
-      o.textContent = d.namaprov;
-      sel.appendChild(o);
-    });
-  } catch(e) {
-    console.error('Gagal memuat provinsi:', e);
-  } finally {
-    sp.classList.add('hidden');
-  }
+function loadProvinsi() {
+  const sel = document.getElementById('q11e_provinsi');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">-- Pilih Provinsi --</option>';
+  const list = (typeof STATIC_PROVINSI !== 'undefined') ? STATIC_PROVINSI : [];
+  list.forEach(d => {
+    const o = document.createElement('option');
+    o.value = d.kode;
+    o.textContent = d.nama;
+    sel.appendChild(o);
+  });
+  syncSearchable('q11e_provinsi', 'provinsi');
 }
 
 async function loadKabupaten(kdprov, selectId='q2_kabupaten', spinnerId='spinner-kab') {
@@ -1142,86 +1979,84 @@ async function loadKabupaten(kdprov, selectId='q2_kabupaten', spinnerId='spinner
       sel.appendChild(o);
     });
     sel.disabled = false;
+    syncSearchable(selectId, 'kabupaten/kota');
   } catch(e) { console.error('Gagal memuat kabupaten:', e); }
   finally { sp.classList.add('hidden'); }
 }
 
-async function loadKecamatan(kdprovkab) {
+function loadKecamatan(kdprovkab) {
   const selKec = document.getElementById('q3_kecamatan');
   const selKel = document.getElementById('q4_kelurahan');
   selKec.innerHTML = '<option value="">-- Pilih Kecamatan --</option>';
   selKel.innerHTML = '<option value="">-- Pilih Kelurahan/Desa/Nagari --</option>';
   selKec.disabled = true; selKel.disabled = true;
+  syncSearchable('q3_kecamatan', 'kecamatan');
+  syncSearchable('q4_kelurahan', 'kelurahan/desa');
   if (!kdprovkab) return;
-  const sp = document.getElementById('spinner-kec');
-  sp.classList.remove('hidden');
-  try {
-    const res = await apiFetch(`${API_BASE}/417a39ed-fcb4-40d6-bf00-b6715a75c681/filter?version=1&filter=kdprovkab||eq||${kdprovkab}`);
-    const data = (res.data || []).sort((a,b)=>a.namakec.localeCompare(b.namakec));
-    data.forEach(d => {
-      const o = document.createElement('option');
-      o.value = d.kdprovkabkec;
-      o.textContent = d.namakec;
-      selKec.appendChild(o);
-    });
-    selKec.disabled = false;
-  } catch(e) { console.error('Gagal memuat kecamatan:', e); }
-  finally { sp.classList.add('hidden'); }
+  const list = (typeof STATIC_KECAMATAN !== 'undefined' && STATIC_KECAMATAN[kdprovkab]) || [];
+  list.forEach(d => {
+    const o = document.createElement('option');
+    o.value = d.kode;
+    o.textContent = d.nama;
+    selKec.appendChild(o);
+  });
+  selKec.disabled = false;
+  syncSearchable('q3_kecamatan', 'kecamatan');
 }
 
-async function loadKelurahan(kdprovkabkec) {
+function loadKelurahan(kdprovkabkec) {
   const sel = document.getElementById('q4_kelurahan');
   sel.innerHTML = '<option value="">-- Pilih Kelurahan/Desa/Nagari --</option>';
   sel.disabled = true;
+  syncSearchable('q4_kelurahan', 'kelurahan/desa');
   if (!kdprovkabkec) return;
-  const sp = document.getElementById('spinner-kel');
-  sp.classList.remove('hidden');
-  try {
-    const res = await apiFetch(`${API_BASE}/b1b3a3f1-fb0e-4268-badb-b0bb24128431/filter?version=1&filter=kdprovkabkec||eq||${kdprovkabkec}`);
-    const data = res.data || [];
-    data.sort((a,b)=>{
-      const na = a.namakel || a.namadesa || '';
-      const nb = b.namakel || b.namadesa || '';
-      return na.localeCompare(nb);
-    });
-    data.forEach(d => {
-      const o = document.createElement('option');
-      o.value = d.kdprovkabkeckel || d.kdwilayah || '';
-      o.textContent = d.namakel || d.namadesa || d.namanagari || JSON.stringify(d);
-      sel.appendChild(o);
-    });
-    sel.disabled = false;
-  } catch(e) { console.error('Gagal memuat kelurahan:', e); }
-  finally { sp.classList.add('hidden'); }
+  const list = (typeof STATIC_KELURAHAN !== 'undefined' && STATIC_KELURAHAN[kdprovkabkec]) || [];
+  list.slice().sort((a,b) => a.nama.localeCompare(b.nama)).forEach(d => {
+    const o = document.createElement('option');
+    o.value = d.kode;
+    o.textContent = d.nama;
+    sel.appendChild(o);
+  });
+  sel.disabled = false;
+  syncSearchable('q4_kelurahan', 'kelurahan/desa');
 }
 
 
+
+// KBLI: pakai data statis dari data.js
+let kbliData = [];
+function preloadKBLI() {
+  kbliData = (typeof KBLI_DATA !== 'undefined') ? KBLI_DATA : [];
+  const inp = document.getElementById('q9g_kbli_search');
+  if (inp) inp.placeholder = `🔍 Cari KBLI 2025… (${kbliData.length} kode tersedia)`;
+}
 
 let kbliTimer = null;
 function searchKBLI(q) {
   clearTimeout(kbliTimer);
   const dd = document.getElementById('kbliDropdown');
   if (!q || q.length < 2) { dd.classList.remove('open'); return; }
-  kbliTimer = setTimeout(async () => {
-    try {
-      const url = `${API_BASE}/7ba2604f-61dc-4fb2-9d46-deb56d8b7aa7/filter?version=1&search=Judul||ilike||${encodeURIComponent(q)}&limit=20`;
-      const res = await apiFetch(url);
-      const data = res.data || [];
-      dd.innerHTML = '';
-      if (!data.length) {
-        dd.innerHTML = '<div class="autocomplete-item" style="color:#999">Tidak ditemukan</div>';
-      } else {
-        data.forEach(d => {
-          const item = document.createElement('div');
-          item.className = 'autocomplete-item';
-          item.innerHTML = `<span class="kode">${d.Kode}</span> ${d.Judul} <span style="color:#999;font-size:11px">[${d.Kategori}]</span>`;
-          item.onclick = () => selectKBLI(d);
-          dd.appendChild(item);
-        });
-      }
-      dd.classList.add('open');
-    } catch(e) { console.error('KBLI search error:', e); }
-  }, 400);
+  kbliTimer = setTimeout(() => {
+    const lower = q.toLowerCase();
+    const results = kbliData.filter(d =>
+      (d.Kode && d.Kode.startsWith(q.toUpperCase().replace(/\s/g,''))) ||
+      (d.Kode && d.Kode.toLowerCase().includes(lower)) ||
+      (d.Judul && d.Judul.toLowerCase().includes(lower))
+    ).slice(0, 50);
+    dd.innerHTML = '';
+    if (!results.length) {
+      dd.innerHTML = '<div class="autocomplete-item" style="color:#999">Tidak ditemukan — coba kata kunci lain</div>';
+    } else {
+      results.forEach(d => {
+        const item = document.createElement('div');
+        item.className = 'autocomplete-item';
+        item.innerHTML = `<span class="kode">${d.Kode}</span> ${d.Judul} <span style="color:#999;font-size:11px">[${d.Kategori}]</span>`;
+        item.onclick = () => selectKBLI(d);
+        dd.appendChild(item);
+      });
+    }
+    dd.classList.add('open');
+  }, 120);
 }
 
 function selectKBLI(d) {
@@ -1259,12 +2094,112 @@ document.addEventListener('click', e => {
   if (!e.target.closest('.autocomplete-wrap')) {
     document.getElementById('kbliDropdown').classList.remove('open');
   }
+  if (!e.target.closest('.ss-wrap')) {
+    document.querySelectorAll('.ss-dropdown.open').forEach(d => d.classList.remove('open'));
+  }
 });
+
+// ---- Searchable Select Component ----
+function makeSearchable(selectId, label) {
+  const select = document.getElementById(selectId);
+  if (!select || select.dataset.ssInit) return;
+  select.dataset.ssInit = '1';
+  select.style.display = 'none';
+
+  const wrap = document.createElement('div');
+  wrap.className = 'ss-wrap';
+  select.parentNode.insertBefore(wrap, select);
+  wrap.appendChild(select);
+
+  const inp = document.createElement('input');
+  inp.type = 'text';
+  inp.className = 'ss-input';
+  inp.id = selectId + '_inp';
+  inp.autocomplete = 'off';
+  inp.disabled = select.disabled;
+  inp.placeholder = select.disabled ? 'Memuat...' : `🔍 Cari ${label}…`;
+  wrap.insertBefore(inp, select);
+
+  const dd = document.createElement('div');
+  dd.className = 'ss-dropdown';
+  dd.id = selectId + '_dd';
+  wrap.appendChild(dd);
+
+  function getOpts() {
+    return Array.from(select.options).filter(o => o.value !== '').map(o => ({value: o.value, label: o.text}));
+  }
+
+  function renderDd(opts) {
+    dd.innerHTML = '';
+    if (!opts.length) {
+      dd.innerHTML = '<div class="ss-item" style="color:#999;font-style:italic">Tidak ditemukan</div>';
+    } else {
+      opts.slice(0, 120).forEach(o => {
+        const el = document.createElement('div');
+        el.className = 'ss-item';
+        el.textContent = o.label;
+        if (o.value === select.value) el.classList.add('active');
+        el.addEventListener('mousedown', e => {
+          e.preventDefault();
+          inp.value = o.label;
+          inp.classList.add('has-value');
+          select.value = o.value;
+          select.dispatchEvent(new Event('change', {bubbles: true}));
+          dd.classList.remove('open');
+        });
+        dd.appendChild(el);
+      });
+    }
+    dd.classList.add('open');
+  }
+
+  inp.addEventListener('focus', () => {
+    if (inp.disabled) return;
+    inp.select();
+    renderDd(getOpts());
+  });
+
+  inp.addEventListener('input', () => {
+    const q = inp.value.toLowerCase();
+    renderDd(getOpts().filter(o => o.label.toLowerCase().includes(q)));
+    if (!inp.value) { inp.classList.remove('has-value'); select.value = ''; }
+  });
+
+  inp.addEventListener('blur', () => {
+    setTimeout(() => {
+      dd.classList.remove('open');
+      // Revert to last valid if no match
+      if (inp.value && !getOpts().find(o => o.label === inp.value)) {
+        const cur = select.value ? (getOpts().find(o => o.value === select.value) || null) : null;
+        inp.value = cur ? cur.label : '';
+        if (!cur) inp.classList.remove('has-value');
+      }
+    }, 180);
+  });
+}
+
+function syncSearchable(selectId, label) {
+  const inp = document.getElementById(selectId + '_inp');
+  const select = document.getElementById(selectId);
+  if (!inp || !select) return;
+  inp.disabled = select.disabled;
+  if (select.disabled) {
+    inp.placeholder = 'Memuat…';
+    inp.value = '';
+    inp.classList.remove('has-value');
+  } else {
+    const count = Array.from(select.options).filter(o => o.value).length;
+    inp.placeholder = count > 0 ? `🔍 Cari ${label}… (${count} pilihan)` : `🔍 Cari ${label}…`;
+    inp.value = '';
+    inp.classList.remove('has-value');
+  }
+}
 
 
 function handleKawasan() {
   const v = getRadio('q5d');
-  document.getElementById('q5e_wrap').classList.toggle('hidden', v === '10');
+  // Show Q5e only when a specific kawasan (1-9) is selected; hide for "Di luar kawasan" or unselected
+  document.getElementById('q5e_wrap').classList.toggle('hidden', !v || v === '10');
 }
 
 function handleNIB() {
@@ -1302,6 +2237,11 @@ function handleHalal() {
 function handleIzinEdar() {
   const v = getRadio('q16a');
   document.getElementById('q16bc_wrap').classList.toggle('hidden', v !== '1');
+}
+
+function handleNegaraKP() {
+  const v = document.getElementById('q11d_negara').value;
+  document.getElementById('q11_prov_kab_wrap').classList.toggle('hidden', v !== 'ID');
 }
 
 
@@ -1386,6 +2326,7 @@ canvas.addEventListener('touchend', ()=>{ drawing=false; ctx.beginPath(); });
 function clearSignature() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   hasSig = false;
+  updateProgress();
 }
 
 
@@ -1397,6 +2338,14 @@ function getRadio(name) {
 function getVal(id) {
   const el = document.getElementById(id);
   return el ? el.value.trim() : '';
+}
+
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function isValidHP(hp) {
+  return /^(\+62|62|0)[0-9]{8,13}$/.test(hp.replace(/[\s\-]/g,''));
 }
 
 function showAlert(id, msg) {
@@ -1424,6 +2373,9 @@ function validateBlok1() {
   const kodepos = getVal('q5c_kodepos');
   if (!kodepos || kodepos.length !== 5) return 'Pertanyaan 5c: Kode Pos harus 5 digit';
   if (!getVal('q5c_hp')) return 'Pertanyaan 5c: Isi Nomor HP/WhatsApp';
+  if (!isValidHP(getVal('q5c_hp'))) return 'Pertanyaan 5c: Format nomor HP tidak valid (contoh: 081234567890)';
+  const emailPerusahaan = getVal('q5c_email');
+  if (emailPerusahaan && !isValidEmail(emailPerusahaan)) return 'Pertanyaan 5c: Format email perusahaan tidak valid';
   if (!getRadio('q5d')) return 'Pertanyaan 5d: Pilih Jenis Kawasan';
   const kawasan = getRadio('q5d');
   if (kawasan !== '10' && !getVal('q5e_nama_kawasan')) return 'Pertanyaan 5e: Isi Nama Kawasan';
@@ -1454,12 +2406,20 @@ function validateBlok1() {
   if (!getVal('q9e_proses')) return 'Pertanyaan 9e: Isi proses produksi';
   if (!getVal('q9f_produk')) return 'Pertanyaan 9f: Isi produk utama';
   if (!getVal('q9g_kbli_kode')) return 'Pertanyaan 9g: Pilih KBLI';
+  if (!document.getElementById('q9i_hotel_wrap').classList.contains('hidden') && !getRadio('q9i'))
+    return 'Pertanyaan 9i: Pilih Klasifikasi Hotel';
   if (!getRadio('q10a')) return 'Pertanyaan 10a: Pilih Jaringan Usaha';
   if (getRadio('q10a')==='2' && !getVal('q10b_jumlah')) return 'Pertanyaan 10b: Isi jumlah kantor cabang';
   if (['3','4','5','6'].includes(getRadio('q10a'))) {
     if (!getVal('q11a_nama')) return 'Pertanyaan 11a: Isi Nama Kantor Pusat';
     if (!getVal('q11b_alamat')) return 'Pertanyaan 11b: Isi Alamat Kantor Pusat';
     if (!getVal('q11c_email')) return 'Pertanyaan 11c: Isi Email Kantor Pusat';
+    if (!isValidEmail(getVal('q11c_email'))) return 'Pertanyaan 11c: Format email Kantor Pusat tidak valid';
+    const negaraKP = document.getElementById('q11d_negara') ? document.getElementById('q11d_negara').value : 'ID';
+    if (negaraKP === 'ID') {
+      if (!getVal('q11e_provinsi')) return 'Pertanyaan 11e: Pilih Provinsi Kantor Pusat';
+      if (!getVal('q11f_kabupaten')) return 'Pertanyaan 11f: Pilih Kabupaten/Kota Kantor Pusat';
+    }
   }
   if (!getRadio('q12a')) return 'Pertanyaan 12a: Pilih apakah menggunakan internet?';
   if (getRadio('q12a') === '1') {
@@ -1516,7 +2476,9 @@ function validateBlok1() {
 function validateBlok3() {
   if (!getVal('r_nama')) return 'Nama responden harus diisi';
   if (!getVal('r_hp')) return 'Nomor HP/Telepon responden harus diisi';
+  if (!isValidHP(getVal('r_hp'))) return 'Format nomor HP responden tidak valid (contoh: 081234567890)';
   if (!getVal('r_email')) return 'Email responden harus diisi';
+  if (!isValidEmail(getVal('r_email'))) return 'Format email responden tidak valid';
   if (!getVal('r_tanggal')) return 'Tanggal pelaksanaan harus diisi';
   if (!hasSig) return 'Tanda tangan harus diisi';
   return null;
@@ -1688,9 +2650,94 @@ async function submitForm() {
 
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Init searchable selects BEFORE any data load
+  makeSearchable('q1_provinsi', 'provinsi');
+  makeSearchable('q2_kabupaten', 'kabupaten/kota');
+  makeSearchable('q3_kecamatan', 'kecamatan');
+  makeSearchable('q4_kelurahan', 'kelurahan/desa');
+  makeSearchable('q11e_provinsi', 'provinsi kantor pusat');
+  makeSearchable('q11f_kabupaten', 'kabupaten/kota kantor pusat');
+
+  // Auto-select Bali [51] and Buleleng [5108] – fixed domicile
+  const selProv = document.getElementById('q1_provinsi');
+  const selKab  = document.getElementById('q2_kabupaten');
+  selProv.value = '51';
+  selKab.value  = '5108';
+  const inpProv = document.getElementById('q1_provinsi_inp');
+  const inpKab  = document.getElementById('q2_kabupaten_inp');
+  if (inpProv) { inpProv.value = 'BALI'; inpProv.classList.add('has-value'); }
+  if (inpKab)  { inpKab.value  = 'KAB. BULELENG'; inpKab.classList.add('has-value'); }
+
+  // Auto-load kecamatan list for Buleleng on open
+  loadKecamatan('5108');
+
+  // Load provinsi for Kantor Pusat (Q11e)
   loadProvinsi();
-  // Set today's date as default
+
+  // Preload KBLI data for instant local search
+  preloadKBLI();
+
+  // Default today's date for Blok III
   document.getElementById('r_tanggal').value = new Date().toISOString().split('T')[0];
+
+  // Inject remark button + area into every section-card header
+  document.querySelectorAll('.section-card').forEach((card, i) => {
+    const header = card.querySelector('.section-header');
+    if (!header) return;
+    const rid = 'remark_card_' + i;
+    const btn = document.createElement('button');
+    btn.className = 'remark-toggle-btn';
+    btn.type = 'button';
+    btn.innerHTML = '+ Catatan';
+    btn.onclick = () => {
+      toggleRemark(rid, btn);
+      // Update badge if note added/removed
+      const ta = document.getElementById(rid + '_ta');
+      if (ta) ta.addEventListener('input', () => {
+        btn.classList.toggle('has-note', ta.value.trim().length > 0);
+      }, {once: true});
+    };
+    header.appendChild(btn);
+    const area = document.createElement('div');
+    area.className = 'remark-area';
+    area.id = rid;
+    area.innerHTML = `<span class="remark-area-label">Catatan Pendata</span><textarea id="${rid}_ta" placeholder="Tambahkan keterangan atau observasi lapangan untuk pertanyaan ini..."></textarea>`;
+    header.insertAdjacentElement('afterend', area);
+  });
+
+  // === FILLED FIELD INDICATOR + LIVE PROGRESS ===
+  function markFilled(el) {
+    if (el.readOnly || el.disabled) return;
+    el.classList.toggle('field-filled', el.value.trim().length > 0);
+  }
+  // Text, number, email, date, textarea inputs
+  document.querySelectorAll('input:not([type=hidden]):not([type=radio]):not([type=checkbox]),textarea').forEach(el => {
+    el.addEventListener('input', () => { markFilled(el); updateProgress(); });
+    el.addEventListener('change', () => { markFilled(el); updateProgress(); });
+    markFilled(el); // set initial state (e.g. r_tanggal auto-filled)
+  });
+  // Select elements (native, including those behind searchable selects)
+  document.querySelectorAll('select').forEach(el => {
+    el.addEventListener('change', updateProgress);
+  });
+  // Radio buttons — highlight checked item row + update progress
+  document.querySelectorAll('input[type=radio]').forEach(el => {
+    el.addEventListener('change', () => {
+      const grp = el.closest('.radio-group');
+      if (grp) grp.querySelectorAll('.radio-item').forEach(item => {
+        item.classList.toggle('checked', !!item.querySelector('input[type=radio]:checked'));
+      });
+      updateProgress();
+    });
+  });
+  // Signature canvas — update after each stroke
+  const sigEl = document.getElementById('sigCanvas');
+  if (sigEl) {
+    sigEl.addEventListener('mouseup', updateProgress);
+    sigEl.addEventListener('touchend', updateProgress);
+  }
+  // Run once on load to reflect any pre-filled defaults
+  updateProgress();
 });
 </script>
 </body>

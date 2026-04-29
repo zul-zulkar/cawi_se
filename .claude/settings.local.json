@@ -7,7 +7,8 @@
       "Bash(curl -s \"https://esurvey.bps.go.id/api/form-engine/js-umd/2\" -H \"User-Agent: Mozilla/5.0\" --max-time 15)",
       "Bash(curl -s \"https://esurvey.bps.go.id/assets/index.37e01782.js\" -H \"User-Agent: Mozilla/5.0\" --max-time 15)",
       "Bash(curl -s \"https://esurvey.bps.go.id/assets/index.37e01782.js\" -H \"User-Agent: Mozilla/5.0\" --max-time 30)",
-      "Bash(curl -s \"https://esurvey.bps.go.id/assets/index.37e01782.js\" --max-time 30)"
+      "Bash(curl -s \"https://esurvey.bps.go.id/assets/index.37e01782.js\" --max-time 30)",
+      "WebFetch(domain:klasifikasi.web.bps.go.id)"
     ]
   }
 }
