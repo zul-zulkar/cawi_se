@@ -2975,12 +2975,13 @@ document.addEventListener('DOMContentLoaded', () => {
 /* ====== PASSWORD GATE ====== */
 // Hash SHA-256 dari kata sandi — ubah dengan: btoa(await crypto.subtle.digest(...))
 // Kata sandi default: BPS2026Buleleng
-// Untuk mengganti: jalankan di console browser:
-//   const h = await crypto.subtle.digest('SHA-256', new TextEncoder().encode('KataSandiBaruAnda'));
-//   console.log([...new Uint8Array(h)].map(b=>b.toString(16).padStart(2,'0')).join(''));
-const PW_HASH = 'c7bbbee97d8d12845dee0e822ef3a74d6ca6b25c9e123422168e1d2a5c00dff5'; // BPS2026Buleleng
+const DEFAULT_PW_HASH = 'c7bbbee97d8d12845dee0e822ef3a74d6ca6b25c9e123422168e1d2a5c00dff5';
+const OVERRIDE_KEY    = 'cawi_pw_override_v1';
+const PW_SESSION_KEY  = 'cawi_auth_v1';
 
-const PW_SESSION_KEY = 'cawi_auth_v1';
+function getActiveHash() {
+  return localStorage.getItem(OVERRIDE_KEY) || DEFAULT_PW_HASH;
+}
 
 async function hashPassword(pw) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw));
@@ -2991,7 +2992,7 @@ async function checkPassword() {
   const pw = document.getElementById('pwInput').value;
   if (!pw) return;
   const h = await hashPassword(pw);
-  if (h === PW_HASH) {
+  if (h === getActiveHash()) {
     sessionStorage.setItem(PW_SESSION_KEY, '1');
     document.getElementById('pwGate').style.display = 'none';
   } else {

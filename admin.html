@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin — CAWI SE2026 BPS</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #f0f2f5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px;
+      color: #1a1a2e;
+    }
+
+    /* ── Gate ── */
+    #adminGate {
+      position: fixed; inset: 0;
+      background: #1a1a2e;
+      display: flex; align-items: center; justify-content: center;
+      z-index: 9999;
+    }
+    .gate-box {
+      background: #fff;
+      border-radius: 16px;
+      padding: 40px 36px;
+      width: 360px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.4);
+      text-align: center;
+    }
+    .gate-box .logo {
+      font-size: 2.4rem;
+      margin-bottom: 8px;
+    }
+    .gate-box h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-bottom: 4px;
+    }
+    .gate-box p {
+      font-size: .82rem;
+      color: #666;
+      margin-bottom: 24px;
+    }
+    .gate-box input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid #ddd;
+      border-radius: 8px;
+      font-size: .95rem;
+      outline: none;
+      margin-bottom: 12px;
+      transition: border-color .2s;
+    }
+    .gate-box input:focus { border-color: #fc6c00; }
+    .gate-box button {
+      width: 100%;
+      padding: 12px;
+      background: #fc6c00;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: .95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s;
+    }
+    .gate-box button:hover { background: #e05a00; }
+    .gate-error {
+      display: none;
+      color: #d32f2f;
+      font-size: .82rem;
+      margin-top: 10px;
+    }
+
+    /* ── Header ── */
+    .top-bar {
+      width: 100%;
+      max-width: 640px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+    }
+    .top-bar h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #1a1a2e;
+    }
+    .top-bar h1 span { color: #fc6c00; }
+    .btn-back {
+      text-decoration: none;
+      font-size: .83rem;
+      color: #555;
+      border: 1px solid #ddd;
+      padding: 6px 14px;
+      border-radius: 8px;
+      background: #fff;
+      transition: background .2s;
+    }
+    .btn-back:hover { background: #f5f5f5; }
+
+    /* ── Cards ── */
+    .card {
+      width: 100%;
+      max-width: 640px;
+      background: #fff;
+      border-radius: 14px;
+      padding: 28px 28px 24px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.06);
+      margin-bottom: 20px;
+    }
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #f0f2f5;
+    }
+    .status-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #f8f9fc;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 8px;
+    }
+    .status-icon { font-size: 1.4rem; }
+    .status-label { font-size: .83rem; color: #666; }
+    .status-value { font-size: .9rem; font-weight: 600; color: #1a1a2e; }
+    .badge {
+      display: inline-block;
+      font-size: .72rem;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 20px;
+      margin-left: 8px;
+    }
+    .badge-default { background: #e3f2fd; color: #1565c0; }
+    .badge-custom  { background: #e8f5e9; color: #2e7d32; }
+
+    .form-group { margin-bottom: 16px; }
+    .form-group label {
+      display: block;
+      font-size: .83rem;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 6px;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1.5px solid #ddd;
+      border-radius: 8px;
+      font-size: .92rem;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .form-group input:focus { border-color: #fc6c00; }
+    .field-hint {
+      font-size: .76rem;
+      color: #888;
+      margin-top: 4px;
+    }
+    .hash-preview {
+      display: none;
+      margin-top: 6px;
+      padding: 10px 12px;
+      background: #f8f9fc;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: .78rem;
+      color: #555;
+      word-break: break-all;
+    }
+    .strength-bar-wrap {
+      height: 4px;
+      background: #eee;
+      border-radius: 4px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+    .strength-bar {
+      height: 100%;
+      border-radius: 4px;
+      transition: width .3s, background .3s;
+      width: 0;
+    }
+    .strength-label {
+      font-size: .73rem;
+      margin-top: 4px;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .btn {
+      flex: 1;
+      padding: 11px;
+      border: none;
+      border-radius: 8px;
+      font-size: .9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s, opacity .2s;
+    }
+    .btn:disabled { opacity: .45; cursor: not-allowed; }
+    .btn-primary { background: #fc6c00; color: #fff; }
+    .btn-primary:not(:disabled):hover { background: #e05a00; }
+    .btn-danger  { background: #d32f2f; color: #fff; }
+    .btn-danger:not(:disabled):hover  { background: #b71c1c; }
+    .btn-outline {
+      background: #fff;
+      color: #555;
+      border: 1.5px solid #ddd;
+      flex: none;
+      padding: 11px 18px;
+    }
+    .btn-outline:hover { background: #f5f5f5; }
+
+    .alert {
+      display: none;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: .87rem;
+      font-weight: 500;
+      margin-top: 14px;
+    }
+    .alert-ok  { background: #e8f5e9; color: #2e7d32; }
+    .alert-err { background: #ffebee; color: #c62828; }
+
+    .info-box {
+      background: #fff8e1;
+      border-left: 4px solid #f9a825;
+      border-radius: 0 8px 8px 0;
+      padding: 12px 16px;
+      font-size: .82rem;
+      color: #5d4037;
+      line-height: 1.6;
+    }
+    .info-box strong { display: block; margin-bottom: 4px; }
+
+    footer {
+      margin-top: 32px;
+      font-size: .75rem;
+      color: #aaa;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── Admin Gate ─── -->
+<div id="adminGate">
+  <div class="gate-box">
+    <div class="logo">🔐</div>
+    <h2>Panel Admin</h2>
+    <p>Masukkan kata sandi administrator untuk melanjutkan</p>
+    <input type="password" id="adminPwInput" placeholder="Kata sandi admin"
+           onkeydown="if(event.key==='Enter') checkAdminPassword()"/>
+    <button onclick="checkAdminPassword()">Masuk</button>
+    <div class="gate-error" id="adminPwError">Kata sandi admin salah.</div>
+  </div>
+</div>
+
+<!-- ─── Main Content ─── -->
+<div class="top-bar">
+  <h1>Panel <span>Admin</span></h1>
+  <a href="daftar.html" class="btn-back">← Dashboard</a>
+</div>
+
+<!-- Status password saat ini -->
+<div class="card">
+  <div class="card-title">Status Password Kuesioner</div>
+  <div class="status-row">
+    <div class="status-icon">🔑</div>
+    <div>
+      <div class="status-label">Sumber password aktif</div>
+      <div class="status-value" id="pwSourceLabel">—</div>
+    </div>
+  </div>
+  <div class="status-row">
+    <div class="status-icon">🛡️</div>
+    <div>
+      <div class="status-label">Hash SHA-256 aktif</div>
+      <div class="status-value" id="pwHashLabel" style="font-family:monospace;font-size:.78rem;word-break:break-all">—</div>
+    </div>
+  </div>
+</div>
+
+<!-- Ubah password kuesioner -->
+<div class="card">
+  <div class="card-title">Ubah Password Kuesioner</div>
+
+  <div class="form-group">
+    <label>Password Baru</label>
+    <input type="password" id="newPw" placeholder="Minimal 8 karakter"
+           oninput="onNewPwInput()" autocomplete="new-password"/>
+    <div class="strength-bar-wrap">
+      <div class="strength-bar" id="strengthBar"></div>
+    </div>
+    <div class="strength-label" id="strengthLabel"></div>
+  </div>
+
+  <div class="form-group">
+    <label>Konfirmasi Password Baru</label>
+    <input type="password" id="confirmPw" placeholder="Ketik ulang password baru"
+           oninput="onConfirmInput()" autocomplete="new-password"/>
+  </div>
+
+  <div class="form-group">
+    <label>Preview Hash SHA-256 <span style="font-weight:400;color:#888">(otomatis)</span></label>
+    <div class="hash-preview" id="hashPreview">—</div>
+    <div class="field-hint">Hash ini yang disimpan — password asli tidak pernah tersimpan.</div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-primary" id="btnSave" onclick="saveNewPassword()" disabled>
+      Simpan Password Baru
+    </button>
+    <button class="btn btn-outline" onclick="toggleShowPw()">👁</button>
+  </div>
+
+  <div class="alert alert-ok"  id="alertOk">✅ Password berhasil diubah dan disimpan di perangkat ini.</div>
+  <div class="alert alert-err" id="alertErr"></div>
+</div>
+
+<!-- Reset ke default -->
+<div class="card">
+  <div class="card-title">Reset ke Password Default</div>
+  <div class="info-box" style="margin-bottom:16px">
+    <strong>⚠️ Perhatian</strong>
+    Reset akan menghapus password kustom di perangkat ini. Perangkat akan kembali menggunakan
+    password default yang tertanam di dalam kode program.
+  </div>
+  <button class="btn btn-danger" onclick="resetToDefault()">Reset ke Default</button>
+  <div class="alert alert-ok" id="alertReset">✅ Berhasil direset. Perangkat kini menggunakan password default.</div>
+</div>
+
+<!-- Info sinkronisasi -->
+<div class="card">
+  <div class="card-title">ℹ️ Cara Kerja & Sinkronisasi</div>
+  <div class="info-box">
+    <strong>Penyimpanan per perangkat</strong>
+    Password yang diubah disimpan di <em>localStorage</em> perangkat ini saja. Perangkat lain
+    (HP/laptop petugas lain) tetap menggunakan password lama sampai admin mengubahnya di
+    perangkat masing-masing.<br><br>
+    <strong>Cara distribusi password baru:</strong><br>
+    1. Ubah password di halaman ini (di perangkat admin).<br>
+    2. Sampaikan password baru kepada semua petugas.<br>
+    3. Masing-masing petugas masuk ke <code>…/admin.html</code> dan atur password yang sama.<br>
+    4. Atau: minta petugas logout (tutup tab/browser), lalu masukkan password baru di form login.
+  </div>
+</div>
+
+<footer>CAWI SE2026 BPS &nbsp;|&nbsp; Panel Admin &nbsp;|&nbsp; v1.0</footer>
+
+<script>
+// ══════════════════════════════════════════════
+// ADMIN GATE
+// ══════════════════════════════════════════════
+// Hash SHA-256 untuk password admin: AdminBPS2026!
+const ADMIN_HASH = '91cbd318e2c820354c44cd0c4ab5863c429767acff747ffb958f5d16da54c334';
+const ADMIN_SESSION_KEY = 'cawi_admin_auth_v1';
+
+async function sha256(text) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function checkAdminPassword() {
+  const pw = document.getElementById('adminPwInput').value;
+  if (!pw) return;
+  const h = await sha256(pw);
+  if (h === ADMIN_HASH) {
+    sessionStorage.setItem(ADMIN_SESSION_KEY, '1');
+    document.getElementById('adminGate').style.display = 'none';
+    initPage();
+  } else {
+    document.getElementById('adminPwError').style.display = 'block';
+    document.getElementById('adminPwInput').value = '';
+    document.getElementById('adminPwInput').focus();
+  }
+}
+
+document.getElementById('adminPwInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') checkAdminPassword();
+});
+
+(function() {
+  if (sessionStorage.getItem(ADMIN_SESSION_KEY) === '1') {
+    document.getElementById('adminGate').style.display = 'none';
+    initPage();
+  }
+})();
+
+// ══════════════════════════════════════════════
+// PASSWORD KUESIONER
+// ══════════════════════════════════════════════
+const DEFAULT_PW_HASH = 'c7bbbee97d8d12845dee0e822ef3a74d6ca6b25c9e123422168e1d2a5c00dff5';
+const OVERRIDE_KEY    = 'cawi_pw_override_v1';
+
+function getActiveHash() {
+  return localStorage.getItem(OVERRIDE_KEY) || DEFAULT_PW_HASH;
+}
+
+function initPage() {
+  const override = localStorage.getItem(OVERRIDE_KEY);
+  const el = document.getElementById;
+  if (override) {
+    el('pwSourceLabel').innerHTML = 'Password Kustom <span class="badge badge-custom">Kustom</span>';
+    el('pwHashLabel').textContent = override;
+  } else {
+    el('pwSourceLabel').innerHTML = 'Password Default <span class="badge badge-default">Default</span>';
+    el('pwHashLabel').textContent = DEFAULT_PW_HASH;
+  }
+}
+
+// strength meter
+function passwordStrength(pw) {
+  let score = 0;
+  if (pw.length >= 8)  score++;
+  if (pw.length >= 12) score++;
+  if (/[A-Z]/.test(pw)) score++;
+  if (/[0-9]/.test(pw)) score++;
+  if (/[^A-Za-z0-9]/.test(pw)) score++;
+  return score;
+}
+
+let computedHash = '';
+
+async function onNewPwInput() {
+  const pw  = document.getElementById('newPw').value;
+  const bar = document.getElementById('strengthBar');
+  const lbl = document.getElementById('strengthLabel');
+  const preview = document.getElementById('hashPreview');
+
+  if (!pw) {
+    bar.style.width = '0';
+    bar.style.background = '';
+    lbl.textContent = '';
+    preview.style.display = 'none';
+    computedHash = '';
+    updateSaveBtn();
+    return;
+  }
+
+  const s = passwordStrength(pw);
+  const pct = Math.min(100, s * 20) + '%';
+  bar.style.width = pct;
+  const colors = ['#ef5350','#ff7043','#ffa726','#66bb6a','#43a047'];
+  const labels = ['Sangat lemah','Lemah','Cukup','Kuat','Sangat kuat'];
+  bar.style.background = colors[s - 1] || '#eee';
+  lbl.textContent = pw.length < 8 ? 'Minimal 8 karakter' : (labels[s - 1] || '');
+  lbl.style.color = colors[s - 1] || '#999';
+
+  computedHash = await sha256(pw);
+  preview.style.display = 'block';
+  preview.textContent = computedHash;
+
+  updateSaveBtn();
+}
+
+function onConfirmInput() { updateSaveBtn(); }
+
+function updateSaveBtn() {
+  const pw  = document.getElementById('newPw').value;
+  const cpw = document.getElementById('confirmPw').value;
+  document.getElementById('btnSave').disabled =
+    !(pw.length >= 8 && pw === cpw && computedHash);
+}
+
+async function saveNewPassword() {
+  const pw  = document.getElementById('newPw').value;
+  const cpw = document.getElementById('confirmPw').value;
+
+  hideAlerts();
+
+  if (pw.length < 8) {
+    showAlert('alertErr', 'Password minimal 8 karakter.');
+    return;
+  }
+  if (pw !== cpw) {
+    showAlert('alertErr', 'Konfirmasi password tidak cocok.');
+    return;
+  }
+
+  const hash = await sha256(pw);
+  localStorage.setItem(OVERRIDE_KEY, hash);
+
+  document.getElementById('newPw').value = '';
+  document.getElementById('confirmPw').value = '';
+  document.getElementById('hashPreview').style.display = 'none';
+  document.getElementById('strengthBar').style.width = '0';
+  document.getElementById('strengthLabel').textContent = '';
+  document.getElementById('btnSave').disabled = true;
+  computedHash = '';
+
+  initPage();
+  showAlert('alertOk', null);
+}
+
+function resetToDefault() {
+  hideAlerts();
+  localStorage.removeItem(OVERRIDE_KEY);
+  initPage();
+  document.getElementById('alertReset').style.display = 'block';
+  setTimeout(() => { document.getElementById('alertReset').style.display = 'none'; }, 4000);
+}
+
+function showAlert(id, msg) {
+  const el = document.getElementById(id);
+  if (msg) el.textContent = msg;
+  el.style.display = 'block';
+  setTimeout(() => { el.style.display = 'none'; }, 4000);
+}
+
+function hideAlerts() {
+  ['alertOk','alertErr','alertReset'].forEach(id => {
+    document.getElementById(id).style.display = 'none';
+  });
+}
+
+let showingPw = false;
+function toggleShowPw() {
+  showingPw = !showingPw;
+  ['newPw','confirmPw'].forEach(id => {
+    document.getElementById(id).type = showingPw ? 'text' : 'password';
+  });
+}
+</script>
+</body>
+</html>
