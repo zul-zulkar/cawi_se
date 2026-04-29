@@ -99,6 +99,30 @@ tr:hover td{background:#fffaf7}
 </head>
 <body>
 
+<!-- ====== PASSWORD GATE ====== -->
+<div id="pwGate" style="position:fixed;inset:0;background:#1a2332;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#fff;border-radius:12px;padding:36px 32px;max-width:380px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.4);text-align:center">
+    <div style="font-size:28px;font-weight:900;color:#fc6c00;letter-spacing:4px;margin-bottom:4px">CAWI</div>
+    <div style="font-size:11px;color:#aaa;letter-spacing:2px;text-transform:uppercase;margin-bottom:24px">SE2026 — BPS Buleleng</div>
+    <div style="background:#fff5f5;border:1.5px solid #feb2b2;border-radius:7px;padding:10px 14px;font-size:12px;color:#c53030;margin-bottom:20px;font-weight:600;letter-spacing:.3px">
+      &#128274; AKSES TERBATAS — PETUGAS BPS
+    </div>
+    <input type="password" id="pwInput" placeholder="Masukkan kata sandi"
+      style="width:100%;padding:11px 14px;border:1.5px solid #ddd;border-radius:7px;font-size:14px;font-family:inherit;margin-bottom:12px;outline:none;transition:border-color .2s"
+      onkeydown="if(event.key==='Enter')checkPassword()"
+      onfocus="this.style.borderColor='#fc6c00'" onblur="this.style.borderColor='#ddd'"/>
+    <div id="pwError" style="color:#c53030;font-size:12px;margin-bottom:10px;display:none;font-weight:600">&#10005; Kata sandi salah</div>
+    <button onclick="checkPassword()"
+      style="width:100%;background:#fc6c00;color:#fff;border:none;padding:12px;border-radius:7px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.3px;transition:background .2s"
+      onmouseover="this.style.background='#e06000'" onmouseout="this.style.background='#fc6c00'">
+      Masuk
+    </button>
+    <p style="font-size:11px;color:#ccc;margin-top:18px;line-height:1.7">
+      Hanya untuk petugas pencacah resmi<br/>Sensus Ekonomi 2026 BPS Buleleng
+    </p>
+  </div>
+</div>
+
 <div class="rahasia-bar">&#x25CF;&nbsp; R A H A S I A &nbsp;&#x25CF;</div>
 
 <div class="header-main">
@@ -590,6 +614,37 @@ document.addEventListener('DOMContentLoaded', () => {
   updateStats();
   renderTable();
 });
+</script>
+
+<script>
+/* ====== PASSWORD GATE (sama dengan index.html) ====== */
+const PW_HASH = 'c3887e00fa3f3fcb76efbbcc12b7d1718d8d5f7a8ab1b3e7e14bcaf898b7e5b7';
+const PW_SESSION_KEY = 'cawi_auth_v1';
+
+async function hashPassword(pw) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pw));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+async function checkPassword() {
+  const pw = document.getElementById('pwInput').value;
+  if (!pw) return;
+  const h = await hashPassword(pw);
+  if (h === PW_HASH) {
+    sessionStorage.setItem(PW_SESSION_KEY, '1');
+    document.getElementById('pwGate').style.display = 'none';
+  } else {
+    document.getElementById('pwError').style.display = 'block';
+    document.getElementById('pwInput').value = '';
+    document.getElementById('pwInput').focus();
+  }
+}
+
+(function() {
+  if (sessionStorage.getItem(PW_SESSION_KEY) === '1') {
+    document.getElementById('pwGate').style.display = 'none';
+  }
+})();
 </script>
 </body>
 </html>
