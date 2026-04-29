@@ -336,7 +336,7 @@
 
 <!-- Reset ke default -->
 <div class="card">
-  <div class="card-title">Reset ke Password Default</div>
+  <div class="card-title">Reset ke Password Default (Kuesioner)</div>
   <div class="info-box" style="margin-bottom:16px">
     <strong>⚠️ Perhatian</strong>
     Reset akan menghapus password kustom di perangkat ini. Perangkat akan kembali menggunakan
@@ -344,6 +344,55 @@
   </div>
   <button class="btn btn-danger" onclick="resetToDefault()">Reset ke Default</button>
   <div class="alert alert-ok" id="alertReset">✅ Berhasil direset. Perangkat kini menggunakan password default.</div>
+</div>
+
+<!-- Ubah password admin -->
+<div class="card">
+  <div class="card-title">Ubah Password Admin</div>
+
+  <div class="status-row" style="margin-bottom:18px">
+    <div class="status-icon">👤</div>
+    <div>
+      <div class="status-label">Status password admin</div>
+      <div class="status-value" id="adminPwStatusLabel">—</div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label>Password Admin Saat Ini <span style="color:#d32f2f">*</span></label>
+    <input type="password" id="curAdminPw" placeholder="Verifikasi password admin lama"
+           autocomplete="current-password"/>
+  </div>
+  <div class="form-group">
+    <label>Password Admin Baru</label>
+    <input type="password" id="newAdminPw" placeholder="Minimal 8 karakter"
+           oninput="onNewAdminPwInput()" autocomplete="new-password"/>
+    <div class="strength-bar-wrap">
+      <div class="strength-bar" id="adminStrengthBar"></div>
+    </div>
+    <div class="strength-label" id="adminStrengthLabel"></div>
+  </div>
+  <div class="form-group">
+    <label>Konfirmasi Password Admin Baru</label>
+    <input type="password" id="confirmAdminPw" placeholder="Ketik ulang password admin baru"
+           oninput="updateSaveAdminBtn()" autocomplete="new-password"/>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-primary" id="btnSaveAdmin" onclick="saveAdminPassword()" disabled>
+      Simpan Password Admin
+    </button>
+    <button class="btn btn-outline" onclick="toggleShowAdminPw()">👁</button>
+  </div>
+  <div class="alert alert-ok"  id="alertAdminOk">✅ Password admin berhasil diubah.</div>
+  <div class="alert alert-err" id="alertAdminErr"></div>
+
+  <div style="margin-top:16px">
+    <button class="btn btn-danger" onclick="resetAdminToDefault()" style="width:auto;padding:10px 18px;font-size:.85rem">
+      Reset Password Admin ke Default
+    </button>
+    <div class="alert alert-ok" id="alertAdminReset">✅ Password admin direset ke default.</div>
+  </div>
 </div>
 
 <!-- Info sinkronisasi -->
@@ -368,20 +417,25 @@
 // ══════════════════════════════════════════════
 // ADMIN GATE
 // ══════════════════════════════════════════════
-// Hash SHA-256 untuk password admin: AdminBPS2026!
-const ADMIN_HASH = '91cbd318e2c820354c44cd0c4ab5863c429767acff747ffb958f5d16da54c334';
-const ADMIN_SESSION_KEY = 'cawi_admin_auth_v1';
+// Hash SHA-256 untuk password admin default: AdminBPS2026!
+const ADMIN_DEFAULT_HASH  = '91cbd318e2c820354c44cd0c4ab5863c429767acff747ffb958f5d16da54c334';
+const ADMIN_OVERRIDE_KEY  = 'cawi_admin_pw_override_v1';
+const ADMIN_SESSION_KEY   = 'cawi_admin_auth_v1';
 
 async function sha256(text) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
   return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
+function getAdminHash() {
+  return localStorage.getItem(ADMIN_OVERRIDE_KEY) || ADMIN_DEFAULT_HASH;
+}
+
 async function checkAdminPassword() {
   const pw = document.getElementById('adminPwInput').value;
   if (!pw) return;
   const h = await sha256(pw);
-  if (h === ADMIN_HASH) {
+  if (h === getAdminHash()) {
     sessionStorage.setItem(ADMIN_SESSION_KEY, '1');
     document.getElementById('adminGate').style.display = 'none';
     initPage();
@@ -409,23 +463,24 @@ document.getElementById('adminPwInput').addEventListener('keydown', e => {
 const DEFAULT_PW_HASH = 'c7bbbee97d8d12845dee0e822ef3a74d6ca6b25c9e123422168e1d2a5c00dff5';
 const OVERRIDE_KEY    = 'cawi_pw_override_v1';
 
-function getActiveHash() {
-  return localStorage.getItem(OVERRIDE_KEY) || DEFAULT_PW_HASH;
-}
-
 function initPage() {
+  // Status kuesioner
   const override = localStorage.getItem(OVERRIDE_KEY);
-  const el = document.getElementById;
   if (override) {
-    el('pwSourceLabel').innerHTML = 'Password Kustom <span class="badge badge-custom">Kustom</span>';
-    el('pwHashLabel').textContent = override;
+    document.getElementById('pwSourceLabel').innerHTML = 'Password Kustom <span class="badge badge-custom">Kustom</span>';
+    document.getElementById('pwHashLabel').textContent = override;
   } else {
-    el('pwSourceLabel').innerHTML = 'Password Default <span class="badge badge-default">Default</span>';
-    el('pwHashLabel').textContent = DEFAULT_PW_HASH;
+    document.getElementById('pwSourceLabel').innerHTML = 'Password Default <span class="badge badge-default">Default</span>';
+    document.getElementById('pwHashLabel').textContent = DEFAULT_PW_HASH;
   }
+  // Status admin
+  const adminOverride = localStorage.getItem(ADMIN_OVERRIDE_KEY);
+  document.getElementById('adminPwStatusLabel').innerHTML = adminOverride
+    ? 'Password Kustom <span class="badge badge-custom">Kustom</span>'
+    : 'Password Default <span class="badge badge-default">Default</span>';
 }
 
-// strength meter
+// ── Strength meter helper ──
 function passwordStrength(pw) {
   let score = 0;
   if (pw.length >= 8)  score++;
@@ -436,66 +491,49 @@ function passwordStrength(pw) {
   return score;
 }
 
-let computedHash = '';
-
-async function onNewPwInput() {
-  const pw  = document.getElementById('newPw').value;
-  const bar = document.getElementById('strengthBar');
-  const lbl = document.getElementById('strengthLabel');
-  const preview = document.getElementById('hashPreview');
-
-  if (!pw) {
-    bar.style.width = '0';
-    bar.style.background = '';
-    lbl.textContent = '';
-    preview.style.display = 'none';
-    computedHash = '';
-    updateSaveBtn();
-    return;
-  }
-
+function applyStrength(pw, barId, lblId) {
+  const bar = document.getElementById(barId);
+  const lbl = document.getElementById(lblId);
+  if (!pw) { bar.style.width = '0'; lbl.textContent = ''; return; }
   const s = passwordStrength(pw);
-  const pct = Math.min(100, s * 20) + '%';
-  bar.style.width = pct;
   const colors = ['#ef5350','#ff7043','#ffa726','#66bb6a','#43a047'];
   const labels = ['Sangat lemah','Lemah','Cukup','Kuat','Sangat kuat'];
+  bar.style.width = Math.min(100, s * 20) + '%';
   bar.style.background = colors[s - 1] || '#eee';
   lbl.textContent = pw.length < 8 ? 'Minimal 8 karakter' : (labels[s - 1] || '');
   lbl.style.color = colors[s - 1] || '#999';
-
-  computedHash = await sha256(pw);
-  preview.style.display = 'block';
-  preview.textContent = computedHash;
-
-  updateSaveBtn();
 }
 
-function onConfirmInput() { updateSaveBtn(); }
+// ══════════════════════════════════════════════
+// UBAH PASSWORD KUESIONER
+// ══════════════════════════════════════════════
+async function onNewPwInput() {
+  const pw = document.getElementById('newPw').value;
+  applyStrength(pw, 'strengthBar', 'strengthLabel');
+  const preview = document.getElementById('hashPreview');
+  if (pw.length >= 8) {
+    preview.style.display = 'block';
+    preview.textContent = await sha256(pw);
+  } else {
+    preview.style.display = 'none';
+  }
+  updateSaveBtn();
+}
 
 function updateSaveBtn() {
   const pw  = document.getElementById('newPw').value;
   const cpw = document.getElementById('confirmPw').value;
-  document.getElementById('btnSave').disabled =
-    !(pw.length >= 8 && pw === cpw && computedHash);
+  document.getElementById('btnSave').disabled = !(pw.length >= 8 && pw === cpw);
 }
 
 async function saveNewPassword() {
   const pw  = document.getElementById('newPw').value;
   const cpw = document.getElementById('confirmPw').value;
-
   hideAlerts();
+  if (pw.length < 8) { showAlert('alertErr', 'Password minimal 8 karakter.'); return; }
+  if (pw !== cpw)    { showAlert('alertErr', 'Konfirmasi password tidak cocok.'); return; }
 
-  if (pw.length < 8) {
-    showAlert('alertErr', 'Password minimal 8 karakter.');
-    return;
-  }
-  if (pw !== cpw) {
-    showAlert('alertErr', 'Konfirmasi password tidak cocok.');
-    return;
-  }
-
-  const hash = await sha256(pw);
-  localStorage.setItem(OVERRIDE_KEY, hash);
+  localStorage.setItem(OVERRIDE_KEY, await sha256(pw));
 
   document.getElementById('newPw').value = '';
   document.getElementById('confirmPw').value = '';
@@ -503,8 +541,6 @@ async function saveNewPassword() {
   document.getElementById('strengthBar').style.width = '0';
   document.getElementById('strengthLabel').textContent = '';
   document.getElementById('btnSave').disabled = true;
-  computedHash = '';
-
   initPage();
   showAlert('alertOk', null);
 }
@@ -517,6 +553,61 @@ function resetToDefault() {
   setTimeout(() => { document.getElementById('alertReset').style.display = 'none'; }, 4000);
 }
 
+// ══════════════════════════════════════════════
+// UBAH PASSWORD ADMIN
+// ══════════════════════════════════════════════
+function onNewAdminPwInput() {
+  applyStrength(document.getElementById('newAdminPw').value, 'adminStrengthBar', 'adminStrengthLabel');
+  updateSaveAdminBtn();
+}
+
+function updateSaveAdminBtn() {
+  const pw  = document.getElementById('newAdminPw').value;
+  const cpw = document.getElementById('confirmAdminPw').value;
+  document.getElementById('btnSaveAdmin').disabled = !(pw.length >= 8 && pw === cpw);
+}
+
+async function saveAdminPassword() {
+  const cur = document.getElementById('curAdminPw').value;
+  const pw  = document.getElementById('newAdminPw').value;
+  const cpw = document.getElementById('confirmAdminPw').value;
+
+  hideAdminAlerts();
+
+  if (!cur) { showAdminAlert('alertAdminErr', 'Masukkan password admin saat ini untuk verifikasi.'); return; }
+  const curHash = await sha256(cur);
+  if (curHash !== getAdminHash()) { showAdminAlert('alertAdminErr', 'Password admin saat ini salah.'); return; }
+  if (pw.length < 8) { showAdminAlert('alertAdminErr', 'Password baru minimal 8 karakter.'); return; }
+  if (pw !== cpw)    { showAdminAlert('alertAdminErr', 'Konfirmasi password tidak cocok.'); return; }
+
+  localStorage.setItem(ADMIN_OVERRIDE_KEY, await sha256(pw));
+
+  document.getElementById('curAdminPw').value = '';
+  document.getElementById('newAdminPw').value = '';
+  document.getElementById('confirmAdminPw').value = '';
+  document.getElementById('adminStrengthBar').style.width = '0';
+  document.getElementById('adminStrengthLabel').textContent = '';
+  document.getElementById('btnSaveAdmin').disabled = true;
+  initPage();
+  showAdminAlert('alertAdminOk', null);
+}
+
+function resetAdminToDefault() {
+  hideAdminAlerts();
+  localStorage.removeItem(ADMIN_OVERRIDE_KEY);
+  initPage();
+  document.getElementById('alertAdminReset').style.display = 'block';
+  setTimeout(() => { document.getElementById('alertAdminReset').style.display = 'none'; }, 4000);
+}
+
+let showingAdminPw = false;
+function toggleShowAdminPw() {
+  showingAdminPw = !showingAdminPw;
+  ['curAdminPw','newAdminPw','confirmAdminPw'].forEach(id => {
+    document.getElementById(id).type = showingAdminPw ? 'text' : 'password';
+  });
+}
+
 function showAlert(id, msg) {
   const el = document.getElementById(id);
   if (msg) el.textContent = msg;
@@ -526,6 +617,14 @@ function showAlert(id, msg) {
 
 function hideAlerts() {
   ['alertOk','alertErr','alertReset'].forEach(id => {
+    document.getElementById(id).style.display = 'none';
+  });
+}
+
+function showAdminAlert(id, msg) { showAlert(id, msg); }
+
+function hideAdminAlerts() {
+  ['alertAdminOk','alertAdminErr','alertAdminReset'].forEach(id => {
     document.getElementById(id).style.display = 'none';
   });
 }
