@@ -12,7 +12,7 @@
 // 5. Salin URL yang diberikan, paste ke index.html pada SCRIPT_URL
 // ============================================================
 
-const SHEET_ID   = "GANTI_DENGAN_ID_GOOGLE_SHEET_ANDA";
+const SHEET_ID   = "1f-YLgJHfMU33_9Pn6snao1xZ-qf3vBQRpAxFwxBLOGI";
 const SHEET_NAME = "SE2026_Responses";
 
 // Header columns — urutan harus sama dengan appendRow di bawah
@@ -75,7 +75,9 @@ const HEADERS = [
   "Catatan Kunjungan I", "Waktu Kunjungan I",
   "Catatan Kunjungan II", "Waktu Kunjungan II",
   "Catatan Kunjungan III", "Waktu Kunjungan III",
-  // BLOK III
+  // BLOK III — Petugas
+  "Petugas Nama", "Petugas NIP", "Petugas HP",
+  // BLOK III — Responden
   "Responden Nama", "Responden HP", "Responden Email",
   "Tanggal Pelaksanaan",
   "Tanda Tangan (base64)"
@@ -162,7 +164,9 @@ function doPost(e) {
       d.catatan1, d.waktu1,
       d.catatan2, d.waktu2,
       d.catatan3, d.waktu3,
-      // Blok III
+      // Blok III — Petugas
+      d.petugas_nama, d.petugas_nip, d.petugas_hp,
+      // Blok III — Responden
       d.responden_nama, d.responden_hp, d.responden_email,
       d.tanggal_pelaksanaan,
       d.tanda_tangan ? "[ada]" : "[kosong]" // simpan flag saja, bukan base64 penuh

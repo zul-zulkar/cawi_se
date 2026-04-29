@@ -350,6 +350,9 @@ input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
     <button class="sidebar-btn" onclick="showRecap()">
       <span class="sidebar-btn-icon">&#128269;</span> Rekap &amp; Periksa
     </button>
+    <button class="sidebar-btn" onclick="window.open('daftar.html','_blank')">
+      <span class="sidebar-btn-icon">&#128196;</span> Daftar Entri
+    </button>
   </div>
   <div style="padding:8px 16px 4px;margin-top:auto">
     <div id="autosaveStatus" style="font-size:10px;color:rgba(255,255,255,.28);line-height:1.6;display:flex;align-items:center;gap:5px">
@@ -414,7 +417,7 @@ input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
 
   <!-- Q1 Provinsi -->
   <div class="section-card">
-    <div class="section-header">&#9312; Provinsi Lokasi Usaha</div>
+    <div class="section-header">1. Provinsi Lokasi Usaha</div>
     <div class="section-body">
       <div class="form-group">
         <label class="field-label">Provinsi <span class="req">*</span></label>
@@ -428,7 +431,7 @@ input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
 
   <!-- Q2 Kabupaten -->
   <div class="section-card">
-    <div class="section-header">&#9313; Kabupaten/Kota</div>
+    <div class="section-header">2. Kabupaten/Kota</div>
     <div class="section-body">
       <div class="form-group">
         <label class="field-label">Kabupaten/Kota <span class="req">*</span></label>
@@ -442,7 +445,7 @@ input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
 
   <!-- Q3 Kecamatan -->
   <div class="section-card">
-    <div class="section-header">&#9314; Kecamatan</div>
+    <div class="section-header">3. Kecamatan</div>
     <div class="section-body">
       <div class="form-group">
         <label class="field-label">Kecamatan <span class="req">*</span> <span id="spinner-kec" class="spinner hidden"></span></label>
@@ -455,7 +458,7 @@ input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
 
   <!-- Q4 Kelurahan -->
   <div class="section-card">
-    <div class="section-header">&#9315; Kelurahan / Desa / Nagari</div>
+    <div class="section-header">4. Kelurahan / Desa / Nagari</div>
     <div class="section-body">
       <div class="form-group">
         <label class="field-label">Kelurahan/Desa/Nagari <span class="req">*</span> <span id="spinner-kel" class="spinner hidden"></span></label>
@@ -468,7 +471,7 @@ input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
 
   <!-- Q5 Nama dan Alamat -->
   <div class="section-card">
-    <div class="section-header">&#9316; Nama dan Alamat Perusahaan / Usaha</div>
+    <div class="section-header">5. Nama dan Alamat Perusahaan / Usaha</div>
     <div class="section-body">
 
       <div class="subsection-label">a. Nama Perusahaan</div>
@@ -563,7 +566,7 @@ input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
 
   <!-- Q6 NIB -->
   <div class="section-card">
-    <div class="section-header">&#9317; Nomor Induk Berusaha (NIB)</div>
+    <div class="section-header">6. Nomor Induk Berusaha (NIB)</div>
     <div class="section-body">
 
       <div class="form-group">
@@ -605,7 +608,7 @@ input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
 
   <!-- Q7 Status Badan Usaha -->
   <div class="section-card">
-    <div class="section-header">&#9318; Status Badan Usaha</div>
+    <div class="section-header">7. Status Badan Usaha</div>
     <div class="section-body">
 
       <div class="form-group">
@@ -661,7 +664,7 @@ input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
 
   <!-- Q8 Keterangan Pengusaha -->
   <div class="section-card">
-    <div class="section-header">&#9319; Keterangan Pengusaha / Penanggung Jawab</div>
+    <div class="section-header">8. Keterangan Pengusaha / Penanggung Jawab</div>
     <div class="section-body">
       <div class="form-group">
         <div class="subsection-label">a. Nama</div>
@@ -692,7 +695,7 @@ input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
 
   <!-- Q9 Kegiatan Utama -->
   <div class="section-card">
-    <div class="section-header">&#9320; Kegiatan Utama Usaha / Perusahaan</div>
+    <div class="section-header">9. Kegiatan Utama Usaha / Perusahaan</div>
     <div class="section-body">
       <div class="form-group">
         <div class="subsection-label">a. Kegiatan utama usaha/perusahaan</div>
@@ -874,7 +877,7 @@ input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
 
   <!-- Q10 Jaringan Usaha -->
   <div class="section-card">
-    <div class="section-header">&#9321; Jaringan / Skala Usaha</div>
+    <div class="section-header">10. Jaringan / Skala Usaha</div>
     <div class="section-body">
       <div class="form-group">
         <div class="subsection-label">a. Jaringan usaha</div>
@@ -898,7 +901,7 @@ input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
 
   <!-- Q11 Info Kantor Pusat -->
   <div class="section-card hidden" id="q11_wrap">
-    <div class="section-header">&#9322; Informasi Kantor Pusat / Induk</div>
+    <div class="section-header">11. Informasi Kantor Pusat / Induk</div>
     <div class="section-body">
       <div class="form-group">
         <div class="subsection-label">a. Nama Kantor Pusat</div>
@@ -963,7 +966,7 @@ input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
 
   <!-- Q12 Internet -->
   <div class="section-card">
-    <div class="section-header">&#9323; Penggunaan Internet dan Teknologi Digital</div>
+    <div class="section-header">12. Penggunaan Internet dan Teknologi Digital</div>
     <div class="section-body">
       <div class="form-group">
         <div class="subsection-label">a. Apakah menggunakan internet?</div>
@@ -1013,7 +1016,7 @@ input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
 
   <!-- Q13 Lingkungan -->
   <div class="section-card">
-    <div class="section-header">&#9324; Produk / Kegiatan Ramah Lingkungan</div>
+    <div class="section-header">13. Produk / Kegiatan Ramah Lingkungan</div>
     <div class="section-body">
       <div class="form-group">
         <div class="subsection-label">a. Apakah memproduksi barang/jasa ramah lingkungan?</div>
@@ -1037,7 +1040,7 @@ input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
 
   <!-- Q14 Produk Kreatif -->
   <div class="section-card">
-    <div class="section-header">&#9325; Produk Karya Seni / Kreatif / Teknologi</div>
+    <div class="section-header">14. Produk Karya Seni / Kreatif / Teknologi</div>
     <div class="section-body">
       <div class="form-group">
         <label class="field-label">Apakah menggunakan produk karya seni, sastra, desain, teknologi kreatif? <span class="req">*</span></label>
@@ -1051,7 +1054,7 @@ input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
 
   <!-- Q15 Sertifikat Halal -->
   <div class="section-card">
-    <div class="section-header">&#9326; Sertifikasi Halal (BPJPH)</div>
+    <div class="section-header">15. Sertifikasi Halal (BPJPH)</div>
     <div class="section-body">
       <div class="form-group">
         <div class="subsection-label">a. Apakah menghasilkan produk bersertifikat halal?</div>
@@ -1079,7 +1082,7 @@ input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
 
   <!-- Q16 Izin Edar -->
   <div class="section-card">
-    <div class="section-header">&#9327; Izin Edar Produk (BPOM)</div>
+    <div class="section-header">16. Izin Edar Produk (BPOM)</div>
     <div class="section-body">
       <div class="form-group">
         <div class="subsection-label">a. Apakah memiliki izin edar?</div>
@@ -1107,7 +1110,7 @@ input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
 
   <!-- Q17 Mitra KDKMP -->
   <div class="section-card">
-    <div class="section-header">&#9328; Kemitraan dengan KDKMP</div>
+    <div class="section-header">17. Kemitraan dengan KDKMP</div>
     <div class="section-body">
       <div class="form-group">
         <label class="field-label">Apakah bermitra dengan KDKMP (Koperasi Desa/Kelurahan Merah Putih)? <span class="req">*</span></label>
@@ -1121,7 +1124,7 @@ input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
 
   <!-- Q18 MBG -->
   <div class="section-card">
-    <div class="section-header">&#9329; Keterlibatan dalam Program MBG (Makan Bergizi Gratis)</div>
+    <div class="section-header">18. Keterlibatan dalam Program MBG (Makan Bergizi Gratis)</div>
     <div class="section-body">
       <div class="form-group">
         <label class="field-label">Apakah terlibat dalam program MBG? <span class="req">*</span></label>
@@ -1138,7 +1141,7 @@ input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
 
   <!-- Q19 Transaksi Non-Penduduk -->
   <div class="section-card">
-    <div class="section-header">&#9330; Transaksi dengan Non-Penduduk (Ekspor/Impor)</div>
+    <div class="section-header">19. Transaksi dengan Non-Penduduk (Ekspor/Impor)</div>
     <div class="section-body">
       <div class="form-group">
         <div class="subsection-label">a. Barang</div>
@@ -1161,7 +1164,7 @@ input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
 
   <!-- Q20 Jumlah Pekerja -->
   <div class="section-card">
-    <div class="section-header">&#9331; Jumlah Pekerja (per akhir 2025)</div>
+    <div class="section-header">20. Jumlah Pekerja (per akhir 2025)</div>
     <div class="section-body">
       <div class="inline-fields">
         <div class="form-group">
@@ -1399,6 +1402,26 @@ input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
     <div>
       <div class="blok-title-text">Identitas Responden &amp; Tanda Tangan</div>
       <div class="blok-title-sub">Pengisian akhir — pastikan semua data sudah benar sebelum submit</div>
+    </div>
+  </div>
+
+  <div class="section-card">
+    <div class="section-header">Identitas Petugas Pendata</div>
+    <div class="section-body">
+      <div class="form-group">
+        <label class="field-label">Nama Petugas <span class="req">*</span></label>
+        <input type="text" id="p_nama" placeholder="Nama lengkap petugas pendata"/>
+      </div>
+      <div class="inline-fields">
+        <div class="form-group">
+          <label class="field-label">NIP / ID Petugas</label>
+          <input type="text" id="p_nip" placeholder="NIP atau ID petugas"/>
+        </div>
+        <div class="form-group">
+          <label class="field-label">No. HP Petugas</label>
+          <input type="text" id="p_hp" placeholder="08xxxxxxxxxx"/>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1852,6 +1875,7 @@ function collectAllProblems() {
   const pen = parseCurrency(getVal('q22f')), pend = parseCurrency(getVal('q23c'));
   if (pen > 0 && pend > 0 && pend < pen * 0.05) w('Pertanyaan 22–23: Keuangan', 'Pendapatan jauh lebih kecil dari pengeluaran — verifikasi', 1, 'q23a');
 
+  if (!getVal('p_nama')) e('Petugas: Nama Petugas', 'Harus diisi', 3, 'p_nama');
   if (!getVal('r_nama')) e('Responden: Nama', 'Harus diisi', 3, 'r_nama');
   if (!getVal('r_hp')) e('Responden: Nomor HP', 'Harus diisi', 3, 'r_hp');
   else if (!isValidHP(getVal('r_hp'))) e('Responden: Nomor HP', 'Format tidak valid', 3, 'r_hp');
@@ -2524,6 +2548,7 @@ function validateBlok1() {
 }
 
 function validateBlok3() {
+  if (!getVal('p_nama')) return 'Nama petugas pendata harus diisi';
   if (!getVal('r_nama')) return 'Nama responden harus diisi';
   if (!getVal('r_hp')) return 'Nomor HP/Telepon responden harus diisi';
   if (!isValidHP(getVal('r_hp'))) return 'Format nomor HP responden tidak valid (contoh: 081234567890)';
@@ -2642,7 +2667,11 @@ function collectData() {
     catatan1: getVal('catatan1'), waktu1: getVal('waktu1'),
     catatan2: getVal('catatan2'), waktu2: getVal('waktu2'),
     catatan3: getVal('catatan3'), waktu3: getVal('waktu3'),
-    // Blok III
+    // Blok III — Petugas
+    petugas_nama: getVal('p_nama'),
+    petugas_nip: getVal('p_nip'),
+    petugas_hp: getVal('p_hp'),
+    // Blok III — Responden
     responden_nama: getVal('r_nama'),
     responden_hp: getVal('r_hp'),
     responden_email: getVal('r_email'),
@@ -2687,6 +2716,13 @@ async function submitForm() {
     btn.textContent = 'TERKIRIM ✓';
     btn.style.background = '#38a169';
     clearDraft();
+    // Simpan ringkasan ke daftar lokal
+    try {
+      const LS_REC = 'cawi_se2026_records_v1';
+      const recs = JSON.parse(localStorage.getItem(LS_REC) || '[]');
+      recs.unshift({ _id: Date.now(), _ts: new Date().toISOString(), ...data });
+      localStorage.setItem(LS_REC, JSON.stringify(recs));
+    } catch(_e) {}
     document.getElementById('submitAlert').classList.add('hidden');
     const successDiv = document.createElement('div');
     successDiv.className = 'alert alert-success';
