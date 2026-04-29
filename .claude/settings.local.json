@@ -9,7 +9,12 @@
       "Bash(curl -s \"https://esurvey.bps.go.id/assets/index.37e01782.js\" -H \"User-Agent: Mozilla/5.0\" --max-time 30)",
       "Bash(curl -s \"https://esurvey.bps.go.id/assets/index.37e01782.js\" --max-time 30)",
       "WebFetch(domain:klasifikasi.web.bps.go.id)",
-      "WebFetch(domain:legalitas.org)"
+      "WebFetch(domain:legalitas.org)",
+      "Bash(git add *)",
+      "Bash(git commit -m 'fix: perbaiki tombol simpan password + tambah ubah password admin *)",
+      "Bash(python -c \"import openpyxl; print\\('openpyxl ok'\\)\")",
+      "Bash(pip install *)",
+      "Bash(python -c ' *)"
     ]
   }
 }
