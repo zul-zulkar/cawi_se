@@ -16,7 +16,7 @@ const SHEET_ID   = "1f-YLgJHfMU33_9Pn6snao1xZ-qf3vBQRpAxFwxBLOGI";
 const SHEET_NAME = "SE2026_Responses";
 
 // Ganti token ini dengan string acak yang kuat — harus sama dengan API_TOKEN di index.html
-const API_TOKEN  = "SE2026-BPS-BULELENG-2026";
+const API_TOKEN  = "BPS-5108-K3r4h4s14an-SE2026-xK9mP";
 
 // Header columns — urutan harus sama dengan appendRow di bawah
 const HEADERS = [
