@@ -351,8 +351,14 @@ input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
       <span class="sidebar-btn-icon">&#128269;</span> Rekap &amp; Periksa
     </button>
   </div>
-  <div style="padding:12px 16px;margin-top:auto">
-    <div style="font-size:10px;color:rgba(255,255,255,.22);line-height:1.8">BPS Republik Indonesia<br/>&#169; Sensus Ekonomi 2026</div>
+  <div style="padding:8px 16px 4px;margin-top:auto">
+    <div id="autosaveStatus" style="font-size:10px;color:rgba(255,255,255,.28);line-height:1.6;display:flex;align-items:center;gap:5px">
+      <span style="width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.2);display:inline-block;flex-shrink:0" id="autosaveDot"></span>
+      <span id="autosaveText">Belum tersimpan</span>
+    </div>
+  </div>
+  <div style="padding:4px 16px 14px">
+    <div style="font-size:10px;color:rgba(255,255,255,.18);line-height:1.8">BPS Republik Indonesia<br/>&#169; Sensus Ekonomi 2026</div>
   </div>
 </aside>
 
@@ -835,6 +841,13 @@ input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
         </div>
         <input type="hidden" id="q9g_kbli_kode"/>
         <input type="hidden" id="q9g_kbli_kategori"/>
+        <div id="q9g_kbli_chip" class="hidden" style="margin-top:8px;padding:10px 14px;background:#f0fff4;border:1.5px solid #68d391;border-radius:6px;display:flex;align-items:center;justify-content:space-between;gap:8px">
+          <div>
+            <div style="font-size:10px;font-weight:800;color:#276749;letter-spacing:1px;text-transform:uppercase">KBLI Terpilih</div>
+            <div style="font-size:13px;font-weight:600;color:#1a4731;margin-top:2px" id="q9g_kbli_chip_text"></div>
+          </div>
+          <button type="button" onclick="clearKBLI()" style="background:none;border:1.5px solid #68d391;color:#276749;padding:4px 12px;border-radius:5px;cursor:pointer;font-size:11.5px;font-weight:700;font-family:inherit;white-space:nowrap;flex-shrink:0">Ganti ✕</button>
+        </div>
       </div>
 
       <div class="form-group">
@@ -861,7 +874,7 @@ input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
 
   <!-- Q10 Jaringan Usaha -->
   <div class="section-card">
-    <div class="section-header">10. Jaringan / Skala Usaha</div>
+    <div class="section-header">&#9321; Jaringan / Skala Usaha</div>
     <div class="section-body">
       <div class="form-group">
         <div class="subsection-label">a. Jaringan usaha</div>
@@ -885,7 +898,7 @@ input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
 
   <!-- Q11 Info Kantor Pusat -->
   <div class="section-card hidden" id="q11_wrap">
-    <div class="section-header">11. Informasi Kantor Pusat / Induk</div>
+    <div class="section-header">&#9322; Informasi Kantor Pusat / Induk</div>
     <div class="section-body">
       <div class="form-group">
         <div class="subsection-label">a. Nama Kantor Pusat</div>
@@ -950,7 +963,7 @@ input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
 
   <!-- Q12 Internet -->
   <div class="section-card">
-    <div class="section-header">12. Penggunaan Internet dan Teknologi Digital</div>
+    <div class="section-header">&#9323; Penggunaan Internet dan Teknologi Digital</div>
     <div class="section-body">
       <div class="form-group">
         <div class="subsection-label">a. Apakah menggunakan internet?</div>
@@ -1000,7 +1013,7 @@ input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
 
   <!-- Q13 Lingkungan -->
   <div class="section-card">
-    <div class="section-header">13. Produk / Kegiatan Ramah Lingkungan</div>
+    <div class="section-header">&#9324; Produk / Kegiatan Ramah Lingkungan</div>
     <div class="section-body">
       <div class="form-group">
         <div class="subsection-label">a. Apakah memproduksi barang/jasa ramah lingkungan?</div>
@@ -1024,7 +1037,7 @@ input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
 
   <!-- Q14 Produk Kreatif -->
   <div class="section-card">
-    <div class="section-header">14. Produk Karya Seni / Kreatif / Teknologi</div>
+    <div class="section-header">&#9325; Produk Karya Seni / Kreatif / Teknologi</div>
     <div class="section-body">
       <div class="form-group">
         <label class="field-label">Apakah menggunakan produk karya seni, sastra, desain, teknologi kreatif? <span class="req">*</span></label>
@@ -1038,7 +1051,7 @@ input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
 
   <!-- Q15 Sertifikat Halal -->
   <div class="section-card">
-    <div class="section-header">15. Sertifikasi Halal (BPJPH)</div>
+    <div class="section-header">&#9326; Sertifikasi Halal (BPJPH)</div>
     <div class="section-body">
       <div class="form-group">
         <div class="subsection-label">a. Apakah menghasilkan produk bersertifikat halal?</div>
@@ -1066,7 +1079,7 @@ input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
 
   <!-- Q16 Izin Edar -->
   <div class="section-card">
-    <div class="section-header">16. Izin Edar Produk (BPOM)</div>
+    <div class="section-header">&#9327; Izin Edar Produk (BPOM)</div>
     <div class="section-body">
       <div class="form-group">
         <div class="subsection-label">a. Apakah memiliki izin edar?</div>
@@ -1094,7 +1107,7 @@ input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
 
   <!-- Q17 Mitra KDKMP -->
   <div class="section-card">
-    <div class="section-header">17. Kemitraan dengan KDKMP</div>
+    <div class="section-header">&#9328; Kemitraan dengan KDKMP</div>
     <div class="section-body">
       <div class="form-group">
         <label class="field-label">Apakah bermitra dengan KDKMP (Koperasi Desa/Kelurahan Merah Putih)? <span class="req">*</span></label>
@@ -1108,7 +1121,7 @@ input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
 
   <!-- Q18 MBG -->
   <div class="section-card">
-    <div class="section-header">18. Keterlibatan dalam Program MBG (Makan Bergizi Gratis)</div>
+    <div class="section-header">&#9329; Keterlibatan dalam Program MBG (Makan Bergizi Gratis)</div>
     <div class="section-body">
       <div class="form-group">
         <label class="field-label">Apakah terlibat dalam program MBG? <span class="req">*</span></label>
@@ -1125,7 +1138,7 @@ input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
 
   <!-- Q19 Transaksi Non-Penduduk -->
   <div class="section-card">
-    <div class="section-header">19. Transaksi dengan Non-Penduduk (Ekspor/Impor)</div>
+    <div class="section-header">&#9330; Transaksi dengan Non-Penduduk (Ekspor/Impor)</div>
     <div class="section-body">
       <div class="form-group">
         <div class="subsection-label">a. Barang</div>
@@ -1148,7 +1161,7 @@ input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
 
   <!-- Q20 Jumlah Pekerja -->
   <div class="section-card">
-    <div class="section-header">20. Jumlah Pekerja (per akhir 2025)</div>
+    <div class="section-header">&#9331; Jumlah Pekerja (per akhir 2025)</div>
     <div class="section-body">
       <div class="inline-fields">
         <div class="form-group">
@@ -1536,9 +1549,19 @@ input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
   </div>
 </div>
 
+<!-- RESTORE BANNER -->
+<div id="restoreBanner" style="display:none;position:fixed;bottom:0;left:240px;right:0;background:#1a2332;color:#fff;padding:12px 20px;z-index:350;box-shadow:0 -3px 16px rgba(0,0,0,.3);border-top:2px solid #fc6c00">
+  <div style="max-width:700px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+    <span style="font-size:13px;flex:1;min-width:200px">&#128190; <strong>Draft tersimpan ditemukan</strong> — lanjutkan isian sebelumnya?</span>
+    <span id="restoreBannerTs" style="font-size:11px;color:rgba(255,255,255,.45)"></span>
+    <button onclick="restoreDraft()" style="background:#fc6c00;color:#fff;border:none;padding:8px 18px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:700;font-family:inherit">&#128257; Muat Draft</button>
+    <button onclick="dismissRestore()" style="background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);padding:8px 14px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit">Mulai Baru</button>
+  </div>
+</div>
+<style>@media(max-width:767px){#restoreBanner{left:0}}</style>
 <script src="data.js"></script>
 <script>
-const SCRIPT_URL = "GANTI_DENGAN_URL_APPS_SCRIPT_ANDA"; // ganti dengan URL Google Apps Script Anda
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyUp2xUJBnCqy0csDsfcSCYE34vmtyjq6gag7rAUMZbkPp4ypL7FNdtnBtpmrW99RFq_w/exec"; // ganti dengan URL Google Apps Script Anda
 
 
 function goBlok(n) {
@@ -1745,6 +1768,10 @@ function collectAllProblems() {
   else if (umur > 75) w('Pertanyaan 8c: Umur', `Pengusaha umur ${umur} tahun — verifikasi kembali`, 1, 'q8c_umur');
   const nik = getVal('q8d_nik');
   if (!nik || nik.length !== 16) e('Pertanyaan 8d: NIK', 'Harus tepat 16 digit', 1, 'q8d_nik');
+  else if (!/^\d{16}$/.test(nik)) e('Pertanyaan 8d: NIK', 'NIK hanya boleh berisi angka', 1, 'q8d_nik');
+  const rt = getVal('q5c_rt'), rw = getVal('q5c_rw');
+  if (rt && !/^\d+$/.test(rt)) e('Pertanyaan 5c: RT', 'RT hanya boleh berisi angka', 1, 'q5c_rt');
+  if (rw && !/^\d+$/.test(rw)) e('Pertanyaan 5c: RW', 'RW hanya boleh berisi angka', 1, 'q5c_rw');
   if (!getVal('q9a_kegiatan')) e('Pertanyaan 9a: Kegiatan Utama', 'Harus diisi', 1, 'q9a_kegiatan');
   const b1=getRadio('q9b1'),b2=getRadio('q9b2'),b3=getRadio('q9b3'),b4=getRadio('q9b4');
   if (!b1||!b2||!b3||!b4) e('Pertanyaan 9b: Aktivitas Usaha', 'Semua pilihan b1–b4 harus dijawab', 1, null);
@@ -2065,9 +2092,28 @@ function selectKBLI(d) {
   document.getElementById('q9g_kbli_kategori').value = d.Kategori;
   document.getElementById('q9h_kategori').value = `[${d.Kategori}] ${getKategoriName(d.Kategori)}`;
   document.getElementById('kbliDropdown').classList.remove('open');
+  // Show KBLI chip
+  const chip = document.getElementById('q9g_kbli_chip');
+  if (chip) {
+    chip.classList.remove('hidden');
+    document.getElementById('q9g_kbli_chip_text').textContent = `[${d.Kode}] ${d.Judul} — Kategori ${d.Kategori}: ${getKategoriName(d.Kategori)}`;
+  }
   // Show hotel classification if kategori = I (accommodation)
   const isHotel = d.Kategori === 'I' || (d.Kode && d.Kode.startsWith('55'));
   document.getElementById('q9i_hotel_wrap').classList.toggle('hidden', !isHotel);
+  updateProgress();
+}
+
+function clearKBLI() {
+  document.getElementById('q9g_kbli_search').value = '';
+  document.getElementById('q9g_kbli_kode').value = '';
+  document.getElementById('q9g_kbli_kategori').value = '';
+  document.getElementById('q9h_kategori').value = '';
+  const chip = document.getElementById('q9g_kbli_chip');
+  if (chip) chip.classList.add('hidden');
+  document.getElementById('q9i_hotel_wrap').classList.add('hidden');
+  document.querySelectorAll('input[name="q9i"]').forEach(r => r.checked = false);
+  updateProgress();
 }
 
 function getKategoriName(k) {
@@ -2397,6 +2443,10 @@ function validateBlok1() {
   if (umur < 17 || umur > 120) return 'Pertanyaan 8c: Umur harus antara 17-120 tahun';
   const nik = getVal('q8d_nik');
   if (!nik || nik.length !== 16) return 'Pertanyaan 8d: NIK harus 16 digit';
+  if (!/^\d{16}$/.test(nik)) return 'Pertanyaan 8d: NIK hanya boleh berisi angka';
+  const rt5 = getVal('q5c_rt'), rw5 = getVal('q5c_rw');
+  if (rt5 && !/^\d+$/.test(rt5)) return 'Pertanyaan 5c: RT hanya boleh berisi angka';
+  if (rw5 && !/^\d+$/.test(rw5)) return 'Pertanyaan 5c: RW hanya boleh berisi angka';
   if (!getVal('q9a_kegiatan')) return 'Pertanyaan 9a: Isi Kegiatan Utama';
   const b1=getRadio('q9b1'), b2=getRadio('q9b2'), b3=getRadio('q9b3'), b4=getRadio('q9b4');
   if (!b1||!b2||!b3||!b4) return 'Pertanyaan 9b: Jawab semua pertanyaan b1-b4';
@@ -2636,6 +2686,7 @@ async function submitForm() {
     // no-cors returns opaque — assume success if no throw
     btn.textContent = 'TERKIRIM ✓';
     btn.style.background = '#38a169';
+    clearDraft();
     document.getElementById('submitAlert').classList.add('hidden');
     const successDiv = document.createElement('div');
     successDiv.className = 'alert alert-success';
@@ -2648,6 +2699,98 @@ async function submitForm() {
   }
 }
 
+
+/* ====== AUTO-SAVE (localStorage) ====== */
+const LS_KEY = 'cawi_se2026_draft_v1';
+let _autosaveTimer = null;
+
+function saveDraft() {
+  try {
+    const vals = {};
+    document.querySelectorAll('input[id]:not([type=radio]):not([type=checkbox]),textarea[id],select[id]').forEach(el => {
+      if (!el.id || el.readOnly) return;
+      vals[el.id] = el.value;
+    });
+    document.querySelectorAll('input[type=radio]:checked').forEach(el => {
+      vals['_r_' + el.name] = el.value;
+    });
+    if (hasSig) {
+      try { vals['_sig'] = canvas.toDataURL('image/png'); } catch(e) {}
+    }
+    vals['_ts'] = new Date().toISOString();
+    localStorage.setItem(LS_KEY, JSON.stringify(vals));
+    // Update status indicator
+    const dot = document.getElementById('autosaveDot');
+    const txt = document.getElementById('autosaveText');
+    if (dot) { dot.style.background = '#68d391'; setTimeout(() => { dot.style.background='rgba(255,255,255,.2)'; }, 2000); }
+    if (txt) { const t=new Date(); txt.textContent='Tersimpan '+String(t.getHours()).padStart(2,'0')+':'+String(t.getMinutes()).padStart(2,'0'); }
+  } catch(e) { console.error('Gagal simpan draft:', e); }
+}
+
+function scheduleAutosave() {
+  if (_autosaveTimer) clearTimeout(_autosaveTimer);
+  _autosaveTimer = setTimeout(saveDraft, 60000);
+}
+
+function restoreDraft() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return;
+    const vals = JSON.parse(raw);
+    // Restore inputs / selects / textareas
+    Object.keys(vals).forEach(key => {
+      if (key.startsWith('_r_')) {
+        const name = key.slice(3);
+        const radio = document.querySelector(`input[name="${name}"][value="${vals[key]}"]`);
+        if (radio) { radio.checked = true; radio.dispatchEvent(new Event('change', {bubbles:true})); }
+      } else if (!key.startsWith('_')) {
+        const el = document.getElementById(key);
+        if (el && !el.readOnly && !el.disabled) {
+          el.value = vals[key];
+          el.dispatchEvent(new Event('input', {bubbles:true}));
+          el.dispatchEvent(new Event('change', {bubbles:true}));
+        }
+      }
+    });
+    // Restore KBLI chip if kode was saved
+    const savedKode = vals['q9g_kbli_kode'];
+    if (savedKode && kbliData.length) {
+      const entry = kbliData.find(d => d.Kode === savedKode);
+      if (entry) selectKBLI(entry);
+    }
+    // Resync searchable select display texts
+    ['q1_provinsi','q2_kabupaten','q3_kecamatan','q4_kelurahan','q11e_provinsi','q11f_kabupaten'].forEach(id => {
+      const sel = document.getElementById(id);
+      if (!sel || !sel.value) return;
+      const inp = document.getElementById(id + '_inp');
+      const opt = sel.options[sel.selectedIndex];
+      if (inp && opt && opt.text) { inp.value = opt.text; inp.classList.add('has-value'); }
+    });
+    // Restore signature
+    if (vals['_sig']) {
+      const img = new Image();
+      img.onload = () => { ctx.clearRect(0,0,canvas.width,canvas.height); ctx.drawImage(img,0,0); hasSig=true; updateProgress(); };
+      img.src = vals['_sig'];
+    }
+    const hint = document.getElementById('sig-hint');
+    if (hint && vals['_sig']) hint.textContent = 'Tanda tangan dimuat dari draft';
+    dismissRestore();
+    updateProgress();
+    const txt = document.getElementById('autosaveText');
+    if (txt) txt.textContent = 'Draft dimuat';
+  } catch(e) { console.error('Gagal load draft:', e); }
+}
+
+function dismissRestore() {
+  const b = document.getElementById('restoreBanner');
+  if (b) b.style.display = 'none';
+}
+
+function clearDraft() {
+  localStorage.removeItem(LS_KEY);
+  const txt = document.getElementById('autosaveText');
+  if (txt) txt.textContent = 'Draft dihapus';
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   // Init searchable selects BEFORE any data load
@@ -2738,6 +2881,32 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   // Run once on load to reflect any pre-filled defaults
   updateProgress();
+
+  // === AUTO-SAVE SETUP ===
+  // Check for existing draft
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (raw) {
+      const vals = JSON.parse(raw);
+      const ts = vals['_ts'] ? new Date(vals['_ts']) : null;
+      const banner = document.getElementById('restoreBanner');
+      const tsEl = document.getElementById('restoreBannerTs');
+      if (banner) banner.style.display = 'block';
+      if (tsEl && ts) {
+        const diff = Math.round((Date.now() - ts.getTime()) / 60000);
+        const label = diff < 2 ? 'baru saja' : diff < 60 ? `${diff} menit lalu` : `${Math.round(diff/60)} jam lalu`;
+        tsEl.textContent = 'Disimpan ' + label;
+      }
+    }
+  } catch(e) {}
+
+  // Auto-save on any input change (debounced 60s)
+  document.addEventListener('input', scheduleAutosave);
+  document.addEventListener('change', scheduleAutosave);
+
+  // Also save on blok navigation
+  const origGoBlok = window.goBlok;
+  window.goBlok = function(n) { saveDraft(); origGoBlok(n); };
 });
 </script>
 </body>
