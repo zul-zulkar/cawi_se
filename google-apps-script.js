@@ -15,6 +15,9 @@
 const SHEET_ID   = "1f-YLgJHfMU33_9Pn6snao1xZ-qf3vBQRpAxFwxBLOGI";
 const SHEET_NAME = "SE2026_Responses";
 
+// Ganti token ini dengan string acak yang kuat — harus sama dengan API_TOKEN di index.html
+const API_TOKEN  = "SE2026-BPS-BULELENG-2026";
+
 // Header columns — urutan harus sama dengan appendRow di bawah
 const HEADERS = [
   "Timestamp",
@@ -85,6 +88,12 @@ const HEADERS = [
 
 function doPost(e) {
   try {
+    const d = JSON.parse(e.postData.contents);
+    if (d._token !== API_TOKEN) {
+      return ContentService
+        .createTextOutput(JSON.stringify({ status: "error", message: "Akses ditolak" }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
     const ss    = SpreadsheetApp.openById(SHEET_ID);
     let sheet   = ss.getSheetByName(SHEET_NAME);
 
@@ -102,8 +111,6 @@ function doPost(e) {
       sheet.setFrozenRows(1);
       sheet.setColumnWidth(1, 160); // Timestamp
     }
-
-    const d = JSON.parse(e.postData.contents);
 
     sheet.appendRow([
       d.timestamp || new Date().toLocaleString("id-ID"),

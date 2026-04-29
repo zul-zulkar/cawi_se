@@ -1584,7 +1584,8 @@ input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
 <style>@media(max-width:767px){#restoreBanner{left:0}}</style>
 <script src="data.js"></script>
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyUp2xUJBnCqy0csDsfcSCYE34vmtyjq6gag7rAUMZbkPp4ypL7FNdtnBtpmrW99RFq_w/exec"; // ganti dengan URL Google Apps Script Anda
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyUp2xUJBnCqy0csDsfcSCYE34vmtyjq6gag7rAUMZbkPp4ypL7FNdtnBtpmrW99RFq_w/exec";
+const API_TOKEN  = "SE2026-BPS-BULELENG-2026"; // harus sama dengan API_TOKEN di Google Apps Script
 
 
 function goBlok(n) {
@@ -2709,7 +2710,7 @@ async function submitForm() {
     const res = await fetch(SCRIPT_URL, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(data),
+      body: JSON.stringify({ ...data, _token: API_TOKEN }),
       mode: 'no-cors'
     });
     // no-cors returns opaque — assume success if no throw
