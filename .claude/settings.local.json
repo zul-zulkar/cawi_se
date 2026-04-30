@@ -14,7 +14,10 @@
       "Bash(git commit -m 'fix: perbaiki tombol simpan password + tambah ubah password admin *)",
       "Bash(python -c \"import openpyxl; print\\('openpyxl ok'\\)\")",
       "Bash(pip install *)",
-      "Bash(python -c ' *)"
+      "Bash(python -c ' *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(git commit *)"
     ]
   }
 }
