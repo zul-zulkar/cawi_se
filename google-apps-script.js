@@ -214,9 +214,95 @@ function getOrCreateFolder(name) {
   return it.hasNext() ? it.next() : DriveApp.createFolder(name);
 }
 
-// Endpoint GET — untuk cek apakah service aktif
+// Urutan kolom ini HARUS sama dengan appendRow di doPost dan HEADERS di atas
+const FIELD_NAMES = [
+  "timestamp",
+  "provinsi", "provinsi_kd",
+  "kabupaten", "kabupaten_kd",
+  "kecamatan", "kecamatan_kd",
+  "kelurahan", "kelurahan_kd",
+  "nama_perusahaan", "nama_komersial",
+  "alamat", "rt", "rw", "kode_pos",
+  "email_perusahaan", "website",
+  "telepon", "hp",
+  "jenis_kawasan", "nama_kawasan",
+  "punya_nib", "nib",
+  "alasan_no_nib", "alasan_no_nib_lain",
+  "badan_usaha", "kdkmp", "jenis_koperasi", "laporan_keuangan",
+  "nama_pengusaha", "jenis_kelamin_pengusaha", "umur_pengusaha", "nik_pengusaha",
+  "kegiatan_utama",
+  "produksi_barang", "layanan_makan", "penjualan_barang", "aktivitas_jasa",
+  "lokasi_usaha",
+  "input_digunakan", "proses_produksi", "produk_utama",
+  "kbli_kode", "kbli_judul", "kbli_kategori",
+  "klasifikasi_hotel",
+  "jaringan_usaha", "jumlah_cabang",
+  "kp_nama", "kp_alamat", "kp_email", "kp_negara", "kp_provinsi", "kp_kabupaten",
+  "pakai_internet",
+  "internet_pesanan", "internet_produksi", "internet_distribusi",
+  "internet_beli", "internet_promosi", "internet_lain",
+  "digital",
+  "ramah_lingkungan", "biaya_lingkungan",
+  "produk_kreatif",
+  "sertifikat_halal", "varian_halal_bpjph", "varian_belum_halal_bpjph",
+  "izin_edar", "varian_bpom", "varian_belum_bpom",
+  "mitra_kdkmp",
+  "program_mbg",
+  "transaksi_barang_nonpenduduk", "transaksi_jasa_nonpenduduk",
+  "pekerja_laki", "pekerja_perempuan", "pekerja_total",
+  "tahun_beroperasi",
+  "pengeluaran_upah", "pengeluaran_produksi", "pengeluaran_beli_barang",
+  "pengeluaran_operasional", "pengeluaran_nonoperasional", "pengeluaran_total",
+  "pendapatan_barang_jasa", "pendapatan_lain", "pendapatan_total",
+  "pct_online",
+  "aset_tanah_bangunan", "aset_lain", "aset_total", "aset_kategori",
+  "luas_tanah",
+  "modal_perorangan", "modal_lnprt", "modal_korporasi_publik",
+  "modal_korporasi_non", "modal_pemerintah", "modal_asing", "modal_total",
+  "catatan1", "waktu1",
+  "catatan2", "waktu2",
+  "catatan3", "waktu3",
+  "petugas_nama", "petugas_nip", "petugas_hp",
+  "responden_nama", "responden_hp", "responden_email",
+  "tanggal_pelaksanaan",
+  "tanda_tangan"
+];
+
+// Endpoint GET — kembalikan semua rekaman sebagai JSON (butuh token)
 function doGet(e) {
-  return ContentService
-    .createTextOutput("CAWI SE2026 BPS — endpoint aktif. Gunakan POST untuk submit data.")
-    .setMimeType(ContentService.MimeType.TEXT);
+  try {
+    const token = e && e.parameter && e.parameter.token;
+    if (token !== API_TOKEN) {
+      return ContentService
+        .createTextOutput(JSON.stringify({ status: "error", message: "Akses ditolak" }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    const ss    = SpreadsheetApp.openById(SHEET_ID);
+    const sheet = ss.getSheetByName(SHEET_NAME);
+    if (!sheet || sheet.getLastRow() <= 1) {
+      return ContentService
+        .createTextOutput(JSON.stringify({ status: "ok", data: [] }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    const values = sheet.getDataRange().getValues();
+    const rows = values.slice(1).map(function(row, idx) {
+      var obj = { _id: idx + 1 };
+      FIELD_NAMES.forEach(function(key, i) {
+        obj[key] = (row[i] !== undefined && row[i] !== null) ? String(row[i]) : "";
+      });
+      obj._ts = obj.timestamp;
+      return obj;
+    });
+
+    return ContentService
+      .createTextOutput(JSON.stringify({ status: "ok", data: rows }))
+      .setMimeType(ContentService.MimeType.JSON);
+
+  } catch(err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ status: "error", message: err.message }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
 }
