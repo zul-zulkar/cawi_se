@@ -6,6 +6,8 @@
 <title>CAWI SE2026 - BPS</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
@@ -1411,6 +1413,9 @@ input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
         <input type="hidden" id="lokasi_lng"/>
         <input type="hidden" id="lokasi_akurasi"/>
         <div class="hint">Digunakan untuk verifikasi kunjungan lapangan. Pastikan GPS aktif di perangkat.</div>
+        <div id="lokasiMapWrap" style="display:none;margin-top:14px;border-radius:10px;overflow:hidden;border:1.5px solid #68d391;box-shadow:0 2px 10px rgba(0,0,0,.1)">
+          <div id="lokasiMap" style="height:240px;width:100%"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -1767,16 +1772,66 @@ function closeSidebar() {
 }
 
 /* ====== AMBIL LOKASI GPS ====== */
+let _lokasiMap = null;
+let _lokasiMarker = null;
+let _lokasiCircle = null;
+
+function renderLokasiMap(lat, lng, akurasi) {
+  const wrap = document.getElementById('lokasiMapWrap');
+  if (!wrap) return;
+  wrap.style.display = 'block';
+
+  const latF = parseFloat(lat);
+  const lngF = parseFloat(lng);
+  const acc  = parseInt(akurasi) || 0;
+
+  if (_lokasiMap) {
+    _lokasiMap.setView([latF, lngF], 17);
+    if (_lokasiMarker) _lokasiMarker.setLatLng([latF, lngF]);
+    if (_lokasiCircle) { _lokasiCircle.setLatLng([latF, lngF]); _lokasiCircle.setRadius(acc); }
+    return;
+  }
+
+  _lokasiMap = L.map('lokasiMap', {zoomControl: true, attributionControl: true}).setView([latF, lngF], 17);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© <a href="https://www.openstreetmap.org/">OpenStreetMap</a>',
+    maxZoom: 19
+  }).addTo(_lokasiMap);
+
+  const icon = L.divIcon({
+    html: '<div style="background:#fc6c00;width:14px;height:14px;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.4)"></div>',
+    className: '',
+    iconSize: [14, 14],
+    iconAnchor: [7, 7]
+  });
+
+  _lokasiMarker = L.marker([latF, lngF], {icon}).addTo(_lokasiMap)
+    .bindPopup('<b>Lokasi Kunjungan</b><br>Lat: ' + lat + '<br>Lng: ' + lng + (acc ? '<br>Akurasi: ±' + acc + ' m' : ''))
+    .openPopup();
+
+  if (acc > 0) {
+    _lokasiCircle = L.circle([latF, lngF], {
+      radius: acc,
+      color: '#fc6c00',
+      fillColor: '#fc6c00',
+      fillOpacity: 0.12,
+      weight: 1.5
+    }).addTo(_lokasiMap);
+  }
+
+  setTimeout(() => _lokasiMap && _lokasiMap.invalidateSize(), 200);
+}
+
 function ambilLokasi() {
   const btn = document.getElementById('lokasiBtn');
   const result = document.getElementById('lokasiResult');
-  btn.textContent = '⏳ Mengambil lokasi...';
+  btn.innerHTML = '&#9203; Mengambil lokasi...';
   btn.disabled = true;
   btn.style.background = '#aaa';
 
   if (!navigator.geolocation) {
     result.innerHTML = '<span style="color:#c53030">&#10005; Browser tidak mendukung GPS.</span>';
-    btn.textContent = '📍 Ambil Lokasi GPS';
+    btn.innerHTML = '&#128205; Ambil Lokasi GPS';
     btn.disabled = false;
     btn.style.background = '#fc6c00';
     return;
@@ -1803,6 +1858,7 @@ function ambilLokasi() {
       btn.onmouseover = null;
       btn.onmouseout = null;
       markFieldFilled(document.getElementById('lokasi_lat'));
+      renderLokasiMap(lat, lng, akurasi);
     },
     function(err) {
       const msg = err.code === 1 ? 'Izin GPS ditolak — aktifkan lokasi di browser.' :
@@ -3196,6 +3252,7 @@ function loadEditMode() {
         btn.onmouseover = null;
         btn.onmouseout = null;
       }
+      setTimeout(() => renderLokasiMap(r.lokasi_lat, r.lokasi_lng, r.lokasi_akurasi), 300);
     }
 
     // Radio buttons
