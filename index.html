@@ -3053,10 +3053,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
 <script>
 /* ====== PASSWORD GATE ====== */
-// Hash SHA-256 dari kata sandi — ubah dengan: btoa(await crypto.subtle.digest(...))
-// Kata sandi default: BPS2026Buleleng
-const DEFAULT_PW_HASH = 'c7bbbee97d8d12845dee0e822ef3a74d6ca6b25c9e123422168e1d2a5c00dff5';
-const OVERRIDE_KEY    = 'cawi_pw_override_v1';
+const DEFAULT_PW_HASH = '941bacc5d2499f5e06108337bca646d12b59fb1d131cf763fce025b682bdd7d8';
+const OVERRIDE_KEY    = 'cawi_pw_override_v2';
 const PW_SESSION_KEY  = 'cawi_auth_v1';
 
 function getActiveHash() {
