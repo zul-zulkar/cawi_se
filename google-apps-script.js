@@ -110,6 +110,11 @@ function doPost(e) {
       sheet.setColumnWidth(1, 160); // Timestamp
     }
 
+    // MODE EDIT: timpa baris yang ada
+    if (d._edit_id && parseInt(d._edit_id) > 0) {
+      return updateRecord(sheet, d, parseInt(d._edit_id));
+    }
+
     sheet.appendRow([
       d.timestamp || new Date().toLocaleString("id-ID"),
       // Lokasi
@@ -177,6 +182,9 @@ function doPost(e) {
       d.tanda_tangan ? "[ada]" : "[kosong]" // simpan flag saja, bukan base64 penuh
     ]);
 
+    // Format kolom HP/NIP/NIB/NIK sebagai teks agar angka 0 di depan tidak hilang
+    applyTextFormat(sheet, sheet.getLastRow(), d);
+
     // Opsional: simpan tanda tangan sebagai file Drive
     if (d.tanda_tangan && d.tanda_tangan.length > 100) {
       try {
@@ -198,6 +206,15 @@ function doPost(e) {
   }
 }
 
+// Konversi nilai sel ke string — tangani Date object dari Google Sheets
+function cellStr(v) {
+  if (v instanceof Date) {
+    // Format: YYYY-MM-DDTHH:mm (kompatibel dengan input[type=date] dan datetime-local)
+    return Utilities.formatDate(v, Session.getScriptTimeZone(), "yyyy-MM-dd'T'HH:mm");
+  }
+  return (v !== null && v !== undefined) ? String(v) : "";
+}
+
 // Kembalikan semua rekaman dari sheet sebagai JSON
 function getRecordsResponse() {
   try {
@@ -212,7 +229,7 @@ function getRecordsResponse() {
     const rows = values.slice(1).map(function(row, idx) {
       var obj = { _id: idx + 1 };
       FIELD_NAMES.forEach(function(key, i) {
-        obj[key] = (row[i] !== undefined && row[i] !== null) ? String(row[i]) : "";
+        obj[key] = cellStr(row[i]);
       });
       obj._ts = obj.timestamp;
       return obj;
@@ -239,6 +256,97 @@ function saveTandaTangan(d) {
 function getOrCreateFolder(name) {
   const it = DriveApp.getFoldersByName(name);
   return it.hasNext() ? it.next() : DriveApp.createFolder(name);
+}
+
+// Format kolom yang berisi angka tapi harus disimpan sebagai teks (HP, NIP, NIK, NIB, kode pos)
+function applyTextFormat(sheet, rowNum, d) {
+  // Kolom 1-based berdasarkan urutan FIELD_NAMES/appendRow
+  var textFields = [
+    { col: 15, val: d.kode_pos },          // kode_pos
+    { col: 19, val: d.hp },                // No HP/WA perusahaan
+    { col: 23, val: d.nib },               // NIB
+    { col: 33, val: d.nik_pengusaha },     // NIK
+    { col: 109, val: d.petugas_nip },      // NIP petugas
+    { col: 110, val: d.petugas_hp },       // HP petugas
+    { col: 112, val: d.responden_hp }      // HP responden
+  ];
+  textFields.forEach(function(f) {
+    if (f.val !== null && f.val !== undefined && f.val !== '') {
+      var cell = sheet.getRange(rowNum, f.col);
+      cell.setNumberFormat('@');
+      cell.setValue(String(f.val));
+    }
+  });
+}
+
+// Timpa rekaman yang ada berdasarkan _id (1-based, baris sheet = _id + 1)
+function updateRecord(sheet, d, editId) {
+  var targetRow = editId + 1;
+  if (targetRow < 2 || targetRow > sheet.getLastRow()) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ status: "error", message: "Rekaman tidak ditemukan (id=" + editId + ")" }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+  var rowData = [
+    d.timestamp || new Date().toLocaleString("id-ID"),
+    d.provinsi, d.provinsi_kd,
+    d.kabupaten, d.kabupaten_kd,
+    d.kecamatan, d.kecamatan_kd,
+    d.kelurahan, d.kelurahan_kd,
+    d.nama_perusahaan, d.nama_komersial,
+    d.alamat, d.rt, d.rw, d.kode_pos,
+    d.email_perusahaan, d.website,
+    d.telepon, d.hp,
+    d.jenis_kawasan, d.nama_kawasan,
+    d.punya_nib, d.nib,
+    d.alasan_no_nib, d.alasan_no_nib_lain,
+    d.badan_usaha, d.kdkmp, d.jenis_koperasi, d.laporan_keuangan,
+    d.nama_pengusaha, d.jenis_kelamin_pengusaha, d.umur_pengusaha, d.nik_pengusaha,
+    d.kegiatan_utama,
+    d.produksi_barang, d.layanan_makan, d.penjualan_barang, d.aktivitas_jasa,
+    d.lokasi_usaha,
+    d.input_digunakan, d.proses_produksi, d.produk_utama,
+    d.kbli_kode, d.kbli_judul, d.kbli_kategori,
+    d.klasifikasi_hotel,
+    d.jaringan_usaha, d.jumlah_cabang,
+    d.kp_nama, d.kp_alamat, d.kp_email, d.kp_negara, d.kp_provinsi, d.kp_kabupaten,
+    d.pakai_internet,
+    d.internet_pesanan, d.internet_produksi, d.internet_distribusi,
+    d.internet_beli, d.internet_promosi, d.internet_lain,
+    d.digital,
+    d.ramah_lingkungan, d.biaya_lingkungan,
+    d.produk_kreatif,
+    d.sertifikat_halal, d.varian_halal_bpjph, d.varian_belum_halal_bpjph,
+    d.izin_edar, d.varian_bpom, d.varian_belum_bpom,
+    d.mitra_kdkmp,
+    d.program_mbg,
+    d.transaksi_barang_nonpenduduk, d.transaksi_jasa_nonpenduduk,
+    d.pekerja_laki, d.pekerja_perempuan, d.pekerja_total,
+    d.tahun_beroperasi,
+    d.pengeluaran_upah, d.pengeluaran_produksi, d.pengeluaran_beli_barang,
+    d.pengeluaran_operasional, d.pengeluaran_nonoperasional, d.pengeluaran_total,
+    d.pendapatan_barang_jasa, d.pendapatan_lain, d.pendapatan_total,
+    d.pct_online,
+    d.aset_tanah_bangunan, d.aset_lain, d.aset_total, d.aset_kategori,
+    d.luas_tanah,
+    d.modal_perorangan, d.modal_lnprt, d.modal_korporasi_publik,
+    d.modal_korporasi_non, d.modal_pemerintah, d.modal_asing, d.modal_total,
+    d.catatan1, d.waktu1,
+    d.catatan2, d.waktu2,
+    d.catatan3, d.waktu3,
+    d.petugas_nama, d.petugas_nip, d.petugas_hp,
+    d.responden_nama, d.responden_hp, d.responden_email,
+    d.tanggal_pelaksanaan,
+    d.tanda_tangan ? "[ada]" : "[kosong]"
+  ];
+  sheet.getRange(targetRow, 1, 1, rowData.length).setValues([rowData]);
+  applyTextFormat(sheet, targetRow, d);
+  if (d.tanda_tangan && d.tanda_tangan.length > 100) {
+    try { saveTandaTangan(d); } catch(sigErr) { Logger.log("Gagal simpan TTD: " + sigErr.message); }
+  }
+  return ContentService
+    .createTextOutput(JSON.stringify({ status: "ok", message: "Data berhasil diperbarui" }))
+    .setMimeType(ContentService.MimeType.JSON);
 }
 
 // Urutan kolom ini HARUS sama dengan appendRow di doPost dan HEADERS di atas
@@ -312,7 +420,7 @@ function doGet(e) {
     const rows = values.slice(1).map(function(row, idx) {
       var obj = { _id: idx + 1 };
       FIELD_NAMES.forEach(function(key, i) {
-        obj[key] = (row[i] !== undefined && row[i] !== null) ? String(row[i]) : "";
+        obj[key] = cellStr(row[i]);
       });
       obj._ts = obj.timestamp;
       return obj;

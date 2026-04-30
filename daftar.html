@@ -362,6 +362,7 @@ function renderTable() {
       <td><div class="td-actions">
         <button class="btn btn-sm btn-info" onclick="viewRecord(${r._id})">&#128065; Lihat</button>
         <button class="btn btn-sm" style="background:#38a169;color:#fff" onclick="editRecord(${r._id})">&#9998; Edit</button>
+        <button class="btn btn-sm" style="background:#805ad5;color:#fff" onclick="duplicateRecord(${r._id})">&#9986; Duplikat</button>
       </div></td>
     </tr>`;
   });
@@ -456,6 +457,20 @@ function editRecord(id) {
   const r = records.find(x => x._id === id);
   if (!r) return;
   localStorage.setItem('cawi_edit_mode', JSON.stringify(r));
+  window.location.href = 'index.html';
+}
+
+/* ====== DUPLIKAT ====== */
+function duplicateRecord(id) {
+  const r = records.find(x => x._id === id);
+  if (!r) return;
+  const copy = Object.assign({}, r);
+  delete copy._id;
+  copy.responden_nama = '';
+  copy.responden_hp   = '';
+  copy.responden_email = '';
+  copy.tanggal_pelaksanaan = '';
+  localStorage.setItem('cawi_edit_mode', JSON.stringify(copy));
   window.location.href = 'index.html';
 }
 
