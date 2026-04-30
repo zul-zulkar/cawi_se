@@ -1,0 +1,9 @@
+# Data pribadi — jangan commit ke repo publik
+daftar_pegawai.xlsx
+*.xlsx
+*.xls
+
+# OS / editor
+.DS_Store
+Thumbs.db
+desktop.ini
