@@ -1636,7 +1636,15 @@ input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
     <button onclick="dismissRestore()" style="background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);padding:8px 14px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit">Mulai Baru</button>
   </div>
 </div>
-<style>@media(max-width:767px){#restoreBanner{left:0}}</style>
+<style>@media(max-width:767px){#restoreBanner{left:0}#editModeBanner{left:0}}</style>
+
+<!-- EDIT MODE BANNER -->
+<div id="editModeBanner" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#276749;color:#fff;padding:11px 20px;z-index:360;box-shadow:0 -3px 16px rgba(0,0,0,.3);border-top:2px solid #68d391">
+  <div style="max-width:700px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+    <span style="font-size:13px;flex:1;min-width:200px">&#9998; <strong>Mode Edit</strong> — isi ulang data di bawah lalu kirim. Pengiriman akan menambah rekaman baru.</span>
+    <button onclick="cancelEditMode()" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);padding:7px 14px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:700;font-family:inherit">&#10005; Batal</button>
+  </div>
+</div>
 <script src="data.js"></script>
 <script>
 // ── Data pegawai untuk autocomplete petugas ──
@@ -2951,6 +2959,195 @@ function clearDraft() {
   if (txt) txt.textContent = 'Draft dihapus';
 }
 
+/* ====== EDIT MODE (dari daftar.html) ====== */
+const EDIT_KEY = 'cawi_edit_mode';
+
+function cancelEditMode() {
+  localStorage.removeItem(EDIT_KEY);
+  const b = document.getElementById('editModeBanner');
+  if (b) b.style.display = 'none';
+}
+
+function loadEditMode() {
+  const raw = localStorage.getItem(EDIT_KEY);
+  if (!raw) return false;
+  localStorage.removeItem(EDIT_KEY);
+  try {
+    const r = JSON.parse(raw);
+    const banner = document.getElementById('editModeBanner');
+    if (banner) banner.style.display = 'block';
+
+    // Isi field teks / angka / textarea
+    const textMap = {
+      'q5a_nama_perusahaan': r.nama_perusahaan,
+      'q5b_nama_komersial':  r.nama_komersial,
+      'q5c_alamat':          r.alamat,
+      'q5c_rt':              r.rt,
+      'q5c_rw':              r.rw,
+      'q5c_kodepos':         r.kode_pos,
+      'q5c_email':           r.email_perusahaan,
+      'q5c_website':         r.website,
+      'q5c_hp':              r.hp,
+      'q5e_nama_kawasan':    r.nama_kawasan,
+      'q6b_nib':             r.nib,
+      'q6c_alasan':          r.alasan_no_nib_lain,
+      'q8a_nama':            r.nama_pengusaha,
+      'q8c_umur':            r.umur_pengusaha,
+      'q8d_nik':             r.nik_pengusaha,
+      'q9a_kegiatan':        r.kegiatan_utama,
+      'q9d_input':           r.input_digunakan,
+      'q9e_proses':          r.proses_produksi,
+      'q9f_produk':          r.produk_utama,
+      'q9g_kbli_kode':       r.kbli_kode,
+      'q9g_kbli_search':     r.kbli_judul,
+      'q9g_kbli_kategori':   r.kbli_kategori,
+      'q9h_kategori':        r.kbli_kategori,
+      'q10b_jumlah':         r.jumlah_cabang,
+      'q11a_nama':           r.kp_nama,
+      'q11b_alamat':         r.kp_alamat,
+      'q11c_email':          r.kp_email,
+      'q15b':                r.varian_halal_bpjph,
+      'q15c':                r.varian_belum_halal_bpjph,
+      'q16b':                r.varian_bpom,
+      'q16c':                r.varian_belum_bpom,
+      'q20a':                r.pekerja_laki,
+      'q20b':                r.pekerja_perempuan,
+      'q21':                 r.tahun_beroperasi,
+      'q22a':                r.pengeluaran_upah,
+      'q22b':                r.pengeluaran_produksi,
+      'q22c':                r.pengeluaran_beli_barang,
+      'q22d':                r.pengeluaran_operasional,
+      'q22e':                r.pengeluaran_nonoperasional,
+      'q23a':                r.pendapatan_barang_jasa,
+      'q23b':                r.pendapatan_lain,
+      'q23d':                r.pct_online,
+      'q24a':                r.aset_tanah_bangunan,
+      'q24b':                r.aset_lain,
+      'q24d':                r.luas_tanah,
+      'q25a':                r.modal_perorangan,
+      'q25b':                r.modal_lnprt,
+      'q25c':                r.modal_korporasi_publik,
+      'q25d':                r.modal_korporasi_non,
+      'q25e':                r.modal_pemerintah,
+      'q25f':                r.modal_asing,
+      'catatan1': r.catatan1, 'waktu1': r.waktu1,
+      'catatan2': r.catatan2, 'waktu2': r.waktu2,
+      'catatan3': r.catatan3, 'waktu3': r.waktu3,
+      'p_hp':     r.petugas_hp,
+      'r_nama':   r.responden_nama,
+      'r_hp':     r.responden_hp,
+      'r_email':  r.responden_email,
+      'r_tanggal':r.tanggal_pelaksanaan,
+    };
+    Object.keys(textMap).forEach(id => {
+      const val = textMap[id];
+      if (!val) return;
+      const el = document.getElementById(id);
+      if (el) {
+        el.value = val;
+        el.dispatchEvent(new Event('input',  {bubbles:true}));
+        el.dispatchEvent(new Event('change', {bubbles:true}));
+      }
+    });
+
+    // Petugas: p_nip readonly — isi langsung
+    if (r.petugas_nama) {
+      const pNama = document.getElementById('p_nama');
+      const pNip  = document.getElementById('p_nip');
+      if (pNama) pNama.value = r.petugas_nama;
+      if (pNip)  pNip.value  = r.petugas_nip || '';
+    }
+
+    // Radio buttons
+    const radioMap = {
+      'q5d':  r.jenis_kawasan,
+      'q6a':  r.punya_nib,
+      'q6c':  r.alasan_no_nib,
+      'q7a':  r.badan_usaha,
+      'q7b':  r.kdkmp,
+      'q7c':  r.jenis_koperasi,
+      'q7d':  r.laporan_keuangan,
+      'q8b':  r.jenis_kelamin_pengusaha,
+      'q9b1': r.produksi_barang,
+      'q9b2': r.layanan_makan,
+      'q9b3': r.penjualan_barang,
+      'q9b4': r.aktivitas_jasa,
+      'q9c':  r.lokasi_usaha,
+      'q9i':  r.klasifikasi_hotel,
+      'q10a': r.jaringan_usaha,
+      'q12a': r.pakai_internet,
+      'q12b1':r.internet_pesanan,
+      'q12b2':r.internet_produksi,
+      'q12b3':r.internet_distribusi,
+      'q12b4':r.internet_beli,
+      'q12b5':r.internet_promosi,
+      'q12b6':r.internet_lain,
+      'q12c': r.digital,
+      'q13a': r.ramah_lingkungan,
+      'q13b': r.biaya_lingkungan,
+      'q14':  r.produk_kreatif,
+      'q15a': r.sertifikat_halal,
+      'q16a': r.izin_edar,
+      'q17':  r.mitra_kdkmp,
+      'q18':  r.program_mbg,
+      'q19a': r.transaksi_barang_nonpenduduk,
+      'q19b': r.transaksi_jasa_nonpenduduk,
+      'q24c1':r.aset_kategori,
+    };
+    Object.keys(radioMap).forEach(name => {
+      const val = radioMap[name];
+      if (!val) return;
+      const radio = document.querySelector(`input[name="${name}"][value="${val}"]`);
+      if (radio) { radio.checked = true; radio.dispatchEvent(new Event('change', {bubbles:true})); }
+    });
+
+    // KBLI chip
+    if (r.kbli_kode && typeof kbliData !== 'undefined' && kbliData.length) {
+      const entry = kbliData.find(d => d.Kode === r.kbli_kode);
+      if (entry && typeof selectKBLI === 'function') selectKBLI(entry);
+    }
+
+    // Lokasi: q1=Bali, q2=Buleleng sudah di-set default.
+    // Kecamatan Buleleng sudah di-load oleh loadKecamatan('5108').
+    // Cukup set kecamatan → load kelurahan → set kelurahan.
+    if (r.kecamatan_kd) {
+      const selKec = document.getElementById('q3_kecamatan');
+      if (selKec) {
+        selKec.value = r.kecamatan_kd;
+        selKec.disabled = false;
+        const kecInp = document.getElementById('q3_kecamatan_inp');
+        if (kecInp) {
+          const opt = selKec.options[selKec.selectedIndex];
+          if (opt && opt.text) { kecInp.value = opt.text; kecInp.classList.add('has-value'); }
+        }
+        if (typeof loadKelurahan === 'function') loadKelurahan(r.kecamatan_kd);
+        if (r.kelurahan_kd) {
+          const selKel = document.getElementById('q4_kelurahan');
+          if (selKel) {
+            selKel.value = r.kelurahan_kd;
+            selKel.disabled = false;
+            const kelInp = document.getElementById('q4_kelurahan_inp');
+            if (kelInp) {
+              const opt = selKel.options[selKel.selectedIndex];
+              if (opt && opt.text) { kelInp.value = opt.text; kelInp.classList.add('has-value'); }
+            }
+          }
+        }
+      }
+    }
+
+    // Recalculate totals
+    if (typeof calcPekerja         === 'function') calcPekerja();
+    if (typeof calcPengeluaran     === 'function') calcPengeluaran();
+    if (typeof calcPendapatan      === 'function') calcPendapatan();
+    if (typeof calcAset            === 'function') calcAset();
+    if (typeof calcModal           === 'function') calcModal();
+    if (typeof updateProgress      === 'function') updateProgress();
+
+    return true;
+  } catch(e) { console.error('Gagal load edit mode:', e); return false; }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   // Init searchable selects BEFORE any data load
   makeSearchable('q1_provinsi', 'provinsi');
@@ -3041,9 +3238,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // Run once on load to reflect any pre-filled defaults
   updateProgress();
 
+  // === EDIT MODE (dari daftar.html) ===
+  const _isEditMode = loadEditMode();
+
   // === AUTO-SAVE SETUP ===
-  // Check for existing draft
-  try {
+  // Check for existing draft (skip jika sedang edit mode)
+  if (!_isEditMode) try {
     const raw = localStorage.getItem(LS_KEY);
     if (raw) {
       const vals = JSON.parse(raw);

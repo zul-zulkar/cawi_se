@@ -362,6 +362,7 @@ function renderTable() {
       <td data-label="Waktu" style="font-size:12px;color:#888;white-space:nowrap">${fmtDate(r._ts||r.timestamp)}</td>
       <td><div class="td-actions">
         <button class="btn btn-sm btn-info" onclick="viewRecord(${r._id})">&#128065; Lihat</button>
+        <button class="btn btn-sm" style="background:#38a169;color:#fff" onclick="editRecord(${r._id})">&#9998; Edit</button>
       </div></td>
     </tr>`;
   });
@@ -449,6 +450,14 @@ function viewRecord(id) {
 
 function closeView() {
   document.getElementById('viewOverlay').classList.remove('open');
+}
+
+/* ====== EDIT ====== */
+function editRecord(id) {
+  const r = records.find(x => x._id === id);
+  if (!r) return;
+  localStorage.setItem('cawi_edit_mode', JSON.stringify(r));
+  window.location.href = 'index.html';
 }
 
 /* ====== EXPORT CSV ====== */
