@@ -95,6 +95,16 @@ function doPost(e) {
     const ss    = SpreadsheetApp.openById(SHEET_ID);
     let sheet   = ss.getSheetByName(SHEET_NAME);
 
+    // Route: hapus rekaman
+    if (d.action === "deleteRecord" && d._delete_id && parseInt(d._delete_id) > 0) {
+      if (!sheet) {
+        return ContentService
+          .createTextOutput(JSON.stringify({ status: "error", message: "Sheet tidak ditemukan" }))
+          .setMimeType(ContentService.MimeType.JSON);
+      }
+      return deleteSheetRecord(sheet, parseInt(d._delete_id));
+    }
+
     if (!sheet) {
       sheet = ss.insertSheet(SHEET_NAME);
     }
@@ -346,6 +356,20 @@ function updateRecord(sheet, d, editId) {
   }
   return ContentService
     .createTextOutput(JSON.stringify({ status: "ok", message: "Data berhasil diperbarui" }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+// Hapus rekaman berdasarkan _id (1-based, baris sheet = _id + 1)
+function deleteSheetRecord(sheet, deleteId) {
+  var targetRow = deleteId + 1;
+  if (targetRow < 2 || targetRow > sheet.getLastRow()) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ status: "error", message: "Rekaman tidak ditemukan (id=" + deleteId + ")" }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+  sheet.deleteRow(targetRow);
+  return ContentService
+    .createTextOutput(JSON.stringify({ status: "ok", message: "Rekaman berhasil dihapus" }))
     .setMimeType(ContentService.MimeType.JSON);
 }
 

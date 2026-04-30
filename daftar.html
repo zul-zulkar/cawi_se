@@ -218,6 +218,35 @@ tr:hover td{background:#fffaf7}
   </div>
 </div>
 
+<!-- CONFIRM DELETE MODAL -->
+<div class="modal-overlay" id="confirmOverlay" onclick="if(event.target===this)cancelDelete()">
+  <div class="modal-box" style="max-width:420px">
+    <div class="modal-head" style="border-bottom-color:#fed7d7">
+      <div class="modal-head-info">
+        <h2 style="color:#c53030">&#128465; Hapus Rekaman?</h2>
+        <p style="color:#e53e3e;font-weight:600">Tindakan ini tidak dapat dibatalkan.</p>
+      </div>
+      <button class="modal-close" onclick="cancelDelete()">&#10005;</button>
+    </div>
+    <div class="modal-body">
+      <div style="background:#fff5f5;border:1.5px solid #feb2b2;border-radius:8px;padding:14px 16px;margin-bottom:4px">
+        <div style="font-size:13px;font-weight:800;color:#1a1a1a;margin-bottom:4px" id="confirmDeleteName"></div>
+        <div style="font-size:12px;color:#888" id="confirmDeleteSub"></div>
+      </div>
+      <p style="font-size:12.5px;color:#555;margin-top:12px;line-height:1.7">
+        Baris ini akan <strong>dihapus permanen</strong> dari Google Sheets.
+        Data yang terhapus tidak dapat dipulihkan dari aplikasi ini.
+      </p>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-secondary" onclick="cancelDelete()">Batal</button>
+      <button class="btn" id="confirmDeleteBtn"
+        style="background:#e53e3e;color:#fff"
+        onclick="confirmDelete()">&#128465; Hapus</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyUp2xUJBnCqy0csDsfcSCYE34vmtyjq6gag7rAUMZbkPp4ypL7FNdtnBtpmrW99RFq_w/exec";
 
@@ -363,6 +392,7 @@ function renderTable() {
         <button class="btn btn-sm btn-info" onclick="viewRecord(${r._id})">&#128065; Lihat</button>
         <button class="btn btn-sm" style="background:#38a169;color:#fff" onclick="editRecord(${r._id})">&#9998; Edit</button>
         <button class="btn btn-sm" style="background:#805ad5;color:#fff" onclick="duplicateRecord(${r._id})">&#9986; Duplikat</button>
+        <button class="btn btn-sm" style="background:#e53e3e;color:#fff" onclick="deleteRecord(${r._id})">&#128465; Hapus</button>
       </div></td>
     </tr>`;
   });
@@ -472,6 +502,51 @@ function duplicateRecord(id) {
   copy.tanggal_pelaksanaan = '';
   localStorage.setItem('cawi_edit_mode', JSON.stringify(copy));
   window.location.href = 'index.html';
+}
+
+/* ====== HAPUS ====== */
+let _pendingDeleteId = null;
+
+function deleteRecord(id) {
+  const r = records.find(x => x._id === id);
+  if (!r) return;
+  _pendingDeleteId = id;
+  document.getElementById('confirmDeleteName').textContent =
+    r.nama_perusahaan || '(tanpa nama)';
+  document.getElementById('confirmDeleteSub').textContent =
+    `Petugas: ${r.petugas_nama || '—'} | ${r.kecamatan || '—'}`;
+  document.getElementById('confirmOverlay').classList.add('open');
+}
+
+function cancelDelete() {
+  _pendingDeleteId = null;
+  document.getElementById('confirmOverlay').classList.remove('open');
+}
+
+async function confirmDelete() {
+  if (!_pendingDeleteId) return;
+  const id = _pendingDeleteId;
+  const btn = document.getElementById('confirmDeleteBtn');
+  btn.textContent = 'Menghapus...';
+  btn.disabled = true;
+
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      body: JSON.stringify({ action: 'deleteRecord', _delete_id: id })
+    });
+    // no-cors → opaque, asumsikan berhasil
+    records = records.filter(x => x._id !== id);
+    buildPetugasFilter();
+    updateStats();
+    renderTable();
+    cancelDelete();
+  } catch(err) {
+    alert('Gagal menghapus: ' + err.message);
+    btn.textContent = 'Hapus';
+    btn.disabled = false;
+  }
 }
 
 /* ====== EXPORT CSV ====== */
