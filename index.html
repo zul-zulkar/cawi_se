@@ -1393,6 +1393,29 @@ input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
   </div>
 
   <div class="section-card">
+    <div class="section-header">Lokasi Kunjungan <span class="req">*</span></div>
+    <div class="section-body">
+      <div class="form-group">
+        <label class="field-label">Koordinat GPS <span class="req">*</span></label>
+        <div style="display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap">
+          <button type="button" id="lokasiBtn" onclick="ambilLokasi()"
+            style="display:flex;align-items:center;gap:8px;padding:10px 20px;background:#fc6c00;color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0;transition:background .2s"
+            onmouseover="this.style.background='#e06000'" onmouseout="this.style.background=this.dataset.done==='1'?'#276749':'#fc6c00'">
+            &#128205; Ambil Lokasi GPS
+          </button>
+          <div id="lokasiResult" style="flex:1;min-width:200px;background:#f7f4f0;border:1.5px solid #e8e3de;border-radius:7px;padding:10px 14px;font-size:12.5px;color:#888;line-height:1.7">
+            Belum mengambil lokasi — tekan tombol untuk mulai.
+          </div>
+        </div>
+        <input type="hidden" id="lokasi_lat"/>
+        <input type="hidden" id="lokasi_lng"/>
+        <input type="hidden" id="lokasi_akurasi"/>
+        <div class="hint">Digunakan untuk verifikasi kunjungan lapangan. Pastikan GPS aktif di perangkat.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-card">
     <div class="section-header">Catatan Kunjungan</div>
     <div class="section-body">
 
@@ -1743,6 +1766,58 @@ function closeSidebar() {
   if (hb) hb.innerHTML = '&#9776;';
 }
 
+/* ====== AMBIL LOKASI GPS ====== */
+function ambilLokasi() {
+  const btn = document.getElementById('lokasiBtn');
+  const result = document.getElementById('lokasiResult');
+  btn.textContent = '⏳ Mengambil lokasi...';
+  btn.disabled = true;
+  btn.style.background = '#aaa';
+
+  if (!navigator.geolocation) {
+    result.innerHTML = '<span style="color:#c53030">&#10005; Browser tidak mendukung GPS.</span>';
+    btn.textContent = '📍 Ambil Lokasi GPS';
+    btn.disabled = false;
+    btn.style.background = '#fc6c00';
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    function(pos) {
+      const lat = pos.coords.latitude.toFixed(6);
+      const lng = pos.coords.longitude.toFixed(6);
+      const akurasi = Math.round(pos.coords.accuracy);
+      document.getElementById('lokasi_lat').value = lat;
+      document.getElementById('lokasi_lng').value = lng;
+      document.getElementById('lokasi_akurasi').value = akurasi;
+      result.innerHTML =
+        '<div style="color:#276749;font-weight:700;margin-bottom:4px">&#10003; Lokasi berhasil diambil</div>' +
+        '<div style="color:#555">Lat: <strong>' + lat + '</strong> &nbsp;|&nbsp; Lng: <strong>' + lng + '</strong></div>' +
+        '<div style="color:#888;font-size:11.5px;margin-top:2px">Akurasi: ±' + akurasi + ' meter</div>';
+      result.style.background = '#f0fff4';
+      result.style.borderColor = '#68d391';
+      btn.innerHTML = '&#10003; Lokasi Terekam';
+      btn.style.background = '#276749';
+      btn.dataset.done = '1';
+      btn.disabled = false;
+      btn.onmouseover = null;
+      btn.onmouseout = null;
+      markFieldFilled(document.getElementById('lokasi_lat'));
+    },
+    function(err) {
+      const msg = err.code === 1 ? 'Izin GPS ditolak — aktifkan lokasi di browser.' :
+                  err.code === 2 ? 'Sinyal GPS tidak tersedia.' : 'Waktu habis, coba lagi.';
+      result.innerHTML = '<span style="color:#c53030">&#10005; ' + msg + '</span>';
+      result.style.background = '#fff5f5';
+      result.style.borderColor = '#feb2b2';
+      btn.innerHTML = '&#128205; Coba Lagi';
+      btn.disabled = false;
+      btn.style.background = '#fc6c00';
+    },
+    {enableHighAccuracy: true, timeout: 12000, maximumAge: 0}
+  );
+}
+
 /* ====== PETUNJUK ====== */
 function togglePetunjuk() {
   const modal = document.getElementById('petunjukModal');
@@ -2011,6 +2086,9 @@ function collectAllProblems() {
   else if (!isValidEmail(getVal('r_email'))) e('Responden: Email', 'Format tidak valid', 3, 'r_email');
   if (!getVal('r_tanggal')) e('Responden: Tanggal Pelaksanaan', 'Harus diisi', 3, 'r_tanggal');
   if (!hasSig) e('Tanda Tangan', 'Harus diisi — gambar di kotak tanda tangan', 3, 'sigCanvas');
+
+  if (!document.getElementById('lokasi_lat').value)
+    e('Blok II: Lokasi Kunjungan', 'Koordinat GPS wajib diambil sebelum submit', 2, 'lokasiBtn');
 
   if (!getVal('catatan1') && !getVal('catatan2') && !getVal('catatan3'))
     k('Blok II: Catatan Kunjungan', 'Semua catatan kunjungan kosong (opsional untuk CAWI)', 2, 'catatan1');
@@ -2794,6 +2872,9 @@ function collectData() {
     modal_asing: getVal('q25f'),
     modal_total: getVal('q25g'),
     // Blok II
+    lokasi_lat: document.getElementById('lokasi_lat').value,
+    lokasi_lng: document.getElementById('lokasi_lng').value,
+    lokasi_akurasi: document.getElementById('lokasi_akurasi').value,
     catatan1: getVal('catatan1'), waktu1: getVal('waktu1'),
     catatan2: getVal('catatan2'), waktu2: getVal('waktu2'),
     catatan3: getVal('catatan3'), waktu3: getVal('waktu3'),
@@ -3051,6 +3132,7 @@ function loadEditMode() {
       'q25d':                r.modal_korporasi_non,
       'q25e':                r.modal_pemerintah,
       'q25f':                r.modal_asing,
+      'lokasi_lat': r.lokasi_lat, 'lokasi_lng': r.lokasi_lng, 'lokasi_akurasi': r.lokasi_akurasi,
       'catatan1': r.catatan1, 'waktu1': (r.waktu1 || '').substring(0, 16),
       'catatan2': r.catatan2, 'waktu2': (r.waktu2 || '').substring(0, 16),
       'catatan3': r.catatan3, 'waktu3': (r.waktu3 || '').substring(0, 16),
@@ -3093,6 +3175,27 @@ function loadEditMode() {
       const pNip  = document.getElementById('p_nip');
       if (pNama) pNama.value = r.petugas_nama;
       if (pNip)  pNip.value  = r.petugas_nip || '';
+    }
+
+    // Render ulang tampilan lokasi jika sudah ada di rekaman
+    if (r.lokasi_lat && r.lokasi_lng) {
+      const result = document.getElementById('lokasiResult');
+      const btn = document.getElementById('lokasiBtn');
+      if (result) {
+        result.innerHTML =
+          '<div style="color:#276749;font-weight:700;margin-bottom:4px">&#10003; Lokasi terekam (dari data sebelumnya)</div>' +
+          '<div style="color:#555">Lat: <strong>' + r.lokasi_lat + '</strong> &nbsp;|&nbsp; Lng: <strong>' + r.lokasi_lng + '</strong></div>' +
+          (r.lokasi_akurasi ? '<div style="color:#888;font-size:11.5px;margin-top:2px">Akurasi: ±' + r.lokasi_akurasi + ' meter</div>' : '');
+        result.style.background = '#f0fff4';
+        result.style.borderColor = '#68d391';
+      }
+      if (btn) {
+        btn.innerHTML = '&#10003; Lokasi Terekam';
+        btn.style.background = '#276749';
+        btn.dataset.done = '1';
+        btn.onmouseover = null;
+        btn.onmouseout = null;
+      }
     }
 
     // Radio buttons
