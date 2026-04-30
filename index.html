@@ -1780,12 +1780,14 @@ function renderLokasiMap(lat, lng, akurasi) {
   const wrap = document.getElementById('lokasiMapWrap');
   if (!wrap) return;
   wrap.style.display = 'block';
+  void wrap.offsetHeight; // force browser reflow sebelum Leaflet ukur container
 
   const latF = parseFloat(lat);
   const lngF = parseFloat(lng);
   const acc  = parseInt(akurasi) || 0;
 
   if (_lokasiMap) {
+    _lokasiMap.invalidateSize();
     _lokasiMap.setView([latF, lngF], 17);
     if (_lokasiMarker) _lokasiMarker.setLatLng([latF, lngF]);
     if (_lokasiCircle) { _lokasiCircle.setLatLng([latF, lngF]); _lokasiCircle.setRadius(acc); }
@@ -1819,7 +1821,8 @@ function renderLokasiMap(lat, lng, akurasi) {
     }).addTo(_lokasiMap);
   }
 
-  setTimeout(() => _lokasiMap && _lokasiMap.invalidateSize(), 200);
+  setTimeout(() => _lokasiMap && _lokasiMap.invalidateSize(), 100);
+  setTimeout(() => _lokasiMap && _lokasiMap.invalidateSize(), 600);
 }
 
 function ambilLokasi() {
