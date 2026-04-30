@@ -94,6 +94,12 @@ function doPost(e) {
         .createTextOutput(JSON.stringify({ status: "error", message: "Akses ditolak" }))
         .setMimeType(ContentService.MimeType.JSON);
     }
+
+    // Route: ambil semua rekaman (untuk halaman daftar)
+    if (d.action === "getRecords") {
+      return getRecordsResponse();
+    }
+
     const ss    = SpreadsheetApp.openById(SHEET_ID);
     let sheet   = ss.getSheetByName(SHEET_NAME);
 
@@ -194,6 +200,35 @@ function doPost(e) {
 
   } catch (err) {
     Logger.log("doPost error: " + err.message);
+    return ContentService
+      .createTextOutput(JSON.stringify({ status: "error", message: err.message }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+// Kembalikan semua rekaman dari sheet sebagai JSON
+function getRecordsResponse() {
+  try {
+    const ss    = SpreadsheetApp.openById(SHEET_ID);
+    const sheet = ss.getSheetByName(SHEET_NAME);
+    if (!sheet || sheet.getLastRow() <= 1) {
+      return ContentService
+        .createTextOutput(JSON.stringify({ status: "ok", data: [] }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+    const values = sheet.getDataRange().getValues();
+    const rows = values.slice(1).map(function(row, idx) {
+      var obj = { _id: idx + 1 };
+      FIELD_NAMES.forEach(function(key, i) {
+        obj[key] = (row[i] !== undefined && row[i] !== null) ? String(row[i]) : "";
+      });
+      obj._ts = obj.timestamp;
+      return obj;
+    });
+    return ContentService
+      .createTextOutput(JSON.stringify({ status: "ok", data: rows }))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
     return ContentService
       .createTextOutput(JSON.stringify({ status: "error", message: err.message }))
       .setMimeType(ContentService.MimeType.JSON);
