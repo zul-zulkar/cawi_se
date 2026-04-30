@@ -1780,49 +1780,54 @@ function renderLokasiMap(lat, lng, akurasi) {
   const wrap = document.getElementById('lokasiMapWrap');
   if (!wrap) return;
   wrap.style.display = 'block';
-  void wrap.offsetHeight; // force browser reflow sebelum Leaflet ukur container
 
   const latF = parseFloat(lat);
   const lngF = parseFloat(lng);
   const acc  = parseInt(akurasi) || 0;
 
   if (_lokasiMap) {
-    _lokasiMap.invalidateSize();
-    _lokasiMap.setView([latF, lngF], 17);
-    if (_lokasiMarker) _lokasiMarker.setLatLng([latF, lngF]);
-    if (_lokasiCircle) { _lokasiCircle.setLatLng([latF, lngF]); _lokasiCircle.setRadius(acc); }
+    setTimeout(() => {
+      _lokasiMap.invalidateSize();
+      _lokasiMap.setView([latF, lngF], 17);
+      if (_lokasiMarker) _lokasiMarker.setLatLng([latF, lngF]);
+      if (_lokasiCircle) { _lokasiCircle.setLatLng([latF, lngF]); _lokasiCircle.setRadius(acc); }
+    }, 50);
     return;
   }
 
-  _lokasiMap = L.map('lokasiMap', {zoomControl: true, attributionControl: true}).setView([latF, lngF], 17);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© <a href="https://www.openstreetmap.org/">OpenStreetMap</a>',
-    maxZoom: 19
-  }).addTo(_lokasiMap);
+  // Tunggu 2 frame agar browser selesai render container sebelum Leaflet ukur dimensi
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      _lokasiMap = L.map('lokasiMap', {zoomControl: true, attributionControl: true}).setView([latF, lngF], 17);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© <a href="https://www.openstreetmap.org/">OpenStreetMap</a>',
+        maxZoom: 19
+      }).addTo(_lokasiMap);
 
-  const icon = L.divIcon({
-    html: '<div style="background:#fc6c00;width:14px;height:14px;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.4)"></div>',
-    className: '',
-    iconSize: [14, 14],
-    iconAnchor: [7, 7]
+      const icon = L.divIcon({
+        html: '<div style="background:#fc6c00;width:14px;height:14px;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.4)"></div>',
+        className: '',
+        iconSize: [14, 14],
+        iconAnchor: [7, 7]
+      });
+
+      _lokasiMarker = L.marker([latF, lngF], {icon}).addTo(_lokasiMap)
+        .bindPopup('<b>Lokasi Kunjungan</b><br>Lat: ' + lat + '<br>Lng: ' + lng + (acc ? '<br>Akurasi: ±' + acc + ' m' : ''))
+        .openPopup();
+
+      if (acc > 0) {
+        _lokasiCircle = L.circle([latF, lngF], {
+          radius: acc,
+          color: '#fc6c00',
+          fillColor: '#fc6c00',
+          fillOpacity: 0.12,
+          weight: 1.5
+        }).addTo(_lokasiMap);
+      }
+
+      setTimeout(() => _lokasiMap && _lokasiMap.invalidateSize(), 300);
+    });
   });
-
-  _lokasiMarker = L.marker([latF, lngF], {icon}).addTo(_lokasiMap)
-    .bindPopup('<b>Lokasi Kunjungan</b><br>Lat: ' + lat + '<br>Lng: ' + lng + (acc ? '<br>Akurasi: ±' + acc + ' m' : ''))
-    .openPopup();
-
-  if (acc > 0) {
-    _lokasiCircle = L.circle([latF, lngF], {
-      radius: acc,
-      color: '#fc6c00',
-      fillColor: '#fc6c00',
-      fillOpacity: 0.12,
-      weight: 1.5
-    }).addTo(_lokasiMap);
-  }
-
-  setTimeout(() => _lokasiMap && _lokasiMap.invalidateSize(), 100);
-  setTimeout(() => _lokasiMap && _lokasiMap.invalidateSize(), 600);
 }
 
 function ambilLokasi() {
