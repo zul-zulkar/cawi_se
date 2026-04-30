@@ -220,7 +220,6 @@ tr:hover td{background:#fffaf7}
 
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyUp2xUJBnCqy0csDsfcSCYE34vmtyjq6gag7rAUMZbkPp4ypL7FNdtnBtpmrW99RFq_w/exec";
-const API_TOKEN  = "BPS-5108-K3r4h4s14an-SE2026-xK9mP";
 
 let records = [];
 
@@ -230,7 +229,7 @@ async function fetchRecords() {
   try {
     const resp = await fetch(SCRIPT_URL, {
       method: 'POST',
-      body: JSON.stringify({ _token: API_TOKEN, action: 'getRecords' })
+      body: JSON.stringify({ action: 'getRecords' })
     });
     const json = await resp.json();
     if (json.status === 'ok') {

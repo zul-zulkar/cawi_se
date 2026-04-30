@@ -15,9 +15,6 @@
 const SHEET_ID   = "1f-YLgJHfMU33_9Pn6snao1xZ-qf3vBQRpAxFwxBLOGI";
 const SHEET_NAME = "SE2026_Responses";
 
-// Ganti token ini dengan string acak yang kuat — harus sama dengan API_TOKEN di index.html
-const API_TOKEN  = "BPS-5108-K3r4h4s14an-SE2026-xK9mP";
-
 // Header columns — urutan harus sama dengan appendRow di bawah
 const HEADERS = [
   "Timestamp",
@@ -89,11 +86,6 @@ const HEADERS = [
 function doPost(e) {
   try {
     const d = JSON.parse(e.postData.contents);
-    if (d._token !== API_TOKEN) {
-      return ContentService
-        .createTextOutput(JSON.stringify({ status: "error", message: "Akses ditolak" }))
-        .setMimeType(ContentService.MimeType.JSON);
-    }
 
     // Route: ambil semua rekaman (untuk halaman daftar)
     if (d.action === "getRecords") {
@@ -306,12 +298,7 @@ const FIELD_NAMES = [
 // Endpoint GET — kembalikan semua rekaman sebagai JSON (butuh token)
 function doGet(e) {
   try {
-    const token = e && e.parameter && e.parameter.token;
-    if (token !== API_TOKEN) {
-      return ContentService
-        .createTextOutput(JSON.stringify({ status: "error", message: "Akses ditolak" }))
-        .setMimeType(ContentService.MimeType.JSON);
-    }
+    // doGet tersedia untuk referensi — tidak digunakan oleh halaman utama
 
     const ss    = SpreadsheetApp.openById(SHEET_ID);
     const sheet = ss.getSheetByName(SHEET_NAME);

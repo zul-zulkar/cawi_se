@@ -1715,7 +1715,6 @@ function hidePetugasDrop() {
 }
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyUp2xUJBnCqy0csDsfcSCYE34vmtyjq6gag7rAUMZbkPp4ypL7FNdtnBtpmrW99RFq_w/exec";
-const API_TOKEN  = "BPS-5108-K3r4h4s14an-SE2026-xK9mP"; // harus sama dengan API_TOKEN di Google Apps Script
 
 
 function goBlok(n) {
@@ -2840,7 +2839,7 @@ async function submitForm() {
     const res = await fetch(SCRIPT_URL, {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ ...data, _token: API_TOKEN }),
+      body: JSON.stringify(data),
       mode: 'no-cors'
     });
     // no-cors returns opaque — assume success if no throw
