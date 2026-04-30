@@ -2839,14 +2839,28 @@ async function submitForm() {
 
   try {
     const data = collectData();
+    const isEdit = !!(data._edit_id);
+    console.log('[SUBMIT] mode:', isEdit ? 'EDIT id=' + data._edit_id : 'BARU');
+    // Content-Type: text/plain → tidak perlu no-cors, bisa baca response
     const res = await fetch(SCRIPT_URL, {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(data),
-      mode: 'no-cors'
+      headers: {'Content-Type': 'text/plain'},
+      body: JSON.stringify(data)
     });
-    // no-cors returns opaque — assume success if no throw
-    const wasEdit = !!_editRecordId;
+    let gasOk = true;
+    try {
+      const json = await res.json();
+      console.log('[SUBMIT] GAS response:', json);
+      if (json.status !== 'ok') throw new Error(json.message || 'GAS error');
+    } catch(parseErr) {
+      // Jika response bukan JSON (mis. redirect GAS), abaikan
+      if (parseErr.message && parseErr.message !== 'GAS error') {
+        console.warn('[SUBMIT] Tidak bisa parse response GAS:', parseErr.message);
+      } else if (parseErr.message === 'GAS error') {
+        throw parseErr;
+      }
+    }
+    const wasEdit = isEdit;
     btn.textContent = wasEdit ? 'DIPERBARUI ✓' : 'TERKIRIM ✓';
     btn.style.background = '#38a169';
     _editRecordId = null;
