@@ -4,20 +4,25 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>CAWI SE2026 - BPS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;background:#f0ede8;color:#2d2d2d;font-size:14px;line-height:1.5}
-/* ====== HEADER ====== */
-.rahasia-bar{background:#b22222;color:#fff;text-align:center;font-weight:800;font-size:11px;letter-spacing:6px;padding:6px;text-transform:uppercase}
-.header-main{background:#fff;border-bottom:4px solid #fc6c00;padding:12px 20px;box-shadow:0 2px 10px rgba(0,0,0,.1)}
-.header-inner{display:flex;align-items:center;justify-content:space-between;max-width:960px;margin:0 auto;gap:16px}
-.header-logos{display:flex;align-items:center;gap:10px}
-.header-logos img{height:70px;object-fit:contain}
-.header-center{text-align:center;flex:1}
-.header-center .title-rep{font-size:11px;font-weight:600;color:#888;letter-spacing:2px;text-transform:uppercase}
-.header-center .title-sensus{font-size:17px;font-weight:800;color:#1a1a1a;letter-spacing:1px;margin-top:2px;text-transform:uppercase}
-.header-center .title-cawi{font-size:32px;font-weight:900;color:#fc6c00;letter-spacing:6px;line-height:1;margin:2px 0}
-.header-center .title-sosialisasi{font-size:11px;color:#aaa;letter-spacing:3px;text-transform:uppercase}
+body{font-family:'Inter','Segoe UI',sans-serif;background:#f0ede8;color:#2d2d2d;font-size:14px;line-height:1.5}
+/* ====== HEADER KOP ====== */
+.header-kop{background:#fff;border-bottom:2px solid #e8e3de;padding:14px 24px;box-shadow:0 2px 8px rgba(0,0,0,.06);transition:opacity .25s}
+.header-kop.kop-hidden{display:none}
+.kop-inner{display:flex;align-items:center;justify-content:space-between;max-width:960px;margin:0 auto;gap:12px}
+.kop-side{display:flex;flex-direction:column;align-items:center;gap:8px;min-width:90px}
+.kop-logo-bps{height:56px;object-fit:contain}
+.kop-logo-se{height:56px;object-fit:contain}
+.kop-badge-rahasia{background:#1a1a1a;color:#fff;font-size:10px;font-weight:800;letter-spacing:3px;padding:4px 14px;border-radius:3px;text-transform:uppercase;font-family:'Inter',sans-serif}
+.kop-badge-cawi{background:#fc6c00;color:#fff;font-size:13px;font-weight:900;letter-spacing:4px;padding:4px 18px;border-radius:4px;font-family:'Inter',sans-serif}
+.kop-center{text-align:center;flex:1}
+.kop-garuda{height:68px;object-fit:contain;display:block;margin:0 auto 6px}
+.kop-rep{font-size:12px;font-weight:700;color:#1a1a1a;letter-spacing:.5px;text-transform:uppercase}
+.kop-sensus{font-size:14px;font-weight:800;color:#1a1a1a;letter-spacing:.5px;text-transform:uppercase}
 /* ====== BLOK NAV ====== */
 .blok-nav-wrap{background:#fff;border-bottom:1px solid #ddd;box-shadow:0 2px 6px rgba(0,0,0,.07);position:sticky;top:0;z-index:100}
 .blok-nav{display:flex;max-width:960px;margin:0 auto}
@@ -133,38 +138,36 @@ canvas#sigCanvas{display:block;cursor:crosshair;touch-action:none}
 }
 /* ====== APP LAYOUT ====== */
 .app-layout{display:flex;min-height:100vh}
-.sidebar{width:240px;background:#1a2332;position:fixed;top:0;left:0;height:100vh;overflow-y:auto;z-index:300;display:flex;flex-direction:column;transition:transform .3s cubic-bezier(.4,0,.2,1);box-shadow:2px 0 20px rgba(0,0,0,.18)}
+.sidebar{width:240px;background:#fff;position:fixed;top:0;left:0;height:100vh;overflow-y:auto;z-index:300;display:flex;flex-direction:column;transition:transform .3s cubic-bezier(.4,0,.2,1);box-shadow:2px 0 16px rgba(0,0,0,.08);border-right:1px solid #e8e3de}
 .sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:250;opacity:0;pointer-events:none;transition:opacity .3s}
 .sidebar-overlay.open{opacity:1;pointer-events:all}
 .main-content{margin-left:240px;flex:1;min-width:0}
 /* ====== SIDEBAR BRAND ====== */
-.sidebar-brand{padding:18px 16px 14px;border-bottom:1px solid rgba(255,255,255,.08);display:flex;align-items:center;gap:10px}
-.sidebar-brand img{height:36px;object-fit:contain;flex-shrink:0}
-.sidebar-brand-text{line-height:1.2}
-.sidebar-brand-title{font-size:20px;font-weight:900;color:#fc6c00;letter-spacing:3px}
-.sidebar-brand-sub{font-size:9px;color:rgba(255,255,255,.4);letter-spacing:1.5px;text-transform:uppercase;margin-top:1px}
-.sidebar-rahasia{background:#b22222;color:#fff;text-align:center;font-size:8.5px;font-weight:800;letter-spacing:4px;padding:4px;text-transform:uppercase}
-.sidebar-nav-label{padding:14px 16px 5px;font-size:9px;font-weight:700;color:rgba(255,255,255,.3);letter-spacing:2.5px;text-transform:uppercase}
+.sidebar-brand{padding:18px 16px 14px;border-bottom:2px solid #f0ede8}
+.sidebar-brand-title{font-size:13px;font-weight:800;color:#1a1a1a;letter-spacing:.2px}
+.sidebar-brand-sub{font-size:10px;color:#fc6c00;font-weight:700;letter-spacing:.3px;margin-top:2px}
+.sidebar-rahasia{background:#1a1a1a;color:#fff;text-align:center;font-size:8.5px;font-weight:800;letter-spacing:4px;padding:4px;text-transform:uppercase}
+.sidebar-nav-label{padding:14px 16px 5px;font-size:9px;font-weight:700;color:#bbb;letter-spacing:2.5px;text-transform:uppercase}
 /* ====== SIDEBAR NAV ITEMS ====== */
-.sidebar-item{display:flex;align-items:center;gap:11px;padding:11px 16px;cursor:pointer;border-left:3px solid transparent;transition:all .2s;color:rgba(255,255,255,.5);font-size:12.5px;font-weight:500;user-select:none}
-.sidebar-item:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.85);border-left-color:rgba(252,108,0,.4)}
-.sidebar-item.active{background:rgba(252,108,0,.12);color:#fc6c00;border-left-color:#fc6c00;font-weight:700}
+.sidebar-item{display:flex;align-items:center;gap:11px;padding:11px 16px;cursor:pointer;border-left:3px solid transparent;transition:all .2s;color:#555;font-size:12.5px;font-weight:500;user-select:none}
+.sidebar-item:hover{background:#fff5ee;color:#fc6c00;border-left-color:#ffd0b0}
+.sidebar-item.active{background:#fc6c00;color:#fff;border-left-color:#d95a00;font-weight:700}
 .sidebar-item-num{width:26px;height:26px;border-radius:50%;border:2px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;transition:all .2s}
-.sidebar-item.active .sidebar-item-num{background:#fc6c00;border-color:#fc6c00;color:#fff}
+.sidebar-item.active .sidebar-item-num{background:rgba(255,255,255,.25);border-color:rgba(255,255,255,.5);color:#fff}
 .sidebar-item-info{flex:1;line-height:1.3}
-.sidebar-item-sub{font-size:10px;color:rgba(255,255,255,.28);font-weight:400;margin-top:1px}
-.sidebar-item.active .sidebar-item-sub{color:rgba(252,108,0,.65)}
+.sidebar-item-sub{font-size:10px;color:#aaa;font-weight:400;margin-top:1px}
+.sidebar-item.active .sidebar-item-sub{color:rgba(255,255,255,.75)}
 /* ====== SIDEBAR PROGRESS ====== */
-.sidebar-divider{height:1px;background:rgba(255,255,255,.07);margin:6px 0}
+.sidebar-divider{height:1px;background:#f0ede8;margin:6px 0}
 .sidebar-progress-section{padding:12px 16px}
-.sidebar-progress-label{display:flex;justify-content:space-between;font-size:10.5px;color:rgba(255,255,255,.38);margin-bottom:6px}
+.sidebar-progress-label{display:flex;justify-content:space-between;font-size:10.5px;color:#999;margin-bottom:6px}
 .sidebar-progress-pct{font-weight:700;color:#fc6c00}
-.sidebar-progress-bar{height:5px;background:rgba(255,255,255,.1);border-radius:4px;overflow:hidden}
+.sidebar-progress-bar{height:5px;background:#f0ede8;border-radius:4px;overflow:hidden}
 .sidebar-progress-fill{height:100%;background:linear-gradient(90deg,#fc6c00,#ff8c00);border-radius:4px;transition:width .5s ease}
 /* ====== SIDEBAR ACTIONS ====== */
 .sidebar-actions{padding:8px 12px}
-.sidebar-btn{display:flex;align-items:center;gap:8px;width:100%;padding:10px 12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:7px;color:rgba(255,255,255,.65);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;margin-bottom:8px;text-align:left;font-family:inherit;letter-spacing:.2px}
-.sidebar-btn:hover{background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.22);transform:translateY(-1px)}
+.sidebar-btn{display:flex;align-items:center;gap:8px;width:100%;padding:10px 12px;background:#f5f2ee;border:1px solid #e8e3de;border-radius:7px;color:#555;font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;margin-bottom:8px;text-align:left;font-family:'Inter',inherit;letter-spacing:.2px}
+.sidebar-btn:hover{background:#fff5ee;color:#fc6c00;border-color:#ffd0b0;transform:translateY(-1px)}
 .sidebar-btn:active{transform:translateY(0)}
 .sidebar-btn-icon{font-size:14px;flex-shrink:0}
 /* ====== MOBILE TOPBAR ====== */
@@ -353,25 +356,22 @@ input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
 <!-- ====== SIDEBAR ====== -->
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-brand">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/2/28/Lambang_Badan_Pusat_Statistik_%28BPS%29_Indonesia.svg" alt="BPS" onerror="this.style.display='none'" style="height:34px;filter:brightness(10)"/>
-    <div class="sidebar-brand-text">
-      <div class="sidebar-brand-title">CAWI</div>
-      <div class="sidebar-brand-sub">Sensus Ekonomi 2026</div>
-    </div>
+    <div class="sidebar-brand-title">Sosialisasi SE2026</div>
+    <div class="sidebar-brand-sub">BPS Buleleng</div>
   </div>
   <div class="sidebar-rahasia">&#x25CF; R A H A S I A &#x25CF;</div>
   <div class="sidebar-nav-label">NAVIGASI BLOK</div>
   <div class="sidebar-item active" onclick="goBlok(1)" id="sidebarTab1">
     <div class="sidebar-item-num">I</div>
     <div class="sidebar-item-info">
-      <div>Keterangan Tempat &amp; Usaha</div>
+      <div>Identitas Usaha/Perusahaan</div>
       <div class="sidebar-item-sub">Pertanyaan 1 s.d. 25</div>
     </div>
   </div>
   <div class="sidebar-item" onclick="goBlok(2)" id="sidebarTab2">
     <div class="sidebar-item-num">II</div>
     <div class="sidebar-item-info">
-      <div>Catatan Kunjungan</div>
+      <div>Catatan</div>
       <div class="sidebar-item-sub">Kunjungan I, II, III</div>
     </div>
   </div>
@@ -406,37 +406,34 @@ input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
     </button>
   </div>
   <div style="padding:8px 16px 4px;margin-top:auto">
-    <div id="autosaveStatus" style="font-size:10px;color:rgba(255,255,255,.28);line-height:1.6;display:flex;align-items:center;gap:5px">
-      <span style="width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.2);display:inline-block;flex-shrink:0" id="autosaveDot"></span>
+    <div id="autosaveStatus" style="font-size:10px;color:#bbb;line-height:1.6;display:flex;align-items:center;gap:5px">
+      <span style="width:6px;height:6px;border-radius:50%;background:#ddd;display:inline-block;flex-shrink:0" id="autosaveDot"></span>
       <span id="autosaveText">Belum tersimpan</span>
     </div>
   </div>
   <div style="padding:4px 16px 14px">
-    <div style="font-size:10px;color:rgba(255,255,255,.18);line-height:1.8">BPS Republik Indonesia<br/>&#169; Sensus Ekonomi 2026</div>
+    <div style="font-size:10px;color:#ccc;line-height:1.8">BPS Republik Indonesia<br/>&#169; Sensus Ekonomi 2026</div>
   </div>
 </aside>
 
 <!-- ====== MAIN CONTENT ====== -->
 <div class="main-content" id="mainContent">
 
-<!-- RAHASIA BAR -->
-<div class="rahasia-bar">&#x25CF;&nbsp; R A H A S I A &nbsp;&#x25CF;</div>
-
-<!-- HEADER -->
-<div class="header-main">
-  <div class="header-inner">
-    <div class="header-logos">
-      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/National_emblem_of_Indonesia_Garuda_Pancasila.svg/1280px-National_emblem_of_Indonesia_Garuda_Pancasila.svg.png" alt="Garuda Pancasila" onerror="this.style.display='none'"/>
+<!-- HEADER KOP — hanya tampil di Blok I -->
+<div class="header-kop" id="headerKop">
+  <div class="kop-inner">
+    <div class="kop-side">
+      <img class="kop-logo-bps" src="https://upload.wikimedia.org/wikipedia/commons/2/28/Lambang_Badan_Pusat_Statistik_%28BPS%29_Indonesia.svg" alt="BPS" onerror="this.style.display='none'"/>
+      <div class="kop-badge-rahasia">RAHASIA</div>
     </div>
-    <div class="header-center">
-      <div class="title-rep">Badan Pusat Statistik — Republik Indonesia</div>
-      <div class="title-sensus">Sensus Ekonomi 2026</div>
-      <div class="title-cawi">CAWI</div>
-      <div class="title-sosialisasi">Sosialisasi &nbsp;|&nbsp; Self-Enumeration</div>
+    <div class="kop-center">
+      <img class="kop-garuda" src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/National_emblem_of_Indonesia_Garuda_Pancasila.svg/1280px-National_emblem_of_Indonesia_Garuda_Pancasila.svg.png" alt="Garuda Pancasila" onerror="this.style.display='none'"/>
+      <div class="kop-rep">Republik Indonesia</div>
+      <div class="kop-sensus">Sensus Ekonomi 2026</div>
     </div>
-    <div class="header-logos" style="gap:10px">
-      <img src="https://satudata.mojokertokab.go.id/onedata/global_assets/logo_se2026.png" alt="SE2026" onerror="this.style.display='none'"/>
-      <img src="https://upload.wikimedia.org/wikipedia/commons/2/28/Lambang_Badan_Pusat_Statistik_%28BPS%29_Indonesia.svg" alt="BPS" onerror="this.style.display='none'"/>
+    <div class="kop-side">
+      <img class="kop-logo-se" src="https://satudata.mojokertokab.go.id/onedata/global_assets/logo_se2026.png" alt="SE2026" onerror="this.style.display='none'"/>
+      <div class="kop-badge-cawi">CAWI</div>
     </div>
   </div>
 </div>
@@ -1723,6 +1720,8 @@ function goBlok(n) {
   document.getElementById('blok' + n).classList.add('active');
   const sTab = document.getElementById('sidebarTab' + n);
   if (sTab) sTab.classList.add('active');
+  const kop = document.getElementById('headerKop');
+  if (kop) kop.classList.toggle('kop-hidden', n !== 1);
   updateProgress();
   window.scrollTo({top: 0, behavior: 'smooth'});
   closeSidebar();
