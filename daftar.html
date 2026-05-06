@@ -248,7 +248,8 @@ tr:hover td{background:#fffaf7}
 </div>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyUp2xUJBnCqy0csDsfcSCYE34vmtyjq6gag7rAUMZbkPp4ypL7FNdtnBtpmrW99RFq_w/exec";
+const DEFAULT_SCRIPT_URL_DAFTAR = "https://script.google.com/macros/s/AKfycbyUp2xUJBnCqy0csDsfcSCYE34vmtyjq6gag7rAUMZbkPp4ypL7FNdtnBtpmrW99RFq_w/exec";
+const SCRIPT_URL = localStorage.getItem('cawi_script_url_override') || DEFAULT_SCRIPT_URL_DAFTAR;
 
 let records = [];
 

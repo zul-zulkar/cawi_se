@@ -262,6 +262,53 @@
       .btn-row button{width:100%}
       .top-bar h1{font-size:1rem}
     }
+
+    /* ── Pegawai Table ── */
+    .pg-table-wrap {
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid #f0f2f5;
+      border-radius: 8px;
+      margin-bottom: 16px;
+    }
+    .pg-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .84rem;
+    }
+    .pg-table th {
+      background: #f8f9fc;
+      font-size: .74rem;
+      font-weight: 700;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      padding: 9px 12px;
+      text-align: left;
+      border-bottom: 2px solid #f0f2f5;
+      position: sticky;
+      top: 0;
+    }
+    .pg-table td {
+      padding: 9px 12px;
+      border-bottom: 1px solid #f5f6fa;
+      vertical-align: middle;
+    }
+    .pg-table tr:last-child td { border-bottom: none; }
+    .pg-table tr:hover td { background: #fffaf7; }
+    .pg-form-box {
+      border: 1.5px solid #f0f2f5;
+      border-radius: 10px;
+      padding: 16px;
+      background: #f8f9fc;
+      margin-top: 4px;
+    }
+    .pg-form-title {
+      font-size: .9rem;
+      font-weight: 700;
+      color: #1a1a2e;
+      margin-bottom: 14px;
+    }
   </style>
 </head>
 <body>
@@ -418,6 +465,105 @@
   </div>
 </div>
 
+<!-- ─── Sumber Google Sheet ─── -->
+<div class="card">
+  <div class="card-title">Sumber Data Google Sheet</div>
+
+  <div class="status-row">
+    <div class="status-icon">📊</div>
+    <div>
+      <div class="status-label">Sumber URL aktif</div>
+      <div class="status-value" id="sheetSourceLabel">—</div>
+    </div>
+  </div>
+  <div class="status-row" style="align-items:flex-start">
+    <div class="status-icon" style="padding-top:2px">🔗</div>
+    <div style="min-width:0;overflow:hidden">
+      <div class="status-label">URL saat ini</div>
+      <div id="sheetUrlLabel" style="font-family:monospace;font-size:.72rem;word-break:break-all;color:#555;margin-top:2px">—</div>
+    </div>
+  </div>
+
+  <div class="form-group" style="margin-top:18px">
+    <label>URL Google Apps Script Baru</label>
+    <input type="text" id="newSheetUrl" placeholder="https://script.google.com/macros/s/…/exec"
+           oninput="updateSaveSheetBtn()"/>
+    <div class="field-hint">Salin URL deployment Web App dari Google Apps Script (deploy as Web App).</div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-primary" id="btnSaveSheet" onclick="saveSheetUrl()" disabled>Simpan URL</button>
+    <button class="btn btn-danger" onclick="resetSheetUrl()" style="flex:none;padding:11px 20px">Reset Default</button>
+  </div>
+  <div class="alert alert-ok"  id="alertSheetOk"></div>
+  <div class="alert alert-err" id="alertSheetErr"></div>
+</div>
+
+<!-- ─── Daftar Pegawai ─── -->
+<div class="card">
+  <div class="card-title">Daftar Pegawai</div>
+
+  <div style="display:flex;gap:10px;margin-bottom:18px;flex-wrap:wrap">
+    <div class="status-row" style="flex:1;min-width:160px;margin-bottom:0">
+      <div class="status-icon">👥</div>
+      <div>
+        <div class="status-label">Sumber daftar</div>
+        <div class="status-value" id="pegawaiSourceLabel">—</div>
+      </div>
+    </div>
+    <div class="status-row" style="flex:1;min-width:120px;margin-bottom:0">
+      <div class="status-icon">🔢</div>
+      <div>
+        <div class="status-label">Jumlah pegawai</div>
+        <div class="status-value" id="pegawaiCountLabel">—</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="pg-table-wrap">
+    <table class="pg-table">
+      <thead>
+        <tr>
+          <th>Nama</th>
+          <th>NIP</th>
+          <th>Jabatan</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="pegawaiTbody"></tbody>
+    </table>
+  </div>
+
+  <div class="pg-form-box" id="pgForm">
+    <div class="pg-form-title" id="pgFormTitle">Tambah Pegawai Baru</div>
+    <div class="form-group">
+      <label>Nama Lengkap <span style="color:#d32f2f">*</span></label>
+      <input type="text" id="pgNama" placeholder="Nama lengkap beserta gelar"/>
+    </div>
+    <div class="form-group">
+      <label>NIP / ID</label>
+      <input type="text" id="pgNip" placeholder="Nomor Induk Pegawai"/>
+    </div>
+    <div class="form-group">
+      <label>Jabatan</label>
+      <input type="text" id="pgJabatan" placeholder="Jabatan / posisi"/>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="btnSavePg" onclick="savePegawai()">Tambah</button>
+      <button class="btn btn-outline" id="btnCancelPg" onclick="cancelEditPegawai()" style="display:none;flex:none;padding:11px 18px">Batal</button>
+    </div>
+  </div>
+
+  <div class="alert alert-ok"  id="alertPgOk"></div>
+  <div class="alert alert-err" id="alertPgErr"></div>
+
+  <div style="margin-top:18px">
+    <button class="btn btn-danger" onclick="resetPegawai()" style="width:auto;padding:10px 18px;font-size:.85rem">
+      Reset Daftar ke Default
+    </button>
+  </div>
+</div>
+
 <footer>CAWI SE2026 BPS &nbsp;|&nbsp; Panel Admin &nbsp;|&nbsp; v1.0</footer>
 
 <script>
@@ -485,6 +631,9 @@ function initPage() {
   document.getElementById('adminPwStatusLabel').innerHTML = adminOverride
     ? 'Password Kustom <span class="badge badge-custom">Kustom</span>'
     : 'Password Default <span class="badge badge-default">Default</span>';
+
+  initSheetCard();
+  initPegawaiCard();
 }
 
 // ── Strength meter helper ──
@@ -642,6 +791,189 @@ function toggleShowPw() {
   ['newPw','confirmPw'].forEach(id => {
     document.getElementById(id).type = showingPw ? 'text' : 'password';
   });
+}
+
+// ══════════════════════════════════════════════
+// SUMBER GOOGLE SHEET
+// ══════════════════════════════════════════════
+const DEFAULT_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyUp2xUJBnCqy0csDsfcSCYE34vmtyjq6gag7rAUMZbkPp4ypL7FNdtnBtpmrW99RFq_w/exec';
+const SHEET_URL_KEY = 'cawi_script_url_override';
+
+function initSheetCard() {
+  const custom = localStorage.getItem(SHEET_URL_KEY);
+  document.getElementById('sheetSourceLabel').innerHTML = custom
+    ? 'URL Kustom <span class="badge badge-custom">Kustom</span>'
+    : 'URL Default <span class="badge badge-default">Default</span>';
+  document.getElementById('sheetUrlLabel').textContent = custom || DEFAULT_SCRIPT_URL;
+}
+
+function updateSaveSheetBtn() {
+  const val = document.getElementById('newSheetUrl').value.trim();
+  document.getElementById('btnSaveSheet').disabled = !val.startsWith('https://');
+}
+
+function saveSheetUrl() {
+  const val = document.getElementById('newSheetUrl').value.trim();
+  if (!val.startsWith('https://')) {
+    showSheetAlert('alertSheetErr', '❌ URL tidak valid. Harus dimulai dengan https://');
+    return;
+  }
+  localStorage.setItem(SHEET_URL_KEY, val);
+  document.getElementById('newSheetUrl').value = '';
+  document.getElementById('btnSaveSheet').disabled = true;
+  initSheetCard();
+  showSheetAlert('alertSheetOk', '✅ URL Google Sheet berhasil disimpan.');
+}
+
+function resetSheetUrl() {
+  localStorage.removeItem(SHEET_URL_KEY);
+  initSheetCard();
+  showSheetAlert('alertSheetOk', '✅ URL direset ke default.');
+}
+
+function showSheetAlert(id, msg) {
+  ['alertSheetOk','alertSheetErr'].forEach(x => { document.getElementById(x).style.display = 'none'; });
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.style.display = 'block';
+  setTimeout(() => { el.style.display = 'none'; }, 4000);
+}
+
+// ══════════════════════════════════════════════
+// DAFTAR PEGAWAI
+// ══════════════════════════════════════════════
+const PEGAWAI_KEY = 'cawi_pegawai_override';
+const DEFAULT_PEGAWAI = [
+  {"nama":"Gede Iwan Santika SST, M.M.","nip":"197807072002121002","jabatan":"Kepala BPS Kabupaten Buleleng"},
+  {"nama":"I Ketut Ariasa, SE","nip":"197306041994011001","jabatan":"Kepala Subbagian Umum"},
+  {"nama":"I Komang Ari Wijaya, SST, M.Agb","nip":"198611152009021002","jabatan":"Statistisi Ahli Madya"},
+  {"nama":"Ketut Ksama Putra SST., M.Si.","nip":"199004042013111001","jabatan":"Statistisi Ahli Muda"},
+  {"nama":"Alit Mahendra, SST","nip":"199204222014121001","jabatan":"Statistisi Ahli Muda"},
+  {"nama":"Nyoman Subaktiyasa, SE","nip":"197106261994011001","jabatan":"Statistisi Ahli Muda"},
+  {"nama":"Ni Made Egy Wira Astuti, SST","nip":"199203302014122001","jabatan":"Statistisi Ahli Muda"},
+  {"nama":"Ni Made Pratiwi Pendit, S.Si., M.Si","nip":"198609142009022007","jabatan":"Statistisi Ahli Muda"},
+  {"nama":"Raden Agus Setiyo Purnawan, SE","nip":"197008251994011001","jabatan":"Statistisi Ahli Muda"},
+  {"nama":"I Made Oka Suarjaya, SST, M.SE.","nip":"198809162010121001","jabatan":"Statistisi Ahli Muda"},
+  {"nama":"Garinca Firgiana Santoso, S.Tr.Stat.","nip":"199902162022012001","jabatan":"Statistisi Ahli Pertama"},
+  {"nama":"I Made Kariasa SST, M.SE.","nip":"199103292014121001","jabatan":"Pranata Komputer Ahli Muda"},
+  {"nama":"Rizq Taufiq Bahtiar Razendrya, S.Tr.Stat.","nip":"200104132023021003","jabatan":"Statistisi Ahli Pertama"},
+  {"nama":"Kadek Suradnyana Wisnawa, SST","nip":"199405202017011001","jabatan":"Statistisi Ahli Pertama"},
+  {"nama":"Amalia Susanti, S.Tr.Stat.","nip":"199901112022012001","jabatan":"Statistisi Ahli Pertama"},
+  {"nama":"Ni Luh Putu Yayang Septia Ningsih, S.Tr.Stat.","nip":"199812302022012001","jabatan":"Statistisi Ahli Pertama"},
+  {"nama":"Novia Putri Lestari, S.Tr.Stat.","nip":"199811242022012002","jabatan":"Statistisi Ahli Pertama"},
+  {"nama":"Kharisma Pandu Utama, S.Tr.Stat.","nip":"200110172023101002","jabatan":"Statistisi Ahli Pertama"},
+  {"nama":"Sita Dian Maretna, S.Tr.Stat.","nip":"200003302023022001","jabatan":"Pranata Komputer Ahli Pertama"},
+  {"nama":"Erik Rihendri Candra Adifa, S.Tr.Stat.","nip":"199905202023021001","jabatan":"Pranata Komputer Ahli Pertama"},
+  {"nama":"Nyoman Pasek Susena, SE","nip":"198612232011011006","jabatan":"Pranata Komputer Ahli Pertama"},
+  {"nama":"I Made Resdana","nip":"196807172006041017","jabatan":"Statistisi Mahir"},
+  {"nama":"Made Sunika","nip":"197204012007101001","jabatan":"Statistisi Mahir"},
+  {"nama":"I Gede Setya Budhi","nip":"197907052006041005","jabatan":"Pranata Keuangan APBN Terampil"},
+  {"nama":"I Nyoman Samiada","nip":"196902011989021001","jabatan":"Fungsional Umum"},
+  {"nama":"Nyoman Redita","nip":"197009302006041007","jabatan":"Statistisi Mahir"},
+  {"nama":"I Putu Wardana Gelgel","nip":"197104072009011004","jabatan":"Fungsional Umum"},
+  {"nama":"Fadly Muhamad Akbar, S.Tr.Stat.","nip":"200103202024121004","jabatan":"Fungsional Umum / Statistisi Ahli Pertama"},
+  {"nama":"Kasah Aisyah, A.Md.Stat.","nip":"200105212024122001","jabatan":"Fungsional Umum / Statistisi Pelaksana"},
+  {"nama":"I Ketut Edi Mudarta","nip":"198307302025211036","jabatan":"PPPK - Operator Layanan Operasional"},
+  {"nama":"I Made Wiradana","nip":"198507072025211071","jabatan":"PPPK - Operator Layanan Operasional"},
+  {"nama":"Ketut Swadana","nip":"196911272025211007","jabatan":"PPPK - Operator Layanan Operasional"},
+  {"nama":"Putri Octaviana","nip":"199510142025212054","jabatan":"PPPK - Operator Layanan Operasional"},
+  {"nama":"Ni Nengah Sekar","nip":"198507172025212050","jabatan":"PPPK - Pengelola Umum Operasional"},
+  {"nama":"Muhammad Zulkarnain, S.Tr.Stat","nip":"199901152023021001","jabatan":"Pranata Komputer Ahli Pertama"}
+];
+
+let pegawaiList = [];
+let editingIdx  = -1;
+
+function initPegawaiCard() {
+  const raw = localStorage.getItem(PEGAWAI_KEY);
+  pegawaiList = raw ? JSON.parse(raw) : DEFAULT_PEGAWAI.map(p => ({...p}));
+  const isCustom = !!raw;
+  document.getElementById('pegawaiSourceLabel').innerHTML = isCustom
+    ? 'Daftar Kustom <span class="badge badge-custom">Kustom</span>'
+    : 'Daftar Default <span class="badge badge-default">Default</span>';
+  document.getElementById('pegawaiCountLabel').textContent = pegawaiList.length + ' pegawai';
+  renderPegawaiTable();
+}
+
+function renderPegawaiTable() {
+  const tbody = document.getElementById('pegawaiTbody');
+  if (!pegawaiList.length) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#aaa;padding:20px">Belum ada data pegawai</td></tr>';
+    return;
+  }
+  tbody.innerHTML = pegawaiList.map((p, i) => `
+    <tr>
+      <td style="font-weight:600">${p.nama}</td>
+      <td style="font-family:monospace;font-size:.78rem;color:#555">${p.nip || '—'}</td>
+      <td style="font-size:.82rem;color:#666">${p.jabatan || '—'}</td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-outline" style="padding:4px 10px;font-size:.76rem;flex:none" onclick="editPegawai(${i})">Edit</button>
+        <button class="btn btn-danger"  style="padding:4px 10px;font-size:.76rem;flex:none;margin-left:4px" onclick="deletePegawai(${i})">Hapus</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function editPegawai(i) {
+  editingIdx = i;
+  const p = pegawaiList[i];
+  document.getElementById('pgNama').value    = p.nama;
+  document.getElementById('pgNip').value     = p.nip;
+  document.getElementById('pgJabatan').value = p.jabatan;
+  document.getElementById('pgFormTitle').textContent   = 'Edit Pegawai';
+  document.getElementById('btnSavePg').textContent     = 'Simpan Perubahan';
+  document.getElementById('btnCancelPg').style.display = 'inline-flex';
+  document.getElementById('pgForm').scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+function cancelEditPegawai() {
+  editingIdx = -1;
+  document.getElementById('pgNama').value    = '';
+  document.getElementById('pgNip').value     = '';
+  document.getElementById('pgJabatan').value = '';
+  document.getElementById('pgFormTitle').textContent   = 'Tambah Pegawai Baru';
+  document.getElementById('btnSavePg').textContent     = 'Tambah';
+  document.getElementById('btnCancelPg').style.display = 'none';
+}
+
+function savePegawai() {
+  const nama    = document.getElementById('pgNama').value.trim();
+  const nip     = document.getElementById('pgNip').value.trim();
+  const jabatan = document.getElementById('pgJabatan').value.trim();
+  if (!nama) { showPgAlert('alertPgErr', '❌ Nama pegawai harus diisi.'); return; }
+  const isEdit = editingIdx >= 0;
+  if (isEdit) {
+    pegawaiList[editingIdx] = {nama, nip, jabatan};
+  } else {
+    pegawaiList.push({nama, nip, jabatan});
+  }
+  localStorage.setItem(PEGAWAI_KEY, JSON.stringify(pegawaiList));
+  cancelEditPegawai();
+  initPegawaiCard();
+  showPgAlert('alertPgOk', isEdit ? '✅ Data pegawai berhasil diperbarui.' : '✅ Pegawai baru berhasil ditambahkan.');
+}
+
+function deletePegawai(i) {
+  if (!confirm('Hapus "' + pegawaiList[i].nama + '" dari daftar?')) return;
+  pegawaiList.splice(i, 1);
+  localStorage.setItem(PEGAWAI_KEY, JSON.stringify(pegawaiList));
+  initPegawaiCard();
+}
+
+function resetPegawai() {
+  if (!confirm('Reset daftar pegawai ke data default? Semua perubahan akan hilang.')) return;
+  localStorage.removeItem(PEGAWAI_KEY);
+  cancelEditPegawai();
+  initPegawaiCard();
+  showPgAlert('alertPgOk', '✅ Daftar pegawai direset ke default.');
+}
+
+function showPgAlert(id, msg) {
+  ['alertPgOk','alertPgErr'].forEach(x => { document.getElementById(x).style.display = 'none'; });
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.style.display = 'block';
+  setTimeout(() => { el.style.display = 'none'; }, 4000);
 }
 </script>
 </body>
