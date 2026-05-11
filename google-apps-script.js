@@ -12,8 +12,9 @@
 // 5. Salin URL yang diberikan, paste ke index.html pada SCRIPT_URL
 // ============================================================
 
-const SHEET_ID   = "1f-YLgJHfMU33_9Pn6snao1xZ-qf3vBQRpAxFwxBLOGI";
-const SHEET_NAME = "SE2026_Responses";
+const SHEET_ID          = "1f-YLgJHfMU33_9Pn6snao1xZ-qf3vBQRpAxFwxBLOGI";
+const SHEET_NAME        = "SE2026_Responses";
+const CONFIG_SHEET_NAME = "CAWI_Config";
 
 // Header columns — urutan harus sama dengan appendRow di bawah
 const HEADERS = [
@@ -86,6 +87,16 @@ const HEADERS = [
 function doPost(e) {
   try {
     const d = JSON.parse(e.postData.contents);
+
+    // Route: ambil config (password hash)
+    if (d.action === "getConfig") {
+      return getConfigResponse();
+    }
+
+    // Route: simpan config (password hash)
+    if (d.action === "setConfig") {
+      return setConfigResponse(d.key, d.value);
+    }
 
     // Route: ambil semua rekaman (untuk halaman daftar)
     if (d.action === "getRecords") {
@@ -426,6 +437,58 @@ const FIELD_NAMES = [
   "tanggal_pelaksanaan",
   "tanda_tangan"
 ];
+
+// Kembalikan semua config dari sheet CAWI_Config sebagai objek key-value
+function getConfigResponse() {
+  try {
+    const ss     = SpreadsheetApp.openById(SHEET_ID);
+    const sheet  = ss.getSheetByName(CONFIG_SHEET_NAME);
+    const config = {};
+    if (sheet && sheet.getLastRow() > 0) {
+      const values = sheet.getDataRange().getValues();
+      values.forEach(function(row) {
+        if (row[0]) config[String(row[0])] = String(row[1] || '');
+      });
+    }
+    return ContentService
+      .createTextOutput(JSON.stringify({ status: "ok", data: config }))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ status: "error", message: err.message }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+// Simpan atau perbarui satu key-value di sheet CAWI_Config
+function setConfigResponse(key, value) {
+  try {
+    if (!key) throw new Error("key diperlukan");
+    const ss    = SpreadsheetApp.openById(SHEET_ID);
+    let sheet   = ss.getSheetByName(CONFIG_SHEET_NAME);
+    if (!sheet) sheet = ss.insertSheet(CONFIG_SHEET_NAME);
+    const lastRow = sheet.getLastRow();
+    if (lastRow > 0) {
+      const keys = sheet.getRange(1, 1, lastRow, 1).getValues();
+      for (var i = 0; i < keys.length; i++) {
+        if (keys[i][0] === key) {
+          sheet.getRange(i + 1, 2).setValue(value || '');
+          return ContentService
+            .createTextOutput(JSON.stringify({ status: "ok" }))
+            .setMimeType(ContentService.MimeType.JSON);
+        }
+      }
+    }
+    sheet.appendRow([key, value || '']);
+    return ContentService
+      .createTextOutput(JSON.stringify({ status: "ok" }))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ status: "error", message: err.message }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
 
 // Endpoint GET — kembalikan semua rekaman sebagai JSON (butuh token)
 function doGet(e) {

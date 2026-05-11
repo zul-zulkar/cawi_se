@@ -11,9 +11,36 @@ cawi_se26/
 ├── index.html              # Formulir isian utama (petugas)
 ├── daftar.html             # Dashboard rekap entri data
 ├── admin.html              # Panel admin (password, sheet, pegawai)
-├── data.js                 # Data statis kecamatan, kelurahan, KBLI
+├── data.js                 # Data statis kecamatan & kelurahan
 ├── google-apps-script.js   # Kode backend Google Apps Script
-└── netlify.toml            # Konfigurasi deployment Netlify
+├── netlify.toml            # Konfigurasi deployment Netlify
+│
+├── master/
+│   └── kbli.json           # Kamus KBLI 2025 (1520 entri: kode, judul, uraian)
+│
+├── css/
+│   ├── index.css           # Styling formulir utama
+│   ├── daftar.css          # Styling dashboard rekap
+│   └── admin.css           # Styling panel admin
+│
+└── js/
+    ├── config.js           # URL Apps Script terpusat (DEFAULT_SCRIPT_URL)
+    ├── utils.js            # SHA-256 hash, esc(), fmtDate()
+    ├── auth.js             # Gate password kuesioner (dipakai index + daftar)
+    ├── auth-admin.js       # Gate password admin
+    ├── petugas.js          # Data & dropdown daftar petugas
+    ├── ui.js               # makeSearchable(), toggleRemark(), goBlok()
+    ├── map.js              # Geolokasi (ambilLokasi)
+    ├── regional.js         # loadProvinsi(), loadKecamatan(), loadKelurahan()
+    ├── kbli.js             # Pencarian KBLI 2025 (scored search)
+    ├── form.js             # Handler radio, kalkulasi, validasi field
+    ├── form-progress.js    # Indikator progres pengisian
+    ├── form-validation.js  # validateBlok1(), validateBlok3()
+    ├── draft.js            # Auto-save & restore draft (localStorage)
+    ├── submit.js           # collectData(), submitForm(), edit mode
+    ├── index-init.js       # DOMContentLoaded — inisialisasi formulir
+    ├── daftar-main.js      # Semua logika dashboard rekap
+    └── admin-main.js       # Semua logika panel admin
 ```
 
 ---
@@ -63,7 +90,7 @@ cawi_se26/
    - Execute as: **Me**
    - Who has access: **Anyone**
 6. Klik **Deploy** → izinkan akses jika diminta
-7. **Salin URL** yang muncul — URL ini yang akan dipakai sebagai `SCRIPT_URL`
+7. **Salin URL** yang muncul — URL ini yang akan dipakai sebagai script URL
 
 ---
 
@@ -73,23 +100,18 @@ Setelah deploy selesai, ada dua cara memasukkan URL baru:
 
 **Cara A — Lewat Panel Admin (tanpa edit kode):**
 1. Buka `admin.html` di browser
-2. Login dengan password admin (default: tanyakan ke pengelola proyek asal)
+2. Login dengan password admin
 3. Scroll ke kartu **Sumber Data Google Sheet**
 4. Tempel URL Apps Script baru → klik **Simpan URL**
 
 **Cara B — Edit langsung di kode:**
 
-Buka `index.html`, cari baris berikut dan ganti URL-nya:
+Buka `js/config.js` dan ganti URL default:
 ```javascript
-const DEFAULT_SCRIPT_URL_FORM = "https://script.google.com/macros/s/<<URL_LAMA>>/exec";
+const DEFAULT_SCRIPT_URL = "https://script.google.com/macros/s/<<URL_BARU>>/exec";
 ```
 
-Lakukan hal yang sama di `daftar.html`:
-```javascript
-const DEFAULT_SCRIPT_URL_DAFTAR = "https://script.google.com/macros/s/<<URL_LAMA>>/exec";
-```
-
-> **Catatan:** Cara A hanya berlaku per-perangkat (localStorage). Cara B mengubah default untuk semua pengguna.
+> **Catatan:** Cara A menyimpan URL di localStorage masing-masing perangkat (berlaku lokal). Cara B mengubah default untuk semua pengguna baru.
 
 ---
 
@@ -121,7 +143,7 @@ const DEFAULT_SCRIPT_URL_DAFTAR = "https://script.google.com/macros/s/<<URL_LAMA
 4. Klik **Save** — situs tersedia di `https://<username>.github.io/<nama-repo>`
 
 **Opsi C — Hosting mandiri:**
-Upload semua file (`index.html`, `daftar.html`, `admin.html`, `data.js`) ke server web manapun yang mendukung file statis.
+Upload seluruh folder proyek (termasuk `js/`, `css/`, `master/`) ke server web manapun yang mendukung file statis.
 
 ---
 
@@ -132,14 +154,31 @@ Upload semua file (`index.html`, `daftar.html`, `admin.html`, `data.js`) ke serv
 | Formulir (kuesioner) | Tanyakan ke pengelola proyek asal |
 | Panel Admin | Tanyakan ke pengelola proyek asal |
 
-> Password disimpan sebagai hash SHA-256 di localStorage masing-masing perangkat. Ubah password melalui `admin.html` segera setelah duplikasi selesai.
+> Password disimpan sebagai hash SHA-256 di Google Sheets dan diambil saat halaman dimuat. Ubah password melalui `admin.html` segera setelah duplikasi selesai — perubahan langsung berlaku untuk semua perangkat.
 
 ---
 
 ## Cara Kerja Penyimpanan
 
-- **Google Sheets + Apps Script** — semua entri formulir dikirim ke sheet via HTTP POST
-- **localStorage** — pengaturan lokal (password kustom, URL sheet kustom, daftar pegawai kustom) disimpan per-perangkat dan tidak tersinkronisasi antar perangkat secara otomatis
+- **Google Sheets + Apps Script** — semua entri formulir dikirim ke sheet via HTTP POST; hash password kuesioner dan admin juga disimpan di sheet agar berlaku terpusat
+- **sessionStorage** — status login sesi aktif; otomatis bersih saat tab/browser ditutup
+- **localStorage** — pengaturan lokal (URL sheet kustom, daftar pegawai kustom, draft isian); tidak tersinkronisasi antar perangkat
+
+---
+
+## Pencarian KBLI 2025
+
+Formulir menggunakan kamus KBLI 2025 (`master/kbli.json`, 1520 entri) dengan algoritma pencarian berbasis skor:
+
+| Field | Bobot |
+|---|---|
+| Kode (exact match) | 100 |
+| Kode (prefix) | 80 |
+| Judul (exact) | 90 |
+| Judul (prefix/contains) | 45–60 |
+| Uraian (contains/word overlap) | 12–20 |
+
+Hasil diurutkan berdasarkan skor tertinggi, menampilkan 15 entri teratas beserta uraian singkat dan kategori KBLI.
 
 ---
 
@@ -149,5 +188,6 @@ Upload semua file (`index.html`, `daftar.html`, `admin.html`, `data.js`) ke serv
 |---|---|
 | Formulir tidak bisa submit | Periksa URL Apps Script di panel admin; pastikan deployment masih aktif |
 | Data tidak muncul di daftar | Pastikan `SHEET_ID` di Apps Script sudah benar dan sheet sudah punya izin akses |
-| Password terkunci | Buka DevTools browser → Console → jalankan `localStorage.clear()` lalu reload |
+| Password tidak dikenali | Pastikan koneksi internet aktif saat membuka halaman (hash diambil dari sheet); coba reload |
 | Apps Script error 403 | Deploy ulang sebagai Web App dengan *Who has access: Anyone* |
+| KBLI tidak muncul saat diketik | Pastikan file `master/kbli.json` ikut ter-upload ke server hosting |
