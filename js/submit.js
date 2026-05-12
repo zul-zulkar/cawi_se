@@ -303,6 +303,7 @@ async function submitForm() {
     _editRecordId = null;
     cancelEditMode();
     clearDraft();
+    if (_currentDraftId) { deleteDraftById(_currentDraftId); }
     // Simpan ringkasan ke daftar lokal
     try {
       const LS_REC = 'cawi_se2026_records_v1';

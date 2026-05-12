@@ -1,5 +1,6 @@
 /* ====== PASSWORD GATE ====== */
-const DEFAULT_PW_HASH = '941bacc5d2499f5e06108337bca646d12b59fb1d131cf763fce025b682bdd7d8';
+// Default fallback jika sheet belum dikonfigurasi (untuk duplikat baru): Kuesioner08!
+const DEFAULT_PW_HASH = '3e7551e772ef6f4b10197687eeb9779ded613d21b05ec5848e911e829e68cc11';
 const PW_SESSION_KEY  = 'cawi_auth_v1';
 
 let _activeHash = null;

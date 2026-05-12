@@ -54,17 +54,26 @@ function calcPekerja() {
 }
 
 function parseCurrency(s) {
-  return parseInt((s || '').replace(/\./g,'')) || 0;
+  return parseFloat((s || '').replace(/\./g,'').replace(',','.')) || 0;
 }
 
 function formatCurrency(el) {
-  const raw = el.value.replace(/\D/g,'');
-  if (!raw) { el.value = ''; return; }
-  el.value = parseInt(raw).toLocaleString('id-ID');
+  const raw = el.value;
+  const commaIdx = raw.indexOf(',');
+  if (commaIdx === -1) {
+    const digits = raw.replace(/\D/g,'');
+    if (!digits) { el.value = ''; return; }
+    el.value = parseInt(digits,10).toLocaleString('id-ID');
+  } else {
+    const intPart = raw.substring(0,commaIdx).replace(/\D/g,'');
+    const decPart = raw.substring(commaIdx+1).replace(/\D/g,'').substring(0,2);
+    const intFormatted = intPart ? parseInt(intPart,10).toLocaleString('id-ID') : '0';
+    el.value = intFormatted + ',' + decPart;
+  }
 }
 
 function setCurrencyReadonly(id, val) {
-  document.getElementById(id).value = val ? val.toLocaleString('id-ID') : '0';
+  document.getElementById(id).value = (val || 0).toLocaleString('id-ID',{minimumFractionDigits:2,maximumFractionDigits:2});
 }
 
 function calcPengeluaran() {
@@ -166,4 +175,39 @@ function hideAlert(id) {
 function markFieldFilled(el) {
   if (!el || el.readOnly || el.disabled) return;
   el.classList.toggle('field-filled', el.value.trim().length > 0);
+}
+
+/* ====== SIDEBAR BLOK ACCORDION ====== */
+function toggleSidebarBlok(n) {
+  const list = document.getElementById('sidebarQList' + n);
+  const btn  = document.getElementById('sidebarExpandBtn' + n);
+  if (!list) return;
+  const opening = list.classList.contains('hidden');
+  list.classList.toggle('hidden');
+  if (btn) btn.classList.toggle('open', opening);
+}
+
+function goBlokAndScroll(blokNum, qId) {
+  goBlok(blokNum);
+  setTimeout(() => scrollToQuestion(qId), 280);
+}
+
+/* ====== BLOK OUTLINE FUNCTIONS ====== */
+function toggleBlokOutline(btn) {
+  const list = btn.nextElementSibling;
+  const isHidden = list.classList.contains('hidden');
+  list.classList.toggle('hidden');
+  btn.classList.toggle('expanded');
+}
+
+function scrollToQuestion(qNum) {
+  const el = document.getElementById('sec-' + qNum);
+  if (el) {
+    el.scrollIntoView({behavior: 'smooth', block: 'start'});
+    el.style.backgroundColor = '#fffaeb';
+    setTimeout(() => {
+      el.style.transition = 'background-color 0.5s ease';
+      el.style.backgroundColor = 'transparent';
+    }, 100);
+  }
 }

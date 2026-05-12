@@ -14,26 +14,16 @@
 <body>
 
 <!-- ====== PASSWORD GATE ====== -->
-<div id="pwGate" style="position:fixed;inset:0;background:#1a2332;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#fff;border-radius:12px;padding:36px 32px;max-width:380px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.4);text-align:center">
-    <div style="font-size:28px;font-weight:900;color:#fc6c00;letter-spacing:4px;margin-bottom:4px">CAWI</div>
-    <div style="font-size:11px;color:#aaa;letter-spacing:2px;text-transform:uppercase;margin-bottom:24px">SE2026 — BPS Buleleng</div>
-    <div style="background:#fff5f5;border:1.5px solid #feb2b2;border-radius:7px;padding:10px 14px;font-size:12px;color:#c53030;margin-bottom:20px;font-weight:600;letter-spacing:.3px">
-      &#128274; AKSES TERBATAS — PETUGAS BPS
-    </div>
-    <input type="password" id="pwInput" placeholder="Masukkan kata sandi"
-      style="width:100%;padding:11px 14px;border:1.5px solid #ddd;border-radius:7px;font-size:14px;font-family:inherit;margin-bottom:12px;outline:none;transition:border-color .2s"
-      onkeydown="if(event.key==='Enter')checkPassword()"
-      onfocus="this.style.borderColor='#fc6c00'" onblur="this.style.borderColor='#ddd'"/>
-    <div id="pwError" style="color:#c53030;font-size:12px;margin-bottom:10px;display:none;font-weight:600">&#10005; Kata sandi salah</div>
-    <button onclick="checkPassword()"
-      style="width:100%;background:#fc6c00;color:#fff;border:none;padding:12px;border-radius:7px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:.3px;transition:background .2s"
-      onmouseover="this.style.background='#e06000'" onmouseout="this.style.background='#fc6c00'">
-      Masuk
-    </button>
-    <p style="font-size:11px;color:#ccc;margin-top:18px;line-height:1.7">
-      Hanya untuk petugas pencacah resmi<br/>Sensus Ekonomi 2026 BPS Buleleng
-    </p>
+<div id="pwGate">
+  <div class="pw-card">
+    <div class="pw-title">CAWI</div>
+    <div class="pw-subtitle">SE2026 — BPS Buleleng</div>
+    <div class="pw-restricted">&#128274; AKSES TERBATAS — PETUGAS BPS</div>
+    <input type="password" id="pwInput" class="pw-input" placeholder="Masukkan kata sandi"
+      onkeydown="if(event.key==='Enter')checkPassword()"/>
+    <div id="pwError">&#10005; Kata sandi salah</div>
+    <button class="pw-btn" onclick="checkPassword()">Masuk</button>
+    <p class="pw-note">Hanya untuk petugas pencacah resmi<br/>Sensus Ekonomi 2026 BPS Buleleng</p>
   </div>
 </div>
 
@@ -44,7 +34,7 @@
   <div class="mobile-topbar-actions">
     <button class="mobile-action-btn" onclick="togglePetunjuk()">? Petunjuk</button>
     <button class="mobile-action-btn" onclick="showRecap()">&#128269; Rekap</button>
-    <button class="mobile-action-btn" onclick="logoutKuesioner()" style="color:#c53030">&#128274; Keluar</button>
+    <button class="mobile-action-btn mobile-action-btn-danger" onclick="guardedNav(logoutKuesioner)">&#128274; Keluar</button>
   </div>
 </div>
 
@@ -61,25 +51,81 @@
     <div class="sidebar-brand-sub">BPS Buleleng</div>
   </div>
   <div class="sidebar-nav-label">NAVIGASI BLOK</div>
-  <div class="sidebar-item active" onclick="goBlok(1)" id="sidebarTab1">
-    <div class="sidebar-item-num">I</div>
-    <div class="sidebar-item-info">
-      <div>Identitas Usaha/Perusahaan</div>
-      <div class="sidebar-item-sub">Pertanyaan 1 s.d. 25</div>
+
+  <!-- BLOK I -->
+  <div class="sidebar-blok-group">
+    <div class="sidebar-item active" id="sidebarTab1">
+      <div class="sidebar-item-main" onclick="goBlok(1)">
+        <div class="sidebar-item-num">I</div>
+        <div class="sidebar-item-info">
+          <div>Identitas Usaha/Perusahaan</div>
+          <div class="sidebar-item-sub">Pertanyaan 1 s.d. 25</div>
+        </div>
+      </div>
+      <button class="sidebar-expand-btn" id="sidebarExpandBtn1" onclick="toggleSidebarBlok(1)" title="Tampilkan pertanyaan">&#9660;</button>
+    </div>
+    <div class="sidebar-q-list hidden" id="sidebarQList1">
+      <div class="sidebar-q-item" onclick="goBlokAndScroll(1,'1')">Q1 · Provinsi Lokasi Usaha</div>
+      <div class="sidebar-q-item" onclick="goBlokAndScroll(1,'2')">Q2 · Kabupaten/Kota</div>
+      <div class="sidebar-q-item" onclick="goBlokAndScroll(1,'3')">Q3 · Kecamatan</div>
+      <div class="sidebar-q-item" onclick="goBlokAndScroll(1,'4')">Q4 · Kelurahan / Desa</div>
+      <div class="sidebar-q-item" onclick="goBlokAndScroll(1,'5')">Q5 · Nama &amp; Alamat Usaha</div>
+      <div class="sidebar-q-item" onclick="goBlokAndScroll(1,'6')">Q6 · Nomor Induk Berusaha</div>
+      <div class="sidebar-q-item" onclick="goBlokAndScroll(1,'7')">Q7 · Status Badan Usaha</div>
+      <div class="sidebar-q-item" onclick="goBlokAndScroll(1,'8')">Q8 · Keterangan Pengusaha</div>
+      <div class="sidebar-q-item" onclick="goBlokAndScroll(1,'9')">Q9 · Kegiatan Utama Usaha</div>
+      <div class="sidebar-q-item" onclick="goBlokAndScroll(1,'10')">Q10 · Jaringan / Skala Usaha</div>
+      <div class="sidebar-q-item" onclick="goBlokAndScroll(1,'11')">Q11 · Informasi Kantor Pusat</div>
+      <div class="sidebar-q-item" onclick="goBlokAndScroll(1,'12')">Q12 · Internet &amp; Teknologi</div>
+      <div class="sidebar-q-item" onclick="goBlokAndScroll(1,'13')">Q13 · Produk Ramah Lingkungan</div>
+      <div class="sidebar-q-item" onclick="goBlokAndScroll(1,'14')">Q14 · Produk Kreatif / Seni</div>
+      <div class="sidebar-q-item" onclick="goBlokAndScroll(1,'15')">Q15 · Sertifikasi Halal</div>
+      <div class="sidebar-q-item" onclick="goBlokAndScroll(1,'16')">Q16 · Izin Edar (BPOM)</div>
+      <div class="sidebar-q-item" onclick="goBlokAndScroll(1,'17')">Q17 · Kemitraan KDKMP</div>
+      <div class="sidebar-q-item" onclick="goBlokAndScroll(1,'18')">Q18 · Program MBG</div>
+      <div class="sidebar-q-item" onclick="goBlokAndScroll(1,'19')">Q19 · Ekspor / Impor</div>
+      <div class="sidebar-q-item" onclick="goBlokAndScroll(1,'20')">Q20 · Jumlah Pekerja</div>
+      <div class="sidebar-q-item" onclick="goBlokAndScroll(1,'21')">Q21 · Tahun Mulai Operasi</div>
+      <div class="sidebar-q-item" onclick="goBlokAndScroll(1,'22')">Q22 · Nilai Pengeluaran</div>
+      <div class="sidebar-q-item" onclick="goBlokAndScroll(1,'23')">Q23 · Nilai Pendapatan</div>
+      <div class="sidebar-q-item" onclick="goBlokAndScroll(1,'24')">Q24 · Nilai Aset</div>
+      <div class="sidebar-q-item" onclick="goBlokAndScroll(1,'25')">Q25 · Kepemilikan Modal</div>
     </div>
   </div>
-  <div class="sidebar-item" onclick="goBlok(2)" id="sidebarTab2">
-    <div class="sidebar-item-num">II</div>
-    <div class="sidebar-item-info">
-      <div>Catatan</div>
-      <div class="sidebar-item-sub">Kunjungan I, II, III</div>
+
+  <!-- BLOK II -->
+  <div class="sidebar-blok-group">
+    <div class="sidebar-item" id="sidebarTab2">
+      <div class="sidebar-item-main" onclick="goBlok(2)">
+        <div class="sidebar-item-num">II</div>
+        <div class="sidebar-item-info">
+          <div>Catatan</div>
+          <div class="sidebar-item-sub">Kunjungan I, II, III</div>
+        </div>
+      </div>
+      <button class="sidebar-expand-btn" id="sidebarExpandBtn2" onclick="toggleSidebarBlok(2)" title="Tampilkan pertanyaan">&#9660;</button>
+    </div>
+    <div class="sidebar-q-list hidden" id="sidebarQList2">
+      <div class="sidebar-q-item" onclick="goBlokAndScroll(2,'Lokasi')">Lokasi Kunjungan</div>
+      <div class="sidebar-q-item" onclick="goBlokAndScroll(2,'Catatan')">Catatan Kunjungan</div>
     </div>
   </div>
-  <div class="sidebar-item" onclick="goBlok(3)" id="sidebarTab3">
-    <div class="sidebar-item-num">III</div>
-    <div class="sidebar-item-info">
-      <div>Identitas Responden</div>
-      <div class="sidebar-item-sub">Tanda tangan &amp; Submit</div>
+
+  <!-- BLOK III -->
+  <div class="sidebar-blok-group">
+    <div class="sidebar-item" id="sidebarTab3">
+      <div class="sidebar-item-main" onclick="goBlok(3)">
+        <div class="sidebar-item-num">III</div>
+        <div class="sidebar-item-info">
+          <div>Identitas Responden</div>
+          <div class="sidebar-item-sub">Tanda tangan &amp; Submit</div>
+        </div>
+      </div>
+      <button class="sidebar-expand-btn" id="sidebarExpandBtn3" onclick="toggleSidebarBlok(3)" title="Tampilkan pertanyaan">&#9660;</button>
+    </div>
+    <div class="sidebar-q-list hidden" id="sidebarQList3">
+      <div class="sidebar-q-item" onclick="goBlokAndScroll(3,'Petugas')">Identitas Petugas</div>
+      <div class="sidebar-q-item" onclick="goBlokAndScroll(3,'Responden')">Data Responden</div>
     </div>
   </div>
   <div class="sidebar-divider"></div>
@@ -91,31 +137,34 @@
     <div class="sidebar-progress-bar">
       <div class="sidebar-progress-fill" id="sidebarProgressFill" style="width:0%"></div>
     </div>
-    <div style="font-size:10px;color:rgba(255,255,255,.3);margin-top:5px" id="sidebarProgressDetail">Mulai mengisi form...</div>
+    <div class="sidebar-progress-detail" id="sidebarProgressDetail">Mulai mengisi form...</div>
   </div>
   <div class="sidebar-divider"></div>
   <div class="sidebar-actions">
+    <button class="sidebar-btn sidebar-btn-primary" id="sidebarDraftBtn" onclick="saveAsDraft()">
+      <span class="sidebar-btn-icon">&#128190;</span> Simpan Draft
+    </button>
     <button class="sidebar-btn" onclick="togglePetunjuk()">
       <span class="sidebar-btn-icon">&#128203;</span> Petunjuk Pengisian
     </button>
     <button class="sidebar-btn" onclick="showRecap()">
       <span class="sidebar-btn-icon">&#128269;</span> Rekap &amp; Periksa
     </button>
-    <button class="sidebar-btn" onclick="window.open('daftar.html','_blank')">
+    <button class="sidebar-btn" onclick="guardedNav('daftar.html', true)">
       <span class="sidebar-btn-icon">&#128196;</span> Daftar Entri
     </button>
-    <button class="sidebar-btn" onclick="logoutKuesioner()" style="color:#c53030">
+    <button class="sidebar-btn sidebar-btn-danger" onclick="guardedNav(logoutKuesioner)">
       <span class="sidebar-btn-icon">&#128274;</span> Keluar
     </button>
   </div>
-  <div style="padding:8px 16px 4px;margin-top:auto">
-    <div id="autosaveStatus" style="font-size:10px;color:#bbb;line-height:1.6;display:flex;align-items:center;gap:5px">
-      <span style="width:6px;height:6px;border-radius:50%;background:#ddd;display:inline-block;flex-shrink:0" id="autosaveDot"></span>
+  <div class="sidebar-autosave">
+    <div id="autosaveStatus" class="autosave-status">
+      <span class="autosave-dot" id="autosaveDot"></span>
       <span id="autosaveText">Belum tersimpan</span>
     </div>
   </div>
-  <div style="padding:4px 16px 14px">
-    <div style="font-size:10px;color:#ccc;line-height:1.8">BPS Republik Indonesia<br/>&#169; Sensus Ekonomi 2026</div>
+  <div class="sidebar-footer-note">
+    <div class="sidebar-copyright">BPS Republik Indonesia<br/>&#169; Sensus Ekonomi 2026</div>
   </div>
 </aside>
 
@@ -162,13 +211,14 @@
     <div class="blok-badge">BLOK I</div>
     <div>
       <div class="blok-title-text">Keterangan Tempat &amp; Usaha/Perusahaan</div>
-      <div class="blok-title-sub">Pertanyaan 1 s.d. 25 — Isi semua kolom bertanda <strong style="color:#ffe0c0">*</strong></div>
+      <div class="blok-title-sub">Pertanyaan 1 s.d. 25 — Isi semua kolom bertanda <strong class="req-light">*</strong></div>
     </div>
   </div>
 
+
   <!-- Q1 Provinsi -->
   <div class="section-card">
-    <div class="section-header">1. Provinsi Lokasi Usaha</div>
+    <div class="section-header" id="sec-1">1. Provinsi Lokasi Usaha</div>
     <div class="section-body">
       <div class="form-group">
         <label class="field-label">Provinsi <span class="req">*</span></label>
@@ -182,7 +232,7 @@
 
   <!-- Q2 Kabupaten -->
   <div class="section-card">
-    <div class="section-header">2. Kabupaten/Kota</div>
+    <div class="section-header" id="sec-2">2. Kabupaten/Kota</div>
     <div class="section-body">
       <div class="form-group">
         <label class="field-label">Kabupaten/Kota <span class="req">*</span></label>
@@ -196,7 +246,7 @@
 
   <!-- Q3 Kecamatan -->
   <div class="section-card">
-    <div class="section-header">3. Kecamatan</div>
+    <div class="section-header" id="sec-3">3. Kecamatan</div>
     <div class="section-body">
       <div class="form-group">
         <label class="field-label">Kecamatan <span class="req">*</span> <span id="spinner-kec" class="spinner hidden"></span></label>
@@ -209,7 +259,7 @@
 
   <!-- Q4 Kelurahan -->
   <div class="section-card">
-    <div class="section-header">4. Kelurahan / Desa / Nagari</div>
+    <div class="section-header" id="sec-4">4. Kelurahan / Desa / Nagari</div>
     <div class="section-body">
       <div class="form-group">
         <label class="field-label">Kelurahan/Desa/Nagari <span class="req">*</span> <span id="spinner-kel" class="spinner hidden"></span></label>
@@ -222,7 +272,7 @@
 
   <!-- Q5 Nama dan Alamat -->
   <div class="section-card">
-    <div class="section-header">5. Nama dan Alamat Perusahaan / Usaha</div>
+    <div class="section-header" id="sec-5">5. Nama dan Alamat Perusahaan / Usaha</div>
     <div class="section-body">
 
       <div class="subsection-label">a. Nama Perusahaan</div>
@@ -269,7 +319,7 @@
           <div class="hint">Alamat website diawali dengan www.</div>
         </div>
       </div>
-      <div class="subsection-label" style="margin-top:8px">Nomor Telepon</div>
+      <div class="subsection-label subsection-label-spaced">Nomor Telepon</div>
       <div class="inline-fields">
         <div class="form-group">
           <label class="field-label">Kode Area</label>
@@ -317,7 +367,7 @@
 
   <!-- Q6 NIB -->
   <div class="section-card">
-    <div class="section-header">6. Nomor Induk Berusaha (NIB)</div>
+    <div class="section-header" id="sec-6">6. Nomor Induk Berusaha (NIB)</div>
     <div class="section-body">
 
       <div class="form-group">
@@ -359,7 +409,7 @@
 
   <!-- Q7 Status Badan Usaha -->
   <div class="section-card">
-    <div class="section-header">7. Status Badan Usaha</div>
+    <div class="section-header" id="sec-7">7. Status Badan Usaha</div>
     <div class="section-body">
 
       <div class="form-group">
@@ -415,7 +465,7 @@
 
   <!-- Q8 Keterangan Pengusaha -->
   <div class="section-card">
-    <div class="section-header">8. Keterangan Pengusaha / Penanggung Jawab</div>
+    <div class="section-header" id="sec-8">8. Keterangan Pengusaha / Penanggung Jawab</div>
     <div class="section-body">
       <div class="form-group">
         <div class="subsection-label">a. Nama</div>
@@ -446,7 +496,7 @@
 
   <!-- Q9 Kegiatan Utama -->
   <div class="section-card">
-    <div class="section-header">9. Kegiatan Utama Usaha / Perusahaan</div>
+    <div class="section-header" id="sec-9">9. Kegiatan Utama Usaha / Perusahaan</div>
     <div class="section-body">
       <div class="form-group">
         <div class="subsection-label">a. Kegiatan utama usaha/perusahaan</div>
@@ -595,13 +645,13 @@
         </div>
         <input type="hidden" id="q9g_kbli_kode"/>
         <input type="hidden" id="q9g_kbli_kategori"/>
-        <div id="q9g_kbli_chip" class="hidden" style="margin-top:8px;padding:10px 14px;background:#f0fff4;border:1.5px solid #68d391;border-radius:6px;display:flex;align-items:center;justify-content:space-between;gap:8px">
+        <div id="q9g_kbli_chip" class="kbli-chip hidden">
           <div>
-            <div style="font-size:10px;font-weight:800;color:#276749;letter-spacing:1px;text-transform:uppercase">KBLI Terpilih</div>
-            <div style="font-size:13px;font-weight:600;color:#1a4731;margin-top:2px" id="q9g_kbli_chip_text"></div>
-            <div style="font-size:12px;color:#2d6a4f;margin-top:6px;line-height:1.55" id="q9g_kbli_chip_uraian" class="hidden"></div>
+            <div class="kbli-chip-label">KBLI Terpilih</div>
+            <div class="kbli-chip-text" id="q9g_kbli_chip_text"></div>
+            <div class="kbli-chip-uraian hidden" id="q9g_kbli_chip_uraian"></div>
           </div>
-          <button type="button" onclick="clearKBLI()" style="background:none;border:1.5px solid #68d391;color:#276749;padding:4px 12px;border-radius:5px;cursor:pointer;font-size:11.5px;font-weight:700;font-family:inherit;white-space:nowrap;flex-shrink:0">Ganti ✕</button>
+          <button type="button" class="kbli-chip-btn" onclick="clearKBLI()">Ganti ✕</button>
         </div>
       </div>
 
@@ -629,7 +679,7 @@
 
   <!-- Q10 Jaringan Usaha -->
   <div class="section-card">
-    <div class="section-header">10. Jaringan / Skala Usaha</div>
+    <div class="section-header" id="sec-10">10. Jaringan / Skala Usaha</div>
     <div class="section-body">
       <div class="form-group">
         <div class="subsection-label">a. Jaringan usaha</div>
@@ -653,7 +703,7 @@
 
   <!-- Q11 Info Kantor Pusat -->
   <div class="section-card hidden" id="q11_wrap">
-    <div class="section-header">11. Informasi Kantor Pusat / Induk</div>
+    <div class="section-header" id="sec-11">11. Informasi Kantor Pusat / Induk</div>
     <div class="section-body">
       <div class="form-group">
         <div class="subsection-label">a. Nama Kantor Pusat</div>
@@ -718,7 +768,7 @@
 
   <!-- Q12 Internet -->
   <div class="section-card">
-    <div class="section-header">12. Penggunaan Internet dan Teknologi Digital</div>
+    <div class="section-header" id="sec-12">12. Penggunaan Internet dan Teknologi Digital</div>
     <div class="section-body">
       <div class="form-group">
         <div class="subsection-label">a. Apakah menggunakan internet?</div>
@@ -768,7 +818,7 @@
 
   <!-- Q13 Lingkungan -->
   <div class="section-card">
-    <div class="section-header">13. Produk / Kegiatan Ramah Lingkungan</div>
+    <div class="section-header" id="sec-13">13. Produk / Kegiatan Ramah Lingkungan</div>
     <div class="section-body">
       <div class="form-group">
         <div class="subsection-label">a. Apakah memproduksi barang/jasa ramah lingkungan?</div>
@@ -792,7 +842,7 @@
 
   <!-- Q14 Produk Kreatif -->
   <div class="section-card">
-    <div class="section-header">14. Produk Karya Seni / Kreatif / Teknologi</div>
+    <div class="section-header" id="sec-14">14. Produk Karya Seni / Kreatif / Teknologi</div>
     <div class="section-body">
       <div class="form-group">
         <label class="field-label">Apakah menggunakan produk karya seni, sastra, desain, teknologi kreatif? <span class="req">*</span></label>
@@ -806,7 +856,7 @@
 
   <!-- Q15 Sertifikat Halal -->
   <div class="section-card">
-    <div class="section-header">15. Sertifikasi Halal (BPJPH)</div>
+    <div class="section-header" id="sec-15">15. Sertifikasi Halal (BPJPH)</div>
     <div class="section-body">
       <div class="form-group">
         <div class="subsection-label">a. Apakah menghasilkan produk bersertifikat halal?</div>
@@ -834,7 +884,7 @@
 
   <!-- Q16 Izin Edar -->
   <div class="section-card">
-    <div class="section-header">16. Izin Edar Produk (BPOM)</div>
+    <div class="section-header" id="sec-16">16. Izin Edar Produk (BPOM)</div>
     <div class="section-body">
       <div class="form-group">
         <div class="subsection-label">a. Apakah memiliki izin edar?</div>
@@ -862,7 +912,7 @@
 
   <!-- Q17 Mitra KDKMP -->
   <div class="section-card">
-    <div class="section-header">17. Kemitraan dengan KDKMP</div>
+    <div class="section-header" id="sec-17">17. Kemitraan dengan KDKMP</div>
     <div class="section-body">
       <div class="form-group">
         <label class="field-label">Apakah bermitra dengan KDKMP (Koperasi Desa/Kelurahan Merah Putih)? <span class="req">*</span></label>
@@ -876,7 +926,7 @@
 
   <!-- Q18 MBG -->
   <div class="section-card">
-    <div class="section-header">18. Keterlibatan dalam Program MBG (Makan Bergizi Gratis)</div>
+    <div class="section-header" id="sec-18">18. Keterlibatan dalam Program MBG (Makan Bergizi Gratis)</div>
     <div class="section-body">
       <div class="form-group">
         <label class="field-label">Apakah terlibat dalam program MBG? <span class="req">*</span></label>
@@ -893,7 +943,7 @@
 
   <!-- Q19 Transaksi Non-Penduduk -->
   <div class="section-card">
-    <div class="section-header">19. Transaksi dengan Non-Penduduk (Ekspor/Impor)</div>
+    <div class="section-header" id="sec-19">19. Transaksi dengan Non-Penduduk (Ekspor/Impor)</div>
     <div class="section-body">
       <div class="form-group">
         <div class="subsection-label">a. Barang</div>
@@ -916,7 +966,7 @@
 
   <!-- Q20 Jumlah Pekerja -->
   <div class="section-card">
-    <div class="section-header">20. Jumlah Pekerja (per akhir 2025)</div>
+    <div class="section-header" id="sec-20">20. Jumlah Pekerja (per akhir 2025)</div>
     <div class="section-body">
       <div class="inline-fields">
         <div class="form-group">
@@ -937,7 +987,7 @@
 
   <!-- Q21 Tahun Beroperasi -->
   <div class="section-card">
-    <div class="section-header">21. Tahun Mulai Beroperasi Secara Komersial</div>
+    <div class="section-header" id="sec-21">21. Tahun Mulai Beroperasi Secara Komersial</div>
     <div class="section-body">
       <div class="form-group">
         <label class="field-label">Tahun mulai beroperasi secara komersial <span class="req">*</span></label>
@@ -949,56 +999,56 @@
 
   <!-- Q22 Pengeluaran -->
   <div class="section-card">
-    <div class="section-header">22. Nilai Pengeluaran Tahun 2025 (Rupiah)</div>
+    <div class="section-header" id="sec-22">22. Nilai Pengeluaran Tahun 2025 (Rupiah)</div>
     <div class="section-body">
       <div class="form-group">
         <label class="field-label">a. Total upah dan gaji, serta jaminan sosial pegawai <span class="req">*</span></label>
-        <div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="q22a" class="currency-field" oninput="formatCurrency(this);calcPengeluaran()" placeholder="0"/></div>
+        <div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="q22a" class="currency-field" oninput="formatCurrency(this);calcPengeluaran()" placeholder="0,00"/></div>
       </div>
       <div class="form-group">
         <label class="field-label">b. Biaya produksi <span class="req">*</span></label>
-        <div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="q22b" class="currency-field" oninput="formatCurrency(this);calcPengeluaran()" placeholder="0"/></div>
+        <div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="q22b" class="currency-field" oninput="formatCurrency(this);calcPengeluaran()" placeholder="0,00"/></div>
       </div>
       <div class="form-group">
         <label class="field-label">c. Biaya pembelian barang yang dijual <span class="req">*</span></label>
-        <div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="q22c" class="currency-field" oninput="formatCurrency(this);calcPengeluaran()" placeholder="0"/></div>
+        <div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="q22c" class="currency-field" oninput="formatCurrency(this);calcPengeluaran()" placeholder="0,00"/></div>
       </div>
       <div class="form-group">
         <label class="field-label">d. Biaya operasional (air, listrik, gas, internet, pulsa, pemeliharaan) <span class="req">*</span></label>
-        <div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="q22d" class="currency-field" oninput="formatCurrency(this);calcPengeluaran()" placeholder="0"/></div>
+        <div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="q22d" class="currency-field" oninput="formatCurrency(this);calcPengeluaran()" placeholder="0,00"/></div>
       </div>
       <div class="form-group">
         <label class="field-label">e. Biaya non-operasional <span class="req">*</span></label>
-        <div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="q22e" class="currency-field" oninput="formatCurrency(this);calcPengeluaran()" placeholder="0"/></div>
+        <div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="q22e" class="currency-field" oninput="formatCurrency(this);calcPengeluaran()" placeholder="0,00"/></div>
       </div>
       <div class="form-group">
         <label class="field-label">f. Total pengeluaran (a+b+c+d+e)</label>
-        <div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="q22f" readonly class="total-field" placeholder="0"/></div>
+        <div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="q22f" readonly class="total-field" placeholder="0,00"/></div>
       </div>
     </div>
   </div>
 
   <!-- Q23 Pendapatan -->
   <div class="section-card">
-    <div class="section-header">23. Nilai Pendapatan / Penjualan Tahun 2025 (Rupiah)</div>
+    <div class="section-header" id="sec-23">23. Nilai Pendapatan / Penjualan Tahun 2025 (Rupiah)</div>
     <div class="section-body">
       <div class="form-group">
         <label class="field-label">a. Nilai barang dan jasa <span class="req">*</span></label>
-        <div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="q23a" class="currency-field" oninput="formatCurrency(this);calcPendapatan()" placeholder="0"/></div>
+        <div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="q23a" class="currency-field" oninput="formatCurrency(this);calcPendapatan()" placeholder="0,00"/></div>
       </div>
       <div class="form-group">
         <label class="field-label">b. Pendapatan lainnya</label>
-        <div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="q23b" class="currency-field" oninput="formatCurrency(this);calcPendapatan()" placeholder="0"/></div>
+        <div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="q23b" class="currency-field" oninput="formatCurrency(this);calcPendapatan()" placeholder="0,00"/></div>
       </div>
       <div class="form-group">
         <label class="field-label">c. Total nilai (a+b)</label>
-        <div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="q23c" readonly class="total-field" placeholder="0"/></div>
+        <div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="q23c" readonly class="total-field" placeholder="0,00"/></div>
       </div>
       <div class="form-group">
         <label class="field-label">d. Persentase pendapatan dari usaha online <span class="req">*</span></label>
-        <div style="display:flex;align-items:center;gap:8px">
-          <input type="number" id="q23d" min="0" max="100" placeholder="0" style="width:120px"/>
-          <span style="color:#666">%</span>
+        <div class="inline-pct-row">
+          <input type="number" id="q23d" class="input-short" min="0" max="100" placeholder="0"/>
+          <span class="pct-label">%</span>
         </div>
       </div>
     </div>
@@ -1006,21 +1056,21 @@
 
   <!-- Q24 Aset -->
   <div class="section-card">
-    <div class="section-header">24. Nilai Aset per 31 Desember 2025 (Rupiah)</div>
+    <div class="section-header" id="sec-24">24. Nilai Aset per 31 Desember 2025 (Rupiah)</div>
     <div class="section-body">
       <div class="form-group">
         <label class="field-label">a. Nilai aset tanah dan bangunan pada 31 Desember 2025 <span class="req">*</span></label>
-        <div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="q24a" class="currency-field" oninput="formatCurrency(this);calcAset()" placeholder="0"/></div>
+        <div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="q24a" class="currency-field" oninput="formatCurrency(this);calcAset()" placeholder="0,00"/></div>
       </div>
       <div class="form-group">
         <label class="field-label">b. Nilai aset selain tanah dan bangunan pada 31 Desember 2025 <span class="req">*</span></label>
-        <div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="q24b" class="currency-field" oninput="formatCurrency(this);calcAset()" placeholder="0"/></div>
+        <div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="q24b" class="currency-field" oninput="formatCurrency(this);calcAset()" placeholder="0,00"/></div>
       </div>
       <div class="form-group">
         <label class="field-label">c. Nilai total aset pada 31 Desember 2025</label>
-        <div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="q24c" readonly class="total-field" placeholder="0"/></div>
-        <div style="margin-top:10px">
-          <label class="field-label" style="font-size:12px">c1. Jika tidak dapat mengisikan nilai nominal, pilih nilai total aset <span class="req">*</span></label>
+        <div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="q24c" readonly class="total-field" placeholder="0,00"/></div>
+        <div class="subsection-label-spaced">
+          <label class="field-label field-label-sm">c1. Jika tidak dapat mengisikan nilai nominal, pilih nilai total aset <span class="req">*</span></label>
           <div class="radio-group">
             <label class="radio-item"><input type="radio" name="q24c1" value="1"/> <span>1. s.d. Rp 500 juta</span></label>
             <label class="radio-item"><input type="radio" name="q24c1" value="2"/> <span>2. Lebih dari Rp 500 juta s.d. Rp 1 miliar</span></label>
@@ -1039,7 +1089,7 @@
 
   <!-- Q25 Kepemilikan Modal -->
   <div class="section-card">
-    <div class="section-header">25. Susunan Kepemilikan Modal per 31 Desember 2025 (%)</div>
+    <div class="section-header" id="sec-25">25. Susunan Kepemilikan Modal per 31 Desember 2025 (%)</div>
     <div class="section-body">
       <div class="inline-fields">
         <div class="form-group">
@@ -1071,17 +1121,18 @@
       </div>
       <div class="form-group">
         <label class="field-label">g. Total (a+b+c+d+e+f) — harus = 100%</label>
-        <div style="display:flex;align-items:center;gap:8px">
-          <input type="number" id="q25g" readonly class="total-field" placeholder="0" style="width:120px"/>
-          <span id="modal-indicator" style="font-size:13px;color:#666">%</span>
+        <div class="inline-pct-row">
+          <input type="number" id="q25g" readonly class="total-field input-short" placeholder="0"/>
+          <span id="modal-indicator">%</span>
         </div>
       </div>
-      <div class="hint" style="margin-top:4px">Keterangan: LNPRT = Lembaga Nonprofit yang Melayani Rumah Tangga</div>
+      <div class="hint">Keterangan: LNPRT = Lembaga Nonprofit yang Melayani Rumah Tangga</div>
     </div>
   </div>
 
   <div class="nav-actions">
     <div></div>
+    <button type="button" class="btn-nav-draft" onclick="saveAsDraft()">&#128190; Simpan Draft</button>
     <button class="btn btn-primary" onclick="goBlok(2)">Selanjutnya: BLOK II &rsaquo;</button>
   </div>
 </div><!-- end blok1 -->
@@ -1097,18 +1148,18 @@
     </div>
   </div>
 
+
   <div class="section-card">
-    <div class="section-header">Lokasi Kunjungan <span class="req">*</span></div>
+    <div class="section-header" id="sec-Lokasi">Lokasi Kunjungan <span class="req">*</span></div>
     <div class="section-body">
       <div class="form-group">
         <label class="field-label">Koordinat GPS <span class="req">*</span></label>
-        <div style="display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap">
+        <div class="lokasi-row">
           <button type="button" id="lokasiBtn" onclick="ambilLokasi()"
-            style="display:flex;align-items:center;gap:8px;padding:10px 20px;background:#fc6c00;color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0;transition:background .2s"
             onmouseover="this.style.background='#e06000'" onmouseout="this.style.background=this.dataset.done==='1'?'#276749':'#fc6c00'">
             &#128205; Ambil Lokasi GPS
           </button>
-          <div id="lokasiResult" style="flex:1;min-width:200px;background:#f7f4f0;border:1.5px solid #e8e3de;border-radius:7px;padding:10px 14px;font-size:12.5px;color:#888;line-height:1.7">
+          <div id="lokasiResult" class="lokasi-result">
             Belum mengambil lokasi — tekan tombol untuk mulai.
           </div>
         </div>
@@ -1116,15 +1167,15 @@
         <input type="hidden" id="lokasi_lng"/>
         <input type="hidden" id="lokasi_akurasi"/>
         <div class="hint">Digunakan untuk verifikasi kunjungan lapangan. Pastikan GPS aktif di perangkat.</div>
-        <div id="lokasiMapWrap" style="display:none;margin-top:14px;border-radius:10px;overflow:hidden;border:1.5px solid #68d391;box-shadow:0 2px 10px rgba(0,0,0,.1)">
-          <div id="lokasiMap" style="height:240px;width:100%"></div>
+        <div id="lokasiMapWrap" class="lokasi-map-wrap" style="display:none">
+          <div id="lokasiMap" class="lokasi-map"></div>
         </div>
       </div>
     </div>
   </div>
 
   <div class="section-card">
-    <div class="section-header">Catatan Kunjungan</div>
+    <div class="section-header" id="sec-Catatan">Catatan Kunjungan</div>
     <div class="section-body">
 
       <div class="catatan-group">
@@ -1168,6 +1219,7 @@
 
   <div class="nav-actions">
     <button class="btn btn-secondary" onclick="goBlok(1)">&lsaquo; Kembali: BLOK I</button>
+    <button type="button" class="btn-nav-draft" onclick="saveAsDraft()">&#128190; Simpan Draft</button>
     <button class="btn btn-primary" onclick="goBlok(3)">Selanjutnya: BLOK III &rsaquo;</button>
   </div>
 </div><!-- end blok2 -->
@@ -1183,8 +1235,9 @@
     </div>
   </div>
 
+
   <div class="section-card">
-    <div class="section-header">Identitas Petugas Pendata</div>
+    <div class="section-header" id="sec-Petugas">Identitas Petugas Pendata</div>
     <div class="section-body">
       <div class="form-group">
         <label class="field-label">Nama Petugas <span class="req">*</span></label>
@@ -1197,7 +1250,7 @@
       <div class="inline-fields">
         <div class="form-group">
           <label class="field-label">NIP / ID Petugas</label>
-          <input type="text" id="p_nip" placeholder="Terisi otomatis saat nama dipilih" readonly style="background:#f8f8f8;color:#555"/>
+          <input type="text" id="p_nip" class="input-muted" placeholder="Terisi otomatis saat nama dipilih" readonly/>
         </div>
         <div class="form-group">
           <label class="field-label">No. HP Petugas</label>
@@ -1208,7 +1261,7 @@
   </div>
 
   <div class="section-card">
-    <div class="section-header">Data Responden / Pengisi Kuesioner</div>
+    <div class="section-header" id="sec-Responden">Data Responden / Pengisi Kuesioner</div>
     <div class="section-body">
 
       <div class="form-group">
@@ -1231,21 +1284,22 @@
       <div class="form-group">
         <label class="field-label">Tanda Tangan <span class="req">*</span></label>
         <div class="sig-wrap">
-          <canvas id="sigCanvas" width="860" height="180" style="max-width:100%"></canvas>
+          <canvas id="sigCanvas" width="860" height="180"></canvas>
         </div>
         <div class="sig-actions">
           <button type="button" class="btn btn-sm btn-danger" onclick="clearSignature()">Hapus Tanda Tangan</button>
-          <span id="sig-hint" style="font-size:12px;color:#888;line-height:2">Gambar tanda tangan di kotak di atas</span>
+          <span id="sig-hint" class="sig-hint">Gambar tanda tangan di kotak di atas</span>
         </div>
       </div>
 
-      <div id="submitAlert" class="alert alert-error hidden" style="margin-top:14px"></div>
+      <div id="submitAlert" class="alert alert-error hidden submit-alert"></div>
 
-      <div style="margin-top:24px;text-align:center">
-        <p style="font-size:12px;color:#aaa;margin-bottom:12px">Dengan menekan tombol KIRIM, Anda menyatakan bahwa data yang diisikan adalah benar dan dapat dipertanggungjawabkan.</p>
-        <button class="btn btn-primary" id="submitBtn" onclick="showRecap()" style="padding:14px 60px;font-size:16px;letter-spacing:1px;border-radius:8px;box-shadow:0 4px 20px rgba(252,108,0,.45)">
-          &#128228; &nbsp;KIRIM / SUBMIT
-        </button>
+      <div class="submit-section">
+        <div class="submit-actions">
+          <button id="saveDraftBtn" type="button" class="btn-draft-inline" onclick="saveAsDraft()">&#128190; Simpan Draft</button>
+          <button class="btn btn-primary btn-submit-compact" id="submitBtn" onclick="showRecap()">&#128228; KIRIM / SUBMIT</button>
+        </div>
+        <p class="submit-note">Dengan menekan KIRIM, Anda menyatakan data yang diisikan adalah benar dan dapat dipertanggungjawabkan.</p>
       </div>
 
     </div>
@@ -1253,20 +1307,21 @@
 
   <div class="nav-actions">
     <button class="btn btn-secondary" onclick="goBlok(2)">&lsaquo; Kembali: BLOK II</button>
+    <button type="button" class="btn-nav-draft" onclick="saveAsDraft()">&#128190; Simpan Draft</button>
     <div></div>
   </div>
 </div><!-- end blok3 -->
 
 </div><!-- end form-container -->
 
-<!-- FOOTER -->
-<div style="background:#fff;border-top:3px solid #fc6c00;margin-top:20px;padding:16px 20px;text-align:center">
-  <div style="max-width:960px;margin:0 auto;font-size:12px;color:#aaa;line-height:1.8">
-    <strong style="color:#fc6c00">SENSUS EKONOMI 2026 — CAWI</strong><br/>
+<!-- ====== FOOTER ====== -->
+<footer class="form-footer">
+  <div class="footer-inner">
+    <strong class="footer-brand">SENSUS EKONOMI 2026 — CAWI</strong><br/>
     Badan Pusat Statistik Republik Indonesia &nbsp;|&nbsp; Sosialisasi SE2026<br/>
-    <span style="font-size:11px">Data yang dikumpulkan bersifat <strong>RAHASIA</strong> dan dilindungi oleh Undang-Undang No. 16 Tahun 1997 tentang Statistik</span>
+    <span class="footer-note">Data yang dikumpulkan bersifat <strong>RAHASIA</strong> dan dilindungi oleh Undang-Undang No. 16 Tahun 1997 tentang Statistik</span>
   </div>
-</div>
+</footer>
 
 </div><!-- end main-content -->
 </div><!-- end app-layout -->
@@ -1286,7 +1341,7 @@
     <div class="petunjuk-section">
       <h3>Cara Pengisian</h3>
       <ul>
-        <li>Isi semua kolom bertanda <strong style="color:#d63031">*</strong> (wajib diisi)</li>
+        <li>Isi semua kolom bertanda <strong class="req">*</strong> (wajib diisi)</li>
         <li>Gunakan navigasi di sidebar kiri untuk berpindah antar blok</li>
         <li>Klik <strong>Rekap &amp; Periksa</strong> sebelum submit untuk memeriksa isian</li>
         <li>Pastikan semua data benar dan dapat dipertanggungjawabkan</li>
@@ -1354,22 +1409,32 @@
   </div>
 </div>
 
-<!-- RESTORE BANNER -->
-<div id="restoreBanner" style="display:none;position:fixed;bottom:0;left:240px;right:0;background:#1a2332;color:#fff;padding:12px 20px;z-index:350;box-shadow:0 -3px 16px rgba(0,0,0,.3);border-top:2px solid #fc6c00">
-  <div style="max-width:700px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-    <span style="font-size:13px;flex:1;min-width:200px">&#128190; <strong>Draft tersimpan ditemukan</strong> — lanjutkan isian sebelumnya?</span>
-    <span id="restoreBannerTs" style="font-size:11px;color:rgba(255,255,255,.45)"></span>
-    <button onclick="restoreDraft()" style="background:#fc6c00;color:#fff;border:none;padding:8px 18px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:700;font-family:inherit">&#128257; Muat Draft</button>
-    <button onclick="dismissRestore()" style="background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);padding:8px 14px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit">Mulai Baru</button>
+<!-- ====== RESTORE BANNER ====== -->
+<div id="restoreBanner" class="restore-banner" style="display:none">
+  <div class="banner-inner">
+    <span class="banner-msg">&#128190; <strong>Draft tersimpan ditemukan</strong> — lanjutkan isian sebelumnya?</span>
+    <span id="restoreBannerTs" class="banner-ts"></span>
+    <button onclick="restoreDraft()" class="banner-btn banner-btn-primary">&#128257; Muat Draft</button>
+    <button onclick="dismissRestore()" class="banner-btn banner-btn-secondary">Mulai Baru</button>
   </div>
 </div>
-<style>@media(max-width:767px){#restoreBanner{left:0}#editModeBanner{left:0}}</style>
 
-<!-- EDIT MODE BANNER -->
-<div id="editModeBanner" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#276749;color:#fff;padding:11px 20px;z-index:360;box-shadow:0 -3px 16px rgba(0,0,0,.3);border-top:2px solid #68d391">
-  <div style="max-width:700px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
-    <span style="font-size:13px;flex:1;min-width:200px">&#9998; <strong>Mode Edit</strong> — periksa dan ubah data, lalu kirim. Pengiriman akan <strong>menimpa rekaman asli</strong>.</span>
-    <button onclick="cancelEditMode()" style="background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.3);padding:7px 14px;border-radius:6px;cursor:pointer;font-size:13px;font-weight:700;font-family:inherit">&#10005; Batal</button>
+<!-- ====== EDIT MODE BANNER ====== -->
+<div id="editModeBanner" class="edit-mode-banner" style="display:none">
+  <div class="banner-inner">
+    <span class="banner-msg">&#9998; <strong>Mode Edit</strong> — periksa dan ubah data, lalu kirim. Pengiriman akan <strong>menimpa rekaman asli</strong>.</span>
+    <button onclick="cancelEditMode()" class="banner-btn banner-btn-outline">&#10005; Batal</button>
+  </div>
+</div>
+<!-- LEAVE GUARD MODAL -->
+<div class="modal-overlay" id="leaveGuardOverlay" onclick="leaveGuardCancel()"></div>
+<div class="leave-guard-modal" id="leaveGuardModal">
+  <div class="leave-guard-title">&#128190; Simpan progress sebelum keluar?</div>
+  <div class="leave-guard-sub">Isian form belum disimpan sebagai draft. Simpan dulu agar bisa dilanjutkan nanti dari halaman Daftar.</div>
+  <div class="leave-guard-btns">
+    <button class="btn-save" onclick="leaveGuardSave()">&#128190; Simpan Draft &amp; Keluar</button>
+    <button class="btn-leave" onclick="leaveGuardGo()">Keluar Tanpa Simpan</button>
+    <button class="btn-cancel" onclick="leaveGuardCancel()">Batal, Tetap di Sini</button>
   </div>
 </div>
 <script src="js/config.js"></script>

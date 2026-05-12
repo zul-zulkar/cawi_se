@@ -1,3 +1,5 @@
+let _formDirty = false;
+
 document.addEventListener('DOMContentLoaded', () => {
   // Init searchable selects BEFORE any data load
   makeSearchable('q1_provinsi', 'provinsi');
@@ -91,9 +93,24 @@ document.addEventListener('DOMContentLoaded', () => {
   // === EDIT MODE (dari daftar.html) ===
   const _isEditMode = loadEditMode();
 
+  // Sembunyikan tombol Simpan Draft saat edit mode
+  if (_isEditMode) {
+    const btn = document.getElementById('saveDraftBtn');
+    if (btn) btn.style.display = 'none';
+  }
+
+  // === DRAFT CONTINUE (dari daftar.html klik "Lanjutkan") ===
+  const _draftContinueId = localStorage.getItem('cawi_draft_continue_id');
+  if (_draftContinueId && !_isEditMode) {
+    localStorage.removeItem('cawi_draft_continue_id');
+    _currentDraftId = _draftContinueId;
+    // LS_KEY sudah diset oleh continueDraft() di daftar-main.js
+    restoreDraft();
+  }
+
   // === AUTO-SAVE SETUP ===
-  // Check for existing draft (skip jika sedang edit mode)
-  if (!_isEditMode) try {
+  // Check for existing draft (skip jika edit mode atau sudah di-continue)
+  if (!_isEditMode && !_draftContinueId) try {
     const raw = localStorage.getItem(LS_KEY);
     if (raw) {
       const vals = JSON.parse(raw);
@@ -109,11 +126,49 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   } catch(e) {}
 
-  // Auto-save on any input change (debounced 60s)
-  document.addEventListener('input', scheduleAutosave);
-  document.addEventListener('change', scheduleAutosave);
+  // Auto-save on any input change (debounced 60s) + mark form dirty
+  document.addEventListener('input', () => { scheduleAutosave(); _formDirty = true; });
+  document.addEventListener('change', () => { scheduleAutosave(); _formDirty = true; });
 
-  // Also save on blok navigation
+  // Save on blok navigation — auto-save draft (create if needed)
   const origGoBlok = window.goBlok;
-  window.goBlok = function(n) { saveDraft(); origGoBlok(n); };
+  window.goBlok = function(n) {
+    saveAsDraft();
+    origGoBlok(n);
+  };
+
+  // Prevent accidental page close/refresh when form has unsaved input
+  window.addEventListener('beforeunload', e => {
+    if (_formDirty) { e.preventDefault(); return (e.returnValue = ''); }
+  });
 });
+
+/* ====== GUARDED NAVIGATION ====== */
+let _leaveAction = null;
+
+function guardedNav(urlOrFn, newTab) {
+  if (!_formDirty && !_currentDraftId) { _doLeaveNav(urlOrFn, newTab); return; }
+  _leaveAction = { fn: urlOrFn, newTab: !!newTab };
+  document.getElementById('leaveGuardOverlay').classList.add('open');
+  document.getElementById('leaveGuardModal').classList.add('open');
+}
+
+function _doLeaveNav(urlOrFn, newTab) {
+  if (typeof urlOrFn === 'function') urlOrFn();
+  else if (newTab) window.open(urlOrFn, '_blank');
+  else window.location.href = urlOrFn;
+}
+
+function leaveGuardSave() { saveAsDraft(); _formDirty = false; leaveGuardGo(); }
+
+function leaveGuardGo() {
+  _closeLeaveGuard();
+  if (_leaveAction) { const a = _leaveAction; _leaveAction = null; _doLeaveNav(a.fn, a.newTab); }
+}
+
+function leaveGuardCancel() { _closeLeaveGuard(); _leaveAction = null; }
+
+function _closeLeaveGuard() {
+  document.getElementById('leaveGuardOverlay').classList.remove('open');
+  document.getElementById('leaveGuardModal').classList.remove('open');
+}

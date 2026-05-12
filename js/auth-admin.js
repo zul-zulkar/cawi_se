@@ -1,9 +1,10 @@
 // ══════════════════════════════════════════════
 // ADMIN GATE
 // ══════════════════════════════════════════════
-// Hash SHA-256 untuk password admin default: AdminBPS2026!
-const ADMIN_DEFAULT_HASH = '5a55c7873ed7338f35d782adb513d336a36086ddec0fa4b6444fda6d440387c2';
-const DEFAULT_PW_HASH    = '941bacc5d2499f5e06108337bca646d12b59fb1d131cf763fce025b682bdd7d8';
+// Default fallback jika sheet belum dikonfigurasi (untuk duplikat baru)
+// Admin: Admin08! — Kuesioner: Kuesioner08!
+const ADMIN_DEFAULT_HASH = 'b2df8fb41bd751d3e93a579175ffa5a15c8185dd82df4fe3224040eba3fd8a76';
+const DEFAULT_PW_HASH    = '3e7551e772ef6f4b10197687eeb9779ded613d21b05ec5848e911e829e68cc11';
 const ADMIN_SESSION_KEY  = 'cawi_admin_auth_v1';
 
 let _adminHash     = null;

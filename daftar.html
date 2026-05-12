@@ -32,25 +32,87 @@
   </div>
 </div>
 
-<div class="rahasia-bar">&#x25CF;&nbsp; R A H A S I A &nbsp;&#x25CF;</div>
-
-<div class="header-main">
-  <div class="header-inner">
-    <div>
-      <div class="header-brand">CAWI <span>SE2026 — BPS Buleleng</span></div>
-    </div>
-    <div class="header-title">
-      Daftar Entri Data <small>Data dari semua perangkat (Google Sheets)</small>
-    </div>
-    <div class="header-actions">
-      <a href="index.html" class="btn btn-primary">&#43; Entri Baru</a>
-      <button class="btn btn-secondary" onclick="exportCSV()">&#128190; CSV</button>
-      <a href="admin.html" class="btn btn-secondary" title="Panel Admin">&#9881;</a>
-      <button class="btn btn-secondary" onclick="logoutKuesioner()" style="color:#c53030;border-color:#fed7d7" title="Keluar">&#128274; Keluar</button>
-    </div>
+<!-- MOBILE TOPBAR -->
+<div class="mobile-topbar" id="mobileTopbar">
+  <button class="hamburger-btn" onclick="toggleSidebar()">&#9776;</button>
+  <div class="mobile-title">CAWI <span>SE2026</span></div>
+  <div class="mobile-topbar-actions">
+    <a href="index.html" class="mobile-action-btn">&#43; Baru</a>
+    <button class="mobile-action-btn" onclick="fetchRecords()">&#8635;</button>
+    <button class="mobile-action-btn" onclick="logoutKuesioner()" style="color:#c53030">&#128274;</button>
   </div>
 </div>
 
+<!-- SIDEBAR OVERLAY -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<!-- APP LAYOUT -->
+<div class="app-layout">
+
+<!-- ====== SIDEBAR ====== -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-rahasia">&#x25CF;&nbsp; R A H A S I A &nbsp;&#x25CF;</div>
+  <div class="sidebar-brand">
+    <div class="sidebar-brand-logo">CAWI</div>
+    <div class="sidebar-brand-sub">SE2026 — BPS Buleleng</div>
+    <div class="sidebar-brand-page">Daftar Entri</div>
+  </div>
+
+  <div class="sidebar-nav-label">TAMPILAN DATA</div>
+  <div class="sidebar-item active" id="sidebarTabAll" onclick="setActiveTab('all')">
+    <div class="sidebar-item-icon">&#128196;</div>
+    <div class="sidebar-item-info">
+      <div>Semua Entri</div>
+      <div class="sidebar-item-sub" id="sidebarTabAllCount">memuat...</div>
+    </div>
+  </div>
+  <div class="sidebar-item" id="sidebarTabSubmitted" onclick="setActiveTab('submitted')">
+    <div class="sidebar-item-icon">&#10003;</div>
+    <div class="sidebar-item-info">
+      <div>Submit</div>
+      <div class="sidebar-item-sub" id="sidebarTabSubmittedCount">—</div>
+    </div>
+  </div>
+  <div class="sidebar-item" id="sidebarTabDraft" onclick="setActiveTab('draft')">
+    <div class="sidebar-item-icon">&#9998;</div>
+    <div class="sidebar-item-info">
+      <div>Draft Lokal</div>
+      <div class="sidebar-item-sub" id="sidebarTabDraftCount">—</div>
+    </div>
+  </div>
+
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-nav-label">TINDAKAN</div>
+  <div class="sidebar-actions">
+    <a href="index.html" class="sidebar-btn sidebar-btn-primary">
+      <span class="sidebar-btn-icon">&#43;</span> Entri Baru
+    </a>
+    <button class="sidebar-btn" onclick="exportCSV()">
+      <span class="sidebar-btn-icon">&#128190;</span> Export CSV
+    </button>
+    <button class="sidebar-btn" onclick="fetchRecords()">
+      <span class="sidebar-btn-icon">&#8635;</span> Refresh Data
+    </button>
+    <button class="sidebar-btn" onclick="backupData()">
+      <span class="sidebar-btn-icon">&#128229;</span> Backup Data
+    </button>
+    <button class="sidebar-btn sidebar-btn-warn" onclick="restoreData()">
+      <span class="sidebar-btn-icon">&#128228;</span> Restore Data
+    </button>
+    <a href="admin.html" class="sidebar-btn">
+      <span class="sidebar-btn-icon">&#9881;</span> Panel Admin
+    </a>
+    <button class="sidebar-btn sidebar-btn-danger" onclick="logoutKuesioner()">
+      <span class="sidebar-btn-icon">&#128274;</span> Keluar
+    </button>
+  </div>
+  <div class="sidebar-footer">
+    BPS Republik Indonesia<br/>&#169; Sensus Ekonomi 2026
+  </div>
+</aside>
+
+<!-- ====== MAIN CONTENT ====== -->
+<div class="main-content" id="mainContent">
 <div class="container">
 
   <div class="toolbar">
@@ -65,14 +127,17 @@
       <select class="filter-select" id="filterPetugas" onchange="onFilter()">
         <option value="">— Semua Petugas —</option>
       </select>
-      <button class="btn btn-secondary" onclick="fetchRecords()" title="Refresh data">&#8635; Refresh</button>
     </div>
   </div>
 
   <div class="stats-row">
     <div class="stat-card">
       <div class="stat-num" id="statTotal">—</div>
-      <div class="stat-label">Total Entri</div>
+      <div class="stat-label">Submit</div>
+    </div>
+    <div class="stat-card s-draft">
+      <div class="stat-num" id="statDraft">—</div>
+      <div class="stat-label">Draft Lokal</div>
     </div>
     <div class="stat-card s2">
       <div class="stat-num" id="statFiltered">—</div>
@@ -84,17 +149,32 @@
     </div>
   </div>
 
-  <div class="table-wrap">
-    <div class="table-header">
-      <span class="table-header-title">&#128196; Rekaman Entri — Semua Perangkat</span>
+  <div class="table-section">
+    <div class="tab-bar">
+      <div class="tab-item active" id="tabBarAll" onclick="setActiveTab('all')">
+        <span>Semua</span>
+        <span class="tab-count" id="tabBarAllCount">—</span>
+      </div>
+      <div class="tab-item" id="tabBarSubmitted" onclick="setActiveTab('submitted')">
+        <span>Submit</span>
+        <span class="tab-count tc-submitted" id="tabBarSubmittedCount">—</span>
+      </div>
+      <div class="tab-item" id="tabBarDraft" onclick="setActiveTab('draft')">
+        <span>Draft Lokal</span>
+        <span class="tab-count tc-draft" id="tabBarDraftCount">—</span>
+      </div>
     </div>
-    <div id="loadingWrap" class="loading-wrap">
-      <div class="spinner"></div>
-      <div class="loading-text">Mengambil data dari Google Sheets...</div>
+    <div class="table-wrap">
+      <div id="loadingWrap" class="loading-wrap">
+        <div class="spinner"></div>
+        <div class="loading-text">Mengambil data dari Google Sheets...</div>
+      </div>
+      <div id="tableContainer" style="display:none"></div>
     </div>
-    <div id="tableContainer" style="display:none"></div>
   </div>
 
+</div>
+</div>
 </div>
 
 <!-- VIEW MODAL -->
@@ -146,6 +226,7 @@
 <script src="js/config.js"></script>
 <script src="js/utils.js"></script>
 <script src="js/auth.js"></script>
+<script src="js/backup.js"></script>
 <script src="js/daftar-main.js"></script>
 </body>
 </html>

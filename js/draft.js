@@ -1,6 +1,8 @@
 /* ====== AUTO-SAVE (localStorage) ====== */
-const LS_KEY = 'cawi_se2026_draft_v1';
-let _autosaveTimer = null;
+const LS_KEY    = 'cawi_se2026_draft_v1';
+const LS_DRAFTS = 'cawi_se2026_drafts_v1';
+let _autosaveTimer  = null;
+let _currentDraftId = null; // ID draft yang sedang dilanjutkan
 
 function saveDraft() {
   try {
@@ -88,4 +90,82 @@ function clearDraft() {
   localStorage.removeItem(LS_KEY);
   const txt = document.getElementById('autosaveText');
   if (txt) txt.textContent = 'Draft dihapus';
+}
+
+/* ====== NAMED DRAFT LIST ====== */
+function getDraftList() {
+  try { return JSON.parse(localStorage.getItem(LS_DRAFTS) || '[]'); }
+  catch(e) { return []; }
+}
+
+function saveAsDraft() {
+  try {
+    const raw = {};
+    document.querySelectorAll('input[id]:not([type=radio]):not([type=checkbox]),textarea[id],select[id]').forEach(el => {
+      if (!el.id || el.readOnly) return;
+      raw[el.id] = el.value;
+    });
+    document.querySelectorAll('input[type=radio]:checked').forEach(el => {
+      raw['_r_' + el.name] = el.value;
+    });
+    if (hasSig) { try { raw['_sig'] = canvas.toDataURL('image/png'); } catch(e) {} }
+    raw['_ts'] = new Date().toISOString();
+
+    const id = _currentDraftId || ('draft_' + Date.now());
+    const kecInp = document.getElementById('q3_kecamatan_inp');
+    const draft = {
+      _draftId:       id,
+      _ts:            raw['_ts'],
+      _isDraft:       true,
+      nama_perusahaan: raw['q5a_nama_perusahaan'] || '',
+      nama_komersial:  raw['q5b_nama_komersial']  || '',
+      kecamatan:      kecInp ? kecInp.value.trim() : '',
+      kecamatan_kd:   raw['q3_kecamatan']         || '',
+      petugas_nama:   raw['p_nama']               || '',
+      kbli_kode:      raw['q9g_kbli_kode']        || '',
+      kbli_judul:     raw['q9g_kbli_search']      || '',
+      _raw:           raw
+    };
+
+    const list = getDraftList();
+    const idx  = list.findIndex(d => d._draftId === id);
+    if (idx >= 0) list[idx] = draft; else list.unshift(draft);
+    localStorage.setItem(LS_DRAFTS, JSON.stringify(list));
+    localStorage.setItem(LS_KEY, JSON.stringify(raw));
+    _currentDraftId = id;
+
+    const txt = document.getElementById('autosaveText');
+    if (txt) txt.textContent = 'Draft tersimpan';
+    const dot = document.getElementById('autosaveDot');
+    if (dot) { dot.style.background = '#fc6c00'; setTimeout(() => { dot.style.background = 'rgba(255,255,255,.2)'; }, 3000); }
+    _showDraftToast(draft.nama_perusahaan || 'Draft baru');
+    return true;
+  } catch(e) {
+    console.error('Gagal simpan draft:', e);
+    alert('Gagal menyimpan draft. Coba lagi.');
+    return false;
+  }
+}
+
+function deleteDraftById(id) {
+  try {
+    const list = getDraftList().filter(d => d._draftId !== id);
+    localStorage.setItem(LS_DRAFTS, JSON.stringify(list));
+    if (_currentDraftId === id) _currentDraftId = null;
+  } catch(e) { console.error('Gagal hapus draft:', e); }
+}
+
+function _showDraftToast(nama) {
+  let t = document.getElementById('_draftToast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = '_draftToast';
+    t.style.cssText = 'position:fixed;bottom:80px;right:20px;background:#276749;color:#fff;padding:12px 18px;border-radius:8px;font-size:13px;font-weight:600;z-index:9999;box-shadow:0 4px 16px rgba(0,0,0,.25);transition:opacity .4s;max-width:300px';
+    document.body.appendChild(t);
+  }
+  const safeName = nama.length > 25 ? nama.slice(0, 25) + '…' : nama;
+  t.textContent = '✓ Draft "' + safeName + '" tersimpan ke Daftar';
+  t.style.opacity = '1';
+  clearTimeout(t._tmr);
+  t._tmr = setTimeout(() => { t.style.opacity = '0'; }, 3500);
 }
