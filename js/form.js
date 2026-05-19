@@ -20,10 +20,170 @@ function handleBadanUsaha() {
   document.getElementById('q7_koperasi_wrap').classList.toggle('hidden', v !== '3');
 }
 
+function handleUsaha() {
+  const b1 = getRadio('q9b1');
+  const b2 = getRadio('q9b2');
+  const b3v = document.getElementById('q9b3_wrap');
+  const b4v = document.getElementById('q9b4_wrap');
+  const cW  = document.getElementById('q9c_wrap');
+  const deW = document.getElementById('q9de_wrap');
+
+  // b3 visible if b1=Tidak AND b2=Tidak
+  const show3 = b1 === '2' && b2 === '2';
+  b3v.classList.toggle('hidden', !show3);
+  if (!show3) document.querySelectorAll('input[name="q9b3"]').forEach(r => r.checked = false);
+
+  const b3 = show3 ? getRadio('q9b3') : '';
+
+  // b4 visible if b1=Tidak AND b2=Tidak AND b3=Tidak
+  const show4 = show3 && b3 === '2';
+  b4v.classList.toggle('hidden', !show4);
+  if (!show4) document.querySelectorAll('input[name="q9b4"]').forEach(r => r.checked = false);
+
+  // 9c shown when food/retail path: b2=Ya OR b3=Ya
+  const showC = b2 === '1' || (show3 && b3 === '1');
+  cW.classList.toggle('hidden', !showC);
+
+  // 9d/9e shown when manufacturing: b1=Ya AND b2=Tidak
+  const showDE = b1 === '1' && b2 === '2';
+  deW.classList.toggle('hidden', !showDE);
+
+  updateProgress();
+}
+
 function handleJaringan() {
   const v = getRadio('q10a');
   document.getElementById('q10b_wrap').classList.toggle('hidden', v !== '2');
   document.getElementById('q11_wrap').classList.toggle('hidden', !['3','4','5','6'].includes(v));
+  // L.KP section only for kantor pusat
+  const lkp = document.getElementById('lkp_section');
+  if (lkp) {
+    if (v === '2') {
+      handleJumlahCabang();
+    } else {
+      lkp.classList.add('hidden');
+    }
+  }
+}
+
+function handleJumlahCabang() {
+  const lkp = document.getElementById('lkp_section');
+  const wrap = document.getElementById('lkp_branches_wrap');
+  if (!lkp || !wrap) return;
+  if (getRadio('q10a') !== '2') { lkp.classList.add('hidden'); return; }
+  const n = parseInt(document.getElementById('q10b_jumlah').value) || 0;
+  if (n <= 0) { lkp.classList.add('hidden'); return; }
+  lkp.classList.remove('hidden');
+  const capped = Math.min(n, 50);
+  // Only re-render if count changed
+  if (wrap.dataset.count === String(capped)) return;
+  wrap.dataset.count = capped;
+  wrap.innerHTML = '';
+  const provOpts = (typeof STATIC_PROVINSI !== 'undefined' ? STATIC_PROVINSI : [])
+    .map(p => `<option value="${p.kode}">${p.nama}</option>`).join('');
+  for (let i = 1; i <= capped; i++) {
+    wrap.insertAdjacentHTML('beforeend', `
+<div class="section-card" id="lkp_card_${i}" style="margin-top:12px;border-left:3px solid #fc6c00">
+  <div class="section-header" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center" onclick="toggleLKPCard(${i})">
+    <span>Cabang/Unit #${i}</span><span id="lkp_toggle_${i}">&#9660;</span>
+  </div>
+  <div id="lkp_body_${i}" class="section-body">
+    <div class="inline-fields">
+      <div class="form-group" style="flex:2">
+        <label class="field-label">Nama Kantor/Unit <span class="req">*</span></label>
+        <input type="text" id="lkp_${i}_nama" placeholder="Nama kantor/unit"/>
+      </div>
+      <div class="form-group" style="flex:1">
+        <label class="field-label">Jenis Unit <span class="req">*</span></label>
+        <select id="lkp_${i}_jenis">
+          <option value="">-- Pilih --</option>
+          <option value="1">1. Kantor Cabang</option>
+          <option value="2">2. Kantor Perwakilan</option>
+          <option value="3">3. Pabrik</option>
+          <option value="4">4. Unit Pembantu/Penunjang</option>
+        </select>
+      </div>
+    </div>
+    <div class="inline-fields">
+      <div class="form-group">
+        <label class="field-label">Provinsi <span class="req">*</span></label>
+        <select id="lkp_${i}_provinsi" onchange="loadKabupatenLKP(this.value,${i})">
+          <option value="">-- Pilih Provinsi --</option>
+          ${provOpts}
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="field-label">Kabupaten/Kota</label>
+        <select id="lkp_${i}_kabupaten" disabled>
+          <option value="">-- Pilih Kabupaten/Kota --</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="field-label">KBLI (5 digit)</label>
+        <input type="text" id="lkp_${i}_kbli" maxlength="5" placeholder="00000"/>
+      </div>
+    </div>
+    <div class="inline-fields">
+      <div class="form-group">
+        <label class="field-label">Jumlah Pekerja (per 31 Des 2025) <span class="req">*</span></label>
+        <input type="number" id="lkp_${i}_pekerja" min="0" placeholder="0"/>
+      </div>
+      <div class="form-group">
+        <label class="field-label">Nilai Pengeluaran 2025 (Rp)</label>
+        <div class="currency-input-wrap"><span class="currency-prefix">Rp</span>
+          <input type="text" id="lkp_${i}_pengeluaran" class="currency-field" oninput="formatCurrency(this)" placeholder="0"/>
+        </div>
+      </div>
+    </div>
+    <div class="inline-fields">
+      <div class="form-group">
+        <label class="field-label">Nilai Produksi/Penjualan/Pendapatan 2025 (Rp)</label>
+        <div class="currency-input-wrap"><span class="currency-prefix">Rp</span>
+          <input type="text" id="lkp_${i}_pendapatan" class="currency-field" oninput="formatCurrency(this)" placeholder="0"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="field-label">Nilai Aset 2025 (Rp)</label>
+        <div class="currency-input-wrap"><span class="currency-prefix">Rp</span>
+          <input type="text" id="lkp_${i}_aset" class="currency-field" oninput="formatCurrency(this)" placeholder="0"/>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>`);
+  }
+}
+
+function toggleLKPCard(i) {
+  const body = document.getElementById('lkp_body_' + i);
+  const icon = document.getElementById('lkp_toggle_' + i);
+  if (!body) return;
+  const hidden = body.style.display === 'none';
+  body.style.display = hidden ? '' : 'none';
+  if (icon) icon.innerHTML = hidden ? '&#9660;' : '&#9658;';
+}
+
+async function loadKabupatenLKP(kdprov, idx) {
+  const sel = document.getElementById('lkp_' + idx + '_kabupaten');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">Memuat...</option>';
+  sel.disabled = true;
+  if (!kdprov) { sel.innerHTML = '<option value="">-- Pilih Kabupaten/Kota --</option>'; return; }
+  try {
+    const res = await fetch(`https://esurvey.bps.go.id/lookup/api/v1/collections/668fcfe6-8ef4-4612-968a-d1330c03fe17/filter?version=1&filter=kdprov||eq||${kdprov}`,
+      {headers:{'Accept':'application/json'}});
+    const d = await res.json();
+    sel.innerHTML = '<option value="">-- Pilih Kabupaten/Kota --</option>';
+    (d.data || []).sort((a,b)=>a.namakab.localeCompare(b.namakab)).forEach(k => {
+      const o = document.createElement('option');
+      o.value = k.kdprovkab; o.textContent = k.namakab;
+      sel.appendChild(o);
+    });
+    sel.disabled = false;
+  } catch(e) {
+    sel.innerHTML = '<option value="">-- Gagal memuat --</option>';
+    sel.disabled = false;
+  }
 }
 
 function handleInternet() {

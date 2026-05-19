@@ -6,6 +6,27 @@ Aplikasi web formulir pendataan **Sensus Ekonomi 2026** berbasis CAWI (Computer 
 
 ## Changelog
 
+### v1.7 — Data Cabang ke Google Sheets (SE2026_LKP)
+- Sheet baru `SE2026_LKP` otomatis dibuat di Google Sheets — satu baris per kantor cabang/unit
+- Kolom baru di `SE2026_Responses`: `Transaksi Beli Jasa Non-Penduduk` (col 116) dan `Data Cabang (JSON)` (col 117)
+- LKP row disinkronkan otomatis saat submit baru, edit, maupun hapus record
+- Helper `buildRow(d)` menghilangkan duplikasi kode antara `doPost` dan `updateRecord`
+- Helper `jsonResponse()` menyederhanakan semua respons JSON di Apps Script
+
+### v1.6 — Formulir L.KP Kantor Cabang
+- Pertanyaan Q10b: bila usaha merupakan kantor pusat, formulir menanyakan jumlah kantor cabang
+- Input kantor cabang di-generate secara dinamis berdasarkan jumlah yang diisi (maks 50)
+- Setiap cabang mencakup: Nama, Jenis Unit, Provinsi, Kabupaten/Kota, KBLI, Jumlah Pekerja, Pengeluaran, Pendapatan, Aset
+- Data cabang dikumpulkan sebagai JSON (`lkp_data`) dan dikirim bersama form utama
+- Edit mode me-restore isian cabang dari `lkp_data` yang tersimpan
+
+### v1.5 — Kuesioner SE2026 L.UB + Password Daftar
+- Narasi, routing, dan pilihan jawaban disesuaikan penuh dengan kuesioner resmi BPS SE2026 L.UB
+- Q6 (NIB), Q7 (Badan Usaha), Q9 (Kegiatan), Q12–Q19 diperbarui sesuai versi terbaru
+- Q19c `transaksi_beli_jasa_nonpenduduk` ditambahkan sebagai field baru
+- Halaman `daftar.html` kini membutuhkan password untuk masuk (password default: `Daftar08!`)
+- Password daftar disimpan sebagai hash SHA-256 di Google Sheets (`daftar_pw_hash`)
+
 ### v1.4 — HTML Structure Cleanup
 - Seluruh `style="..."` inline dipindah ke class CSS (`index.css`) — tidak ada perubahan JS
 - Password gate, notification banners, sidebar, footer kini sepenuhnya dikendalikan oleh CSS class
@@ -180,6 +201,7 @@ Password aktif diambil dari Google Sheets. Jika sheet belum dikonfigurasi (misal
 | Akses | Password Fallback (Duplikat Baru) |
 |---|---|
 | Formulir (kuesioner) | `Kuesioner08!` |
+| Daftar Entri | `Daftar08!` |
 | Panel Admin | `Admin08!` |
 
 > **Segera ganti password** setelah duplikasi selesai melalui `admin.html` → kartu *Ubah Password*. Perubahan disimpan ke Google Sheets dan langsung berlaku untuk semua perangkat.
@@ -191,6 +213,8 @@ Password aktif diambil dari Google Sheets. Jika sheet belum dikonfigurasi (misal
 ## Cara Kerja Penyimpanan
 
 - **Google Sheets + Apps Script** — semua entri formulir dikirim ke sheet via HTTP POST; hash password kuesioner dan admin juga disimpan di sheet agar berlaku terpusat
+- **SE2026_Responses** — satu baris per usaha/perusahaan; kolom 117 (`Data Cabang (JSON)`) menyimpan raw JSON data cabang sebagai cadangan
+- **SE2026_LKP** — sheet terpisah, satu baris per kantor cabang/unit; dibuat otomatis saat pertama kali ada submit dengan data cabang; linked ke `SE2026_Responses` via `Record ID`
 - **sessionStorage** — status login sesi aktif; otomatis bersih saat tab/browser ditutup
 - **localStorage** — pengaturan lokal (URL sheet kustom, daftar pegawai kustom, draft isian); tidak tersinkronisasi antar perangkat
 

@@ -51,12 +51,22 @@ function collectAllProblems() {
   if (rt && !/^\d+$/.test(rt)) e('Pertanyaan 5c: RT', 'RT hanya boleh berisi angka', 1, 'q5c_rt');
   if (rw && !/^\d+$/.test(rw)) e('Pertanyaan 5c: RW', 'RW hanya boleh berisi angka', 1, 'q5c_rw');
   if (!getVal('q9a_kegiatan')) e('Pertanyaan 9a: Kegiatan Utama', 'Harus diisi', 1, 'q9a_kegiatan');
-  const b1=getRadio('q9b1'),b2=getRadio('q9b2'),b3=getRadio('q9b3'),b4=getRadio('q9b4');
-  if (!b1||!b2||!b3||!b4) e('Pertanyaan 9b: Aktivitas Usaha', 'Semua pilihan b1–b4 harus dijawab', 1, 'q9b1');
-  else if (b1==='2'&&b2==='2'&&b3==='2'&&b4==='2') e('Pertanyaan 9b: Aktivitas Usaha', 'Minimal satu b1–b4 harus "Ya"', 1, 'q9b1');
-  if (!getRadio('q9c')) e('Pertanyaan 9c: Lokasi Usaha', 'Belum dipilih', 1, 'q9c');
-  if (!getVal('q9d_input')) e('Pertanyaan 9d: Input/Bahan Baku', 'Harus diisi', 1, 'q9d_input');
-  if (!getVal('q9e_proses')) e('Pertanyaan 9e: Proses Produksi', 'Harus diisi', 1, 'q9e_proses');
+  const b1=getRadio('q9b1'), b2=getRadio('q9b2');
+  if (!b1) e('Pertanyaan 9b1: Produksi Barang', 'Harus dijawab', 1, 'q9b1');
+  if (!b2) e('Pertanyaan 9b2: Layanan Makan Minum', 'Harus dijawab', 1, 'q9b2');
+  const show3 = b1==='2' && b2==='2';
+  const b3 = show3 ? getRadio('q9b3') : '';
+  if (show3 && !b3) e('Pertanyaan 9b3: Penjualan Barang', 'Harus dijawab', 1, 'q9b3');
+  const show4 = show3 && b3==='2';
+  const b4 = show4 ? getRadio('q9b4') : '';
+  if (show4 && !b4) e('Pertanyaan 9b4: Jenis Aktivitas', 'Harus dipilih (Jasa atau Pertanian/Kehutanan/Perikanan)', 1, 'q9b4');
+  // 9c: required when food/retail path
+  const showC = b2==='1' || (show3 && b3==='1');
+  if (showC && !getRadio('q9c')) e('Pertanyaan 9c: Lokasi Usaha', 'Belum dipilih', 1, 'q9c');
+  // 9d/9e: required when manufacturing path (b1=Ya AND b2=Tidak)
+  const showDE = b1==='1' && b2==='2';
+  if (showDE && !getVal('q9d_input')) e('Pertanyaan 9d: Input/Bahan Baku', 'Harus diisi', 1, 'q9d_input');
+  if (showDE && !getVal('q9e_proses')) e('Pertanyaan 9e: Proses Produksi', 'Harus diisi', 1, 'q9e_proses');
   if (!getVal('q9f_produk')) e('Pertanyaan 9f: Produk Utama', 'Harus diisi', 1, 'q9f_produk');
   if (!getVal('q9g_kbli_kode')) e('Pertanyaan 9g: KBLI 2025', 'Belum dipilih dari daftar', 1, 'q9g_kbli_search');
   const hotelW = document.getElementById('q9i_hotel_wrap');
@@ -95,8 +105,23 @@ function collectAllProblems() {
   }
   if (!getRadio('q17')) e('Pertanyaan 17: Mitra KDKMP', 'Belum dipilih', 1, 'q17');
   if (!getRadio('q18')) e('Pertanyaan 18: Program MBG', 'Belum dipilih', 1, 'q18');
-  if (!getRadio('q19a')) e('Pertanyaan 19a: Transaksi Barang Non-Penduduk', 'Belum dipilih', 1, 'q19a');
-  if (!getRadio('q19b')) e('Pertanyaan 19b: Transaksi Jasa Non-Penduduk', 'Belum dipilih', 1, 'q19b');
+  if (!getRadio('q19a')) e('Pertanyaan 19a: Penjualan/Pembelian Barang Non-Penduduk', 'Belum dipilih', 1, 'q19a');
+  if (!getRadio('q19b')) e('Pertanyaan 19b: Penjualan Jasa Non-Penduduk', 'Belum dipilih', 1, 'q19b');
+  if (!getRadio('q19c')) e('Pertanyaan 19c: Pembelian Jasa Non-Penduduk', 'Belum dipilih', 1, 'q19c');
+  // L.KP validasi: minimal nama & jenis unit per cabang
+  if (getRadio('q10a') === '2') {
+    const nCabang = parseInt(getVal('q10b_jumlah')) || 0;
+    for (let i = 1; i <= Math.min(nCabang, 50); i++) {
+      const nm = document.getElementById('lkp_' + i + '_nama');
+      const jn = document.getElementById('lkp_' + i + '_jenis');
+      const pr = document.getElementById('lkp_' + i + '_provinsi');
+      const pk = document.getElementById('lkp_' + i + '_pekerja');
+      if (nm && !nm.value.trim()) e('L.KP Cabang #' + i + ': Nama', 'Nama kantor/unit harus diisi', 1, 'lkp_' + i + '_nama');
+      if (jn && !jn.value) e('L.KP Cabang #' + i + ': Jenis Unit', 'Jenis unit harus dipilih', 1, 'lkp_' + i + '_jenis');
+      if (pr && !pr.value) e('L.KP Cabang #' + i + ': Provinsi', 'Provinsi harus dipilih', 1, 'lkp_' + i + '_provinsi');
+      if (pk && pk.value === '') e('L.KP Cabang #' + i + ': Jumlah Pekerja', 'Harus diisi (isi 0 jika tidak ada)', 1, 'lkp_' + i + '_pekerja');
+    }
+  }
   if (!getVal('q20a')) e('Pertanyaan 20a: Pekerja Laki-laki', 'Harus diisi (isi 0 jika tidak ada)', 1, 'q20a');
   if (!getVal('q20b')) e('Pertanyaan 20b: Pekerja Perempuan', 'Harus diisi (isi 0 jika tidak ada)', 1, 'q20b');
   const totPekerja = (parseInt(getVal('q20a'))||0)+(parseInt(getVal('q20b'))||0);

@@ -29,11 +29,20 @@ function calcProgress() {
   c(getVal('q8d_nik').length === 16);
   // Q9 kegiatan
   c(!!getVal('q9a_kegiatan'));
-  ['q9b1','q9b2','q9b3','q9b4'].forEach(n => c(!!getRadio(n)));
-  const bv = ['q9b1','q9b2','q9b3','q9b4'].map(n => getRadio(n));
-  if (bv.every(v => v)) c(!bv.every(v => v === '2'));
-  c(!!getRadio('q9c'));
-  c(!!getVal('q9d_input')); c(!!getVal('q9e_proses')); c(!!getVal('q9f_produk'));
+  const b1p = getRadio('q9b1'), b2p = getRadio('q9b2');
+  c(!!b1p); c(!!b2p);
+  const show3p = b1p === '2' && b2p === '2';
+  const b3p = show3p ? getRadio('q9b3') : '';
+  if (show3p) c(!!b3p);
+  const show4p = show3p && b3p === '2';
+  if (show4p) c(!!getRadio('q9b4'));
+  // 9c: counted only when food/retail path
+  const showCp = b2p === '1' || (show3p && b3p === '1');
+  if (showCp) c(!!getRadio('q9c'));
+  // 9d/9e: counted only when manufacturing path
+  const showDEp = b1p === '1' && b2p === '2';
+  if (showDEp) { c(!!getVal('q9d_input')); c(!!getVal('q9e_proses')); }
+  c(!!getVal('q9f_produk'));
   c(!!getVal('q9g_kbli_kode'));
   const hW = document.getElementById('q9i_hotel_wrap');
   if (hW && !hW.classList.contains('hidden')) c(!!getRadio('q9i'));
@@ -59,7 +68,21 @@ function calcProgress() {
   c(!!getRadio('q16a'));
   if (getRadio('q16a') === '1') { c(getVal('q16b') !== ''); c(getVal('q16c') !== ''); }
   c(!!getRadio('q17')); c(!!getRadio('q18'));
-  c(!!getRadio('q19a')); c(!!getRadio('q19b'));
+  c(!!getRadio('q19a')); c(!!getRadio('q19b')); c(!!getRadio('q19c'));
+  // L.KP progress (kantor pusat cabang)
+  if (getRadio('q10a') === '2') {
+    const nC = parseInt(getVal('q10b_jumlah')) || 0;
+    for (let i = 1; i <= Math.min(nC, 50); i++) {
+      const nm = document.getElementById('lkp_' + i + '_nama');
+      const jn = document.getElementById('lkp_' + i + '_jenis');
+      const pr = document.getElementById('lkp_' + i + '_provinsi');
+      const pk = document.getElementById('lkp_' + i + '_pekerja');
+      if (nm) c(!!nm.value.trim());
+      if (jn) c(!!jn.value);
+      if (pr) c(!!pr.value);
+      if (pk) c(pk.value !== '');
+    }
+  }
   // Q20-Q25
   c(getVal('q20a') !== ''); c(getVal('q20b') !== '');
   const yr = parseInt(getVal('q21'));

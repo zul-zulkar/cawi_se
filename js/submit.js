@@ -38,12 +38,20 @@ function validateBlok1() {
   if (rt5 && !/^\d+$/.test(rt5)) return 'Pertanyaan 5c: RT hanya boleh berisi angka';
   if (rw5 && !/^\d+$/.test(rw5)) return 'Pertanyaan 5c: RW hanya boleh berisi angka';
   if (!getVal('q9a_kegiatan')) return 'Pertanyaan 9a: Isi Kegiatan Utama';
-  const b1=getRadio('q9b1'), b2=getRadio('q9b2'), b3=getRadio('q9b3'), b4=getRadio('q9b4');
-  if (!b1||!b2||!b3||!b4) return 'Pertanyaan 9b: Jawab semua pertanyaan b1-b4';
-  if (b1==='2'&&b2==='2'&&b3==='2'&&b4==='2') return 'Pertanyaan 9b: Minimal satu dari b1-b4 harus dijawab "Ya"';
-  if (!getRadio('q9c')) return 'Pertanyaan 9c: Pilih lokasi usaha';
-  if (!getVal('q9d_input')) return 'Pertanyaan 9d: Isi input yang digunakan';
-  if (!getVal('q9e_proses')) return 'Pertanyaan 9e: Isi proses produksi';
+  const b1=getRadio('q9b1'), b2=getRadio('q9b2');
+  if (!b1) return 'Pertanyaan 9b1: Pilih apakah memproduksi barang';
+  if (!b2) return 'Pertanyaan 9b2: Pilih apakah menyediakan layanan makan minum';
+  const _show3 = b1==='2' && b2==='2';
+  const b3 = _show3 ? getRadio('q9b3') : '';
+  if (_show3 && !b3) return 'Pertanyaan 9b3: Pilih apakah melakukan penjualan barang';
+  const _show4 = _show3 && b3==='2';
+  const b4 = _show4 ? getRadio('q9b4') : '';
+  if (_show4 && !b4) return 'Pertanyaan 9b4: Pilih jenis aktivitas (Jasa atau Pertanian/Kehutanan/Perikanan)';
+  if ((b2==='1' || (_show3 && b3==='1')) && !getRadio('q9c')) return 'Pertanyaan 9c: Pilih lokasi usaha';
+  if (b1==='1' && b2==='2') {
+    if (!getVal('q9d_input')) return 'Pertanyaan 9d: Isi input yang digunakan';
+    if (!getVal('q9e_proses')) return 'Pertanyaan 9e: Isi proses produksi';
+  }
   if (!getVal('q9f_produk')) return 'Pertanyaan 9f: Isi produk utama';
   if (!getVal('q9g_kbli_kode')) return 'Pertanyaan 9g: Pilih KBLI';
   if (!document.getElementById('q9i_hotel_wrap').classList.contains('hidden') && !getRadio('q9i'))
@@ -86,8 +94,23 @@ function validateBlok1() {
   }
   if (!getRadio('q17')) return 'Pertanyaan 17: Pilih apakah bermitra KDKMP?';
   if (!getRadio('q18')) return 'Pertanyaan 18: Pilih keterlibatan MBG?';
-  if (!getRadio('q19a')) return 'Pertanyaan 19a: Pilih transaksi barang non-penduduk?';
-  if (!getRadio('q19b')) return 'Pertanyaan 19b: Pilih transaksi jasa non-penduduk?';
+  if (!getRadio('q19a')) return 'Pertanyaan 19a: Pilih transaksi penjualan/pembelian barang non-penduduk?';
+  if (!getRadio('q19b')) return 'Pertanyaan 19b: Pilih transaksi penjualan jasa non-penduduk?';
+  if (!getRadio('q19c')) return 'Pertanyaan 19c: Pilih transaksi pembelian jasa non-penduduk?';
+  // L.KP validasi
+  if (getRadio('q10a') === '2') {
+    const nCabang = parseInt(getVal('q10b_jumlah')) || 0;
+    for (let i = 1; i <= Math.min(nCabang, 50); i++) {
+      const nm = document.getElementById('lkp_' + i + '_nama');
+      const jn = document.getElementById('lkp_' + i + '_jenis');
+      const pr = document.getElementById('lkp_' + i + '_provinsi');
+      const pk = document.getElementById('lkp_' + i + '_pekerja');
+      if (nm && !nm.value.trim()) return 'L.KP Cabang #' + i + ': Isi nama kantor/unit';
+      if (jn && !jn.value) return 'L.KP Cabang #' + i + ': Pilih jenis unit';
+      if (pr && !pr.value) return 'L.KP Cabang #' + i + ': Pilih provinsi';
+      if (pk && pk.value === '') return 'L.KP Cabang #' + i + ': Isi jumlah pekerja';
+    }
+  }
   if (getVal('q20a')==='' || getVal('q20b')==='') return 'Pertanyaan 20: Isi jumlah pekerja';
   if (!getVal('q21')) return 'Pertanyaan 21: Isi tahun mulai beroperasi';
   const thn = parseInt(getVal('q21'));
@@ -202,7 +225,8 @@ function collectData() {
     mitra_kdkmp: getRadio('q17'),
     program_mbg: getRadio('q18'),
     transaksi_barang_nonpenduduk: getRadio('q19a'),
-    transaksi_jasa_nonpenduduk: getRadio('q19b'),
+    transaksi_jual_jasa_nonpenduduk: getRadio('q19b'),
+    transaksi_beli_jasa_nonpenduduk: getRadio('q19c'),
     pekerja_laki: getVal('q20a'),
     pekerja_perempuan: getVal('q20b'),
     pekerja_total: getVal('q20c'),
@@ -229,6 +253,28 @@ function collectData() {
     modal_pemerintah: getVal('q25e'),
     modal_asing: getVal('q25f'),
     modal_total: getVal('q25g'),
+    // L.KP kantor cabang
+    lkp_data: (function() {
+      if (getRadio('q10a') !== '2') return '';
+      const nC = parseInt(getVal('q10b_jumlah')) || 0;
+      const branches = [];
+      for (let i = 1; i <= Math.min(nC, 50); i++) {
+        const g = id => { const el = document.getElementById(id); return el ? el.value : ''; };
+        branches.push({
+          no: i,
+          nama: g('lkp_'+i+'_nama'),
+          jenis: g('lkp_'+i+'_jenis'),
+          provinsi: g('lkp_'+i+'_provinsi'),
+          kabupaten: g('lkp_'+i+'_kabupaten'),
+          kbli: g('lkp_'+i+'_kbli'),
+          pekerja: g('lkp_'+i+'_pekerja'),
+          pengeluaran: parseCurrency(g('lkp_'+i+'_pengeluaran')),
+          pendapatan: parseCurrency(g('lkp_'+i+'_pendapatan')),
+          aset: parseCurrency(g('lkp_'+i+'_aset'))
+        });
+      }
+      return JSON.stringify(branches);
+    })(),
     // Blok II
     lokasi_lat: document.getElementById('lokasi_lat').value,
     lokasi_lng: document.getElementById('lokasi_lng').value,
@@ -499,7 +545,8 @@ function loadEditMode() {
       'q17':  r.mitra_kdkmp,
       'q18':  r.program_mbg,
       'q19a': r.transaksi_barang_nonpenduduk,
-      'q19b': r.transaksi_jasa_nonpenduduk,
+      'q19b': r.transaksi_jual_jasa_nonpenduduk || r.transaksi_jasa_nonpenduduk,
+      'q19c': r.transaksi_beli_jasa_nonpenduduk,
       'q24c1':r.aset_kategori,
     };
     Object.keys(radioMap).forEach(name => {
@@ -550,7 +597,31 @@ function loadEditMode() {
     if (typeof calcPendapatan      === 'function') calcPendapatan();
     if (typeof calcAset            === 'function') calcAset();
     if (typeof calcModal           === 'function') calcModal();
-    if (typeof updateProgress      === 'function') updateProgress();
+    // Restore L.KP branches
+    if (r.lkp_data && typeof handleJumlahCabang === 'function') {
+      setTimeout(() => {
+        handleJumlahCabang();
+        try {
+          const branches = JSON.parse(r.lkp_data);
+          branches.forEach(b => {
+            const i = b.no;
+            const s = (id, val) => { const el = document.getElementById(id); if (el && val != null) el.value = val; };
+            s('lkp_'+i+'_nama', b.nama);
+            s('lkp_'+i+'_jenis', b.jenis);
+            s('lkp_'+i+'_kbli', b.kbli);
+            s('lkp_'+i+'_pekerja', b.pekerja);
+            if (b.pengeluaran) { const el = document.getElementById('lkp_'+i+'_pengeluaran'); if (el) { el.value = Number(b.pengeluaran).toLocaleString('id-ID'); } }
+            if (b.pendapatan) { const el = document.getElementById('lkp_'+i+'_pendapatan'); if (el) { el.value = Number(b.pendapatan).toLocaleString('id-ID'); } }
+            if (b.aset) { const el = document.getElementById('lkp_'+i+'_aset'); if (el) { el.value = Number(b.aset).toLocaleString('id-ID'); } }
+            if (b.provinsi) {
+              const prSel = document.getElementById('lkp_'+i+'_provinsi');
+              if (prSel) { prSel.value = b.provinsi; loadKabupatenLKP(b.provinsi, i).then(() => { const kSel = document.getElementById('lkp_'+i+'_kabupaten'); if (kSel && b.kabupaten) kSel.value = b.kabupaten; }); }
+            }
+          });
+        } catch(_e) {}
+        if (typeof updateProgress === 'function') updateProgress();
+      }, 500);
+    } else if (typeof updateProgress === 'function') updateProgress();
 
     return true;
   } catch(e) { console.error('Gagal load edit mode:', e); return false; }

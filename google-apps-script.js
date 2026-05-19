@@ -14,7 +14,17 @@
 
 const SHEET_ID          = "1f-YLgJHfMU33_9Pn6snao1xZ-qf3vBQRpAxFwxBLOGI";
 const SHEET_NAME        = "SE2026_Responses";
+const LKP_SHEET_NAME    = "SE2026_LKP";
 const CONFIG_SHEET_NAME = "CAWI_Config";
+
+// Header SE2026_LKP sheet (satu baris per kantor cabang)
+const LKP_HEADERS = [
+  "Record ID", "Timestamp", "Nama Perusahaan",
+  "No Cabang", "Nama Kantor/Unit", "Jenis Unit",
+  "Provinsi", "Kabupaten/Kota", "KBLI",
+  "Jumlah Pekerja", "Nilai Pengeluaran (Rp)",
+  "Nilai Produksi/Penjualan/Pendapatan (Rp)", "Nilai Aset (Rp)"
+];
 
 // Header columns — urutan harus sama dengan appendRow di bawah
 const HEADERS = [
@@ -60,7 +70,7 @@ const HEADERS = [
   "Izin Edar", "Varian BPOM", "Varian Belum BPOM",
   "Mitra KDKMP",
   "Program MBG",
-  "Transaksi Barang Non-Penduduk", "Transaksi Jasa Non-Penduduk",
+  "Transaksi Barang Non-Penduduk", "Transaksi Jual Jasa Non-Penduduk",
   // Q20-Q25
   "Pekerja Laki-laki", "Pekerja Perempuan", "Pekerja Total",
   "Tahun Beroperasi",
@@ -81,38 +91,97 @@ const HEADERS = [
   // BLOK III — Responden
   "Responden Nama", "Responden HP", "Responden Email",
   "Tanggal Pelaksanaan",
-  "Tanda Tangan (base64)"
+  "Tanda Tangan (base64)",
+  // Tambahan Q19c + L.KP
+  "Transaksi Beli Jasa Non-Penduduk",
+  "Data Cabang (JSON)"
 ];
+
+function buildRow(d) {
+  return [
+    d.timestamp || new Date().toLocaleString("id-ID"),
+    // Lokasi
+    d.provinsi, d.provinsi_kd,
+    d.kabupaten, d.kabupaten_kd,
+    d.kecamatan, d.kecamatan_kd,
+    d.kelurahan, d.kelurahan_kd,
+    // Q5
+    d.nama_perusahaan, d.nama_komersial,
+    d.alamat, d.rt, d.rw, d.kode_pos,
+    d.email_perusahaan, d.website,
+    d.telepon, d.hp,
+    d.jenis_kawasan, d.nama_kawasan,
+    // Q6
+    d.punya_nib, d.nib,
+    d.alasan_no_nib, d.alasan_no_nib_lain,
+    // Q7
+    d.badan_usaha, d.kdkmp, d.jenis_koperasi, d.laporan_keuangan,
+    // Q8
+    d.nama_pengusaha, d.jenis_kelamin_pengusaha, d.umur_pengusaha, d.nik_pengusaha,
+    // Q9
+    d.kegiatan_utama,
+    d.produksi_barang, d.layanan_makan, d.penjualan_barang, d.aktivitas_jasa,
+    d.lokasi_usaha,
+    d.input_digunakan, d.proses_produksi, d.produk_utama,
+    d.kbli_kode, d.kbli_judul, d.kbli_kategori,
+    d.klasifikasi_hotel,
+    // Q10
+    d.jaringan_usaha, d.jumlah_cabang,
+    // Q11
+    d.kp_nama, d.kp_alamat, d.kp_email, d.kp_negara, d.kp_provinsi, d.kp_kabupaten,
+    // Q12
+    d.pakai_internet,
+    d.internet_pesanan, d.internet_produksi, d.internet_distribusi,
+    d.internet_beli, d.internet_promosi, d.internet_lain,
+    d.digital,
+    // Q13-Q19
+    d.ramah_lingkungan, d.biaya_lingkungan,
+    d.produk_kreatif,
+    d.sertifikat_halal, d.varian_halal_bpjph, d.varian_belum_halal_bpjph,
+    d.izin_edar, d.varian_bpom, d.varian_belum_bpom,
+    d.mitra_kdkmp,
+    d.program_mbg,
+    d.transaksi_barang_nonpenduduk, d.transaksi_jual_jasa_nonpenduduk,
+    // Q20-Q25
+    d.pekerja_laki, d.pekerja_perempuan, d.pekerja_total,
+    d.tahun_beroperasi,
+    d.pengeluaran_upah, d.pengeluaran_produksi, d.pengeluaran_beli_barang,
+    d.pengeluaran_operasional, d.pengeluaran_nonoperasional, d.pengeluaran_total,
+    d.pendapatan_barang_jasa, d.pendapatan_lain, d.pendapatan_total,
+    d.pct_online,
+    d.aset_tanah_bangunan, d.aset_lain, d.aset_total, d.aset_kategori,
+    d.luas_tanah,
+    d.modal_perorangan, d.modal_lnprt, d.modal_korporasi_publik,
+    d.modal_korporasi_non, d.modal_pemerintah, d.modal_asing, d.modal_total,
+    // Blok II
+    d.catatan1, d.waktu1,
+    d.catatan2, d.waktu2,
+    d.catatan3, d.waktu3,
+    // Blok III — Petugas
+    d.petugas_nama, d.petugas_nip, d.petugas_hp,
+    // Blok III — Responden
+    d.responden_nama, d.responden_hp, d.responden_email,
+    d.tanggal_pelaksanaan,
+    d.tanda_tangan ? "[ada]" : "[kosong]",
+    // Q19c + L.KP
+    d.transaksi_beli_jasa_nonpenduduk,
+    d.lkp_data || ''
+  ];
+}
 
 function doPost(e) {
   try {
     const d = JSON.parse(e.postData.contents);
 
-    // Route: ambil config (password hash)
-    if (d.action === "getConfig") {
-      return getConfigResponse();
-    }
+    if (d.action === "getConfig")  return getConfigResponse();
+    if (d.action === "setConfig")  return setConfigResponse(d.key, d.value);
+    if (d.action === "getRecords") return getRecordsResponse();
 
-    // Route: simpan config (password hash)
-    if (d.action === "setConfig") {
-      return setConfigResponse(d.key, d.value);
-    }
+    const ss  = SpreadsheetApp.openById(SHEET_ID);
+    let sheet = ss.getSheetByName(SHEET_NAME);
 
-    // Route: ambil semua rekaman (untuk halaman daftar)
-    if (d.action === "getRecords") {
-      return getRecordsResponse();
-    }
-
-    const ss    = SpreadsheetApp.openById(SHEET_ID);
-    let sheet   = ss.getSheetByName(SHEET_NAME);
-
-    // Route: hapus rekaman
     if (d.action === "deleteRecord" && d._delete_id && parseInt(d._delete_id) > 0) {
-      if (!sheet) {
-        return ContentService
-          .createTextOutput(JSON.stringify({ status: "error", message: "Sheet tidak ditemukan" }))
-          .setMimeType(ContentService.MimeType.JSON);
-      }
+      if (!sheet) return jsonResponse({ status: "error", message: "Sheet tidak ditemukan" });
       return deleteSheetRecord(sheet, parseInt(d._delete_id));
     }
 
@@ -122,115 +191,44 @@ function doPost(e) {
 
     if (sheet.getLastRow() === 0) {
       sheet.appendRow(HEADERS);
-      const headerRange = sheet.getRange(1, 1, 1, HEADERS.length);
-      headerRange
+      sheet.getRange(1, 1, 1, HEADERS.length)
         .setFontWeight("bold")
         .setBackground("#fc6c00")
         .setFontColor("#ffffff");
       sheet.setFrozenRows(1);
-      sheet.setColumnWidth(1, 160); // Timestamp
+      sheet.setColumnWidth(1, 160);
     }
 
-    // MODE EDIT: timpa baris yang ada
     if (d._edit_id && parseInt(d._edit_id) > 0) {
       return updateRecord(sheet, d, parseInt(d._edit_id));
     }
 
-    sheet.appendRow([
-      d.timestamp || new Date().toLocaleString("id-ID"),
-      // Lokasi
-      d.provinsi, d.provinsi_kd,
-      d.kabupaten, d.kabupaten_kd,
-      d.kecamatan, d.kecamatan_kd,
-      d.kelurahan, d.kelurahan_kd,
-      // Q5
-      d.nama_perusahaan, d.nama_komersial,
-      d.alamat, d.rt, d.rw, d.kode_pos,
-      d.email_perusahaan, d.website,
-      d.telepon, d.hp,
-      d.jenis_kawasan, d.nama_kawasan,
-      // Q6
-      d.punya_nib, d.nib,
-      d.alasan_no_nib, d.alasan_no_nib_lain,
-      // Q7
-      d.badan_usaha, d.kdkmp, d.jenis_koperasi, d.laporan_keuangan,
-      // Q8
-      d.nama_pengusaha, d.jenis_kelamin_pengusaha, d.umur_pengusaha, d.nik_pengusaha,
-      // Q9
-      d.kegiatan_utama,
-      d.produksi_barang, d.layanan_makan, d.penjualan_barang, d.aktivitas_jasa,
-      d.lokasi_usaha,
-      d.input_digunakan, d.proses_produksi, d.produk_utama,
-      d.kbli_kode, d.kbli_judul, d.kbli_kategori,
-      d.klasifikasi_hotel,
-      // Q10
-      d.jaringan_usaha, d.jumlah_cabang,
-      // Q11
-      d.kp_nama, d.kp_alamat, d.kp_email, d.kp_negara, d.kp_provinsi, d.kp_kabupaten,
-      // Q12
-      d.pakai_internet,
-      d.internet_pesanan, d.internet_produksi, d.internet_distribusi,
-      d.internet_beli, d.internet_promosi, d.internet_lain,
-      d.digital,
-      // Q13-Q19
-      d.ramah_lingkungan, d.biaya_lingkungan,
-      d.produk_kreatif,
-      d.sertifikat_halal, d.varian_halal_bpjph, d.varian_belum_halal_bpjph,
-      d.izin_edar, d.varian_bpom, d.varian_belum_bpom,
-      d.mitra_kdkmp,
-      d.program_mbg,
-      d.transaksi_barang_nonpenduduk, d.transaksi_jasa_nonpenduduk,
-      // Q20-Q25
-      d.pekerja_laki, d.pekerja_perempuan, d.pekerja_total,
-      d.tahun_beroperasi,
-      d.pengeluaran_upah, d.pengeluaran_produksi, d.pengeluaran_beli_barang,
-      d.pengeluaran_operasional, d.pengeluaran_nonoperasional, d.pengeluaran_total,
-      d.pendapatan_barang_jasa, d.pendapatan_lain, d.pendapatan_total,
-      d.pct_online,
-      d.aset_tanah_bangunan, d.aset_lain, d.aset_total, d.aset_kategori,
-      d.luas_tanah,
-      d.modal_perorangan, d.modal_lnprt, d.modal_korporasi_publik,
-      d.modal_korporasi_non, d.modal_pemerintah, d.modal_asing, d.modal_total,
-      // Blok II
-      d.catatan1, d.waktu1,
-      d.catatan2, d.waktu2,
-      d.catatan3, d.waktu3,
-      // Blok III — Petugas
-      d.petugas_nama, d.petugas_nip, d.petugas_hp,
-      // Blok III — Responden
-      d.responden_nama, d.responden_hp, d.responden_email,
-      d.tanggal_pelaksanaan,
-      d.tanda_tangan ? "[ada]" : "[kosong]" // simpan flag saja, bukan base64 penuh
-    ]);
-
-    // Format kolom HP/NIP/NIB/NIK sebagai teks agar angka 0 di depan tidak hilang
+    sheet.appendRow(buildRow(d));
+    const newId = sheet.getLastRow() - 1;
     applyTextFormat(sheet, sheet.getLastRow(), d);
+    saveLKPBranches(sheet, newId, d);
 
-    // Opsional: simpan tanda tangan sebagai file Drive
     if (d.tanda_tangan && d.tanda_tangan.length > 100) {
-      try {
-        saveTandaTangan(d);
-      } catch(sigErr) {
-        Logger.log("Gagal simpan TTD: " + sigErr.message);
-      }
+      try { saveTandaTangan(d); } catch(sigErr) { Logger.log("Gagal simpan TTD: " + sigErr.message); }
     }
 
-    return ContentService
-      .createTextOutput(JSON.stringify({ status: "ok", message: "Data berhasil disimpan" }))
-      .setMimeType(ContentService.MimeType.JSON);
+    return jsonResponse({ status: "ok", message: "Data berhasil disimpan" });
 
   } catch (err) {
     Logger.log("doPost error: " + err.message);
-    return ContentService
-      .createTextOutput(JSON.stringify({ status: "error", message: err.message }))
-      .setMimeType(ContentService.MimeType.JSON);
+    return jsonResponse({ status: "error", message: err.message });
   }
+}
+
+function jsonResponse(obj) {
+  return ContentService
+    .createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
 }
 
 // Konversi nilai sel ke string — tangani Date object dari Google Sheets
 function cellStr(v) {
   if (v instanceof Date) {
-    // Format: YYYY-MM-DDTHH:mm (kompatibel dengan input[type=date] dan datetime-local)
     return Utilities.formatDate(v, Session.getScriptTimeZone(), "yyyy-MM-dd'T'HH:mm");
   }
   return (v !== null && v !== undefined) ? String(v) : "";
@@ -242,9 +240,7 @@ function getRecordsResponse() {
     const ss    = SpreadsheetApp.openById(SHEET_ID);
     const sheet = ss.getSheetByName(SHEET_NAME);
     if (!sheet || sheet.getLastRow() <= 1) {
-      return ContentService
-        .createTextOutput(JSON.stringify({ status: "ok", data: [] }))
-        .setMimeType(ContentService.MimeType.JSON);
+      return jsonResponse({ status: "ok", data: [] });
     }
     const values = sheet.getDataRange().getValues();
     const rows = values.slice(1).map(function(row, idx) {
@@ -255,13 +251,9 @@ function getRecordsResponse() {
       obj._ts = obj.timestamp;
       return obj;
     });
-    return ContentService
-      .createTextOutput(JSON.stringify({ status: "ok", data: rows }))
-      .setMimeType(ContentService.MimeType.JSON);
+    return jsonResponse({ status: "ok", data: rows });
   } catch(err) {
-    return ContentService
-      .createTextOutput(JSON.stringify({ status: "error", message: err.message }))
-      .setMimeType(ContentService.MimeType.JSON);
+    return jsonResponse({ status: "error", message: err.message });
   }
 }
 
@@ -279,17 +271,16 @@ function getOrCreateFolder(name) {
   return it.hasNext() ? it.next() : DriveApp.createFolder(name);
 }
 
-// Format kolom yang berisi angka tapi harus disimpan sebagai teks (HP, NIP, NIK, NIB, kode pos)
+// Format kolom yang berisi angka tapi harus disimpan sebagai teks
 function applyTextFormat(sheet, rowNum, d) {
-  // Kolom 1-based berdasarkan urutan FIELD_NAMES/appendRow
   var textFields = [
-    { col: 15, val: d.kode_pos },          // kode_pos
-    { col: 19, val: d.hp },                // No HP/WA perusahaan
-    { col: 23, val: d.nib },               // NIB
-    { col: 33, val: d.nik_pengusaha },     // NIK
-    { col: 109, val: d.petugas_nip },      // NIP petugas
-    { col: 110, val: d.petugas_hp },       // HP petugas
-    { col: 112, val: d.responden_hp }      // HP responden
+    { col: 15,  val: d.kode_pos },
+    { col: 19,  val: d.hp },
+    { col: 23,  val: d.nib },
+    { col: 33,  val: d.nik_pengusaha },
+    { col: 109, val: d.petugas_nip },
+    { col: 110, val: d.petugas_hp },
+    { col: 112, val: d.responden_hp }
   ];
   textFields.forEach(function(f) {
     if (f.val !== null && f.val !== undefined && f.val !== '') {
@@ -300,91 +291,97 @@ function applyTextFormat(sheet, rowNum, d) {
   });
 }
 
-// Timpa rekaman yang ada berdasarkan _id (1-based, baris sheet = _id + 1)
+// Timpa rekaman yang ada berdasarkan _id
 function updateRecord(sheet, d, editId) {
   var targetRow = editId + 1;
   if (targetRow < 2 || targetRow > sheet.getLastRow()) {
-    return ContentService
-      .createTextOutput(JSON.stringify({ status: "error", message: "Rekaman tidak ditemukan (id=" + editId + ")" }))
-      .setMimeType(ContentService.MimeType.JSON);
+    return jsonResponse({ status: "error", message: "Rekaman tidak ditemukan (id=" + editId + ")" });
   }
-  var rowData = [
-    d.timestamp || new Date().toLocaleString("id-ID"),
-    d.provinsi, d.provinsi_kd,
-    d.kabupaten, d.kabupaten_kd,
-    d.kecamatan, d.kecamatan_kd,
-    d.kelurahan, d.kelurahan_kd,
-    d.nama_perusahaan, d.nama_komersial,
-    d.alamat, d.rt, d.rw, d.kode_pos,
-    d.email_perusahaan, d.website,
-    d.telepon, d.hp,
-    d.jenis_kawasan, d.nama_kawasan,
-    d.punya_nib, d.nib,
-    d.alasan_no_nib, d.alasan_no_nib_lain,
-    d.badan_usaha, d.kdkmp, d.jenis_koperasi, d.laporan_keuangan,
-    d.nama_pengusaha, d.jenis_kelamin_pengusaha, d.umur_pengusaha, d.nik_pengusaha,
-    d.kegiatan_utama,
-    d.produksi_barang, d.layanan_makan, d.penjualan_barang, d.aktivitas_jasa,
-    d.lokasi_usaha,
-    d.input_digunakan, d.proses_produksi, d.produk_utama,
-    d.kbli_kode, d.kbli_judul, d.kbli_kategori,
-    d.klasifikasi_hotel,
-    d.jaringan_usaha, d.jumlah_cabang,
-    d.kp_nama, d.kp_alamat, d.kp_email, d.kp_negara, d.kp_provinsi, d.kp_kabupaten,
-    d.pakai_internet,
-    d.internet_pesanan, d.internet_produksi, d.internet_distribusi,
-    d.internet_beli, d.internet_promosi, d.internet_lain,
-    d.digital,
-    d.ramah_lingkungan, d.biaya_lingkungan,
-    d.produk_kreatif,
-    d.sertifikat_halal, d.varian_halal_bpjph, d.varian_belum_halal_bpjph,
-    d.izin_edar, d.varian_bpom, d.varian_belum_bpom,
-    d.mitra_kdkmp,
-    d.program_mbg,
-    d.transaksi_barang_nonpenduduk, d.transaksi_jasa_nonpenduduk,
-    d.pekerja_laki, d.pekerja_perempuan, d.pekerja_total,
-    d.tahun_beroperasi,
-    d.pengeluaran_upah, d.pengeluaran_produksi, d.pengeluaran_beli_barang,
-    d.pengeluaran_operasional, d.pengeluaran_nonoperasional, d.pengeluaran_total,
-    d.pendapatan_barang_jasa, d.pendapatan_lain, d.pendapatan_total,
-    d.pct_online,
-    d.aset_tanah_bangunan, d.aset_lain, d.aset_total, d.aset_kategori,
-    d.luas_tanah,
-    d.modal_perorangan, d.modal_lnprt, d.modal_korporasi_publik,
-    d.modal_korporasi_non, d.modal_pemerintah, d.modal_asing, d.modal_total,
-    d.catatan1, d.waktu1,
-    d.catatan2, d.waktu2,
-    d.catatan3, d.waktu3,
-    d.petugas_nama, d.petugas_nip, d.petugas_hp,
-    d.responden_nama, d.responden_hp, d.responden_email,
-    d.tanggal_pelaksanaan,
-    d.tanda_tangan ? "[ada]" : "[kosong]"
-  ];
-  sheet.getRange(targetRow, 1, 1, rowData.length).setValues([rowData]);
+  sheet.getRange(targetRow, 1, 1, HEADERS.length).setValues([buildRow(d)]);
   applyTextFormat(sheet, targetRow, d);
+  deleteLKPBranches(sheet, editId);
+  saveLKPBranches(sheet, editId, d);
   if (d.tanda_tangan && d.tanda_tangan.length > 100) {
     try { saveTandaTangan(d); } catch(sigErr) { Logger.log("Gagal simpan TTD: " + sigErr.message); }
   }
-  return ContentService
-    .createTextOutput(JSON.stringify({ status: "ok", message: "Data berhasil diperbarui" }))
-    .setMimeType(ContentService.MimeType.JSON);
+  return jsonResponse({ status: "ok", message: "Data berhasil diperbarui" });
 }
 
-// Hapus rekaman berdasarkan _id (1-based, baris sheet = _id + 1)
+// Hapus rekaman berdasarkan _id
 function deleteSheetRecord(sheet, deleteId) {
   var targetRow = deleteId + 1;
   if (targetRow < 2 || targetRow > sheet.getLastRow()) {
-    return ContentService
-      .createTextOutput(JSON.stringify({ status: "error", message: "Rekaman tidak ditemukan (id=" + deleteId + ")" }))
-      .setMimeType(ContentService.MimeType.JSON);
+    return jsonResponse({ status: "error", message: "Rekaman tidak ditemukan (id=" + deleteId + ")" });
   }
+  deleteLKPBranches(sheet, deleteId);
   sheet.deleteRow(targetRow);
-  return ContentService
-    .createTextOutput(JSON.stringify({ status: "ok", message: "Rekaman berhasil dihapus" }))
-    .setMimeType(ContentService.MimeType.JSON);
+  return jsonResponse({ status: "ok", message: "Rekaman berhasil dihapus" });
 }
 
-// Urutan kolom ini HARUS sama dengan appendRow di doPost dan HEADERS di atas
+// ============================================================
+// SE2026_LKP — Manajemen Data Cabang
+// ============================================================
+
+function getOrInitLKPSheet(ss) {
+  var lkpSheet = ss.getSheetByName(LKP_SHEET_NAME);
+  if (!lkpSheet) {
+    lkpSheet = ss.insertSheet(LKP_SHEET_NAME);
+    lkpSheet.appendRow(LKP_HEADERS);
+    lkpSheet.getRange(1, 1, 1, LKP_HEADERS.length)
+      .setFontWeight("bold")
+      .setBackground("#1a56db")
+      .setFontColor("#ffffff");
+    lkpSheet.setFrozenRows(1);
+    lkpSheet.setColumnWidth(1, 80);   // Record ID
+    lkpSheet.setColumnWidth(3, 180);  // Nama Perusahaan
+    lkpSheet.setColumnWidth(5, 200);  // Nama Kantor/Unit
+  }
+  return lkpSheet;
+}
+
+// Tulis baris cabang ke SE2026_LKP (satu baris per cabang)
+function saveLKPBranches(sheet, mainId, d) {
+  if (!d.lkp_data) return;
+  var branches;
+  try { branches = JSON.parse(d.lkp_data); } catch(e) { return; }
+  if (!branches || !branches.length) return;
+  var lkpSheet = getOrInitLKPSheet(sheet.getParent());
+  branches.forEach(function(b) {
+    lkpSheet.appendRow([
+      mainId,
+      d.timestamp || '',
+      d.nama_perusahaan || '',
+      b.no,
+      b.nama,
+      b.jenis,
+      b.provinsi,
+      b.kabupaten,
+      b.kbli,
+      b.pekerja,
+      b.pengeluaran,
+      b.pendapatan,
+      b.aset
+    ]);
+  });
+}
+
+// Hapus semua baris cabang untuk mainId tertentu
+function deleteLKPBranches(sheet, mainId) {
+  var lkpSheet = sheet.getParent().getSheetByName(LKP_SHEET_NAME);
+  if (!lkpSheet || lkpSheet.getLastRow() <= 1) return;
+  var lastRow = lkpSheet.getLastRow();
+  var ids = lkpSheet.getRange(2, 1, lastRow - 1, 1).getValues();
+  // Hapus dari bawah ke atas agar row index tidak bergeser
+  for (var i = ids.length - 1; i >= 0; i--) {
+    if (String(ids[i][0]) === String(mainId)) {
+      lkpSheet.deleteRow(i + 2);
+    }
+  }
+}
+
+// ============================================================
+// FIELD_NAMES — urutan HARUS sama dengan buildRow / HEADERS
+// ============================================================
 const FIELD_NAMES = [
   "timestamp",
   "provinsi", "provinsi_kd",
@@ -418,7 +415,7 @@ const FIELD_NAMES = [
   "izin_edar", "varian_bpom", "varian_belum_bpom",
   "mitra_kdkmp",
   "program_mbg",
-  "transaksi_barang_nonpenduduk", "transaksi_jasa_nonpenduduk",
+  "transaksi_barang_nonpenduduk", "transaksi_jual_jasa_nonpenduduk",
   "pekerja_laki", "pekerja_perempuan", "pekerja_total",
   "tahun_beroperasi",
   "pengeluaran_upah", "pengeluaran_produksi", "pengeluaran_beli_barang",
@@ -435,7 +432,9 @@ const FIELD_NAMES = [
   "petugas_nama", "petugas_nip", "petugas_hp",
   "responden_nama", "responden_hp", "responden_email",
   "tanggal_pelaksanaan",
-  "tanda_tangan"
+  "tanda_tangan",
+  "transaksi_beli_jasa_nonpenduduk",
+  "lkp_data"
 ];
 
 // Kembalikan semua config dari sheet CAWI_Config sebagai objek key-value
@@ -450,13 +449,9 @@ function getConfigResponse() {
         if (row[0]) config[String(row[0])] = String(row[1] || '');
       });
     }
-    return ContentService
-      .createTextOutput(JSON.stringify({ status: "ok", data: config }))
-      .setMimeType(ContentService.MimeType.JSON);
+    return jsonResponse({ status: "ok", data: config });
   } catch(err) {
-    return ContentService
-      .createTextOutput(JSON.stringify({ status: "error", message: err.message }))
-      .setMimeType(ContentService.MimeType.JSON);
+    return jsonResponse({ status: "error", message: err.message });
   }
 }
 
@@ -473,36 +468,25 @@ function setConfigResponse(key, value) {
       for (var i = 0; i < keys.length; i++) {
         if (keys[i][0] === key) {
           sheet.getRange(i + 1, 2).setValue(value || '');
-          return ContentService
-            .createTextOutput(JSON.stringify({ status: "ok" }))
-            .setMimeType(ContentService.MimeType.JSON);
+          return jsonResponse({ status: "ok" });
         }
       }
     }
     sheet.appendRow([key, value || '']);
-    return ContentService
-      .createTextOutput(JSON.stringify({ status: "ok" }))
-      .setMimeType(ContentService.MimeType.JSON);
+    return jsonResponse({ status: "ok" });
   } catch(err) {
-    return ContentService
-      .createTextOutput(JSON.stringify({ status: "error", message: err.message }))
-      .setMimeType(ContentService.MimeType.JSON);
+    return jsonResponse({ status: "error", message: err.message });
   }
 }
 
-// Endpoint GET — kembalikan semua rekaman sebagai JSON (butuh token)
+// Endpoint GET — kembalikan semua rekaman sebagai JSON
 function doGet(e) {
   try {
-    // doGet tersedia untuk referensi — tidak digunakan oleh halaman utama
-
     const ss    = SpreadsheetApp.openById(SHEET_ID);
     const sheet = ss.getSheetByName(SHEET_NAME);
     if (!sheet || sheet.getLastRow() <= 1) {
-      return ContentService
-        .createTextOutput(JSON.stringify({ status: "ok", data: [] }))
-        .setMimeType(ContentService.MimeType.JSON);
+      return jsonResponse({ status: "ok", data: [] });
     }
-
     const values = sheet.getDataRange().getValues();
     const rows = values.slice(1).map(function(row, idx) {
       var obj = { _id: idx + 1 };
@@ -512,14 +496,8 @@ function doGet(e) {
       obj._ts = obj.timestamp;
       return obj;
     });
-
-    return ContentService
-      .createTextOutput(JSON.stringify({ status: "ok", data: rows }))
-      .setMimeType(ContentService.MimeType.JSON);
-
+    return jsonResponse({ status: "ok", data: rows });
   } catch(err) {
-    return ContentService
-      .createTextOutput(JSON.stringify({ status: "error", message: err.message }))
-      .setMimeType(ContentService.MimeType.JSON);
+    return jsonResponse({ status: "error", message: err.message });
   }
 }
