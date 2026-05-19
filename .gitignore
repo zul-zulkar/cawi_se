@@ -3,6 +3,10 @@ daftar_pegawai.xlsx
 *.xlsx
 *.xls
 
+# Node.js / testing
+node_modules/
+tests/coverage/
+
 # OS / editor
 .DS_Store
 Thumbs.db

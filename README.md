@@ -92,6 +92,61 @@ cawi_se26/
 
 ---
 
+## Menjalankan Test Suite
+
+Proyek ini dilengkapi unit test menggunakan [Vitest](https://vitest.dev/) untuk memverifikasi fungsi-fungsi inti.
+
+### Prasyarat
+
+Node.js v18 atau lebih baru. Cek dengan:
+```bash
+node --version
+```
+Jika belum terinstall, unduh dari [nodejs.org](https://nodejs.org) atau lewat `winget install OpenJS.NodeJS.LTS` (Windows).
+
+### Instalasi Dependencies
+
+```bash
+cd cawi_se
+npm install
+```
+
+### Menjalankan Test
+
+```bash
+# Jalankan semua test sekali
+npm test
+
+# Jalankan ulang otomatis saat ada perubahan file
+npm run test:watch
+
+# Jalankan + laporan coverage (HTML di tests/coverage/)
+npm run coverage
+```
+
+Contoh output saat semua test lolos:
+```
+ Test Files  3 passed (3)
+      Tests  89 passed (89)
+   Duration  ~1s
+```
+
+### Struktur Test
+
+```
+tests/
+├── helpers/
+│   └── load-source.js   # Loader fungsi dari browser scripts (tanpa DOM nyata)
+└── unit/
+    ├── utils.test.js     # esc(), fmtDate(), sha256()
+    ├── kbli.test.js      # getKategoriFromKode(), scoreKBLI(), dll.
+    └── validators.test.js # isValidHP(), isValidEmail(), parseCurrency()
+```
+
+> **Catatan teknis:** Fungsi-fungsi yang ditest sepenuhnya independen dari DOM (pure functions). Script browser dimuat ke konteks test melalui `new Function()` dengan mock DOM minimal, sehingga tidak ada perubahan pada source file.
+
+---
+
 ## Cara Duplikasi Proyek
 
 ### 1. Salin Repository
