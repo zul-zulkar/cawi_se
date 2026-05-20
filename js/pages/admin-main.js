@@ -100,6 +100,9 @@ async function saveNewPassword() {
 
 async function resetToDefault() {
   hideAlerts();
+  const btn = document.querySelector('[onclick="resetToDefault()"]');
+  const orig = btn ? btn.textContent : '';
+  if (btn) { btn.disabled = true; btn.textContent = 'Mereset…'; }
   try {
     const res = await fetch(getScriptUrl(), {
       method: 'POST',
@@ -110,8 +113,10 @@ async function resetToDefault() {
     if (d.status !== 'ok') throw new Error(d.message || 'Gagal reset');
   } catch(e) {
     showAlert('alertErr', 'Gagal reset: ' + e.message);
+    if (btn) { btn.disabled = false; btn.textContent = orig; }
     return;
   }
+  if (btn) { btn.disabled = false; btn.textContent = orig; }
   _kuesionerHash = DEFAULT_PW_HASH;
   initPage();
   document.getElementById('alertReset').style.display = 'block';
@@ -172,6 +177,9 @@ async function saveAdminPassword() {
 
 async function resetAdminToDefault() {
   hideAdminAlerts();
+  const btn = document.querySelector('[onclick="resetAdminToDefault()"]');
+  const orig = btn ? btn.textContent : '';
+  if (btn) { btn.disabled = true; btn.textContent = 'Mereset…'; }
   try {
     const res = await fetch(getScriptUrl(), {
       method: 'POST',
@@ -182,8 +190,10 @@ async function resetAdminToDefault() {
     if (d.status !== 'ok') throw new Error(d.message || 'Gagal reset');
   } catch(e) {
     showAdminAlert('alertAdminErr', 'Gagal reset: ' + e.message);
+    if (btn) { btn.disabled = false; btn.textContent = orig; }
     return;
   }
+  if (btn) { btn.disabled = false; btn.textContent = orig; }
   _adminHash = ADMIN_DEFAULT_HASH;
   initPage();
   document.getElementById('alertAdminReset').style.display = 'block';
@@ -257,8 +267,13 @@ function saveSheetUrl() {
   showSheetAlert('alertSheetOk', '✅ URL Google Sheet berhasil disimpan.');
 }
 
-function resetSheetUrl() {
+async function resetSheetUrl() {
+  const btn = document.querySelector('[onclick="resetSheetUrl()"]');
+  const orig = btn ? btn.textContent : '';
+  if (btn) { btn.disabled = true; btn.textContent = 'Mereset…'; }
+  await new Promise(r => setTimeout(r, 200)); // let UI repaint
   localStorage.removeItem(SHEET_URL_KEY);
+  if (btn) { btn.disabled = false; btn.textContent = orig; }
   initSheetCard();
   showSheetAlert('alertSheetOk', '✅ URL direset ke default.');
 }

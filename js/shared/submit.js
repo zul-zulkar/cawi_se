@@ -578,6 +578,8 @@ async function submitForm() {
 
   const btn = document.getElementById(submitBtnId);
   if (btn) { btn.disabled = true; btn.textContent = 'Mengirim...'; }
+  const loadingOverlay = document.getElementById('submitLoadingOverlay');
+  if (loadingOverlay) loadingOverlay.style.display = 'flex';
 
   try {
     const data = collectData();
@@ -611,6 +613,8 @@ async function submitForm() {
     cancelEditMode();
     clearDraft();
     if (_currentDraftId) { deleteDraftById(_currentDraftId); }
+    // Mark form clean so leave-guard / beforeunload don't prompt after submit
+    if (typeof _formDirty !== 'undefined') _formDirty = false;
     // Simpan ringkasan ke daftar lokal
     try {
       const LS_REC = 'cawi_se2026_records_v1';
@@ -618,6 +622,7 @@ async function submitForm() {
       recs.unshift({ _id: Date.now(), _ts: new Date().toISOString(), ...data });
       localStorage.setItem(LS_REC, JSON.stringify(recs));
     } catch(_e) {}
+    if (loadingOverlay) loadingOverlay.style.display = 'none';
     const submitAlertEl = document.getElementById(submitAlertId);
     if (submitAlertEl) submitAlertEl.classList.add('hidden');
     const successDiv = document.createElement('div');
@@ -628,6 +633,7 @@ async function submitForm() {
     if (btn) btn.parentNode.insertBefore(successDiv, btn);
   } catch(e) {
     if (btn) { btn.disabled = false; btn.textContent = 'KIRIM / SUBMIT'; }
+    if (loadingOverlay) loadingOverlay.style.display = 'none';
     showAlert(submitAlertId, 'Gagal mengirim: ' + e.message + '. Pastikan koneksi internet stabil dan coba lagi.');
   }
 }

@@ -24,20 +24,31 @@ async function checkPassword() {
   if (!_activeHash) return;
   const pw = document.getElementById('pwInput').value;
   if (!pw) return;
-  const h = await hashPassword(pw);
-  if (h === _activeHash) {
-    sessionStorage.setItem(PW_SESSION_KEY, '1');
-    document.getElementById('pwGate').style.display = 'none';
-    document.dispatchEvent(new Event('cawi-auth-ok'));
-  } else {
-    document.getElementById('pwError').style.display = 'block';
-    document.getElementById('pwInput').value = '';
-    document.getElementById('pwInput').focus();
+  const btn = document.querySelector('#pwGate button[type="button"], #pwGate button:not([type])');
+  const inp = document.getElementById('pwInput');
+  if (btn) { btn.disabled = true; btn.textContent = 'Memeriksa…'; }
+  if (inp) inp.disabled = true;
+  try {
+    const h = await hashPassword(pw);
+    if (h === _activeHash) {
+      sessionStorage.setItem(PW_SESSION_KEY, '1');
+      document.getElementById('pwGate').style.display = 'none';
+      document.dispatchEvent(new Event('cawi-auth-ok'));
+    } else {
+      document.getElementById('pwError').style.display = 'block';
+      inp.value = '';
+      inp.focus();
+      if (btn) { btn.disabled = false; btn.textContent = 'Masuk'; }
+    }
+  } finally {
+    if (inp) inp.disabled = false;
+    if (btn && btn.disabled) { btn.disabled = false; btn.textContent = 'Masuk'; }
   }
 }
 
 function logoutKuesioner() {
   sessionStorage.removeItem(PW_SESSION_KEY);
+  localStorage.removeItem('cawi_form_mode'); // force mode-gate on next login
   location.reload();
 }
 

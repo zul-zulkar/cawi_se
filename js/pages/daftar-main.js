@@ -226,10 +226,10 @@ function renderTable() {
         <td data-label="Kecamatan" style="font-size:12.5px;color:#555">${esc(r.kecamatan||'—')}</td>
         <td data-label="Waktu" style="font-size:12px;color:#888;white-space:nowrap">${fmtDate(r._ts||r.timestamp)}</td>
         <td><div class="td-actions">
-          <button class="btn btn-sm btn-info" title="Lihat" onclick="viewRecord(${r._id})">&#128065;</button>
-          <button class="btn btn-sm" style="background:#38a169;color:#fff" title="Edit" onclick="editRecord(${r._id})">&#9998;</button>
-          <button class="btn btn-sm" style="background:#805ad5;color:#fff" title="Duplikat" onclick="duplicateRecord(${r._id})">&#9986;</button>
-          <button class="btn btn-sm" style="background:#e53e3e;color:#fff" title="Hapus" onclick="deleteRecord(${r._id})">&#128465;</button>
+          <button class="btn btn-sm btn-info" title="Lihat" onclick="viewRecord(${r._id},'${mode}')">&#128065;</button>
+          <button class="btn btn-sm" style="background:#38a169;color:#fff" title="Edit" onclick="editRecord(${r._id},'${mode}')">&#9998;</button>
+          <button class="btn btn-sm" style="background:#805ad5;color:#fff" title="Duplikat" onclick="duplicateRecord(${r._id},'${mode}')">&#9986;</button>
+          <button class="btn btn-sm" style="background:#e53e3e;color:#fff" title="Hapus" onclick="deleteRecord(${r._id},'${mode}')">&#128465;</button>
         </div></td>
       </tr>`;
     }
@@ -376,16 +376,18 @@ function viewSectionsL(r) {
 }
 
 /* ====== VIEW ====== */
-function viewRecord(id) {
-  const r = records.find(x => x._id === id);
+function viewRecord(id, mode) {
+  const r = mode
+    ? records.find(x => x._id === id && getRecordMode(x) === mode)
+    : records.find(x => x._id === id);
   if (!r) return;
-  const mode = getRecordMode(r);
+  const recMode = getRecordMode(r);
   const titleName = getRecordName(r) || 'Detail Entri';
   document.getElementById('viewTitle').textContent    = titleName;
   document.getElementById('viewSubtitle').textContent =
-    `${mode === 'l' ? '[L]' : '[L.UB]'} Submit: ${fmtDate(r._ts||r.timestamp)} | Petugas: ${r.petugas_nama || '—'}`;
+    `${recMode === 'l' ? '[L]' : '[L.UB]'} Submit: ${fmtDate(r._ts||r.timestamp)} | Petugas: ${r.petugas_nama || '—'}`;
 
-  const sections = (mode === 'l') ? viewSectionsL(r) : viewSectionsLUB(r);
+  const sections = (recMode === 'l') ? viewSectionsL(r) : viewSectionsLUB(r);
 
   let html = '';
   sections.forEach(sec => {
@@ -410,8 +412,10 @@ function closeView() {
 }
 
 /* ====== EDIT ====== */
-function editRecord(id) {
-  const r = records.find(x => x._id === id);
+function editRecord(id, mode) {
+  const r = mode
+    ? records.find(x => x._id === id && getRecordMode(x) === mode)
+    : records.find(x => x._id === id);
   if (!r) return;
   localStorage.setItem('cawi_form_mode', getRecordMode(r));
   localStorage.setItem('cawi_edit_mode', JSON.stringify(r));
@@ -419,8 +423,10 @@ function editRecord(id) {
 }
 
 /* ====== DUPLIKAT ====== */
-function duplicateRecord(id) {
-  const r = records.find(x => x._id === id);
+function duplicateRecord(id, mode) {
+  const r = mode
+    ? records.find(x => x._id === id && getRecordMode(x) === mode)
+    : records.find(x => x._id === id);
   if (!r) return;
   const copy = Object.assign({}, r);
   delete copy._id;
@@ -437,10 +443,10 @@ function duplicateRecord(id) {
 let _pendingDeleteId = null;
 let _pendingDeleteMode = null;
 
-function deleteRecord(id) {
-  // Records lama tanpa _formMode dianggap L.UB — kedua sheet bisa punya _id yg sama
-  // sehingga butuh mode untuk disambiguasi
-  const r = records.find(x => x._id === id && !x._isDraft);
+function deleteRecord(id, mode) {
+  const r = mode
+    ? records.find(x => x._id === id && !x._isDraft && getRecordMode(x) === mode)
+    : records.find(x => x._id === id && !x._isDraft);
   if (!r) return;
   _pendingDeleteId   = id;
   _pendingDeleteMode = getRecordMode(r);
@@ -454,6 +460,8 @@ function deleteRecord(id) {
 function cancelDelete() {
   _pendingDeleteId   = null;
   _pendingDeleteMode = null;
+  const btn = document.getElementById('confirmDeleteBtn');
+  if (btn) { btn.innerHTML = '&#128465; Hapus'; btn.disabled = false; }
   document.getElementById('confirmOverlay').classList.remove('open');
 }
 
@@ -535,6 +543,13 @@ function exportCSV() {
   a.download = `CAWI_SE2026_${new Date().toISOString().slice(0,10)}.csv`;
   a.click();
   URL.revokeObjectURL(url);
+}
+
+/* ====== NEW ENTRY ====== */
+function newEntry() {
+  // Always clear mode so the pre-selector gate shows on index.html
+  localStorage.removeItem('cawi_form_mode');
+  window.location.href = 'index.html';
 }
 
 /* ====== INIT ====== */

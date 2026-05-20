@@ -37,7 +37,7 @@
   <button class="hamburger-btn" onclick="toggleSidebar()">&#9776;</button>
   <div class="mobile-title">CAWI <span>SE2026</span></div>
   <div class="mobile-topbar-actions">
-    <a href="index.html" class="mobile-action-btn">&#43; Baru</a>
+    <button class="mobile-action-btn" onclick="newEntry()">&#43; Baru</button>
     <button class="mobile-action-btn" onclick="fetchRecords()">&#8635;</button>
     <button class="mobile-action-btn" onclick="logoutKuesioner()" style="color:#c53030">&#128274;</button>
   </div>
@@ -84,9 +84,9 @@
   <div class="sidebar-divider"></div>
   <div class="sidebar-nav-label">TINDAKAN</div>
   <div class="sidebar-actions">
-    <a href="index.html" class="sidebar-btn sidebar-btn-primary">
+    <button class="sidebar-btn sidebar-btn-primary" onclick="newEntry()">
       <span class="sidebar-btn-icon">&#43;</span> Entri Baru
-    </a>
+    </button>
     <button class="sidebar-btn" onclick="exportCSV()">
       <span class="sidebar-btn-icon">&#128190;</span> Export CSV
     </button>
@@ -132,6 +132,7 @@
         <option value="lub">Usaha Besar (L.UB)</option>
         <option value="l">Rumah Tangga (L)</option>
       </select>
+      <button class="btn btn-secondary" onclick="fetchRecords()" title="Muat ulang data dari server" style="flex-shrink:0">&#8635; Refresh</button>
     </div>
   </div>
 
