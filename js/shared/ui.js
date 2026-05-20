@@ -1,15 +1,20 @@
 function goBlok(n) {
+  const mode = (typeof getFormMode === 'function') ? getFormMode() : 'lub';
+  const prefix = (mode === 'l') ? 'blokL' : 'blok';
+  const tabPrefix = (mode === 'l') ? 'sidebarTabL' : 'sidebarTab';
   document.querySelectorAll('.blok-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.sidebar-item').forEach(t => t.classList.remove('active'));
-  document.getElementById('blok' + n).classList.add('active');
-  const sTab = document.getElementById('sidebarTab' + n);
+  const panel = document.getElementById(prefix + n);
+  if (panel) panel.classList.add('active');
+  const sTab = document.getElementById(tabPrefix + n);
   if (sTab) sTab.classList.add('active');
   const kop = document.getElementById('headerKop');
   if (kop) kop.classList.toggle('kop-hidden', n !== 1);
-  updateProgress();
+  if (typeof updateProgress === 'function') updateProgress();
   window.scrollTo({top: 0, behavior: 'smooth'});
   closeSidebar();
 }
+
 
 /* ====== SIDEBAR ====== */
 function toggleSidebar() {

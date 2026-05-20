@@ -1,0 +1,36 @@
+<!-- ====== PASSWORD GATE ====== -->
+<div id="pwGate">
+  <div class="pw-card">
+    <div class="pw-title">CAWI</div>
+    <div class="pw-subtitle">SE2026 — BPS Buleleng</div>
+    <div class="pw-restricted">&#128274; AKSES TERBATAS — PETUGAS BPS</div>
+    <input type="password" id="pwInput" class="pw-input" placeholder="Masukkan kata sandi"
+      onkeydown="if(event.key==='Enter')checkPassword()"/>
+    <div id="pwError">&#10005; Kata sandi salah</div>
+    <button class="pw-btn" onclick="checkPassword()">Masuk</button>
+    <p class="pw-note">Hanya untuk petugas pencacah resmi<br/>Sensus Ekonomi 2026 BPS Buleleng</p>
+  </div>
+</div>
+
+<!-- ====== MODE PRE-SELECTOR GATE ====== -->
+<div id="modeGate">
+  <div class="mode-card">
+    <div class="mode-card-title">Jenis Pendataan</div>
+    <div class="mode-card-sub">Pilih jenis kuesioner yang akan diisi. Pilihan ini menentukan struktur form yang ditampilkan.</div>
+    <div class="mode-card-q">Input Usaha/Perusahaan Besar atau Usaha Rumah Tangga (Sedang, Kecil, atau Mikro)?</div>
+    <div class="mode-btns">
+      <button type="button" class="mode-btn" onclick="chooseMode('lub')">
+        <span class="mode-btn-code mode-btn-code-lub">L.UB</span>
+        <div class="mode-btn-title">Usaha / Perusahaan Besar</div>
+        <div class="mode-btn-desc">Kuesioner SE2026-L.UB. Untuk perusahaan menengah-besar dengan badan usaha formal (PT/CV/Koperasi/Yayasan). Termasuk pendataan kantor cabang via L.KP.</div>
+      </button>
+      <button type="button" class="mode-btn" onclick="chooseMode('l')">
+        <span class="mode-btn-code mode-btn-code-l">L</span>
+        <div class="mode-btn-title">Usaha Rumah Tangga (Sedang/Kecil/Mikro)</div>
+        <div class="mode-btn-desc">Kuesioner SE2026-L. Untuk usaha rumah tangga + pendataan keluarga (DTSEN): perumahan, aset, dan sosial ekonomi tiap anggota keluarga.</div>
+      </button>
+    </div>
+    <button type="button" id="modeCancelBtn" class="mode-card-cancel" onclick="hideModeGate()" style="display:none">Batal</button>
+  </div>
+</div>
+

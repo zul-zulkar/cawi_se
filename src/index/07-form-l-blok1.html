@@ -1,0 +1,153 @@
+<!-- ==================== FORM L (Usaha Rumah Tangga + DTSEN) ==================== -->
+<div id="form-l">
+
+<!-- ==================== L BLOK I: Keluarga & Anggota ==================== -->
+<div class="blok-panel active" id="blokL1">
+  <div class="blok-banner">
+    <div class="blok-badge">BLOK I</div>
+    <div>
+      <div class="blok-title-text">Keterangan Keluarga &amp; Anggota</div>
+      <div class="blok-title-sub">Pendataan kepala keluarga, alamat tempat tinggal, dan tiap anggota keluarga (DTSEN)</div>
+    </div>
+  </div>
+
+  <!-- L1.1 Kepala Keluarga -->
+  <div class="section-card">
+    <div class="section-header" id="sec-L1-1">1. Kepala Keluarga</div>
+    <div class="section-body">
+      <div class="form-group">
+        <label class="field-label">a. Nama Kepala Keluarga <span class="req">*</span></label>
+        <input type="text" id="l1_nama_kk" placeholder="Nama lengkap kepala keluarga"/>
+      </div>
+      <div class="inline-fields">
+        <div class="form-group">
+          <label class="field-label">b. NIK Kepala Keluarga <span class="req">*</span></label>
+          <input type="text" id="l1_nik_kk" maxlength="16" placeholder="16 digit NIK"/>
+        </div>
+        <div class="form-group">
+          <label class="field-label">c. Nomor KK <span class="req">*</span></label>
+          <input type="text" id="l1_no_kk" maxlength="16" placeholder="16 digit Nomor Kartu Keluarga"/>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- L1.2 Jumlah Anggota -->
+  <div class="section-card">
+    <div class="section-header" id="sec-L1-2">2. Jumlah Anggota Keluarga</div>
+    <div class="section-body">
+      <div class="inline-fields">
+        <div class="form-group">
+          <label class="field-label">a. Sesuai KK <span class="req">*</span></label>
+          <input type="number" id="l1_jml_kk_anggota" min="1" max="30" placeholder="0" oninput="renderAnggotaCards()"/>
+          <div class="hint">Akan men-generate kartu anggota sesuai jumlah ini (max 30)</div>
+        </div>
+        <div class="form-group">
+          <label class="field-label">b. Hasil Pendataan (autofill)</label>
+          <input type="number" id="l1_jml_pendataan" class="input-muted" readonly placeholder="0"/>
+          <div class="hint">Terhitung otomatis dari kartu anggota yang terisi</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- L1.3 Alamat -->
+  <div class="section-card">
+    <div class="section-header" id="sec-L1-3">3. Alamat Keluarga</div>
+    <div class="section-body">
+      <div class="inline-fields">
+        <div class="form-group">
+          <label class="field-label">a. Provinsi <span class="req">*</span></label>
+          <select id="l1_alamat_provinsi" onchange="loadKabupatenL(this.value)">
+            <option value="">-- Pilih Provinsi --</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="field-label">b. Kabupaten/Kota <span class="req">*</span></label>
+          <select id="l1_alamat_kab" onchange="loadKecamatanL(this.value)" disabled>
+            <option value="">-- Pilih Kabupaten/Kota --</option>
+          </select>
+        </div>
+      </div>
+      <div class="inline-fields">
+        <div class="form-group">
+          <label class="field-label">c. Kecamatan <span class="req">*</span></label>
+          <select id="l1_alamat_kec" onchange="loadKelurahanL(this.value)" disabled>
+            <option value="">-- Pilih Kecamatan --</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="field-label">d. Kelurahan/Desa <span class="req">*</span></label>
+          <select id="l1_alamat_kel" disabled>
+            <option value="">-- Pilih Kelurahan/Desa --</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="field-label">e. Klasifikasi Desa/Kota <span class="req">*</span></label>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l1_klasifikasi" value="1"/> <span>1. Perkotaan</span></label>
+          <label class="radio-item"><input type="radio" name="l1_klasifikasi" value="2"/> <span>2. Perdesaan</span></label>
+        </div>
+      </div>
+      <div class="inline-fields">
+        <div class="form-group">
+          <label class="field-label">f. Kode Pos <span class="req">*</span></label>
+          <input type="text" id="l1_kodepos" maxlength="5" placeholder="00000"/>
+        </div>
+        <div class="form-group">
+          <label class="field-label">g. Kode SLS</label>
+          <input type="text" id="l1_kode_sls" placeholder="Kode SLS"/>
+        </div>
+        <div class="form-group">
+          <label class="field-label">h. Nama SLS</label>
+          <input type="text" id="l1_nama_sls" placeholder="Nama SLS"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="field-label">i. Alamat (Jalan/Gang/Nomor/RT/RW) <span class="req">*</span></label>
+        <input type="text" id="l1_alamat_detail" placeholder="Detail alamat lengkap"/>
+      </div>
+      <div class="inline-fields">
+        <div class="form-group">
+          <label class="field-label">j. Nama Jalan</label>
+          <input type="text" id="l1_nama_jalan" placeholder="Nama Jalan (atau '-' jika tidak ada)"/>
+        </div>
+        <div class="form-group">
+          <label class="field-label">k. Nomor Rumah</label>
+          <input type="text" id="l1_no_rumah" placeholder="Nomor rumah (atau '-' jika tidak ada)"/>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- L1.4 Kesesuaian KK -->
+  <div class="section-card">
+    <div class="section-header" id="sec-L1-4">4. Kesesuaian Alamat dengan KK</div>
+    <div class="section-body">
+      <div class="form-group">
+        <label class="field-label">Apakah alamat tersebut sesuai dengan KK? <span class="req">*</span></label>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l1_sesuai_kk" value="1"/> <span>1. Ya, sesuai KK</span></label>
+          <label class="radio-item"><input type="radio" name="l1_sesuai_kk" value="2"/> <span>2. Tidak sesuai KK</span></label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ANGGOTA CARDS (dynamic) -->
+  <div class="section-card" id="l1_anggota_section">
+    <div class="section-header" id="sec-L1-anggota">Daftar Anggota Keluarga</div>
+    <div class="section-body">
+      <div id="l1_anggota_empty" class="hint">Isi rincian 2.a di atas untuk menampilkan kartu anggota keluarga. Tiap kartu berisi identitas (r5-r13) dan sosial ekonomi (r14-r21).</div>
+      <div id="l1_anggota_wrap"></div>
+    </div>
+  </div>
+
+  <div class="nav-actions">
+    <div></div>
+    <button type="button" class="btn-nav-draft" onclick="saveAsDraft()">&#128190; Simpan Draft</button>
+    <button class="btn btn-primary" onclick="goBlok(2)">Lanjut: BLOK II &rsaquo;</button>
+  </div>
+</div>
+

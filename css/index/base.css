@@ -1,0 +1,25 @@
+/* ====== BASE: reset, body, utility classes ====== */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter','Segoe UI',sans-serif;background:#f0ede8;color:#2d2d2d;font-size:14px;line-height:1.5}
+
+/* ====== UTILITIES ====== */
+.hidden{display:none!important}
+
+/* ====== ALERTS ====== */
+.alert{padding:12px 16px;border-radius:6px;margin-bottom:16px;font-size:13px;line-height:1.5}
+.alert-error{background:#fff5f5;border:1.5px solid #f5c6c6;color:#c0392b}
+.alert-success{background:#f0fff4;border:1.5px solid #9ae6b4;color:#276749}
+
+/* ====== SPINNER ====== */
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid #e8e0d8;border-top-color:#fc6c00;border-radius:50%;animation:spin .7s linear infinite;vertical-align:middle;margin-left:6px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ====== FILLED FIELD INDICATOR ====== */
+input[type=text].field-filled,input[type=number].field-filled,input[type=email].field-filled,
+input[type=date].field-filled,input[type=datetime-local].field-filled,textarea.field-filled{
+  background:#f0fff8;border-color:#68d391}
+input[type=text].field-filled:focus,input[type=number].field-filled:focus,
+input[type=email].field-filled:focus,input[type=date].field-filled:focus,
+input[type=datetime-local].field-filled:focus,textarea.field-filled:focus{
+  border-color:#38a169;box-shadow:0 0 0 3px rgba(56,161,105,.15)}
+.radio-item.checked{background:#f0fff8!important;border-color:#68d391!important}

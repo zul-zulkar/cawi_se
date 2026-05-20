@@ -150,8 +150,17 @@ function validateBlok3() {
 
 
 function collectData() {
+  // Mode dispatcher: L mode uses collectDataL (different field structure)
+  if (typeof getFormMode === 'function' && getFormMode() === 'l') {
+    return collectDataL();
+  }
+  return collectDataLUB();
+}
+
+function collectDataLUB() {
   const data = {
     timestamp: new Date().toLocaleString('id-ID'),
+    formMode: 'lub',
     // Blok I
     provinsi: document.getElementById('q1_provinsi').options[document.getElementById('q1_provinsi').selectedIndex]?.text || '',
     provinsi_kd: getVal('q1_provinsi'),
@@ -297,28 +306,278 @@ function collectData() {
   return data;
 }
 
+/* ====== L MODE DATA COLLECTION ====== */
+function collectDataL() {
+  const optText = (id) => {
+    const el = document.getElementById(id);
+    if (!el || el.tagName !== 'SELECT' || el.selectedIndex < 0) return '';
+    return el.options[el.selectedIndex]?.text || '';
+  };
+  const data = {
+    timestamp: new Date().toLocaleString('id-ID'),
+    formMode: 'l',
+    // === BLOK I: Keluarga ===
+    nama_kk:        getVal('l1_nama_kk'),
+    nik_kk:         getVal('l1_nik_kk'),
+    no_kk:          getVal('l1_no_kk'),
+    jml_anggota:    getVal('l1_jml_kk_anggota'),
+    jml_pendataan:  getVal('l1_jml_pendataan'),
+    provinsi:       optText('l1_alamat_provinsi'),
+    provinsi_kd:    getVal('l1_alamat_provinsi'),
+    kabupaten:      optText('l1_alamat_kab'),
+    kabupaten_kd:   getVal('l1_alamat_kab'),
+    kecamatan:      optText('l1_alamat_kec'),
+    kecamatan_kd:   getVal('l1_alamat_kec'),
+    kelurahan:      optText('l1_alamat_kel'),
+    kelurahan_kd:   getVal('l1_alamat_kel'),
+    klasifikasi:    getRadio('l1_klasifikasi'),
+    kode_pos:       getVal('l1_kodepos'),
+    kode_sls:       getVal('l1_kode_sls'),
+    nama_sls:       getVal('l1_nama_sls'),
+    alamat_detail:  getVal('l1_alamat_detail'),
+    nama_jalan:     getVal('l1_nama_jalan'),
+    no_rumah:       getVal('l1_no_rumah'),
+    sesuai_kk:      getRadio('l1_sesuai_kk'),
+    // === Per Anggota (JSON array) ===
+    anggota_data: (function() {
+      const nA = parseInt(getVal('l1_jml_kk_anggota')) || 0;
+      const arr = [];
+      for (let i = 1; i <= Math.min(nA, 30); i++) {
+        const card = document.getElementById('l_ang_card_' + i);
+        if (!card) continue;
+        const keb = getRadio('l_ang_' + i + '_keberadaan');
+        const STOP = (keb === '2' || keb === '6' || keb === '7');
+        const rec = {
+          no:           i,
+          nama:         getVal('l_ang_' + i + '_nama'),
+          nik:          getVal('l_ang_' + i + '_nik'),
+          hubungan:     getVal('l_ang_' + i + '_hubungan'),
+          keberadaan:   keb,
+          stop_state:   STOP ? 1 : 0,
+        };
+        if (!STOP) {
+          rec.alamat_dom    = getRadio('l_ang_' + i + '_alamat_dom');
+          rec.dn_provinsi   = getVal('l_ang_' + i + '_dn_provinsi');
+          rec.dn_kab        = getVal('l_ang_' + i + '_dn_kab');
+          rec.ln_negara     = getVal('l_ang_' + i + '_ln_negara');
+          rec.kawin         = getRadio('l_ang_' + i + '_kawin');
+          rec.jk            = getRadio('l_ang_' + i + '_jk');
+          rec.tgl_lahir     = getVal('l_ang_' + i + '_tgl_lahir');
+          rec.umur          = getVal('l_ang_' + i + '_umur');
+          const umur = parseInt(rec.umur) || 0;
+          if (umur >= 5) {
+            rec.sekolah  = getRadio('l_ang_' + i + '_sekolah');
+            rec.ijazah   = getVal('l_ang_' + i + '_ijazah');
+            rec.rekening = getRadio('l_ang_' + i + '_rekening');
+          }
+          if (umur >= 10) {
+            rec.profesi      = getVal('l_ang_' + i + '_profesi');
+            rec.kedudukan    = getVal('l_ang_' + i + '_kedudukan');
+            rec.pend_18a     = getRadio('l_ang_' + i + '_18a');
+            rec.pend_18a_nilai = parseCurrency(getVal('l_ang_' + i + '_18a_nilai'));
+            rec.pend_18b     = getRadio('l_ang_' + i + '_18b');
+            rec.pend_18b_nilai = parseCurrency(getVal('l_ang_' + i + '_18b_nilai'));
+            rec.pend_18c     = getRadio('l_ang_' + i + '_18c');
+            rec.pend_18c_nilai = parseCurrency(getVal('l_ang_' + i + '_18c_nilai'));
+          }
+          // Disabilitas & penyakit kronis (always collected if non-STOP)
+          rec.disab = ['a','b','c','d','e','f'].map(s => getRadio('l_ang_' + i + '_disab_' + s)).join('|');
+          rec.kronis = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p']
+            .map(s => getRadio('l_ang_' + i + '_kronis_' + s)).join('|');
+          rec.kronis_lain = getVal('l_ang_' + i + '_kronis_q_lain');
+        }
+        arr.push(rec);
+      }
+      return JSON.stringify(arr);
+    })(),
+    // === BLOK II: Usaha ===
+    nama_usaha:       getVal('l2_nama_usaha'),
+    nama_komersial:   getVal('l2_nama_komersial'),
+    alamat_usaha:     getVal('l2_alamat'),
+    rt:               getVal('l2_rt'),
+    rw:               getVal('l2_rw'),
+    kodepos_usaha:    getVal('l2_kodepos'),
+    email_usaha:      getVal('l2_email'),
+    website_usaha:    getVal('l2_website'),
+    hp_usaha:         getVal('l2_hp'),
+    kawasan:          getRadio('l2_kawasan'),
+    nama_kawasan:     getVal('l2_nama_kawasan'),
+    jenis_usaha:      getRadio('l2_jenis_usaha'),
+    lokasi_alamat:    getVal('l2_lokasi_alamat'),
+    lokasi_provinsi:  getVal('l2_lokasi_provinsi'),
+    lokasi_kab:       getVal('l2_lokasi_kab'),
+    punya_nib:        getRadio('l2_punya_nib'),
+    nib:              getVal('l2_nib'),
+    nib_alasan:       getRadio('l2_nib_alasan'),
+    nib_alasan_lain:  getVal('l2_nib_alasan_lain'),
+    badan_usaha:      getRadio('l2_badan_usaha'),
+    pengusaha_nama:   getVal('l2_pengusaha_nama'),
+    pengusaha_jk:     getRadio('l2_pengusaha_jk'),
+    pengusaha_umur:   getVal('l2_pengusaha_umur'),
+    pengusaha_nik:    getVal('l2_pengusaha_nik'),
+    kegiatan_utama:   getVal('l2_kegiatan_utama'),
+    b1: getRadio('l2_b1'), b2: getRadio('l2_b2'),
+    b3: getRadio('l2_b3'), b4: getRadio('l2_b4'),
+    c:  getRadio('l2_c'),
+    input_bahan:      getVal('l2_input'),
+    proses_produksi:  getVal('l2_proses'),
+    produk_utama:     getVal('l2_produk_utama'),
+    kbli_kode:        getVal('l2_kbli_kode'),
+    kbli_judul:       getVal('l2_kbli_search'),
+    kbli_kategori:    getVal('l2_kbli_kategori'),
+    klasifikasi_hotel: getRadio('l2_hotel'),
+    jaringan:         getRadio('l2_jaringan'),
+    jml_cabang:       getVal('l2_jml_cabang'),
+    kp_nama:          getVal('l2_kp_nama'),
+    kp_negara:        getVal('l2_kp_negara'),
+    kp_alamat:        getVal('l2_kp_alamat'),
+    kp_email:         getVal('l2_kp_email'),
+    kp_provinsi:      getVal('l2_kp_provinsi'),
+    kp_kab:           getVal('l2_kp_kab'),
+    internet:         getRadio('l2_internet'),
+    halal:            getRadio('l2_halal'),
+    halal_b:          getVal('l2_halal_b'),
+    halal_c:          getVal('l2_halal_c'),
+    bpom:             getRadio('l2_bpom'),
+    bpom_b:           getVal('l2_bpom_b'),
+    bpom_c:           getVal('l2_bpom_c'),
+    pekerja_l:        getVal('l2_pekerja_l'),
+    pekerja_p:        getVal('l2_pekerja_p'),
+    pekerja_dibayar:  getVal('l2_pekerja_dibayar'),
+    pekerja_tidak_dibayar: getVal('l2_pekerja_tidak_dibayar'),
+    tahun_operasi:    getVal('l2_tahun_operasi'),
+    // Yearly (l2_y26-y29)
+    y26a: parseCurrency(getVal('l2_y26a')), y26b: parseCurrency(getVal('l2_y26b')),
+    y26c: parseCurrency(getVal('l2_y26c')), y26d: parseCurrency(getVal('l2_y26d')),
+    y26e: parseCurrency(getVal('l2_y26e')), y26f: parseCurrency(getVal('l2_y26f')),
+    y27a: parseCurrency(getVal('l2_y27a')), y27b: parseCurrency(getVal('l2_y27b')),
+    y27c: parseCurrency(getVal('l2_y27c')), y27d: getVal('l2_y27d'),
+    y28a: parseCurrency(getVal('l2_y28a')), y28b: parseCurrency(getVal('l2_y28b')),
+    y28c: parseCurrency(getVal('l2_y28c')), y28c1: getVal('l2_y28c1'),
+    y28d: getVal('l2_y28d'),
+    y29a: getVal('l2_y29a'), y29b: getVal('l2_y29b'), y29c: getVal('l2_y29c'),
+    y29d: getVal('l2_y29d'), y29e: getVal('l2_y29e'), y29f: getVal('l2_y29f'),
+    y29g: getVal('l2_y29g'),
+    // Monthly (l2_m30-m33)
+    m30a: parseCurrency(getVal('l2_m30a')), m30b: parseCurrency(getVal('l2_m30b')),
+    m30c: parseCurrency(getVal('l2_m30c')), m30d: parseCurrency(getVal('l2_m30d')),
+    m30e: parseCurrency(getVal('l2_m30e')), m30f: parseCurrency(getVal('l2_m30f')),
+    m31a: parseCurrency(getVal('l2_m31a')), m31b: parseCurrency(getVal('l2_m31b')),
+    m31c: parseCurrency(getVal('l2_m31c')), m31d: getVal('l2_m31d'),
+    m31e: (function() {
+      const arr = [];
+      for (let i = 1; i <= 8; i++) {
+        const cb = document.getElementById('l2_m31e_' + i);
+        if (cb && cb.checked) arr.push(i);
+      }
+      return arr.join(',');
+    })(),
+    m32a: parseCurrency(getVal('l2_m32a')), m32b: parseCurrency(getVal('l2_m32b')),
+    m32c: parseCurrency(getVal('l2_m32c')), m32c1: getVal('l2_m32c1'),
+    m32d: getVal('l2_m32d'),
+    m33a: getVal('l2_m33a'), m33b: getVal('l2_m33b'), m33c: getVal('l2_m33c'),
+    m33d: getVal('l2_m33d'), m33e: getVal('l2_m33e'), m33f: getVal('l2_m33f'),
+    m33g: getVal('l2_m33g'),
+    // === BLOK III: Perumahan & Aset ===
+    jenis_bangunan:    getRadio('l3_jenis_bangunan'),
+    lantai_apt:        getVal('l3_lantai_apt'),
+    bangunan_lain:     getVal('l3_bangunan_lain'),
+    jml_keluarga_rumah: getVal('l3_jml_keluarga'),
+    kk_lain:           getVal('l3_kk_lain'),
+    status_milik:      getRadio('l3_status_milik'),
+    bukti:             getRadio('l3_bukti'),
+    status_lain:       getVal('l3_status_lain'),
+    sewa:              parseCurrency(getVal('l3_sewa')),
+    luas_lantai:       getVal('l3_luas_lantai'),
+    lantai_bahan:      getVal('l3_lantai_bahan'),
+    lantai_kondisi:    getVal('l3_lantai_kondisi'),
+    dinding_bahan:     getVal('l3_dinding_bahan'),
+    dinding_kondisi:   getVal('l3_dinding_kondisi'),
+    atap_bahan:        getVal('l3_atap_bahan'),
+    atap_kondisi:      getVal('l3_atap_kondisi'),
+    bab:               getRadio('l3_bab'),
+    kloset:            getRadio('l3_kloset'),
+    tinja:             getRadio('l3_tinja'),
+    air:               getVal('l3_air'),
+    listrik:           getRadio('l3_listrik'),
+    meteran_jml:       getVal('l3_meteran_jml'),
+    meteran_daya1:     getVal('l3_meteran_daya1'),
+    meteran_daya2:     getVal('l3_meteran_daya2'),
+    meteran_id1:       getVal('l3_meteran_id1'),
+    meteran_id2:       getVal('l3_meteran_id2'),
+    listrik_bln:       parseCurrency(getVal('l3_listrik_bln')),
+    pulsa_bln:         parseCurrency(getVal('l3_pulsa_bln')),
+    makanan_mgg:       parseCurrency(getVal('l3_makanan_mgg')),
+    nonmakanan_bln:    parseCurrency(getVal('l3_nonmakanan_bln')),
+    nonmakanan_thn:    parseCurrency(getVal('l3_nonmakanan_thn')),
+    aset_gas3:         getVal('l3_aset_gas3'),
+    aset_gas5:         getVal('l3_aset_gas5'),
+    aset_kulkas:       getVal('l3_aset_kulkas'),
+    aset_ac:           getVal('l3_aset_ac'),
+    aset_emas:         getVal('l3_aset_emas'),
+    aset_komputer:     getVal('l3_aset_komputer'),
+    aset_motor:        getVal('l3_aset_motor'),
+    aset_motor_nilai:  parseCurrency(getVal('l3_aset_motor_nilai')),
+    aset_mobil:        getVal('l3_aset_mobil'),
+    aset_mobil_nilai:  parseCurrency(getVal('l3_aset_mobil_nilai')),
+    aset_tanah:        getVal('l3_aset_tanah'),
+    aset_tanah_nilai:  parseCurrency(getVal('l3_aset_tanah_nilai')),
+    aset_rumah:        getVal('l3_aset_rumah'),
+    aset_rumah_nilai:  parseCurrency(getVal('l3_aset_rumah_nilai')),
+    // === BLOK IV: Catatan ===
+    catatan_pendata:   getVal('l4_catatan'),
+    // === BLOK V: Petugas & Responden ===
+    petugas_nama:      getVal('l5_petugas_nama'),
+    petugas_nip:       getVal('l5_petugas_nip'),
+    petugas_hp:        getVal('l5_petugas_hp'),
+    responden_nama:    getVal('l5_responden_nama'),
+    responden_hp:      getVal('l5_responden_hp'),
+    responden_email:   getVal('l5_responden_email'),
+    tanggal_pelaksanaan: getVal('l5_tanggal'),
+    tanda_tangan: (typeof l5HasSig !== 'undefined' && l5HasSig && typeof l5Canvas !== 'undefined' && l5Canvas)
+      ? l5Canvas.toDataURL('image/png') : '',
+  };
+  if (_editRecordId) data._edit_id = _editRecordId;
+  return data;
+}
+
 
 async function submitForm() {
-  hideAlert('submitAlert');
+  const mode = (typeof getFormMode === 'function') ? getFormMode() : 'lub';
+  const submitAlertId = (mode === 'l') ? 'l5_submitAlert' : 'submitAlert';
+  const submitBtnId   = (mode === 'l') ? 'l5_submitBtn'   : 'submitBtn';
+  hideAlert(submitAlertId);
 
-  // Validate Blok I
-  const errB1 = validateBlok1();
-  if (errB1) {
-    goBlok(1);
-    setTimeout(() => showAlert('alertBox', 'Blok I — ' + errB1), 300);
-    return;
+  // === L MODE: validate via collectAllProblemsL (already gated by recap) ===
+  if (mode === 'l') {
+    if (typeof collectAllProblemsL === 'function') {
+      const probs = collectAllProblemsL();
+      if (probs.errors.length > 0) {
+        const first = probs.errors[0];
+        goBlok(first.blok || 1);
+        setTimeout(() => showAlert(submitAlertId, first.label + ' — ' + first.text), 300);
+        return;
+      }
+    }
+  } else {
+    // Validate Blok I (L.UB)
+    const errB1 = validateBlok1();
+    if (errB1) {
+      goBlok(1);
+      setTimeout(() => showAlert('alertBox', 'Blok I — ' + errB1), 300);
+      return;
+    }
+
+    // Validate Blok III (L.UB)
+    const errB3 = validateBlok3();
+    if (errB3) {
+      showAlert(submitAlertId, errB3);
+      return;
+    }
   }
 
-  // Validate Blok III
-  const errB3 = validateBlok3();
-  if (errB3) {
-    showAlert('submitAlert', errB3);
-    return;
-  }
-
-  const btn = document.getElementById('submitBtn');
-  btn.disabled = true;
-  btn.textContent = 'Mengirim...';
+  const btn = document.getElementById(submitBtnId);
+  if (btn) { btn.disabled = true; btn.textContent = 'Mengirim...'; }
 
   try {
     const data = collectData();
@@ -344,8 +603,10 @@ async function submitForm() {
       }
     }
     const wasEdit = isEdit;
-    btn.textContent = wasEdit ? 'DIPERBARUI ✓' : 'TERKIRIM ✓';
-    btn.style.background = '#38a169';
+    if (btn) {
+      btn.textContent = wasEdit ? 'DIPERBARUI ✓' : 'TERKIRIM ✓';
+      btn.style.background = '#38a169';
+    }
     _editRecordId = null;
     cancelEditMode();
     clearDraft();
@@ -357,17 +618,17 @@ async function submitForm() {
       recs.unshift({ _id: Date.now(), _ts: new Date().toISOString(), ...data });
       localStorage.setItem(LS_REC, JSON.stringify(recs));
     } catch(_e) {}
-    document.getElementById('submitAlert').classList.add('hidden');
+    const submitAlertEl = document.getElementById(submitAlertId);
+    if (submitAlertEl) submitAlertEl.classList.add('hidden');
     const successDiv = document.createElement('div');
     successDiv.className = 'alert alert-success';
     successDiv.innerHTML = wasEdit
       ? '<strong>Data berhasil diperbarui!</strong> Rekaman asli telah ditimpa di Google Sheets.'
       : '<strong>Data berhasil dikirim!</strong> Terima kasih telah mengisi form CAWI SE2026.';
-    document.getElementById('submitBtn').parentNode.insertBefore(successDiv, document.getElementById('submitBtn'));
+    if (btn) btn.parentNode.insertBefore(successDiv, btn);
   } catch(e) {
-    btn.disabled = false;
-    btn.textContent = 'KIRIM / SUBMIT';
-    showAlert('submitAlert', 'Gagal mengirim: ' + e.message + '. Pastikan koneksi internet stabil dan coba lagi.');
+    if (btn) { btn.disabled = false; btn.textContent = 'KIRIM / SUBMIT'; }
+    showAlert(submitAlertId, 'Gagal mengirim: ' + e.message + '. Pastikan koneksi internet stabil dan coba lagi.');
   }
 }
 
@@ -391,6 +652,14 @@ function loadEditMode() {
     const r = JSON.parse(raw);
     const banner = document.getElementById('editModeBanner');
     if (banner) banner.style.display = 'block';
+
+    // Mode-aware: switch to L mode and delegate to L-mode loader
+    if (r.formMode === 'l' || r._formMode === 'l') {
+      if (typeof setFormMode === 'function') setFormMode('l');
+      if (typeof applyFormMode === 'function') applyFormMode('l');
+      if (typeof loadEditModeL === 'function') return loadEditModeL(r);
+      return true; // L mode loader not yet implemented; mode is set so user can review/edit
+    }
 
     // Isi field teks / angka / textarea
     const textMap = {

@@ -3,6 +3,14 @@ let _recapData = {error:[], warning:[], kosong:[], catatan:[]};
 let _curRecapTab = 'error';
 
 function collectAllProblems() {
+  // Mode dispatcher: L mode delegates to collectAllProblemsL (form-l-validation.js)
+  if (typeof getFormMode === 'function' && getFormMode() === 'l' && typeof collectAllProblemsL === 'function') {
+    return collectAllProblemsL();
+  }
+  return collectAllProblemsLUB();
+}
+
+function collectAllProblemsLUB() {
   const errors = [], warnings = [], kosong = [];
   const e = (label, text, blok, field) => errors.push({label, text, blok, field: field || null});
   const w = (label, text, blok, field) => warnings.push({label, text, blok, field: field || null});

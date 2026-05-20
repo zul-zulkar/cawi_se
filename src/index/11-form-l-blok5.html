@@ -1,0 +1,77 @@
+<div class="blok-panel" id="blokL5">
+  <div class="blok-banner">
+    <div class="blok-badge">BLOK V</div>
+    <div>
+      <div class="blok-title-text">Petugas &amp; Responden</div>
+      <div class="blok-title-sub">Pengisian akhir — pastikan semua data sudah benar sebelum submit</div>
+    </div>
+  </div>
+
+  <div class="section-card">
+    <div class="section-header" id="sec-L5-petugas">Identitas Petugas Pendata</div>
+    <div class="section-body">
+      <div class="form-group">
+        <label class="field-label">Nama Petugas <span class="req">*</span></label>
+        <input type="text" id="l5_petugas_nama" placeholder="Nama petugas pendata"/>
+      </div>
+      <div class="inline-fields">
+        <div class="form-group">
+          <label class="field-label">NIP / ID Petugas</label>
+          <input type="text" id="l5_petugas_nip" placeholder="NIP atau ID"/>
+        </div>
+        <div class="form-group">
+          <label class="field-label">No. HP Petugas</label>
+          <input type="text" id="l5_petugas_hp" placeholder="08xxxxxxxxxx"/>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-card">
+    <div class="section-header" id="sec-L5-responden">Data Responden</div>
+    <div class="section-body">
+      <div class="form-group">
+        <label class="field-label">Nama Responden <span class="req">*</span></label>
+        <input type="text" id="l5_responden_nama" placeholder="Nama lengkap responden"/>
+      </div>
+      <div class="form-group">
+        <label class="field-label">Nomor HP/Telepon <span class="req">*</span></label>
+        <input type="text" id="l5_responden_hp" placeholder="08xxxxxxxxxx"/>
+      </div>
+      <div class="form-group">
+        <label class="field-label">Email <span class="req">*</span></label>
+        <input type="email" id="l5_responden_email" placeholder="email@responden.com"/>
+      </div>
+      <div class="form-group">
+        <label class="field-label">Tanggal Pelaksanaan <span class="req">*</span></label>
+        <input type="date" id="l5_tanggal"/>
+      </div>
+      <div class="form-group">
+        <label class="field-label">Tanda Tangan <span class="req">*</span></label>
+        <div class="sig-wrap">
+          <canvas id="l5_sigCanvas" width="860" height="180"></canvas>
+        </div>
+        <div class="sig-actions">
+          <button type="button" class="btn btn-sm btn-danger" onclick="clearSignatureL()">Hapus Tanda Tangan</button>
+          <span id="l5_sig_hint" class="sig-hint">Gambar tanda tangan di kotak di atas</span>
+        </div>
+      </div>
+      <div id="l5_submitAlert" class="alert alert-error hidden submit-alert"></div>
+      <div class="submit-section">
+        <div class="submit-actions">
+          <button id="l5_saveDraftBtn" type="button" class="btn-draft-inline" onclick="saveAsDraft()">&#128190; Simpan Draft</button>
+          <button class="btn btn-primary btn-submit-compact" id="l5_submitBtn" onclick="showRecap()">&#128228; KIRIM / SUBMIT</button>
+        </div>
+        <p class="submit-note">Dengan menekan KIRIM, Anda menyatakan data yang diisikan adalah benar dan dapat dipertanggungjawabkan.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-actions">
+    <button class="btn btn-secondary" onclick="goBlok(4)">&lsaquo; Kembali: BLOK IV</button>
+    <button type="button" class="btn-nav-draft" onclick="saveAsDraft()">&#128190; Simpan Draft</button>
+    <div></div>
+  </div>
+</div>
+
+</div><!-- end #form-l -->

@@ -1,6 +1,9 @@
 let _formDirty = false;
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Apply current mode early (so form-l/form-lub visibility is correct)
+  if (typeof applyFormMode === 'function') applyFormMode(getFormMode());
+
   // Init searchable selects BEFORE any data load
   makeSearchable('q1_provinsi', 'provinsi');
   makeSearchable('q2_kabupaten', 'kabupaten/kota');
@@ -8,6 +11,13 @@ document.addEventListener('DOMContentLoaded', () => {
   makeSearchable('q4_kelurahan', 'kelurahan/desa');
   makeSearchable('q11e_provinsi', 'provinsi kantor pusat');
   makeSearchable('q11f_kabupaten', 'kabupaten/kota kantor pusat');
+  // L mode regional dropdowns
+  if (document.getElementById('l1_alamat_provinsi')) {
+    makeSearchable('l1_alamat_provinsi', 'provinsi keluarga');
+    makeSearchable('l1_alamat_kab', 'kabupaten/kota keluarga');
+    makeSearchable('l1_alamat_kec', 'kecamatan keluarga');
+    makeSearchable('l1_alamat_kel', 'kelurahan/desa keluarga');
+  }
 
   // Auto-select Bali [51] and Buleleng [5108] – fixed domicile
   const selProv = document.getElementById('q1_provinsi');
@@ -89,6 +99,17 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   // Run once on load to reflect any pre-filled defaults
   updateProgress();
+
+  // === MODE PRE-SELECTOR ===
+  // Show mode gate after auth succeeds if no mode is set yet
+  document.addEventListener('cawi-auth-ok', () => {
+    if (typeof hasFormMode === 'function' && !hasFormMode()) {
+      // No draft-continue in progress means user is starting fresh — ask which kuesioner
+      const continuing = localStorage.getItem('cawi_draft_continue_id');
+      const editing    = localStorage.getItem('cawi_edit_mode');
+      if (!continuing && !editing) showModeGate(false);
+    }
+  });
 
   // === EDIT MODE (dari daftar.html) ===
   const _isEditMode = loadEditMode();

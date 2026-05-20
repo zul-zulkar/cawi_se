@@ -5,7 +5,9 @@
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
-    "coverage": "vitest run --coverage"
+    "coverage": "vitest run --coverage",
+    "build:html": "node tools/build-html.js",
+    "build": "npm run build:html"
   },
   "devDependencies": {
     "@vitest/coverage-v8": "^2.0.0",

@@ -1,5 +1,13 @@
 /* ====== PROGRESS CALCULATION ====== */
 function calcProgress() {
+  // Mode dispatcher: L mode delegates to calcProgressL (form-l-progress.js)
+  if (typeof getFormMode === 'function' && getFormMode() === 'l' && typeof calcProgressL === 'function') {
+    return calcProgressL();
+  }
+  return calcProgressLUB();
+}
+
+function calcProgressLUB() {
   let t = 0, f = 0;
   const c = ok => { t++; if (ok) f++; };
   // Q1-Q4 lokasi

@@ -1,0 +1,1366 @@
+                                                                                                                             SE2026-L
+
+  BADAN PUSAT STATISTIK                        REPUBLIK INDONESIA
+                                           SENSUS EKONOMI 2026
+RAHASIA                   PENDATAAN LENGKAP USAHA/PERUSAHAAN
+
+PENGANTAR
+
+ I. Tujuan
+    SE2026 bertujuan untuk menyediakan data dasar yang terpercaya untuk seluruh kegiatan ekonomi.
+
+II. Dasar Hukum
+    a. Undang-Undang No. 16 Tahun 1997 tentang Statistik.
+    b. Peraturan Pemerintah RI No. 51 Tahun 1999 tentang Penyelenggaraan Statistik.
+
+III. Kerahasiaan
+    Kerahasiaan data yang diberikan dijamin oleh Undang-Undang No. 16 Tahun 1997 pasal 21.
+
+IV. Layanan Informasi
+    Untuk bantuan pengisian daftar isian, dapat menghubungi Sekretariat Sensus Ekonomi Tahun 2026 - Badan Pusat Statistik
+    Email: halose2026@bps.go.id
+
+TATA CARA PENGISIAN
+
+   1. Penulisan kata-kata harus menggunakan huruf kapital (balok) serta tidak boleh disingkat, kecuali kata-kata yang terlalu panjang.
+   2. Angka ditulis dengan angka biasa (bukan angka romawi).
+   3. Isikan keterangan/jawaban pada tempat yang disediakan.
+   4. Berikan tanda checklist (P) salah satu kode jawaban yang sesuai.
+
+Blok I hanya ditanyakan kepada responden keluarga
+                                            BLOK I : KETERANGAN UMUM KELUARGA
+
+1. a. Nama Kepala Keluarga                                           .............................................................
+    b. NIK Kepala Keluarga
+    c. Nomor Kartu Keluarga (KK) dari Kepala Keluarga
+
+2. a. Jumlah anggota keluarga sesuai KK
+    b. Jumlah anggota keluarga sesuai hasil pendataan (autofill )
+
+3. Alamat                                                     .............................................................
+    a. Provinsi
+
+b. Kabupaten/Kota                                             .............................................................
+
+c. Kecamatan                                                  .............................................................
+
+d. Desa/Kelurahan                                             .............................................................
+
+e. Klasifikasi Desa/Kota
+
+f. Kode Pos
+
+g. Kode SLS
+
+h. Nama SLS                                                   .................................................................................
+i. Alamat (Jalan/Gang/Nomor Rumah/RT/RW)                      .................................................................................
+                                                              .................................................................................
+j. Tuliskan Nama Jalan                                        .................................................................................
+    Jika tidak ada nama jalan, tulis strip (-)
+
+k. Tuliskan Nomor Rumah
+    Jika tidak ada nomor rumah, tulis strip (-)
+
+4. Apakah alamat tersebut sesuai dengan alamat pada Kartu Keluarga?
+    1. Ya Sesuai KK
+
+2. Tidak Sesuai KK
+
+Pertanyaan yang ditulis tebal (bold) merupakan predefined
+
+                                                           1
+                                                       KETERANGAN ANGGOTA KELUARGA
+5. Nomor Urut Anggota Keluarga
+6. Nama Anggota Keluarga
+7. Nomor Induk Kependudukan (NIK)
+
+8. Hubungan dengan Kepala Keluarga
+
+1. Kepala Keluarga 6. Orang Tua
+
+2. Istri/Suami  7. Mertua
+
+3. Anak         8. Famili
+
+4. Menantu      9. Lainnya
+
+5. Cucu
+
+  9. a. Keberadaan anggota keluarga                           /                     /  /  /
+          1. Tinggal di rumah/tempat tinggal ini
+          2. Meninggal  STOP
+          3. Tidak tinggal bersama keluarga/pindah ke
+              wilayah/daerah lain di Indonesia
+                lanjut ke r10DN
+          4. Tidak tinggal bersama keluarga/pindah ke
+              luar negeri  lanjut ke r10LN
+          5. Anggota keluarga baru  lanjut ke r11
+          6. Sudah pisah KK  STOP
+          7. Tidak ditemukan/Tidak dikenal  STOP
+
+      b. Alamat domisili:
+           1. Sesuai KK dan KTP
+           2. Hanya sesuai KK
+           3. Hanya sesuai KTP
+           4. Tidak sesuai KK dan KTP
+                (lanjut ke r11)
+
+  10DN.a. Provinsi domisili
+           b. Kabupaten/Kota domisili  Lanjut ke r11
+
+  10LN. Negara domisili  Lanjut ke r11
+
+ 11. Apakah status perkawinan [NAMA]?
+       1. Belum kawin
+       2. Kawin/nikah
+       3. Cerai hidup
+       4. Cerai mati
+
+ 12. Apakah jenis kelamin [NAMA]?
+      1. Laki-laki
+      2. Perempuan
+
+ 13. a. Tanggal lahir (DD/MM/YY)
+      b. Umur (autofill )
+
+Pertanyaan yang ditulis tebal (bold) merupakan predefined
+
+                                                           2
+Blok II hanya ditanyakan kepada responden usaha/perusahaan
+                                        BLOK II : KETERANGAN USAHA/PERUSAHAAN
+
+1. Provinsi                         : .......................................................................................
+
+2. Kabupaten/Kota                   : .......................................................................................
+
+3. Kecamatan                        : .......................................................................................
+
+4. Kelurahan/Desa/Nagari            : .......................................................................................
+
+5. Nama dan Nomor SLS/Sub-SLS : .......................................................................................
+
+6. Nomor Bangunan                   : .......................................................................................
+
+7. Nomor Urut Usaha/Perusahaan : .......................................................................................
+
+[Rincian 1 s.d. 7  diisi oleh BPS]
+
+8. Nama dan Alamat Usaha/Perusahaan
+
+a. Nama usaha/perusahaan               : ................................................................................................
+
+b. Nama komersial usaha/perusahaan : ................................................................................................
+    Jika tidak memiliki nama komersial, maka tuliskan nama usaha/perusahaan.
+
+c. Alamat usaha/perusahaan             : ................................................................................................
+
+Khusus usaha: 1) di dalam bangunan tempat tinggal (contoh: usaha online , catering , les privat, dsb, yang dilakukan di tempat tinggal);
+2) keliling; 3) usaha di luar bangunan tempat tinggal dengan lokasi tetap dan perlengkapan usaha dipindah/dibongkar pasang;
+4) konstruksi perorangan, pertambangan dan penggalian perorangan; 5) persewaan rumah/kamar/kantor;
+ yang dicatat adalah alamat tempat tinggal pemilik usaha.
+
+RT : ...............                RW : ...............             Nomor Telepon:
+
+Kode Pos              :                                              Kode area:            Nomor telepon:                      Ekstensi:
+
+Email                 : ...........................................
+
+Homepage/website : ........................................... Nomor HP / whatsapp :
+
+Alamat website diawali dengan www. Contoh : www.bps.go.id
+
+d. Jenis kawasan beroperasi:
+
+1 Kawasan Ekonomi Khusus (KEK)                                       6 Terminal
+2 Kawasan Industri (KI)                                              7 Rest area jalan tol
+3 Stasiun                                                            8 Kawasan sentra ekonomi perdesaan/kelurahan
+4 Bandara                                                            9 Kawasan usaha lainnya
+5 Pelabuhan                                                          10 Di luar kawasan  [Lanjut ke rincian 9a]
+
+e. Nama kawasan                     : ...................................................
+
+Contoh: KEK Mandalika, Kawasan Industri Jababeka, Stasiun Gambir, Bandara Soekarno-Hatta, Pelabuhan Tanjung Priok, Terminal Pulo
+Gebang, Rest Area KM 57 Tol Jakarta-Cikampek, Sentra Batik Laweyan, Kompleks Pertokoan ITC Mangga Dua.
+
+Khusus usaha/perusahaan di bangunan campuran atau yang dicatat di tempat tinggal.
+
+9. a. Apa jenis usaha/perusahaan ini?
+
+1 Usaha di dalam bangunan tempat tinggal                             [Kode 1 atau 2  Lanjut ke rincian 10a]
+
+2 Usaha keliling
+
+3 Usaha di luar bangunan tempat tinggal dengan lokasi tetap
+   dan perlengkapan usaha dipindah/dibongkar pasang
+
+4 Usaha konstruksi perorangan, pertambangan dan penggalian perorangan
+
+5 Usaha persewaan rumah/kamar/kantor
+
+    6 Usaha pertanian
+b. Lokasi utama usaha/perusahaan
+
+b1. Alamat/lokasi utama : ..........................................
+
+b2. Provinsi                        : ..........................................           [Kode diisi oleh BPS]
+
+b3. Kabupaten/Kota                  : ..........................................           [Kode diisi oleh BPS]
+
+                                                           3
+                  BLOK II : KETERANGAN USAHA/PERUSAHAAN (lanjutan)
+
+10. a. Apakah memiliki Nomor Induk Berusaha (NIB)?
+
+1 Ya              2 Tidak  [Lanjut ke rincian 10c]
+
+b. Tuliskan NIB:                                                                      [Lanjut ke rincian 11a]
+                                                                                  5 Lainnya, tuliskan: ...........................
+c. Apa alasan utama tidak memiliki NIB?
+
+1 Dalam proses pembuatan NIB 3 Tidak memerlukan NIB
+
+2 Pengurusan NIB rumit                   4 Tidak tahu tentang NIB
+
+11. a. Apa status badan usaha dari usaha/perusahaan ini?
+
+   Perseroan (PT/NV, PT Persero, PT Tbk, PT Persero     5 Perum/Perumda                     10 Kantor Perwakilan Luar Negeri
+1a Tbk, Perseroan Daerah)
+
+1b Perseroan Perorangan                                 6 BUM Desa                          11 Badan Usaha Luar Negeri
+
+2 Yayasan                                               7 Persekutuan Komanditer (CV)       12  Badan Usaha Lainnya
+                                                                                                (Contoh: BLU, PTN-BH)
+
+3 Koperasi                                              8 Persekutuan Firma (Fa)            13 Bukan Badan Usaha
+
+4 Dana Pensiun                                          9 Persekutuan Perdata (Maatschap )
+
+                       [Jika rincian 11a diisi selain kode 3  Lanjut ke rincian 11d]
+b. Apakah koperasi ini merupakan Koperasi Desa/Kelurahan Merah Putih (KDKMP)?
+
+1 Ya                                                      2 Tidak
+
+c. Apa jenis koperasi ini berdasarkan layanannya?
+
+1 Open Loop (dapat melayani nonanggota)                   2 Close Loop (hanya melayani anggota)
+
+d. Apakah mempunyai laporan/catatan keuangan?
+
+1 Ya                                                      2 Tidak
+
+12. a. Nama Pengusaha/Penanggung Jawab               : ..............................................................................
+     b. Jenis Kelamin
+     c. Umur                                         : 1 Laki-laki                2 Perempuan
+     d. Nomor Induk Kependudukan (NIK)
+                                                     : ........... tahun
+
+                                                     :
+
+13. Kegiatan utama dan produk utama usaha/perusahaan:
+     a. Apa kegiatan utama usaha/perusahaan ini? Tuliskan selengkapnya.
+         ........................................................................................................................................................
+
+Contoh: membudidayakan tanaman padi; membudidayakan cabai, membudidayakan tanaman tembakau; membudidayakan udang di
+air payau; membibitkan ayam ras; menangkap ikan konsumsi di sungai; memungut madu di hutan; menggiling daging ikan menjadi sosis
+dan dijual di rumah/online; membuat kebab di rumah dan dititipkan di warung; jasa borongan/konstruksi rumah; menjual mobil bekas di
+showroom; menjual kaset video game yang dibeli dari pihak lain di marketplace; angkutan bus antarkota antarprovinsi; membuat sosis
+dari ikan, disajikan dengan pembakaran, dijual di depan rumah/online; menyewakan kos bulanan; menyewakan kamar hotel bintang 5;
+membuat kebab berdasarkan pesanan langsung di gerobak depan alfamart; menjual perangkat lunak video gim yang dikembangkan sendiri;
+penyediaan telekomunikasi internet tanpa kabel; membuat rumah kemudian dipasarkan sendiri; menyewakan rumah dengan periode
+tahunan; membuat desain kemasan botol minuman; sekolah menengah pertama negeri; rumah sakit pemerintah; membuat seni lukisan yang
+dipajang untuk dijual; membuat kunci duplikat di pinggir jalan; menulis cerpen; membuat desain interior rumah; pengembangan aplikasi
+video gim; meracik jamu secara langsung untuk siap konsumsi di sebuah kedai
+
+b. Pilih yang paling sesuai dengan kegiatan utama usaha/perusahaan ini:
+
+b1. Apakah memproduksi barang di lokasi ini?
+
+1 Ya                                                      2 Tidak
+
+b2.Apakah menyediakan layanan makan minum?
+    Ciri: terdapat kegiatan peracikkan, pemanasan ulang, atau pembuatan produk berdasarkan pesanan/permintaan pelanggan
+
+1 Ya               [Lanjut ke rincian 13c]                2 Tidak [Jika 13b1 terisi Ya, lanjut ke rincian 13d]
+                                                                        [Jika 13b1 terisi Tidak, lanjut ke rincian 13b3]
+
+                                                     4
+               BLOK II : KETERANGAN USAHA/PERUSAHAAN (lanjutan)
+
+b3. Apakah melakukan penjualan barang?
+
+1 Ya            [Lanjut ke rincian 13c]                  2 Tidak
+
+b4.Pilih salah satu aktivitas yang dilakukan:
+
+1 Jasa                                                 [Lanjut ke rincian 13f]
+
+2 Pertanian, Kehutanan, dan Perikanan
+
+c. Di mana usaha tersebut biasa dilakukan?
+
+1 Apotek                                 5 Kedai, stan, tenda                   9 Restoran, warung makan,
+                                                                                   dan sejenisnya
+
+2 Swalayan                               6 Bar                                  10 Keliling
+3 Los Pasar                              7 Kelab malam, diskotek                11 Daring (online )
+
+4 Toko, ruko, dan sejenisnya             8 Kafe
+
+                [Setelah menjawab rincian 13c  Lanjut ke rincian 13f]
+
+d. Apa input yang digunakan?
+
+........................................................................................................................................................
+Contoh: daging ikan, tepung; daging kebab, kulit kebab, sayuran; bambu; jagung pipil; kaca; kain; kulit sapi; kayu bulat; rotan; kunci polos.
+
+e. Bagaimana proses mengubah input tersebut menjadi produk output (beserta alatnya)?
+
+   ........................................................................................................................................................
+
+   Contoh: menggiling daging ikan menjadi sosis; membuat kebab di rumah dan sudah dikemasi kemudian dititipkan di warung;
+   penggaraman; pengasapan; pemindangan; pembekuan
+
+f. Apa produk utama yang dihasilkan? Tuliskan selengkapnya.
+
+   ........................................................................................................................................................
+
+   Contoh: padi; tembakau; udang; ayam ras; ikan segar konsumsi; ayam ras; madu hutan; sosis; kebab yang sudah dikemas;
+   jasa renovasi/ membuat rumah; jasa perdagangan mobil bekas; jasa perdagangan kaset video gim; jasa angkutan bus antarkota
+   antarprovinsi; sosis ikan yang dibakar; jasa sewa kos bulanan; jasa penyediaan akomodasi hotel bintang 5; jasa penyajian kebab;
+   jasa pengembangan perangkat lunak video gim; jasa telekomunikasi internet tanpa kabel; jasa penjualan rumah yang dibangun sendiri;
+   jasa penyediaan rumah dengan periode tahunan; jasa pendidikan sekolah menengah pertama negeri; jasa kesehatan oleh rumah sakit
+   pemerintah; jasa pembuatan kunci duplikat; lukisan, patung, kerajinan, musik, tari, foto, film, ilustrasi, animasi, board game, puisi, cerpen,
+   novel, naskah drama; desain arsitektur, desain produk, desain interior, desain komunikasi visual, desain fesyen, pembuatan perangkat
+   lunak (software ), aplikasi digital, aplikasi gim, perangkat elektronik, inovasi berbasis kecerdasan buatan; rendang, gudeg; gamelan, angklung.
+
+g. Kode KBLI:
+
+h. Kategori Lapangan Usaha:
+
+Rincian 13i hanya ditanyakan kepada usaha/perusahaan akomodasi .
+
+i. Jika usaha/perusahaan merupakan akomodasi jangka pendek, apa klasifikasi usaha/perusahaan ini?
+
+1 Hotel Bintang 1                              4 Hotel Bintang 4
+
+2 Hotel Bintang 2                              5 Hotel Bintang 5
+
+3 Hotel Bintang 3                              6 Lainnya (hotel nonbintang, vila, dll)
+
+14. a. Apa jaringan usaha dari usaha/perusahaan ini?
+
+1 Tunggal  [Lanjut ke rincian 16]              3 Cabang
+
+2 Kantor pusat                                 4 Perwakilan                     [Kode 3 s.d. 6  Lanjut ke rincian 15]
+
+                                               5 Pabrik
+
+                                               6 Unit pembantu/penunjang
+
+b. Berapa jumlah seluruh kantor cabang dan unit usaha yang berada di bawah kantor pusat?
+
+                [Lanjut ke rincian 16]
+
+                                               5
+             BLOK II : KETERANGAN USAHA/PERUSAHAAN (lanjutan)
+
+15. Informasi Kantor Pusat:                                                                                            [Kode diisi oleh BPS]
+
+a. Nama Kantor Pusat : ................................... d. Negara               : ...............................
+
+b. Alamat Kantor Pusat : ................................... e. Provinsi           : ...............................
+
+c. Email                     : ................................... f. Kabupaten/Kota : ...............................
+
+          Jika usaha/perusahaan ini adalah unit pembantu/penunjang (r14a berkode 6) , maka PENDATAAN SELESAI.
+
+16. a. Apakah usaha/perusahaan ini menggunakan internet dalam menjalankan usaha?
+
+1 Ya                           2 Tidak [Lanjut ke rincian 17a]
+
+b. Tujuan penggunaan internet:          1 Ya                              2 Tidak
+   b1. Menerima pesanan barang/jasa
+
+b2. Produksi barang/jasa                1 Ya                              2 Tidak
+
+b3. Distribusi barang/jasa              1 Ya                              2 Tidak
+
+b4. Membeli bahan baku online           1 Ya                              2 Tidak
+
+b5. Promosi                             1 Ya                              2 Tidak
+
+b6. Lainnya                             1 Ya                              2 Tidak
+
+c. Apakah usaha/perusahaan ini memanfaatkan teknologi digital Artificial Intellegence (AI),
+   Internet of Things (IoT), big data, printer 3D, blockchain, atau cloud computing ?
+
+1 Ya                           2 Tidak
+
+17. a. Apakah usaha/perusahaan ini memproduksi barang/jasa yang ramah lingkungan?
+
+1 Ya, seluruhnya               2 Ya, sebagian                             3 Tidak sama sekali
+
+Contoh: Produk efisiensi energi (lampu atau mesin hemat listrik); Energi terbarukan (panel surya, turbin angin, biogas);
+Kendaraan ramah lingkungan (kendaraan listrik/ hybrid); Produk berbahan daur ulang (kertas/plastik daur ulang, kemasan
+ramah lingkungan); Jasa pengelolaan dan pembersihan limbah dan sampah (pengolahan sampah/ air limbah, daur ulang).
+
+b. Apakah usaha/perusahaan ini menggunakan input untuk tujuan perlindungan lingkungan
+   dan/atau pembelian barang dan jasa yang ramah lingkungan?
+
+1 Ya                           2 Tidak
+
+Contoh: Pengeluaran untuk pengelolaan dan pembersihan limbah dan sampah, pengendalian polusi udara,
+perbaikan tanah/ air tanah, pengurangan kebisingan, pelestarian alam/keanekaragaman hayati, audit/ penilaian lingkungan.
+
+18. Apakah usaha/perusahaan ini menggunakan produk karya seni, sastra, desain, teknologi
+
+atau warisan budaya, baik diproduksi sendiri maupun oleh pihak lain?
+
+1 Ya                           2 Tidak
+
+- Contoh produk karya seni: lukisan, patung, kerajinan, musik, tari, foto, film, ilustrasi, animasi, board game, dll.
+- Contoh produk sastra: puisi, cerpen, novel, naskah drama, dll.
+- Contoh produk desain: arsitektur, desain produk, desain interior, desain komunikasi visual, desain fesyen, dll.
+- Contoh produk teknologi: perangkat lunak (software ), aplikasi digital, aplikasi gim, perangkat elektronik, dll.
+- Contoh produk warisan budaya: makanan tradisional, peralatan tradisional, obat tradisional, dll.
+
+        Rincian 19 hanya ditanyakan kepada kategori usaha/perusahaan khusus berdasarkan BPJPH.
+19. a. Apakah usaha/perusahaan ini menghasilkan produk bersertifikat halal?
+
+             1 Ya, oleh BPJPH
+             2 Ya, bukan oleh BPJPH  [Lanjut ke rincian 19c]
+             3 Tidak  [Lanjut ke rincian 19c]
+    b. Berapa jumlah varian produk yang sudah bersertifikat halal BPJPH?
+
+    c. Berapa jumlah varian produk yang belum bersertifikat halal BPJPH?
+
+                                        6
+                   BLOK II : KETERANGAN USAHA/PERUSAHAAN (lanjutan)
+
+        Rincian 20 hanya ditanyakan kepada kategori usaha/perusahaan khusus berdasarkan BPOM.
+
+20. a. Apakah usaha/perusahaan ini memiliki izin edar?
+             1 Ya, oleh BPOM
+             2 Ya, bukan oleh BPOM  [Lanjut ke rincian 20c]
+             3 Tidak  [Lanjut ke rincian 20c]
+
+    b. Berapa jumlah varian produk yang sudah memiliki izin edar BPOM?
+    c. Berapa jumlah varian produk yang belum memiliki izin edar BPOM?
+
+21. Apakah usaha/perusahaan ini bermitra dengan Koperasi Desa/Kelurahan Merah Putih (KDKMP)?
+
+1 Ya                                       2 Tidak
+
+22. Apakah usaha/perusahaan ini terlibat dalam program Makan Bergizi Gratis (MBG)?
+         1 Ya, sebagai SATUAN PELAYANAN PEMENUHAN GIZI (SPPG)
+         2 Ya, sebagai supplier
+         3 Ya, sebagai penerima manfaat MBG (Sekolah, Puskesmas)
+         4 Ya, peran lainnya
+         5 Tidak terlibat MBG
+
+23. Apakah usaha/perusahaan melakukan penjualan/pembelian kepada bukan penduduk Indonesia
+    selama periode 1 Mei 2024 s.d. 31 Agustus 2026?
+
+a. Penjualan dan/atau pembelian barang              1 Ya                                   2 Tidak
+
+b. Penjualan Jasa                                   1 Ya                                   2 Tidak
+
+c. Pembelian Jasa                                   1 Ya                                   2 Tidak
+
+Bukan penduduk adalah orang atau badan yang pusat kegiatan ekonominya berada di luar Indonesia. Contoh orang yaitu turis wisatawan
+mancanegara yang berwisata kurang dari 1 tahun. Contoh badan yaitu usaha/perusahaan yang tidak terdaftar badan usahanya di Indonesia.
+Contoh kegiatan:
+- Ekspor barang: Pengrajin perak di Bali mengirimkan aksesori dan perhiasan ke pembeli di luar negeri.
+- Impor barang: Toko elektronik Indonesia mengimpor smartphone dari Tiongkok untuk dijual kembali.
+- Ekspor jasa: Konsultan Indonesia memberikan jasa pelatihan secara online ke perusahaan luar negeri; Hotel di Indonesia melayani
+ tamu wisatawan mancanegara
+- Impor jasa: Usaha/perusahaan Indonesia berlangganan layanan digital berbayar dari perusahaan luar negeri (Canva, Microsoft 365,
+ Google Cloud, Adobe, ChatGPT, dll.); Perusahaan Indonesia menggunakan jasa Konsultan asing
+
+24. Pekerja
+         1. Jika beroperasi tahun 2026, isikan rata-rata pekerja per bulan di tahun 2026.
+         2. Jika beroperasi sebelum tahun 2026:
+              a. isikan pekerja per 31 Desember 2025, atau
+              b. jika tidak tersedia, isikan rata-rata pekerja per bulan di tahun 2025.
+
+a1. Pekerja laki-laki                               orang  a2. Pekerja dibayar                      orang
+                                                                                                    orang
+b1. Pekerja perempuan                               orang  b2. Pekerja tidak dibayar                orang
+                                        +           orang                                      +
+
+c1. Total pekerja (a1+b1)                                  c2. Total pekerja (a2+b2)
+
+25. Tahun berapa usaha/perusahaan ini mulai beroperasi secara komersial?
+         Tahun beroperasi komersial terdiri dari 4 angka. Contoh: 1995; 2025;dsb.
+
+                                                    7
+                   BLOK II : KETERANGAN USAHA/PERUSAHAAN (lanjutan)
+
+                                     PENGELUARAN, PENDAPATAN, DAN ASET TAHUN 2025
+[Rincian 26-29 hanya ditanyakan jika usaha/perusahaan beroperasi secara komersial SEBELUM tahun 2026]
+
+26. Rincian Pengeluaran Tahun 2025
+
+a. Total upah dan gaji, serta jaminan sosial pegawai                                          : Rp _ _ , _ _ _ , _ _ _ , _ _ _ , _ _ _
+
+b. Biaya produksi                                                                             : Rp _ _ , _ _ _ , _ _ _ , _ _ _ , _ _ _
+
+c. Biaya pembelian barang yang terjual (Keterangan: Khusus usaha perdagangan)                 : Rp _ _ , _ _ _ , _ _ _ , _ _ _ , _ _ _
+
+d. Biaya operasional (air, listrik, gas, internet, pulsa, pemeliharaan, biaya angkutan, dll)  : Rp _ _ , _ _ _ , _ _ _ , _ _ _ , _ _ _
+
+e. Biaya nonoperasional                                                                          : Rp _ _ , _ _ _ , _ _ _ , _ _ _ , _ _ _
+f. Total pengeluaran (a+b+c+d+e)                                                              +
+
+                                                                                                 : Rp _ _ , _ _ _ , _ _ _ , _ _ _ , _ _ _
+
+Petunjuk:
+a. Total upah dan gaji, serta jaminan sosial pegawai
+Termasuk: Upah dan gaji pegawai/karyawan yang telah dikeluarkan ringkasan pembayarannya (group sertificate )
+
+            Komisi dan tips untuk pegawai/karyawan
+            Bonus
+            Pembayaran Cuti tahunan dan jenis cuti lainnya
+Tidak Termasuk: Upah dan gaji yang dikapitalisasi
+
+                     Pembayaran untuk konsultan dan kontraktor yang berusaha sendiri (bukan karyawan perusahaan),
+                     yang dibayarkan dengan komisi
+b. Biaya produksi (pemakaian bahan baku dan penolong)
+Catatan: Mencakup seluruh nilai barang dan jasa yang digunakan sebagai bahan baku dalam proses produksi, tidak termasuk aset tetap.
+            Pada usaha pertanian, ongkos/biaya yang dicatat adalah biaya dari barang/jasa yang benar-benar DIBELI/DIBAYARKAN dan
+            TELAH DIGUNAKAN (tidak termasuk yang disimpan, diberikan ke pihak lain, dsb).
+            Untuk usaha jasa, biaya produksi yang dimaksud meliputi biaya-biaya yang dikeluarkan secara langsung untuk menghasilkan jasa.
+Contoh: Biaya produksi usaha tanaman pangan, hortikultura, perkebunan, peternakan, kehutanan, dan perikanan meliputi benih, bibit,
+            pupuk, pestisida, vaksin, vitamin, obat-obatan, pakan, umpan, wadah, tali, es, garam, konsumsi, awak kapal, dll.
+            Biaya produksi jasa transportasi meliputi biaya bahan bakar. Biaya produksi usaha perbankan meliputi beban bunga, provisi,
+            dan komisi. Biaya produksi usaha asuransi meliputi klaim asuransi. Biaya produksi usaha sewa kos-kosan atau kontrakan
+            meliputi air bersih dan listrik yang ditanggung pemilik.
+Termasuk: Pembelian bahan yang digunakan dalam proses produksi dan pengemasan
+Tidak Termasuk: Pembelian barang yang dikapitalisasi
+                     Perubahan persediaan
+                     Pembelian barang jadi untuk dijual kembali
+c. Biaya pembelian barang yang terjual
+Catatan: Mencakup seluruh nilai pembelian barang perdagangan yang terjual. Contoh: nilai pembelian beras yang terjual, nilai pembelian
+            tepung yang terjual, dsb.
+d. Biaya operasional (air, listrik, gas, internet, pulsa, pemeliharaan, biaya angkutan)
+Catatan: Mencakup biaya-biaya yang tidak secara langsung dalam proses produksi seperti air, listrik, gas, pemeliharaan,
+        serrta biaya angkutan
+Termasuk: Pengeluaran listrik, bahan bakar dan air
+            Pembelian bahan perkantoran umum
+            Pembelian komponen dan bahan bakar untuk kendaraan bermotor
+            pembayaran ke pihak lain untuk kargo, delivery, dan jasa angkutan
+            Pembayaran sewa operasi (dengan atau tanpa operator)
+            Biaya lisensi software komputer yang berumur kurang dari satu tahun (termasuk biaya instalasi oleh provider eksternal)
+            Biaya bank selain bunga
+Tidak Termasuk: Pemeliharaan besar
+e. Biaya nonoperasional
+CatatanM: encakup biaya bunga, biaya pajak, biaya administrasi, biaya hukum, biaya donasi, biaya restrukturisasi, biaya kerugian di awal, dan
+        biaya lain-lain yang tidak terkait dengan kegiatan operasional, seperti biaya perjalanan yang tidak terkait dengan bisnis.
+
+                                                      8
+BLOK II : KETERANGAN USAHA/PERUSAHAAN (lanjutan)
+
+                                     PENGELUARAN, PENDAPATAN, DAN ASET TAHUN 2025
+[Rincian 26-29 hanya ditanyakan jika usaha/perusahaan beroperasi secara komersial SEBELUM tahun 2026]
+
+27. Rincian Nilai Produksi/Penjualan/Pendapatan Tahun 2025             : Rp _ _ , _ _ _ , _ _ _ , _ _ _ , _ _ _
+    a. Nilai produksi/penjualan/pendapatan barang dan jasa
+
+b. Pendapatan lainnya yang dihasilkan                                     : Rp _ _ , _ _ _ , _ _ _ , _ _ _ , _ _ _
+c. Total nilai produksi/penjualan/pendapatan (a+b)                     +
+
+                                                                          : Rp _ _ , _ _ _ , _ _ _ , _ _ _ , _ _ _
+
+d. Berapa persentase pendapatan yang diperoleh dari usaha online ?                                                                            %
+
+Petunjuk:
+a. Nilai produksi/penjualan/pendapatan barang dan jasa
+
+    Termasuk: Barang yang dijual baik yang diproduksi sendiri maupun tidak
+                 Penjualan ekspor (FOB-Free On Board )
+                 Penjualan atau transfer ke rekan bisnis/ organisasi atau cabang di luar negeri
+                 Pendapatan yang diperoleh dari pengangkutan barang yang tidak dijual perusahaan
+                 Pendapatan jasa perbaikan dan layanan
+                 Pendapatan dari kontrak, subkontrak dan komisi
+                 Pendapatan manajemen dari perusahaan/organisasi terkait maupun tidak
+                 Pendapatan dari jasa pemasangan
+                 Pendapatan dari jasa berlangganan dan keanggotaan
+                 Pendapatan dari jasa iklan
+                 Pendapatan royalti (hak cipta, hak paten, waralaba, dll)
+                 Pendapatan dari sewa operasi
+                 Pendapatan bunga (khusus jasa keuangan)
+
+    Tidak Termasuk: Penjualan aset
+                         Royalti dari penggunaan lahan di bawah pengaturan sewa mineral
+
+    Catatan: Pada usaha pertanian, nilai produksi yang dicatat yaitu nilai produksi yang dipanen, dikonsumsi sendiri (termasuk yang
+                 digunakan untuk bibit), diolah sendiri, dijual, disimpan, digunakan sebagai upah/gaji pekerja, diberikan kepada pihak lain,
+                 hilang, pertambahan bobot ternak, serta nilai pembesaran tanaman kehutanan selama periode tahun 2025 sesuai dengan
+                  jenis dan satuan produksi pada masing-masing subsektor yang diusahakan. Nilai produksi yang dicakup termasuk
+                  nilai produksi ikutan yang dijual.
+
+b. Pendapatan lainnya yang dihasilkan
+    Termasuk: Sewa/royalti sumber daya alam
+                 Pendapatan bunga
+                 Pendapatan dividen
+                 Pendanaan dari Pemerintah (subsidi, skema magang dan pelatihan)
+                 Donasi
+    Tidak Termasuk: Pendanaan yang disediakan khusus untuk barang modal tertentu
+
+28. a. Nilai aset tanah dan bangunan pada 31 Desember 2025                : Rp _ _ , _ _ _ , _ _ _ , _ _ _ , _ _ _
+    b. Nilai aset selain tanah dan bangunan pada 31 Desember 2025
+                                                                          : Rp _ _ , _ _ _ , _ _ _ , _ _ _ , _ _ _
+    c. Nilai total aset pada 31 Desember 2025                          +
+
+                                                                          : Rp _ _ , _ _ _ , _ _ _ , _ _ _ , _ _ _
+
+c1. Jika tidak dapat mengisikan nilai nominal, pilih nilai total aset dalam rentang berikut:
+
+1 s.d. Rp 500 juta
+
+2 Lebih dari Rp 500 juta s.d. Rp 1 miliar
+
+3 Lebih dari Rp 1 miliar s.d. Rp 5 miliar
+
+4 Lebih dari Rp 5 miliar s.d. Rp 10 miliar
+
+5 Lebih dari Rp 10 miliar
+
+d. Berapa luas tanah yang dikuasai dan digunakan untuk kegiatan usaha
+
+pada 31 Desember 2025?                                                 : _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ m_ _2 _ _
+
+                                            9
+                   BLOK II : KETERANGAN USAHA/PERUSAHAAN (lanjutan)
+
+29. Bagaimana susunan kepemilikan modal di usaha/perusahaan ini pada 31 Desember 2025?
+
+a. Pribadi/Perorangan                                     :                                   %
+
+b. Lembaga Nonprofit yang Melayani Rumah Tangga :                                             %
+
+c. Korporasi Publik                                       :                                   %
+
+d. Korporasi Nonpublik                                    :                                   %
+
+e. Pemerintah                                             :                                   %
+
+f. Asing                                                  :                                   %
+g. Total (a+b+c+d+e+f)
+                                                          +
+
+                                                             100%
+
+                      PENGELUARAN DAN PENDAPATAN SELAMA SATU BULAN TERAKHIR
+[Rincian 30-33 hanya ditanyakan jika usaha/perusahaan beroperasi secara komersial pada tahun 2026]
+
+30. Rincian Pengeluaran Selama Satu Bulan Terakhir
+     Contoh: Usaha/perusahaan didata bulan Juni 2026, maka nilai yang dicatat adalah data sebulan penuh tanggal 1-31 Mei 2026.
+
+a. Total upah dan gaji, serta jaminan sosial pegawai                                             : Rp _ _ , _ _ _ , _ _ _ , _ _ _ , _ _ _
+
+b. Biaya produksi                                                                                : Rp _ _ , _ _ _ , _ _ _ , _ _ _ , _ _ _
+
+c. Biaya pembelian barang yang terjual (Keterangan: Khusus usaha perdagangan)                    : Rp _ _ , _ _ _ , _ _ _ , _ _ _ , _ _ _
+
+d. Biaya operasional (air, listrik, gas, internet, pulsa, pemeliharaan, biaya angkutan, dll)     : Rp _ _ , _ _ _ , _ _ _ , _ _ _ , _ _ _
+
+e. Biaya nonoperasional                                                                             : Rp _ _ , _ _ _ , _ _ _ , _ _ _ , _ _ _
+f. Total pengeluaran (a+b+c+d+e)                                                                 +
+
+                                                                                                    : Rp _ _ , _ _ _ , _ _ _ , _ _ _ , _ _ _
+
+Petunjuk:
+a. Total upah dan gaji, serta jaminan sosial pegawai
+Termasuk: Upah dan gaji pegawai/karyawan yang telah dikeluarkan ringkasan pembayarannya (group sertificate)
+
+            Komisi dan tips untuk pegawai/karyawan, Bonus, Pembayaran Cuti tahunan dan jenis cuti lainnya.
+Tidak Termasuk: Upah dan gaji yang dikapitalisasi
+
+                     Pembayaran untuk konsultan dan kontraktor yang berusaha sendiri (bukan karyawan perusahaan),
+                     yang dibayarkan dengan komisi
+b. Biaya produksi (pemakaian bahan baku dan penolong)
+Catatan: Mencakup seluruh nilai barang dan jasa yang digunakan sebagai bahan baku dalam proses produksi, tidak termasuk aset tetap.
+            Pada usaha pertanian, ongkos/biaya yang dicatat adalah biaya dari barang/jasa yang benar-benar DIBELI/DIBAYARKAN dan
+            TELAH DIGUNAKAN (tidak termasuk yang disimpan, diberikan ke pihak lain, dsb). Untuk usaha jasa, biaya produksi
+
+            yang dimaksud meliputi biaya-biaya yang dikeluarkan secara langsung untuk menghasilkan jasa.
+Contoh: Biaya produksi usaha tanaman pangan, hortikultura, perkebunan, peternakan, kehutanan, dan perikanan meliputi benih, bibit,
+
+            pupuk, pestisida, vaksin, vitamin, obat-obatan, pakan, umpan, wadah, tali, es, garam, konsumsi, awak kapal, dll.
+            Biaya produksi jasa transportasi meliputi biaya bahan bakar. Biaya produksi usaha perbankan meliputi beban bunga, provisi,
+            dan komisi. Biaya produksi usaha asuransi meliputi klaim asuransi. Biaya produksi usaha sewa kos-kosan atau kontrakan
+            meliputi air bersih dan listrik yang ditanggung pemilik.
+Termasuk: Pembelian bahan yang digunakan dalam proses produksi dan pengemasan
+Tidak Termasuk: Pembelian barang yang dikapitalisasi, Perubahan persediaan, Pembelian barang jadi untuk dijual kembali
+c. Biaya pembelian barang yang terjual
+Catatan: Mencakup seluruh nilai pembelian barang perdagangan yang terjual. Contoh: nilai pembelian beras yang terjual, nilai pembelian
+            tepung yang terjual, dsb.
+d. Biaya operasional (air, listrik, gas, internet, pulsa, pemeliharaan, biaya angkutan)
+Catatan: Mencakup biaya-biaya yang tidak secara langsung dalam proses produksi seperti air, listrik, gas, pemeliharaan,
+         serta biaya angkutan
+Termasuk: Pengeluaran listrik, bahan bakar dan air
+            Pembelian bahan perkantoran umum
+            Pembelian komponen dan bahan bakar untuk kendaraan bermotor
+            pembayaran ke pihak lain untuk kargo, delivery, dan jasa angkutan
+            Pembayaran sewa operasi (dengan atau tanpa operator)
+            Biaya lisensi software komputer yang berumur kurang dari satu tahun (termasuk biaya instalasi oleh provider eksternal)
+            Biaya bank selain bunga
+Tidak Termasuk: Pemeliharaan besar
+e. Biaya nonoperasional
+CatatanM: encakup biaya bunga, biaya pajak, biaya administrasi, biaya hukum, biaya donasi, biaya restrukturisasi, biaya kerugian di awal, dan
+        biaya lain-lain yang tidak terkait dengan kegiatan operasional, seperti biaya perjalanan yang tidak terkait dengan bisnis.
+
+                                                      10
+BLOK II : KETERANGAN USAHA/PERUSAHAAN (lanjutan)
+
+                      PENGELUARAN DAN PENDAPATAN SELAMA SATU BULAN TERAKHIR
+[Rincian 30-33 hanya ditanyakan jika usaha/perusahaan beroperasi secara komersial pada tahun 2026]
+
+31. Rincian Nilai Produksi/Penjualan/Pendapatan Selama Satu Bulan Terakhir
+
+Contoh: Usaha/perusahaan didata bulan Juni 2026, maka nilai yang dicatat adalah data sebulan penuh tanggal 1-31 Mei 2026.
+
+a. Nilai produksi/penjualan/pendapatan barang dan jasa                            : Rp _ _ , _ _ _ , _ _ _ , _ _ _ , _ _ _
+
+b. Pendapatan lainnya yang dihasilkan                                                : Rp _ _ , _ _ _ , _ _ _ , _ _ _ , _ _ _
+c. Total nilai produksi/penjualan/pendapatan (a+b)                                +
+
+                                                                                     : Rp _ _ , _ _ _ , _ _ _ , _ _ _ , _ _ _
+
+d. Berapa persentase pendapatan yang diperoleh dari usaha online ?                                                                            %
+
+Petunjuk:
+a. Nilai produksi/penjualan/pendapatan barang dan jasa
+
+    Termasuk: Barang yang dijual baik yang diproduksi sendiri maupun tidak
+                 Penjualan ekspor (FOB-Free On Board )
+
+                 Penjualan atau transfer ke rekan bisnis/ organisasi atau cabang di luar negeri
+                 Pendapatan yang diperoleh dari pengangkutan barang yang tidak dijual perusahaan
+                 Pendapatan jasa perbaikan dan layanan
+                 Pendapatan dari kontrak, subkontrak dan komisi
+                 Pendapatan manajemen dari perusahaan/organisasi terkait maupun tidak
+                 Pendapatan dari jasa pemasangan
+                 Pendapatan dari jasa berlangganan dan keanggotaan
+                 Pendapatan dari jasa iklan
+                 Pendapatan royalti (hak cipta, hak paten, waralaba, dll)
+                 Pendapatan dari sewa operasi
+                 Pendapatan bunga (khusus jasa keuangan)
+    Tidak Termasuk: Penjualan aset
+
+                         Royalti dari penggunaan lahan di bawah pengaturan sewa mineral
+    Catatan: Pada usaha pertanian, nilai produksi yang dicatat yaitu nilai produksi yang dipanen, dikonsumsi sendiri (termasuk yang
+
+                 digunakan untuk bibit), diolah sendiri, dijual, disimpan, digunakan sebagai upah/gaji pekerja, diberikan kepada pihak lain,
+                 hilang, pertambahan bobot ternak, serta nilai pembesaran tanaman kehutanan selama periode tahun 2025 sesuai dengan
+                 jenis dan satuan produksi pada masing-masing subsektor yang diusahakan. Nilai produksi yang dicakup termasuk
+                 nilai produksi ikutan yang dijual.
+
+b. Pendapatan lainnya yang dihasilkan
+    Termasuk: Sewa/royalti sumber daya alam
+                 Pendapatan bunga
+                 Pendapatan dividen
+                 Pendanaan dari Pemerintah (subsidi, skema magang dan pelatihan)
+                 Donasi
+    Tidak Termasuk: Pendanaan yang disediakan khusus untuk barang modal tertentu
+
+e. Bulan beroperasi selama tahun 2026:
+
+Jan Feb Mar Apr Mei Juni Juli Agst
+
+32. a. Nilai aset tanah dan bangunan pada akhir bulan yang lalu                   : Rp _ _ , _ _ _ , _ _ _ , _ _ _ , _ _ _
+
+b. Nilai aset selain tanah dan bangunan pada akhir bulan yang lalu                   : Rp _ _ , _ _ _ , _ _ _ , _ _ _ , _ _ _
+c. Nilai total aset pada akhir bulan yang lalu                                    +
+
+                                                                                     : Rp _ _ , _ _ _ , _ _ _ , _ _ _ , _ _ _
+
+c1. Jika tidak dapat mengisikan nilai nominal, pilih nilai total aset dalam rentang berikut:
+
+1 s.d. Rp 500 juta
+
+2 Lebih dari Rp 500 juta s.d. Rp 1 miliar
+
+3 Lebih dari Rp 1 miliar s.d. Rp 5 miliar
+
+4 Lebih dari Rp 5 miliar s.d. Rp 10 miliar
+
+5 Lebih dari Rp 10 miliar
+
+d. Berapa luas tanah yang dikuasai dan digunakan untuk kegiatan usaha
+
+pada akhir bulan yang lalu?                                                       : _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ m_ _2 _ _
+
+                                            11
+               BLOK II : KETERANGAN USAHA/PERUSAHAAN (lanjutan)
+
+33. Bagaimana susunan kepemilikan modal di usaha/perusahaan ini pada saat didirikan?
+
+a. Pribadi/Perorangan                                              :  %
+
+b. Lembaga Nonprofit yang Melayani Rumah Tangga :                     %
+
+c. Korporasi Publik                                                :  %
+
+d. Korporasi Nonpublik                                             :  %
+
+e. Pemerintah                                                      :  %
+
+f. Asing                                                           :  %
+
+g. Total (a+b+c+d+e+f)                                             +
+                                                                      100%
+
+KHUSUS KANTOR PUSAT
+
+Apabila usaha/perusahaan ini merupakan kantor pusat, lanjutkan pengisian informasi kantor cabang dan
+unit yang berada di bawah kendali kantor pusat melalui kuesioner SE2026-L.KP.
+
+                     BLOK III : KETERANGAN SOSIAL EKONOMI ANGGOTA KELUARGA
+                       KETERANGAN PENDIDIKAN, KETENAGAKERJAAN, DAN KEPEMILIKAN REKENING
+5. Nomor Urut Anggota Keluarga
+
+6. Nama Anggota Keluarga                                           .......................................  .......................................
+
+14. Partisipasi sekolah (usia 5 tahun ke atas)
+     0. Tidak/belum pernah sekolah  Lanjut ke r16
+     1. Masih sekolah
+     2. Tidak bersekolah lagi
+
+15. Ijazah/STTB tertinggi yang dimiliki
+     (usia 5 tahun ke atas)
+     0. Tidak punya ijazah SD
+     1. SD/sederajat
+     2. SMP/sederajat
+     3. SMA/sederajat
+     4. D1/D2/D3
+     5. D4/S1/Profesi
+     6. S2/S3
+
+16. Profesi Pekerjaan Utama (usia 10 tahun ke atas)
+     Jika tidak bekerja, lanjut ke r18
+     Jika profesi pekerjaan lainnya, sebutkan:
+
+17. Status Kedudukan dalam Pekerjaan Utama
+
+     (usia 10 tahun ke atas)
+
+     1. Berusaha sendiri
+     2. Berusaha dibantu buruh
+     3. Buruh/karyawan/pegawai swasta
+     4. ASN/TNI/Polri/BUMN/BUMD/pejabat negara/kades
+     5. Pekerja bebas
+     6. Pekerja keluarga/tidak dibayar
+     9. Tidak tahu  Hanya dapat dipilih apabila Blok I r9a = 3, 4
+
+Pertanyaan yang ditulis tebal (bold) merupakan predefined
+
+                                                           12
+BLOK III : KETERANGAN SOSIAL EKONOMI ANGGOTA KELUARGA (lanjutan)
+
+18. Apa [NAMA] biasanya memiliki pendapatan (tetap                   Rp..................................  Rp..................................
+    maupun tidak tetap dalam sebulan)?                               Rp..................................  Rp..................................
+     (usia 10 tahun ke atas)                                         Rp..................................  Rp..................................
+     a. Pendapatan dari pekerjaan, baik berupa uang                  Rp..................................  Rp..................................
+         maupun barang/jasa (gaji, tunjangan, uang makan,            Rp..................................  Rp..................................
+         honor, lembur, dll):                                        Rp..................................  Rp..................................
+         1. Ya
+
+            a. Upah/Gaji:
+            b. Tunjangan
+            c. Uang makan
+            d. Honor
+            e. Lembur
+
+            f. Lainnya
+
+       Total pendapatan: ........ rupiah                             Rp..................................  Rp..................................
+         otomatis terisi dari penjumlahan a s.d f                    Rp..................................  Rp..................................
+   2. Tidak                                                          Rp..................................  Rp..................................
+   9. Tidak tahu  Hanya dapat dipilih apabila Blok I r9a = 3, 4
+b. Pendapatan dari keuntungan usaha, baik offline
+   (warung, kos-kosan, dll) maupun online (affiliate,
+   online shop, endorse , youtuber , dll) dan
+   usaha pertanian:
+   1. Ya, total pendapatan: ........ rupiah
+
+   2. Tidak
+
+   9. Tidak tahu  Hanya dapat dipilih apabila Blok I r9a = 3, 4
+
+c. Penerimaan pendapatan lain (transfer/passive
+   income ) seperti pensiunan, kupon SBN, Obligasi,
+   dll):
+   1. Ya, total pendapatan: ........ rupiah
+   2. Tidak
+   9. Tidak tahu  Hanya dapat dipilih apabila Blok I r9a = 3, 4
+
+ 19. Apakah [NAMA] memiliki rekening aktif atau
+      dompet digital? (5 tahun ke atas)
+       1. Ya untuk usaha
+       2. Ya untuk pribadi
+       3. Ya untuk usaha dan pribadi
+       4. Tidak ada
+       9. Tidak tahu  Hanya dapat dipilih apabila Blok I r9a = 3, 4
+
+Pertanyaan yang ditulis tebal (bold) merupakan predefined
+
+13
+BLOK III : KETERANGAN SOSIAL EKONOMI ANGGOTA KELUARGA (lanjutan)
+
+                                             KETERANGAN DISABILITAS DAN PENYAKIT KRONIS
+
+20. Apakah [NAMA] memiliki keterbatasan dalam
+    jangka waktu lama sehingga mengalami kesulitan
+    dalam menjalankan aktivitas sehari-hari?
+
+     Pilihan jawaban:
+     1. Ya 2. Tidak 9. Tidak Tahu  Hanya dapat dipilih
+
+                                                     apabila Blok I r9a = 3, 4
+
+    A. Disabilitas Fisik
+
+    B. Disabilitas Mental
+
+    C. Disabilitas Intelektual
+
+    D. Disabilitas Sensorik Netra
+
+    E. Disabilitas Sensorik Rungu
+
+    F. Disabilitas Sensorik Wicara
+
+21. Apakah [NAMA] memiliki keluhan kesehatan
+    kronis/menahun?
+
+     Pilihan jawaban:
+     1. Ya 2. Tidak 9. Tidak Tahu  Hanya dapat dipilih
+
+                                                     apabila Blok I r9a = 3, 4
+
+     A. Hipertensi (tekanan darah tinggi)
+
+B. Rematik
+
+C. Asma
+
+D. Masalah jantung
+
+E. Diabetes (kencing manis)
+
+F. Tuberkulosis (TBC)
+
+G. Stroke
+
+H. Kanker atau tumor ganas
+
+I. Gagal ginjal
+
+J. Hemofilia
+
+K. HIV/AIDS
+
+L. Kolestrol
+
+M. Sirosis hati
+
+N. Talasemia
+
+O. Leukemia
+
+P. Alzheimer
+
+Q. Lainnya       ..............................................
+
+Blok IV hanya ditanyakan kepada responden keluarga
+
+                    BLOK IV : KETERANGAN SOSIAL EKONOMI KELUARGA
+
+                             KETERANGAN PERUMAHAN
+
+1. a. Apa jenis bangunan tempat tinggal yang ditempati?
+
+1. Rumah tunggal             4. Apartemen
+
+2. Rumah deret               5. Lainnya, tuliskan .........................................   lanjut ke r3a
+
+3. Rumah susun
+
+      b. Jika jenis tempat tinggal apartemen/rumah susun, tuliskan Nama/Nomor lantai: ..............................................
+
+Pertanyaan yang ditulis tebal (bold) merupakan predefined
+
+                                                                                14
+                               BLOK IV : KETERANGAN SOSIAL EKONOMI KELUARGA
+
+2. a. Berapa jumlah keluarga yang tinggal dalam 1 rumah/tempat tinggal?
+         Jika r2a = 1, lanjut ke r3a
+
+    b. Sebutkan Nomor KK dari keluarga yang tinggal dalam 1 rumah/tempat tinggal! Selain yang disebutkan pada
+        Blok I rincian 1.c.
+         Pertanyaan ini hanya ditanyakan jika isian r2a lebih dari satu
+
+3. a. Apa status kepemilikan bangunan tempat tinggal yang ditempati?
+
+1. Milik sendiri                                                                              ..............................................
+2. Kontrak/sewa  lanjut ke r4b
+3. Bebas sewa  lanjut ke r4a
+4. Dinas  lanjut ke r4c
+5. Lainnya, Tuliskan
+
+    lanjut ke r4c
+
+b. Jika tempat tinggal milik sendiri, apa jenis bukti kepemilikan tanah bangunan tempat tinggal ini?
+
+1. Sertifikat Hak Milik (SHM)
+2. Sertifikat selain SHM (SHGB, SHSRS)
+3. Surat bukti lainnya (Girik, Letter C , dll)
+4. Tidak punya
+
+4. a. Jika milik sendiri/bebas sewa, perkiraan sewa sebulan: Rp................. Rp.          ,              ,
+
+b. Jika kontrak/sewa, nilai kontrak sebulan: Rp.................                     Rp.      ,              ,
+
+c. Jika dinas atau lainnya, perkiraan sewa sebulan: Rp.................              Rp.      ,              ,
+
+5. Berapa luas lantai bangunan tempat tinggal?                                                                  m²
+
+6. a. Apa bahan bangunan utama lantai rumah terluas?
+
+1. Marmer/granit                   4. Ubin/tegel/teraso                           7. Bambu  lanjut ke r7a
+                                                                                  8. Tanah  lanjut ke r7a
+2. Keramik                         5. Kayu/papan                                  9. Lainnya  lanjut ke r7a
+
+3. Parket/vinil/karpet             6. Semen/bata merah                     4. Rusak Berat
+
+b. Kondisi Lantai:
+
+1. Baik           2. Rusak Ringan  3. Rusak Sedang
+
+7. a. Apa bahan bangunan utama dinding rumah terluas?
+
+1. Tembok                                                  5. Batang kayu
+
+2. Plesteran anyaman bambu/kawat 6. Bambu  lanjut ke r8a
+
+3. Kayu/papan/gipsum/GRC/calciboard 7. Lainnya  lanjut ke r8a
+
+4. Anyaman bambu
+
+b. Kondisi Dinding:
+
+1. Baik           2. Rusak Ringan  3. Rusak Sedang 4. Rusak Berat
+
+8. a. Apa bahan bangunan utama atap rumah terluas?
+
+1. Beton                                                   5. Bambu  lanjut ke r9
+
+2. Genteng                                                 6. Kayu/sirap
+
+3. Seng                                                    7. Jerami/ijuk/daun-daunan/rumbia   lanjut ke r9
+
+4. Asbes                                                   8. Lainnya  lanjut ke r9
+
+b. Kondisi Atap:
+
+1. Baik           2. Rusak Ringan  3. Rusak Sedang 4. Rusak Berat
+
+Pertanyaan yang ditulis tebal (bold) merupakan predefined
+
+                                                           15
+           BLOK IV : KETERANGAN SOSIAL EKONOMI KELUARGA (lanjutan)
+
+9. Apakah memiliki fasilitas tempat buang air besar dan siapa saja yang menggunakan?
+    1. Ada, digunakan oleh anggota keluarga dalam satu rumah
+    2. Ada, digunakan bersama oleh anggota keluarga dari beberapa rumah
+    3. Ada, di MCK komunal
+    4. Ada, di MCK umum/siapapun menggunakan  lanjut ke r12
+    5. Ada, anggota keluarga tidak menggunakan lanjut ke r12
+    6. Tidak ada  lanjut ke r12
+
+10. [Jika r9 = 1, 2, 3]
+    Apa jenis kloset yang digunakan?
+     1. Leher angsa
+     2. Plengsengan dengan tutup
+     3. Plengsengan tanpa tutup
+     4. Cemplung/cubluk
+
+11. Di manakah tempat pembuangan akhir tinja?
+
+1. Tangki septik
+2. Instalasi Pengolahan Air Limbah (IPAL)
+3. Kolam/sawah/sungai/danau/laut
+4. Lubang tanah
+5. Pantai/tanah lapang/kebun
+6. Lainnya
+
+12. Apa sumber air utama yang digunakan keluarga untuk minum?
+
+1. Air kemasan bermerek 7. Mata air terlindung
+
+2. Air isi ulang         8. Mata air tak terlindung
+
+3. Leding                9. Air permukaan (sungai/danau/waduk/kolam/irigasi)
+
+4. Sumur bor/pompa       10.Air hujan
+
+5. Sumur terlindung      11. Lainnya
+
+6. Sumur tak terlindung
+
+13. Apa sumber penerangan utama rumah ini?
+
+1. Listrik PLN dengan meteran
+
+2. Listrik PLN tanpa meteran  lanjut ke r15a
+
+3. Listrik non-PLN              lanjut ke r15a
+
+4. Bukan listrik                lanjut ke r15b
+
+Pertanyaan yang ditulis tebal (bold) merupakan predefined
+
+                                                           16
+        BLOK IV : KETERANGAN SOSIAL EKONOMI KELUARGA (lanjutan)
+
+14. a. Jika listrik PLN dengan meteran, berapa jumlah meteran listrik yang terpasang di rumah ini?
+
+b. Berapa daya yang terpasang di rumah ini?
+
+                                                           Meteran 1                Meteran 2
+                                                                                         (ii)
+1. 450 watt                                                (i)
+
+2. 900 watt
+
+3. 1.300 watt               b
+
+4. 2.200 watt
+
+5. >2.200 watt
+
+c. Isikan salah satu
+    nomor berikut:
+
+1. ID Pelanggan PLN 1
+
+2. No Meteran Listrik 2
+
+15. a. Berapa nilai pengeluaran listrik sebulan?                           Rp.      .               .
+                                                                                                    .
+(Dapat menggunakan pertanyaan seperti: biasanya, rata-rata, atau sebulan terakhir)
+                                                                                                    .
+b. Berapa pengeluaran pulsa dan internet seluruh anggota                   Rp.      .               .
+    keluarga sebulan?                                                                               .
+
+(Dapat menggunakan pertanyaan seperti: biasanya, rata-rata, atau sebulan terakhir)                          unit
+                                                                                                            unit
+16. a. Berapa rata-rata pengeluaran makanan keluarga seminggu?             Rp.      .                       unit
+                                                                                                            unit
+b. Berapa rata-rata pengeluaran bukan makanan rutin keluarga bulanan? Rp.           .                     gram
+                                                                                                            unit
+c. Berapa rata-rata pengeluaran bukan makanan rutin keluarga tahunan? Rp.           .                       unit
+                                                                                                    ,
+                                       KETERANGAN KEPEMILIKAN ASET                                          unit
+                                                                                                    ,
+17. Apakah keluarga ini memiliki barang-barang sebagai berikut? Berapa jumlahnya?
+                                                                                                         lokasi
+a. Tabung gas 3 kg:
+                                                                                                    ,
+b. Tabung gas 5,5 kg atau lebih:
+                                                                                                    bangunan
+c. Lemari es/kulkas:
+                                                                                                    ,
+d. AC:
+
+e. Emas/perhiasan:
+
+f. Komputer/laptop/tablet:
+
+g. i. Sepeda motor (termasuk sepeda motor listrik):
+
+ii. [Jika r17.g.i > 0] Total nilai aset sepeda motor:                      Rp.      ,
+
+h. i. Mobil (termasuk mobil listrik):
+
+ii. [Jika r17.g.i > 0] Total nilai aset mobil:                        Rp.       ,   ,
+
+18. Apakah Keluarga ini memiliki aset tidak bergerak sebagai berikut?
+
+a. i. Jumlah tanah/lahan di tempat lain (selain yang ditempati):
+
+ii. [Jika r18.a.i > 0]                                                Rp.       ,   ,
+   Total nilai harga jual tanah/lahan di tempat lain
+   (selain yang ditempati):
+
+b. i. Jumlah rumah/bangunan di tempat lain (selain yang ditempati):
+
+ii. [Jika r18.b.i > 0]
+
+Total nilai harga jual rumah/bangunan di tempat lain                  Rp.       ,   ,
+
+(selain yang ditempati):
+
+Pertanyaan yang ditulis tebal (bold) merupakan predefined
+
+                                                           17
+                       BLOK IV : KETERANGAN SOSIAL EKONOMI KELUARGA (lanjutan)
+19. Foto rumah (2 buah yang mencerminkan kualitas bangunan) :
+
+    a. Foto tampak depan (harus mencakup atap dan dinding)
+    b. Foto ruang tamu (harus mencakup dinding dan lantai)
+
+                                                             BLOK V : CATATAN
+
+                                   BLOK VI : KETERANGAN PEMBERI JAWABAN
+
+                                          PETUGAS
+
+                 URAIAN            PPL             PML                          RESPONDEN
+
+                              (1)    (2)             (3)                                   (4)
+
+1. Nama                            ................. sd ...................... ................. sd ...................... ................. sd ......................
+2. NIP/NMS
+3. Nomor HP/Telepon
+4. E-mail
+5. Tanggal Pelaksanaan
+6. Tanda Tangan
+
+                                   18
+                                     KODE PROFESI PEKERJAAN UTAMA
+
+000. Tidak Bekerja                   064. Menteri/Kepala Badan (setingkat Menteri)/ 125. Peramal
+001. Agen Tenaga Kerja
+002. Ahli Sejarah dan Cagar budaya   Wakil Menteri/Wakil Kepala Badan          126. Perancang Busana/Desainer
+003. Akuntan
+004. Analis Keuangan                 065. Nakhoda                              127. Perangkat Desa
+005. Anggota DPD
+006. Anggota DPR RI/MPR RI           066. Nelayan                              128. Perawat
+007. Anggota DPRD Provinsi/ Anggota
+                                     067. Notaris                              129. Petani/Pekebun/Petani Hutan
+    DPRD Kabupaten/Kota
+008. Apoteker                        068. Operator Layanan Pelanggan           130. Peternak
+009. Arsiparis
+010. Arsitek                         (Customer Service )                       131. Petugas Pemadam Kebakaran
+011. Asisten Apoteker
+012. Atase                           069. Operator Mesin                       132. Petugas Stasiun Pengisian Bahan Bakar
+013. Atlet/Olahragawan
+014. Awak Kapal                      070. Pandita                              133. Pilot
+015. Bhikkhu
+016. Biarawan                        071. Panitera Pengadilan                  134. Pinandita
+017. Biarawati
+018. Bidan                           072. Paraji                               135. PNS Fungsional Tertentu
+019. Broker/Pialang Saham
+020. Bupati                          073. Paranormal                           136. PNS Fungsional Umum
+021. Buruh Angkut Barang
+022. Buruh Bangunan                  074. Pastor                               137. PNS Struktural
+023. Buruh Industri
+024. Buruh Perikanan                 075. Pedagang                             138. Polisi
+025. Buruh Pertambangan
+026. Buruh Pertanian/Kehutanan       076. Pedagang Asongan/Keliling Makanan    139. Pramugara/i
+027. Buruh Peternakan
+028. Camat                           077. Pedagang Asongan/Keliling Nonmakanan 140. Pramusaji
+029. Chef
+030. Chief Executive Officer (CEO)   078. Pedagang Online                      141. Presiden
+
+031. Dokter Gigi                     079. Pegawai Pemerintah dengan Perjanjian 142. Programer
+032. Dokter Hewan
+033. Dokter Spesialis                Kerja (PPPK)                              143. Psikiater
+034. Dokter Umum
+035. Dosen                           080. Pekerja Garmen/Konveksi              144. Psikolog
+036. Duta Besar
+037. Empu Keris                      081. Pekerja Percetakan                   145. Pustakawan
+038. Fotografer
+039. Gembala                         082. Pekerja Profesional Penjualan (agen  146. Resepsionis
+040. Gubernur
+041. Guru                            asuransi, sales penjualan, dll)           147. Sekretaris
+042. Hakim
+043. Hakim Agung                     083. Pekerja Sosial                       148. Seniman/Artis
+044. Imam Masjid
+045. Jaksa                           084. Pelaku Ekosistem Musik               149. Sopir
+046. Jaksa Agung
+047. Jiaosheng                       085. Pelaku Ekosistem Perfilman           150. Supervisor/Mandor
+048. Juru Gambar Teknik/Drafter
+                                     086. Pelaku Ekosistem Seni Pertunjukan    151. Tabib
+049. Kameramen
+050. Kapten Kapal                    087. Pelaku Ekosistem Seni Rupa dan Kriya 152. Teknisi
+051. Kasir
+052. Kepala Desa                     088. Pelatih/ Instruktur Olahraga         153. Teller Bank
+053. Ketua Adat
+054. Ketua Organisasi                089. Pelayan Toko                         154. Tenaga Cuci
+055. Konsultan
+056. Kreator Konten                  090. Pembantu/Asisten Rumah Tangga        155. Tenaga Humas
+057. Kurator
+058. Kurir                           091. Pemberi Pinjaman                     156. Tenaga Kebersihan
+059. Lurah
+060. Makelar                         092. Pembuat Makanan/Juru Masak           157. Tenaga Tata Usaha
+061. Manajer
+062. Masinis                         093. Pembuat Minuman (Barista, Bartender, dll) 158. Tentara Nasional Indonesia (TNI)
+063. Mekanik
+                                     094. Pembuat Rokok/Cerutu/Tembakau Gulung 159. Tukang Bangunan
+
+                                     095. Pembuat Sepatu dan Tas               160. Tukang Cat
+
+                                     096. Pembudi Daya Ikan dan Biota Air Lainnya 161. Tukang Cukur
+
+                                     097. Pemulung                             162. Tukang Fotokopi
+
+                                     098. Penagih Hutang (Debt Collector )     163. Tukang Gigi
+
+                                     099. Penasihat Spiritual                  164. Tukang Kaca
+
+                                     100. Penata Busana                        165. Tukang Kayu
+
+                                     101. Penata Rambut                        166. Tukang Kunci
+
+                                     102. Penata Rias                          167. Tukang Las/Pandai Besi
+
+                                     103. Penata Suara                         168. Tukang Listrik
+
+                                     104. Pendeta                              169. Tukang Pijat
+
+                                     105. Peneliti                             170. Tukang Pipa
+
+                                     106. Penerjemah                           171. Tukang Sablon
+
+                                     107. Pengacara                            172. Tukang Sol Sepatu
+
+                                     108. Pengasuh Anak (Baby Sitter )         173. Tukang Tambal Ban
+
+                                     109. Pengelola Gedung/Properti            174. Tukang Tebang Kayu
+
+                                     110. Pengemudi Ojek Online                175. Uskup
+
+                                     111. Pengemudi Ojek Pangkalan             176. Ustaz/Mubalig
+
+                                     112. Pengepul                             177. Wakil Bupati
+
+                                     113. Penjaga Keamanan/Satpam              178. Wakil Gubernur
+
+                                     114. Penjahit                             179. Wakil Presiden
+
+                                     115. Penulis                              180. Wakil Walikota
+
+                                     116. Penyelenggara Acara (Event Organizer /EO) 181. Walikota
+
+                                     117. Penyiar Radio                        182. Wartawan
+
+                                     118. Penyiar Televisi                     183. Wenshi
+
+                                     119. Perajin Batu                         184. Xueshi
+
+                                     120. Perajin Kayu, Bambu, dan Anyaman     185. Lainnya (tuliskan.......................................)
+
+                                     121. Perajin Kulit dan Tekstil            999. Tidak Tahu  Hanya dapat dipilih
+
+                                     122. Perajin Logam                                              apabila Blok I r9a = 3, 4
+
+                                     123. Perajin Perhiasan
+
+                                     124. Perajin Tembikar/Keramik
+
+                                                    19
+

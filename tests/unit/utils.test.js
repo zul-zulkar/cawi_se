@@ -1,6 +1,6 @@
 import { extractFrom } from '../helpers/load-source.js'
 
-const { esc, fmtDate, sha256 } = extractFrom('js/utils.js', 'esc', 'fmtDate', 'sha256')
+const { esc, fmtDate, sha256 } = extractFrom('js/shared/utils.js', 'esc', 'fmtDate', 'sha256')
 
 /* ─────────────── esc() ─────────────── */
 describe('esc()', () => {

@@ -12,10 +12,14 @@
 // 5. Salin URL yang diberikan, paste ke index.html pada SCRIPT_URL
 // ============================================================
 
-const SHEET_ID          = "1f-YLgJHfMU33_9Pn6snao1xZ-qf3vBQRpAxFwxBLOGI";
+const SHEET_ID          = "1GvDink6EEC0HFDT7eUgUXpG_gCfroFp7cZxOuWFvKew";
 const SHEET_NAME        = "SE2026_Responses";
 const LKP_SHEET_NAME    = "SE2026_LKP";
 const CONFIG_SHEET_NAME = "CAWI_Config";
+
+// L MODE (Rumah Tangga / SE2026-L) — sheet baru, dibuat otomatis bila belum ada
+const L_SHEET_NAME       = "SE2026_L_Responses";
+const L_ANGGOTA_SHEET    = "SE2026_L_Anggota";
 
 // Header SE2026_LKP sheet (satu baris per kantor cabang)
 const LKP_HEADERS = [
@@ -177,13 +181,28 @@ function doPost(e) {
     if (d.action === "setConfig")  return setConfigResponse(d.key, d.value);
     if (d.action === "getRecords") return getRecordsResponse();
 
-    const ss  = SpreadsheetApp.openById(SHEET_ID);
-    let sheet = ss.getSheetByName(SHEET_NAME);
+    // === MODE DISPATCHER: L mode pakai sheet terpisah ===
+    const mode = (d.formMode === 'l') ? 'l' : 'lub';
 
+    // Delete: cari di kedua sheet (frontend tidak kirim formMode di delete)
     if (d.action === "deleteRecord" && d._delete_id && parseInt(d._delete_id) > 0) {
+      const targetMode = d.formMode || _findRecordMode(parseInt(d._delete_id));
+      if (targetMode === 'l') return deleteLRecord(parseInt(d._delete_id));
+      const ss = SpreadsheetApp.openById(SHEET_ID);
+      const sheet = ss.getSheetByName(SHEET_NAME);
       if (!sheet) return jsonResponse({ status: "error", message: "Sheet tidak ditemukan" });
       return deleteSheetRecord(sheet, parseInt(d._delete_id));
     }
+
+    // L MODE: submit / edit
+    if (mode === 'l') {
+      if (d._edit_id && parseInt(d._edit_id) > 0) return updateLRecord(d, parseInt(d._edit_id));
+      return insertLRecord(d);
+    }
+
+    // L.UB MODE (kode lama, tidak diubah)
+    const ss  = SpreadsheetApp.openById(SHEET_ID);
+    let sheet = ss.getSheetByName(SHEET_NAME);
 
     if (!sheet) {
       sheet = ss.insertSheet(SHEET_NAME);
@@ -212,12 +231,22 @@ function doPost(e) {
       try { saveTandaTangan(d); } catch(sigErr) { Logger.log("Gagal simpan TTD: " + sigErr.message); }
     }
 
-    return jsonResponse({ status: "ok", message: "Data berhasil disimpan" });
+    return jsonResponse({ status: "ok", message: "Data berhasil disimpan", mode: "lub" });
 
   } catch (err) {
     Logger.log("doPost error: " + err.message);
     return jsonResponse({ status: "error", message: err.message });
   }
+}
+
+// Cek mode record by _id (dipakai untuk deleteRecord ketika frontend tidak kirim formMode)
+function _findRecordMode(id) {
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  var lub = ss.getSheetByName(SHEET_NAME);
+  if (lub && (id + 1) >= 2 && (id + 1) <= lub.getLastRow()) return 'lub';
+  var l = ss.getSheetByName(L_SHEET_NAME);
+  if (l && (id + 1) >= 2 && (id + 1) <= l.getLastRow()) return 'l';
+  return 'lub';
 }
 
 function jsonResponse(obj) {
@@ -234,24 +263,23 @@ function cellStr(v) {
   return (v !== null && v !== undefined) ? String(v) : "";
 }
 
-// Kembalikan semua rekaman dari sheet sebagai JSON
+// Kembalikan semua rekaman dari sheet sebagai JSON — merged L.UB + L
 function getRecordsResponse() {
   try {
     const ss    = SpreadsheetApp.openById(SHEET_ID);
     const sheet = ss.getSheetByName(SHEET_NAME);
-    if (!sheet || sheet.getLastRow() <= 1) {
-      return jsonResponse({ status: "ok", data: [] });
-    }
-    const values = sheet.getDataRange().getValues();
-    const rows = values.slice(1).map(function(row, idx) {
-      var obj = { _id: idx + 1 };
-      FIELD_NAMES.forEach(function(key, i) {
-        obj[key] = cellStr(row[i]);
+    var lubRows = [];
+    if (sheet && sheet.getLastRow() > 1) {
+      const values = sheet.getDataRange().getValues();
+      lubRows = values.slice(1).map(function(row, idx) {
+        var obj = { _id: idx + 1, _formMode: 'lub' };
+        FIELD_NAMES.forEach(function(key, i) { obj[key] = cellStr(row[i]); });
+        obj._ts = obj.timestamp;
+        return obj;
       });
-      obj._ts = obj.timestamp;
-      return obj;
-    });
-    return jsonResponse({ status: "ok", data: rows });
+    }
+    var lRows = readLRecords();
+    return jsonResponse({ status: "ok", data: lubRows.concat(lRows) });
   } catch(err) {
     return jsonResponse({ status: "error", message: err.message });
   }
@@ -479,25 +507,321 @@ function setConfigResponse(key, value) {
   }
 }
 
-// Endpoint GET — kembalikan semua rekaman sebagai JSON
+// Endpoint GET — kembalikan semua rekaman sebagai JSON (L.UB + L merged)
 function doGet(e) {
   try {
-    const ss    = SpreadsheetApp.openById(SHEET_ID);
-    const sheet = ss.getSheetByName(SHEET_NAME);
-    if (!sheet || sheet.getLastRow() <= 1) {
-      return jsonResponse({ status: "ok", data: [] });
-    }
-    const values = sheet.getDataRange().getValues();
-    const rows = values.slice(1).map(function(row, idx) {
-      var obj = { _id: idx + 1 };
-      FIELD_NAMES.forEach(function(key, i) {
-        obj[key] = cellStr(row[i]);
-      });
-      obj._ts = obj.timestamp;
-      return obj;
-    });
-    return jsonResponse({ status: "ok", data: rows });
+    return getRecordsResponse();
   } catch(err) {
     return jsonResponse({ status: "error", message: err.message });
   }
+}
+
+// ============================================================
+// L MODE (SE2026-L Rumah Tangga) — header, builder, helpers
+// ============================================================
+
+const L_HEADERS = [
+  "Timestamp",
+  // Blok I: Keluarga
+  "Nama KK", "NIK KK", "No KK",
+  "Jumlah Anggota", "Jumlah Pendataan",
+  "Provinsi", "Kode Provinsi",
+  "Kabupaten/Kota", "Kode Kabupaten",
+  "Kecamatan", "Kode Kecamatan",
+  "Kelurahan/Desa", "Kode Kelurahan",
+  "Klasifikasi", "Kode Pos",
+  "Kode SLS", "Nama SLS",
+  "Alamat Detail", "Nama Jalan", "Nomor Rumah",
+  "Sesuai KK",
+  "Anggota Data (JSON)",
+  // Blok II: Usaha
+  "Nama Usaha", "Nama Komersial", "Alamat Usaha",
+  "RT", "RW", "Kode Pos Usaha",
+  "Email Usaha", "Website Usaha", "HP Usaha",
+  "Kawasan", "Nama Kawasan",
+  "Jenis Usaha",
+  "Lokasi Alamat", "Lokasi Provinsi", "Lokasi Kab",
+  "Punya NIB", "NIB",
+  "NIB Alasan", "NIB Alasan Lain",
+  "Badan Usaha",
+  "Pengusaha Nama", "Pengusaha JK", "Pengusaha Umur", "Pengusaha NIK",
+  "Kegiatan Utama",
+  "B1", "B2", "B3", "B4", "C",
+  "Input Bahan", "Proses Produksi", "Produk Utama",
+  "KBLI Kode", "KBLI Judul", "KBLI Kategori",
+  "Klasifikasi Hotel",
+  "Jaringan", "Jumlah Cabang",
+  "KP Nama", "KP Negara", "KP Alamat", "KP Email", "KP Provinsi", "KP Kab",
+  "Internet",
+  "Halal", "Halal B", "Halal C",
+  "BPOM", "BPOM B", "BPOM C",
+  "Pekerja L", "Pekerja P", "Pekerja Dibayar", "Pekerja Tidak Dibayar",
+  "Tahun Operasi",
+  // Tahunan y26-y29
+  "Y26a", "Y26b", "Y26c", "Y26d", "Y26e", "Y26f",
+  "Y27a", "Y27b", "Y27c", "Y27d",
+  "Y28a", "Y28b", "Y28c", "Y28c1", "Y28d",
+  "Y29a", "Y29b", "Y29c", "Y29d", "Y29e", "Y29f", "Y29g",
+  // Bulanan m30-m33
+  "M30a", "M30b", "M30c", "M30d", "M30e", "M30f",
+  "M31a", "M31b", "M31c", "M31d", "M31e",
+  "M32a", "M32b", "M32c", "M32c1", "M32d",
+  "M33a", "M33b", "M33c", "M33d", "M33e", "M33f", "M33g",
+  // Blok III: Perumahan & Aset
+  "Jenis Bangunan", "Lantai Apt", "Bangunan Lain",
+  "Jumlah Keluarga di Rumah", "KK Lain",
+  "Status Milik", "Bukti", "Status Lain", "Sewa",
+  "Luas Lantai",
+  "Lantai Bahan", "Lantai Kondisi",
+  "Dinding Bahan", "Dinding Kondisi",
+  "Atap Bahan", "Atap Kondisi",
+  "BAB", "Kloset", "Tinja",
+  "Air",
+  "Listrik", "Meteran Jumlah",
+  "Meteran Daya 1", "Meteran Daya 2",
+  "Meteran ID 1", "Meteran ID 2",
+  "Listrik/Bulan", "Pulsa/Bulan",
+  "Makanan/Minggu", "NonMakanan/Bulan", "NonMakanan/Tahun",
+  "Aset Gas 3kg", "Aset Gas 5.5kg+", "Aset Kulkas", "Aset AC",
+  "Aset Emas (gram)", "Aset Komputer",
+  "Aset Motor", "Aset Motor Nilai",
+  "Aset Mobil", "Aset Mobil Nilai",
+  "Aset Tanah", "Aset Tanah Nilai",
+  "Aset Rumah", "Aset Rumah Nilai",
+  // Blok IV
+  "Catatan Pendata",
+  // Blok V
+  "Petugas Nama", "Petugas NIP", "Petugas HP",
+  "Responden Nama", "Responden HP", "Responden Email",
+  "Tanggal Pelaksanaan",
+  "Tanda Tangan (base64)"
+];
+
+// Urutan HARUS sama persis dengan L_HEADERS — dipakai untuk parse balik di getRecordsResponse
+const L_FIELD_NAMES = [
+  "timestamp",
+  "nama_kk", "nik_kk", "no_kk",
+  "jml_anggota", "jml_pendataan",
+  "provinsi", "provinsi_kd",
+  "kabupaten", "kabupaten_kd",
+  "kecamatan", "kecamatan_kd",
+  "kelurahan", "kelurahan_kd",
+  "klasifikasi", "kode_pos",
+  "kode_sls", "nama_sls",
+  "alamat_detail", "nama_jalan", "no_rumah",
+  "sesuai_kk",
+  "anggota_data",
+  // Blok II
+  "nama_usaha", "nama_komersial", "alamat_usaha",
+  "rt", "rw", "kodepos_usaha",
+  "email_usaha", "website_usaha", "hp_usaha",
+  "kawasan", "nama_kawasan",
+  "jenis_usaha",
+  "lokasi_alamat", "lokasi_provinsi", "lokasi_kab",
+  "punya_nib", "nib",
+  "nib_alasan", "nib_alasan_lain",
+  "badan_usaha",
+  "pengusaha_nama", "pengusaha_jk", "pengusaha_umur", "pengusaha_nik",
+  "kegiatan_utama",
+  "b1", "b2", "b3", "b4", "c",
+  "input_bahan", "proses_produksi", "produk_utama",
+  "kbli_kode", "kbli_judul", "kbli_kategori",
+  "klasifikasi_hotel",
+  "jaringan", "jml_cabang",
+  "kp_nama", "kp_negara", "kp_alamat", "kp_email", "kp_provinsi", "kp_kab",
+  "internet",
+  "halal", "halal_b", "halal_c",
+  "bpom", "bpom_b", "bpom_c",
+  "pekerja_l", "pekerja_p", "pekerja_dibayar", "pekerja_tidak_dibayar",
+  "tahun_operasi",
+  "y26a", "y26b", "y26c", "y26d", "y26e", "y26f",
+  "y27a", "y27b", "y27c", "y27d",
+  "y28a", "y28b", "y28c", "y28c1", "y28d",
+  "y29a", "y29b", "y29c", "y29d", "y29e", "y29f", "y29g",
+  "m30a", "m30b", "m30c", "m30d", "m30e", "m30f",
+  "m31a", "m31b", "m31c", "m31d", "m31e",
+  "m32a", "m32b", "m32c", "m32c1", "m32d",
+  "m33a", "m33b", "m33c", "m33d", "m33e", "m33f", "m33g",
+  // Blok III
+  "jenis_bangunan", "lantai_apt", "bangunan_lain",
+  "jml_keluarga_rumah", "kk_lain",
+  "status_milik", "bukti", "status_lain", "sewa",
+  "luas_lantai",
+  "lantai_bahan", "lantai_kondisi",
+  "dinding_bahan", "dinding_kondisi",
+  "atap_bahan", "atap_kondisi",
+  "bab", "kloset", "tinja",
+  "air",
+  "listrik", "meteran_jml",
+  "meteran_daya1", "meteran_daya2",
+  "meteran_id1", "meteran_id2",
+  "listrik_bln", "pulsa_bln",
+  "makanan_mgg", "nonmakanan_bln", "nonmakanan_thn",
+  "aset_gas3", "aset_gas5", "aset_kulkas", "aset_ac",
+  "aset_emas", "aset_komputer",
+  "aset_motor", "aset_motor_nilai",
+  "aset_mobil", "aset_mobil_nilai",
+  "aset_tanah", "aset_tanah_nilai",
+  "aset_rumah", "aset_rumah_nilai",
+  "catatan_pendata",
+  "petugas_nama", "petugas_nip", "petugas_hp",
+  "responden_nama", "responden_hp", "responden_email",
+  "tanggal_pelaksanaan",
+  "tanda_tangan"
+];
+
+function buildRowL(d) {
+  // Build row dari L_FIELD_NAMES — urutan dijamin match L_HEADERS
+  return L_FIELD_NAMES.map(function(key) {
+    if (key === "tanda_tangan") return d.tanda_tangan ? "[ada]" : "[kosong]";
+    var v = d[key];
+    return (v === null || v === undefined) ? "" : v;
+  });
+}
+
+// Init sheet L (header berwarna biru, beda dari L.UB yg orange)
+function getOrInitLSheet(ss) {
+  var sheet = ss.getSheetByName(L_SHEET_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(L_SHEET_NAME);
+  }
+  if (sheet.getLastRow() === 0) {
+    sheet.appendRow(L_HEADERS);
+    sheet.getRange(1, 1, 1, L_HEADERS.length)
+      .setFontWeight("bold")
+      .setBackground("#2b6cb0")
+      .setFontColor("#ffffff");
+    sheet.setFrozenRows(1);
+    sheet.setColumnWidth(1, 160);
+  }
+  return sheet;
+}
+
+// Sheet flat per-anggota (mirip pola SE2026_LKP) untuk analisis sosek anggota
+const L_ANGGOTA_HEADERS = [
+  "Record ID", "Timestamp", "Nama KK",
+  "No Anggota", "Nama Anggota", "NIK Anggota",
+  "Hubungan", "Keberadaan", "STOP State",
+  "Alamat Dom", "DN Provinsi", "DN Kab", "LN Negara",
+  "Kawin", "Jenis Kelamin", "Tgl Lahir", "Umur",
+  "Sekolah", "Ijazah", "Rekening",
+  "Profesi", "Kedudukan",
+  "18a", "18a Nilai", "18b", "18b Nilai", "18c", "18c Nilai",
+  "Disabilitas", "Kronis", "Kronis Lainnya"
+];
+
+function getOrInitLAnggotaSheet(ss) {
+  var sheet = ss.getSheetByName(L_ANGGOTA_SHEET);
+  if (!sheet) {
+    sheet = ss.insertSheet(L_ANGGOTA_SHEET);
+    sheet.appendRow(L_ANGGOTA_HEADERS);
+    sheet.getRange(1, 1, 1, L_ANGGOTA_HEADERS.length)
+      .setFontWeight("bold")
+      .setBackground("#2b6cb0")
+      .setFontColor("#ffffff");
+    sheet.setFrozenRows(1);
+  }
+  return sheet;
+}
+
+// Pecah anggota_data JSON jadi satu baris per anggota di sheet terpisah
+function saveLAnggota(mainSheet, mainId, d) {
+  if (!d.anggota_data) return;
+  var arr;
+  try { arr = JSON.parse(d.anggota_data); } catch(e) { return; }
+  if (!arr || !arr.length) return;
+  var sheet = getOrInitLAnggotaSheet(mainSheet.getParent());
+  arr.forEach(function(a) {
+    sheet.appendRow([
+      mainId, d.timestamp || '', d.nama_kk || '',
+      a.no, a.nama || '', a.nik || '',
+      a.hubungan || '', a.keberadaan || '', a.stop_state || 0,
+      a.alamat_dom || '', a.dn_provinsi || '', a.dn_kab || '', a.ln_negara || '',
+      a.kawin || '', a.jk || '', a.tgl_lahir || '', a.umur || '',
+      a.sekolah || '', a.ijazah || '', a.rekening || '',
+      a.profesi || '', a.kedudukan || '',
+      a.pend_18a || '', a.pend_18a_nilai || 0,
+      a.pend_18b || '', a.pend_18b_nilai || 0,
+      a.pend_18c || '', a.pend_18c_nilai || 0,
+      a.disab || '', a.kronis || '', a.kronis_lain || ''
+    ]);
+  });
+}
+
+function deleteLAnggota(mainSheet, mainId) {
+  var sheet = mainSheet.getParent().getSheetByName(L_ANGGOTA_SHEET);
+  if (!sheet || sheet.getLastRow() <= 1) return;
+  var lastRow = sheet.getLastRow();
+  var ids = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+  for (var i = ids.length - 1; i >= 0; i--) {
+    if (String(ids[i][0]) === String(mainId)) sheet.deleteRow(i + 2);
+  }
+}
+
+// Simpan TTD L mode ke folder Drive berbeda (opsional, pola sama dgn L.UB)
+function saveTandaTanganL(d) {
+  if (!d.tanda_tangan || d.tanda_tangan.length < 100) return;
+  var base64 = d.tanda_tangan.replace(/^data:image\/png;base64,/, '');
+  var blob   = Utilities.newBlob(Utilities.base64Decode(base64), 'image/png',
+    `TTD_L_${d.nama_kk || 'unknown'}_${d.timestamp || Date.now()}.png`);
+  var folder = getOrCreateFolder('CAWI_SE2026_L_TTD');
+  folder.createFile(blob);
+}
+
+// Insert L record
+function insertLRecord(d) {
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  var sheet = getOrInitLSheet(ss);
+  sheet.appendRow(buildRowL(d));
+  var newId = sheet.getLastRow() - 1;
+  saveLAnggota(sheet, newId, d);
+  if (d.tanda_tangan && d.tanda_tangan.length > 100) {
+    try { saveTandaTanganL(d); } catch(e) { Logger.log("Gagal simpan TTD L: " + e.message); }
+  }
+  return jsonResponse({ status: "ok", message: "Data L berhasil disimpan", mode: "l" });
+}
+
+// Update L record by _id
+function updateLRecord(d, editId) {
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  var sheet = getOrInitLSheet(ss);
+  var targetRow = editId + 1;
+  if (targetRow < 2 || targetRow > sheet.getLastRow()) {
+    return jsonResponse({ status: "error", message: "Rekaman L tidak ditemukan (id=" + editId + ")" });
+  }
+  sheet.getRange(targetRow, 1, 1, L_HEADERS.length).setValues([buildRowL(d)]);
+  deleteLAnggota(sheet, editId);
+  saveLAnggota(sheet, editId, d);
+  if (d.tanda_tangan && d.tanda_tangan.length > 100) {
+    try { saveTandaTanganL(d); } catch(e) { Logger.log("Gagal simpan TTD L: " + e.message); }
+  }
+  return jsonResponse({ status: "ok", message: "Data L berhasil diperbarui", mode: "l" });
+}
+
+// Delete L record
+function deleteLRecord(deleteId) {
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  var sheet = ss.getSheetByName(L_SHEET_NAME);
+  if (!sheet) return jsonResponse({ status: "error", message: "Sheet L tidak ditemukan" });
+  var targetRow = deleteId + 1;
+  if (targetRow < 2 || targetRow > sheet.getLastRow()) {
+    return jsonResponse({ status: "error", message: "Rekaman L tidak ditemukan (id=" + deleteId + ")" });
+  }
+  deleteLAnggota(sheet, deleteId);
+  sheet.deleteRow(targetRow);
+  return jsonResponse({ status: "ok", message: "Rekaman L berhasil dihapus", mode: "l" });
+}
+
+// Baca semua L records — return objek dengan _formMode='l' supaya daftar.html bisa render badge
+function readLRecords() {
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  var sheet = ss.getSheetByName(L_SHEET_NAME);
+  if (!sheet || sheet.getLastRow() <= 1) return [];
+  var values = sheet.getDataRange().getValues();
+  return values.slice(1).map(function(row, idx) {
+    var obj = { _id: idx + 1, _formMode: 'l' };
+    L_FIELD_NAMES.forEach(function(key, i) { obj[key] = cellStr(row[i]); });
+    obj._ts = obj.timestamp;
+    return obj;
+  });
 }

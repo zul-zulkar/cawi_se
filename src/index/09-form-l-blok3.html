@@ -1,0 +1,433 @@
+<div class="blok-panel" id="blokL3">
+  <div class="blok-banner">
+    <div class="blok-badge">BLOK III</div>
+    <div>
+      <div class="blok-title-text">Sosial Ekonomi Keluarga (Perumahan &amp; Aset)</div>
+      <div class="blok-title-sub">Keterangan perumahan, sanitasi, listrik, pengeluaran &amp; kepemilikan aset keluarga</div>
+    </div>
+  </div>
+
+  <!-- L3.1 Jenis Bangunan -->
+  <div class="section-card">
+    <div class="section-header" id="sec-L3-1">1. Jenis Bangunan Tempat Tinggal</div>
+    <div class="section-body">
+      <div class="form-group">
+        <label class="field-label">a. Jenis bangunan <span class="req">*</span></label>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l3_jenis_bangunan" value="1" onchange="handleJenisBangunanL()"/> <span>1. Rumah tunggal</span></label>
+          <label class="radio-item"><input type="radio" name="l3_jenis_bangunan" value="2" onchange="handleJenisBangunanL()"/> <span>2. Rumah deret</span></label>
+          <label class="radio-item"><input type="radio" name="l3_jenis_bangunan" value="3" onchange="handleJenisBangunanL()"/> <span>3. Rumah susun</span></label>
+          <label class="radio-item"><input type="radio" name="l3_jenis_bangunan" value="4" onchange="handleJenisBangunanL()"/> <span>4. Apartemen</span></label>
+          <label class="radio-item"><input type="radio" name="l3_jenis_bangunan" value="5" onchange="handleJenisBangunanL()"/> <span>5. Lainnya</span></label>
+        </div>
+      </div>
+      <div class="form-group hidden" id="l3_lantai_apt_wrap">
+        <label class="field-label">b. Nama/Nomor lantai (apartemen/rusun)</label>
+        <input type="text" id="l3_lantai_apt" placeholder="Lantai"/>
+      </div>
+      <div class="form-group hidden" id="l3_bangunan_lain_wrap">
+        <label class="field-label">Tuliskan jenis bangunan lainnya</label>
+        <input type="text" id="l3_bangunan_lain" placeholder="Jenis bangunan"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- L3.2 Jumlah Keluarga -->
+  <div class="section-card">
+    <div class="section-header" id="sec-L3-2">2. Jumlah Keluarga dalam 1 Rumah</div>
+    <div class="section-body">
+      <div class="form-group">
+        <label class="field-label">a. Jumlah keluarga <span class="req">*</span></label>
+        <input type="number" id="l3_jml_keluarga" min="1" placeholder="1" oninput="handleJmlKeluargaL()"/>
+        <div class="hint">Jika &gt; 1, isi nomor KK keluarga lain di b</div>
+      </div>
+      <div class="form-group hidden" id="l3_kk_lain_wrap">
+        <label class="field-label">b. Nomor KK keluarga lain</label>
+        <textarea id="l3_kk_lain" rows="2" placeholder="Pisahkan dengan koma jika lebih dari satu"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <!-- L3.3-4 Kepemilikan -->
+  <div class="section-card">
+    <div class="section-header" id="sec-L3-3">3-4. Kepemilikan Bangunan</div>
+    <div class="section-body">
+      <div class="form-group">
+        <div class="subsection-label">3a. Status kepemilikan</div>
+        <label class="field-label">Pilih salah satu <span class="req">*</span></label>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l3_status_milik" value="1" onchange="handleStatusMilikL()"/> <span>1. Milik sendiri</span></label>
+          <label class="radio-item"><input type="radio" name="l3_status_milik" value="2" onchange="handleStatusMilikL()"/> <span>2. Kontrak/sewa</span></label>
+          <label class="radio-item"><input type="radio" name="l3_status_milik" value="3" onchange="handleStatusMilikL()"/> <span>3. Bebas sewa</span></label>
+          <label class="radio-item"><input type="radio" name="l3_status_milik" value="4" onchange="handleStatusMilikL()"/> <span>4. Dinas</span></label>
+          <label class="radio-item"><input type="radio" name="l3_status_milik" value="5" onchange="handleStatusMilikL()"/> <span>5. Lainnya</span></label>
+        </div>
+      </div>
+      <div class="form-group hidden" id="l3_bukti_wrap">
+        <div class="subsection-label">3b. Bukti kepemilikan</div>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l3_bukti" value="1"/> <span>1. SHM</span></label>
+          <label class="radio-item"><input type="radio" name="l3_bukti" value="2"/> <span>2. Sertifikat selain SHM</span></label>
+          <label class="radio-item"><input type="radio" name="l3_bukti" value="3"/> <span>3. Surat bukti lainnya (Girik, Letter C)</span></label>
+          <label class="radio-item"><input type="radio" name="l3_bukti" value="4"/> <span>4. Tidak punya</span></label>
+        </div>
+      </div>
+      <div class="form-group hidden" id="l3_status_lain_wrap">
+        <label class="field-label">Tuliskan status lainnya</label>
+        <input type="text" id="l3_status_lain" placeholder="Status"/>
+      </div>
+      <div class="form-group">
+        <label class="field-label">4. Perkiraan sewa sebulan (Rp)</label>
+        <div class="currency-input-wrap"><span class="currency-prefix">Rp</span>
+          <input type="text" id="l3_sewa" class="currency-field" oninput="formatCurrency(this)" placeholder="0"/>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- L3.5-8 Bangunan -->
+  <div class="section-card">
+    <div class="section-header" id="sec-L3-5">5-8. Lantai, Dinding, Atap</div>
+    <div class="section-body">
+      <div class="form-group">
+        <label class="field-label">5. Luas lantai bangunan (m²) <span class="req">*</span></label>
+        <input type="number" id="l3_luas_lantai" min="0" placeholder="0"/>
+      </div>
+      <div class="inline-fields">
+        <div class="form-group">
+          <label class="field-label">6a. Bahan lantai utama</label>
+          <select id="l3_lantai_bahan">
+            <option value="">-- Pilih --</option>
+            <option value="1">1. Marmer/granit</option>
+            <option value="2">2. Keramik</option>
+            <option value="3">3. Parket/vinil/karpet</option>
+            <option value="4">4. Ubin/tegel/teraso</option>
+            <option value="5">5. Kayu/papan</option>
+            <option value="6">6. Semen/bata merah</option>
+            <option value="7">7. Bambu</option>
+            <option value="8">8. Tanah</option>
+            <option value="9">9. Lainnya</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="field-label">6b. Kondisi lantai</label>
+          <select id="l3_lantai_kondisi">
+            <option value="">-- Pilih --</option>
+            <option value="1">1. Baik</option>
+            <option value="2">2. Rusak ringan</option>
+            <option value="3">3. Rusak sedang</option>
+            <option value="4">4. Rusak berat</option>
+          </select>
+        </div>
+      </div>
+      <div class="inline-fields">
+        <div class="form-group">
+          <label class="field-label">7a. Bahan dinding utama</label>
+          <select id="l3_dinding_bahan">
+            <option value="">-- Pilih --</option>
+            <option value="1">1. Tembok</option>
+            <option value="2">2. Plesteran anyaman bambu/kawat</option>
+            <option value="3">3. Kayu/papan/gipsum/GRC</option>
+            <option value="4">4. Anyaman bambu</option>
+            <option value="5">5. Batang kayu</option>
+            <option value="6">6. Bambu</option>
+            <option value="7">7. Lainnya</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="field-label">7b. Kondisi dinding</label>
+          <select id="l3_dinding_kondisi">
+            <option value="">-- Pilih --</option>
+            <option value="1">1. Baik</option>
+            <option value="2">2. Rusak ringan</option>
+            <option value="3">3. Rusak sedang</option>
+            <option value="4">4. Rusak berat</option>
+          </select>
+        </div>
+      </div>
+      <div class="inline-fields">
+        <div class="form-group">
+          <label class="field-label">8a. Bahan atap utama</label>
+          <select id="l3_atap_bahan">
+            <option value="">-- Pilih --</option>
+            <option value="1">1. Beton</option>
+            <option value="2">2. Genteng</option>
+            <option value="3">3. Seng</option>
+            <option value="4">4. Asbes</option>
+            <option value="5">5. Bambu</option>
+            <option value="6">6. Kayu/sirap</option>
+            <option value="7">7. Jerami/ijuk/daun/rumbia</option>
+            <option value="8">8. Lainnya</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="field-label">8b. Kondisi atap</label>
+          <select id="l3_atap_kondisi">
+            <option value="">-- Pilih --</option>
+            <option value="1">1. Baik</option>
+            <option value="2">2. Rusak ringan</option>
+            <option value="3">3. Rusak sedang</option>
+            <option value="4">4. Rusak berat</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- L3.9-11 Sanitasi -->
+  <div class="section-card">
+    <div class="section-header" id="sec-L3-9">9-11. Sanitasi (BAB)</div>
+    <div class="section-body">
+      <div class="form-group">
+        <div class="subsection-label">9. Fasilitas BAB</div>
+        <label class="field-label">Pilih salah satu <span class="req">*</span></label>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l3_bab" value="1" onchange="handleBABL()"/> <span>1. Ada, dipakai keluarga sendiri</span></label>
+          <label class="radio-item"><input type="radio" name="l3_bab" value="2" onchange="handleBABL()"/> <span>2. Ada, dipakai beberapa keluarga</span></label>
+          <label class="radio-item"><input type="radio" name="l3_bab" value="3" onchange="handleBABL()"/> <span>3. Ada, di MCK komunal</span></label>
+          <label class="radio-item"><input type="radio" name="l3_bab" value="4" onchange="handleBABL()"/> <span>4. Ada, di MCK umum</span></label>
+          <label class="radio-item"><input type="radio" name="l3_bab" value="5" onchange="handleBABL()"/> <span>5. Ada, tidak dipakai</span></label>
+          <label class="radio-item"><input type="radio" name="l3_bab" value="6" onchange="handleBABL()"/> <span>6. Tidak ada</span></label>
+        </div>
+      </div>
+      <div class="form-group hidden" id="l3_kloset_wrap">
+        <div class="subsection-label">10. Jenis kloset</div>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l3_kloset" value="1"/> <span>1. Leher angsa</span></label>
+          <label class="radio-item"><input type="radio" name="l3_kloset" value="2"/> <span>2. Plengsengan dengan tutup</span></label>
+          <label class="radio-item"><input type="radio" name="l3_kloset" value="3"/> <span>3. Plengsengan tanpa tutup</span></label>
+          <label class="radio-item"><input type="radio" name="l3_kloset" value="4"/> <span>4. Cemplung/cubluk</span></label>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="subsection-label">11. Pembuangan akhir tinja</div>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l3_tinja" value="1"/> <span>1. Tangki septik</span></label>
+          <label class="radio-item"><input type="radio" name="l3_tinja" value="2"/> <span>2. IPAL</span></label>
+          <label class="radio-item"><input type="radio" name="l3_tinja" value="3"/> <span>3. Kolam/sawah/sungai/danau/laut</span></label>
+          <label class="radio-item"><input type="radio" name="l3_tinja" value="4"/> <span>4. Lubang tanah</span></label>
+          <label class="radio-item"><input type="radio" name="l3_tinja" value="5"/> <span>5. Pantai/tanah lapang/kebun</span></label>
+          <label class="radio-item"><input type="radio" name="l3_tinja" value="6"/> <span>6. Lainnya</span></label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- L3.12 Air Minum -->
+  <div class="section-card">
+    <div class="section-header" id="sec-L3-12">12. Sumber Air Minum</div>
+    <div class="section-body">
+      <div class="form-group">
+        <label class="field-label">Sumber air utama <span class="req">*</span></label>
+        <select id="l3_air">
+          <option value="">-- Pilih --</option>
+          <option value="1">1. Air kemasan bermerek</option>
+          <option value="2">2. Air isi ulang</option>
+          <option value="3">3. Leding</option>
+          <option value="4">4. Sumur bor/pompa</option>
+          <option value="5">5. Sumur terlindung</option>
+          <option value="6">6. Sumur tak terlindung</option>
+          <option value="7">7. Mata air terlindung</option>
+          <option value="8">8. Mata air tak terlindung</option>
+          <option value="9">9. Air permukaan</option>
+          <option value="10">10. Air hujan</option>
+          <option value="11">11. Lainnya</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- L3.13-15 Listrik -->
+  <div class="section-card">
+    <div class="section-header" id="sec-L3-13">13-15. Penerangan, Listrik &amp; Pulsa</div>
+    <div class="section-body">
+      <div class="form-group">
+        <div class="subsection-label">13. Sumber penerangan utama</div>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l3_listrik" value="1" onchange="handleListrikL()"/> <span>1. PLN dengan meteran</span></label>
+          <label class="radio-item"><input type="radio" name="l3_listrik" value="2" onchange="handleListrikL()"/> <span>2. PLN tanpa meteran</span></label>
+          <label class="radio-item"><input type="radio" name="l3_listrik" value="3" onchange="handleListrikL()"/> <span>3. Listrik non-PLN</span></label>
+          <label class="radio-item"><input type="radio" name="l3_listrik" value="4" onchange="handleListrikL()"/> <span>4. Bukan listrik</span></label>
+        </div>
+      </div>
+      <div class="hidden" id="l3_meteran_wrap">
+        <div class="subsection-label">14. Detail Meteran (PLN bermeter)</div>
+        <div class="inline-fields">
+          <div class="form-group">
+            <label class="field-label">a. Jumlah meteran</label>
+            <input type="number" id="l3_meteran_jml" min="1" max="2" placeholder="1"/>
+          </div>
+          <div class="form-group">
+            <label class="field-label">b. Daya meteran 1 (W)</label>
+            <select id="l3_meteran_daya1">
+              <option value="">-- Pilih --</option>
+              <option value="450">450</option>
+              <option value="900">900</option>
+              <option value="1300">1.300</option>
+              <option value="2200">2.200</option>
+              <option value=">2200">&gt;2.200</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="field-label">b. Daya meteran 2 (W)</label>
+            <select id="l3_meteran_daya2">
+              <option value="">-- Pilih --</option>
+              <option value="450">450</option>
+              <option value="900">900</option>
+              <option value="1300">1.300</option>
+              <option value="2200">2.200</option>
+              <option value=">2200">&gt;2.200</option>
+            </select>
+          </div>
+        </div>
+        <div class="inline-fields">
+          <div class="form-group">
+            <label class="field-label">c. ID Pelanggan PLN 1 atau No Meteran 1</label>
+            <input type="text" id="l3_meteran_id1" placeholder="ID/Nomor"/>
+          </div>
+          <div class="form-group">
+            <label class="field-label">c. ID Pelanggan PLN 2 atau No Meteran 2</label>
+            <input type="text" id="l3_meteran_id2" placeholder="ID/Nomor"/>
+          </div>
+        </div>
+      </div>
+      <div class="inline-fields">
+        <div class="form-group">
+          <label class="field-label">15a. Pengeluaran listrik/bulan</label>
+          <div class="currency-input-wrap"><span class="currency-prefix">Rp</span>
+            <input type="text" id="l3_listrik_bln" class="currency-field" oninput="formatCurrency(this)" placeholder="0"/>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="field-label">15b. Pulsa &amp; internet/bulan</label>
+          <div class="currency-input-wrap"><span class="currency-prefix">Rp</span>
+            <input type="text" id="l3_pulsa_bln" class="currency-field" oninput="formatCurrency(this)" placeholder="0"/>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- L3.16 Pengeluaran -->
+  <div class="section-card">
+    <div class="section-header" id="sec-L3-16">16. Pengeluaran Makanan &amp; Bukan Makanan</div>
+    <div class="section-body">
+      <div class="form-group">
+        <label class="field-label">a. Makanan keluarga / minggu</label>
+        <div class="currency-input-wrap"><span class="currency-prefix">Rp</span>
+          <input type="text" id="l3_makanan_mgg" class="currency-field" oninput="formatCurrency(this)" placeholder="0"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="field-label">b. Bukan makanan rutin keluarga / bulan</label>
+        <div class="currency-input-wrap"><span class="currency-prefix">Rp</span>
+          <input type="text" id="l3_nonmakanan_bln" class="currency-field" oninput="formatCurrency(this)" placeholder="0"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="field-label">c. Bukan makanan rutin keluarga / tahun</label>
+        <div class="currency-input-wrap"><span class="currency-prefix">Rp</span>
+          <input type="text" id="l3_nonmakanan_thn" class="currency-field" oninput="formatCurrency(this)" placeholder="0"/>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- L3.17 Aset Bergerak -->
+  <div class="section-card">
+    <div class="section-header" id="sec-L3-17">17. Kepemilikan Aset</div>
+    <div class="section-body">
+      <div class="inline-fields">
+        <div class="form-group"><label class="field-label">a. Tabung gas 3 kg</label><input type="number" id="l3_aset_gas3" min="0" placeholder="0"/></div>
+        <div class="form-group"><label class="field-label">b. Tabung gas 5.5 kg+</label><input type="number" id="l3_aset_gas5" min="0" placeholder="0"/></div>
+        <div class="form-group"><label class="field-label">c. Kulkas</label><input type="number" id="l3_aset_kulkas" min="0" placeholder="0"/></div>
+      </div>
+      <div class="inline-fields">
+        <div class="form-group"><label class="field-label">d. AC</label><input type="number" id="l3_aset_ac" min="0" placeholder="0"/></div>
+        <div class="form-group"><label class="field-label">e. Emas/perhiasan (gram)</label><input type="number" id="l3_aset_emas" min="0" placeholder="0"/></div>
+        <div class="form-group"><label class="field-label">f. Komputer/laptop/tablet</label><input type="number" id="l3_aset_komputer" min="0" placeholder="0"/></div>
+      </div>
+      <div class="inline-fields">
+        <div class="form-group">
+          <label class="field-label">g.i. Sepeda motor</label>
+          <input type="number" id="l3_aset_motor" min="0" placeholder="0" oninput="handleAsetMotorL()"/>
+        </div>
+        <div class="form-group hidden" id="l3_motor_nilai_wrap">
+          <label class="field-label">g.ii. Total nilai motor (Rp)</label>
+          <div class="currency-input-wrap"><span class="currency-prefix">Rp</span>
+            <input type="text" id="l3_aset_motor_nilai" class="currency-field" oninput="formatCurrency(this)" placeholder="0"/>
+          </div>
+        </div>
+      </div>
+      <div class="inline-fields">
+        <div class="form-group">
+          <label class="field-label">h.i. Mobil</label>
+          <input type="number" id="l3_aset_mobil" min="0" placeholder="0" oninput="handleAsetMobilL()"/>
+        </div>
+        <div class="form-group hidden" id="l3_mobil_nilai_wrap">
+          <label class="field-label">h.ii. Total nilai mobil (Rp)</label>
+          <div class="currency-input-wrap"><span class="currency-prefix">Rp</span>
+            <input type="text" id="l3_aset_mobil_nilai" class="currency-field" oninput="formatCurrency(this)" placeholder="0"/>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- L3.18 Aset Tidak Bergerak -->
+  <div class="section-card">
+    <div class="section-header" id="sec-L3-18">18. Aset Tidak Bergerak (selain yang ditempati)</div>
+    <div class="section-body">
+      <div class="inline-fields">
+        <div class="form-group">
+          <label class="field-label">a.i. Jumlah tanah/lahan lain</label>
+          <input type="number" id="l3_aset_tanah" min="0" placeholder="0" oninput="handleAsetTanahL()"/>
+        </div>
+        <div class="form-group hidden" id="l3_tanah_nilai_wrap">
+          <label class="field-label">a.ii. Total harga jual tanah (Rp)</label>
+          <div class="currency-input-wrap"><span class="currency-prefix">Rp</span>
+            <input type="text" id="l3_aset_tanah_nilai" class="currency-field" oninput="formatCurrency(this)" placeholder="0"/>
+          </div>
+        </div>
+      </div>
+      <div class="inline-fields">
+        <div class="form-group">
+          <label class="field-label">b.i. Jumlah rumah/bangunan lain</label>
+          <input type="number" id="l3_aset_rumah" min="0" placeholder="0" oninput="handleAsetRumahL()"/>
+        </div>
+        <div class="form-group hidden" id="l3_rumah_nilai_wrap">
+          <label class="field-label">b.ii. Total harga jual rumah (Rp)</label>
+          <div class="currency-input-wrap"><span class="currency-prefix">Rp</span>
+            <input type="text" id="l3_aset_rumah_nilai" class="currency-field" oninput="formatCurrency(this)" placeholder="0"/>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- L3.19 Foto Rumah -->
+  <div class="section-card">
+    <div class="section-header" id="sec-L3-19">19. Foto Rumah</div>
+    <div class="section-body">
+      <div class="hint">Unggah 2 foto: (a) tampak depan — atap &amp; dinding terlihat, (b) ruang tamu — dinding &amp; lantai terlihat.</div>
+      <div class="inline-fields">
+        <div class="form-group">
+          <label class="field-label">a. Foto tampak depan</label>
+          <input type="file" id="l3_foto_depan" accept="image/*"/>
+        </div>
+        <div class="form-group">
+          <label class="field-label">b. Foto ruang tamu</label>
+          <input type="file" id="l3_foto_ruang_tamu" accept="image/*"/>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-actions">
+    <button class="btn btn-secondary" onclick="goBlok(2)">&lsaquo; Kembali: BLOK II</button>
+    <button type="button" class="btn-nav-draft" onclick="saveAsDraft()">&#128190; Simpan Draft</button>
+    <button class="btn btn-primary" onclick="goBlok(4)">Lanjut: BLOK IV &rsaquo;</button>
+  </div>
+</div>
+
+<!-- ==================== L BLOK IV: Catatan ==================== -->

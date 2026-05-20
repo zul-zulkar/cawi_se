@@ -82,23 +82,42 @@ function buildPetugasFilter() {
     names.map(n => `<option value="${esc(n)}"${n===current?' selected':''}>${esc(n)}</option>`).join('');
 }
 
+function getRecordMode(r) {
+  // Records lama tanpa _formMode dianggap L.UB (backward-compat)
+  return r._formMode || r.formMode || 'lub';
+}
+
+function getRecordName(r) {
+  if (getRecordMode(r) === 'l') {
+    return r.nama_kk || r.nama_usaha || r.nama_perusahaan || '';
+  }
+  return r.nama_perusahaan || '';
+}
+
 function getFiltered() {
   const q = (document.getElementById('searchBox').value || '').toLowerCase().trim();
   const p = document.getElementById('filterPetugas').value;
+  const fmEl = document.getElementById('filterMode');
+  const fm = fmEl ? fmEl.value : '';
   return records.filter(r => {
     const okStatus  = _activeTab === 'all'
       || (_activeTab === 'draft'     &&  r._isDraft)
       || (_activeTab === 'submitted' && !r._isDraft);
     const okPetugas = !p || r.petugas_nama === p;
+    const okMode    = !fm || getRecordMode(r) === fm;
+    const recName   = getRecordName(r);
     const okSearch  = !q
+      || (recName           || '').toLowerCase().includes(q)
       || (r.nama_perusahaan || '').toLowerCase().includes(q)
       || (r.nama_komersial  || '').toLowerCase().includes(q)
+      || (r.nama_kk         || '').toLowerCase().includes(q)
+      || (r.nama_usaha      || '').toLowerCase().includes(q)
       || (r.petugas_nama    || '').toLowerCase().includes(q)
       || (r.kecamatan       || '').toLowerCase().includes(q)
       || (r.kelurahan       || '').toLowerCase().includes(q)
       || (r.kbli_judul      || '').toLowerCase().includes(q)
       || (r.kbli_kode       || '').toLowerCase().includes(q);
-    return okStatus && okPetugas && okSearch;
+    return okStatus && okPetugas && okMode && okSearch;
   });
 }
 
@@ -161,7 +180,8 @@ function renderTable() {
 
   let html = `<table><thead><tr>
     <th>No</th>
-    <th>Perusahaan / Usaha</th>
+    <th>Jenis</th>
+    <th>Perusahaan / Usaha / Keluarga</th>
     <th>Petugas Pendata</th>
     <th>Kecamatan</th>
     <th>Waktu</th>
@@ -169,13 +189,20 @@ function renderTable() {
   </tr></thead><tbody>`;
 
   filtered.forEach((r, idx) => {
-    const co   = esc(r.nama_perusahaan) || '<em style="color:#bbb">Tanpa nama</em>';
-    const koml = r.nama_komersial ? `<small>${esc(r.nama_komersial)}</small>` : '';
+    const mode = getRecordMode(r);
+    const badge = (mode === 'l')
+      ? `<span class="mode-badge mode-badge-l" title="Usaha Rumah Tangga">L</span>`
+      : `<span class="mode-badge mode-badge-lub" title="Usaha/Perusahaan Besar">L.UB</span>`;
+    const nameMain = getRecordName(r);
+    const nameSub  = (mode === 'l') ? r.nama_usaha : r.nama_komersial;
+    const co       = esc(nameMain) || '<em style="color:#bbb">Tanpa nama</em>';
+    const koml     = nameSub ? `<small>${esc(nameSub)}</small>` : '';
 
     if (r._isDraft) {
       const kec = esc(r.kecamatan || r.kecamatan_kd || '—');
       html += `<tr class="tr-draft">
         <td data-label="No" style="color:#aaa;font-size:12px;text-align:center">${idx+1}</td>
+        <td data-label="Jenis" class="cell-jenis">${badge}</td>
         <td data-label="Perusahaan" class="cell-company">
           ${co}${koml}
         </td>
@@ -190,6 +217,7 @@ function renderTable() {
     } else {
       html += `<tr>
         <td data-label="No" style="color:#aaa;font-size:12px;text-align:center">${idx+1}</td>
+        <td data-label="Jenis" class="cell-jenis">${badge}</td>
         <td data-label="Perusahaan" class="cell-company">
           ${co}${koml}
         </td>
@@ -210,14 +238,9 @@ function renderTable() {
   container.innerHTML = html;
 }
 
-/* ====== VIEW ====== */
-function viewRecord(id) {
-  const r = records.find(x => x._id === id);
-  if (!r) return;
-  document.getElementById('viewTitle').textContent    = r.nama_perusahaan || 'Detail Entri';
-  document.getElementById('viewSubtitle').textContent = `Submit: ${fmtDate(r._ts||r.timestamp)} | Petugas: ${r.petugas_nama || '—'}`;
-
-  const sections = [
+/* ====== VIEW: SECTION BUILDERS ====== */
+function viewSectionsLUB(r) {
+  return [
     { title: 'Petugas Pendata', fields: [
       ['Nama Petugas', r.petugas_nama],
       ['NIP / ID', r.petugas_nip],
@@ -269,6 +292,100 @@ function viewRecord(id) {
       ['Tanggal Pelaksanaan', r.tanggal_pelaksanaan],
     ]},
   ];
+}
+
+function viewSectionsL(r) {
+  // Parse anggota_data if available
+  let anggotaList = [];
+  try {
+    if (r.anggota_data) anggotaList = JSON.parse(r.anggota_data);
+  } catch(e) { anggotaList = []; }
+
+  const sections = [
+    { title: 'Petugas Pendata', fields: [
+      ['Nama Petugas', r.petugas_nama],
+      ['NIP / ID', r.petugas_nip],
+      ['HP Petugas', r.petugas_hp],
+    ]},
+    { title: 'Keluarga (Kepala KK)', fields: [
+      ['Nama KK', r.nama_kk],
+      ['NIK KK', r.nik_kk],
+      ['No KK', r.no_kk],
+      ['Jumlah Anggota', r.jml_anggota],
+      ['Jumlah Pendataan', r.jml_pendataan],
+    ]},
+    { title: 'Alamat Keluarga', fields: [
+      ['Provinsi', r.provinsi],
+      ['Kabupaten/Kota', r.kabupaten],
+      ['Kecamatan', r.kecamatan],
+      ['Kelurahan/Desa', r.kelurahan],
+      ['Klasifikasi', r.klasifikasi === '1' ? 'Perkotaan' : r.klasifikasi === '2' ? 'Perdesaan' : ''],
+      ['Kode Pos', r.kode_pos],
+      ['Alamat Detail', r.alamat_detail],
+      ['Nama Jalan', r.nama_jalan],
+      ['No Rumah', r.no_rumah],
+    ]},
+    { title: `Anggota Keluarga (${anggotaList.length})`, fields:
+      anggotaList.length ? anggotaList.map(a => [
+        `#${a.no} ${a.nama || '(tanpa nama)'}`,
+        `${a.stop_state ? 'STOP — ' : ''}${a.hubungan ? 'Hub: ' + a.hubungan + ' · ' : ''}${a.umur ? 'Umur ' + a.umur : ''}`
+      ]) : [['(tidak ada anggota terdata)', '']],
+    },
+    { title: 'Usaha', fields: [
+      ['Nama Usaha', r.nama_usaha],
+      ['Nama Komersial', r.nama_komersial],
+      ['Alamat', r.alamat_usaha],
+      ['HP Usaha', r.hp_usaha],
+      ['Email Usaha', r.email_usaha],
+      ['Jenis Usaha', r.jenis_usaha],
+      ['Punya NIB', r.punya_nib],
+      ['NIB', r.nib],
+      ['Badan Usaha', r.badan_usaha],
+      ['Pengusaha', r.pengusaha_nama],
+      ['NIK Pengusaha', r.pengusaha_nik],
+      ['Kegiatan Utama', r.kegiatan_utama],
+      ['KBLI', r.kbli_judul],
+      ['Kode KBLI', r.kbli_kode],
+      ['Tahun Operasi', r.tahun_operasi],
+      ['Pekerja L/P', (r.pekerja_l || 0) + ' / ' + (r.pekerja_p || 0)],
+    ]},
+    { title: 'Perumahan & Aset', fields: [
+      ['Jenis Bangunan', r.jenis_bangunan],
+      ['Status Kepemilikan', r.status_milik],
+      ['Luas Lantai', r.luas_lantai ? r.luas_lantai + ' m²' : ''],
+      ['Sumber Air', r.air],
+      ['Sumber Listrik', r.listrik],
+      ['Motor', r.aset_motor],
+      ['Mobil', r.aset_mobil],
+      ['Tanah', r.aset_tanah],
+      ['Rumah', r.aset_rumah],
+      ['Pengeluaran Makanan/Mgg', r.makanan_mgg ? 'Rp ' + Number(r.makanan_mgg).toLocaleString('id-ID') : ''],
+      ['Pengeluaran NonMakanan/Bln', r.nonmakanan_bln ? 'Rp ' + Number(r.nonmakanan_bln).toLocaleString('id-ID') : ''],
+    ]},
+    { title: 'Catatan Pendata', fields: [
+      ['Catatan', r.catatan_pendata],
+    ]},
+    { title: 'Responden', fields: [
+      ['Nama Responden', r.responden_nama],
+      ['HP Responden', r.responden_hp],
+      ['Email Responden', r.responden_email],
+      ['Tanggal Pelaksanaan', r.tanggal_pelaksanaan],
+    ]},
+  ];
+  return sections;
+}
+
+/* ====== VIEW ====== */
+function viewRecord(id) {
+  const r = records.find(x => x._id === id);
+  if (!r) return;
+  const mode = getRecordMode(r);
+  const titleName = getRecordName(r) || 'Detail Entri';
+  document.getElementById('viewTitle').textContent    = titleName;
+  document.getElementById('viewSubtitle').textContent =
+    `${mode === 'l' ? '[L]' : '[L.UB]'} Submit: ${fmtDate(r._ts||r.timestamp)} | Petugas: ${r.petugas_nama || '—'}`;
+
+  const sections = (mode === 'l') ? viewSectionsL(r) : viewSectionsLUB(r);
 
   let html = '';
   sections.forEach(sec => {
@@ -296,6 +413,7 @@ function closeView() {
 function editRecord(id) {
   const r = records.find(x => x._id === id);
   if (!r) return;
+  localStorage.setItem('cawi_form_mode', getRecordMode(r));
   localStorage.setItem('cawi_edit_mode', JSON.stringify(r));
   window.location.href = 'index.html';
 }
@@ -310,42 +428,49 @@ function duplicateRecord(id) {
   copy.responden_hp          = '';
   copy.responden_email       = '';
   copy.tanggal_pelaksanaan   = '';
+  localStorage.setItem('cawi_form_mode', getRecordMode(r));
   localStorage.setItem('cawi_edit_mode', JSON.stringify(copy));
   window.location.href = 'index.html';
 }
 
 /* ====== HAPUS (server record) ====== */
 let _pendingDeleteId = null;
+let _pendingDeleteMode = null;
 
 function deleteRecord(id) {
-  const r = records.find(x => x._id === id);
+  // Records lama tanpa _formMode dianggap L.UB — kedua sheet bisa punya _id yg sama
+  // sehingga butuh mode untuk disambiguasi
+  const r = records.find(x => x._id === id && !x._isDraft);
   if (!r) return;
-  _pendingDeleteId = id;
+  _pendingDeleteId   = id;
+  _pendingDeleteMode = getRecordMode(r);
   document.getElementById('confirmDeleteName').textContent =
-    r.nama_perusahaan || '(tanpa nama)';
+    getRecordName(r) || '(tanpa nama)';
   document.getElementById('confirmDeleteSub').textContent =
     `Petugas: ${r.petugas_nama || '—'} | ${r.kecamatan || '—'}`;
   document.getElementById('confirmOverlay').classList.add('open');
 }
 
 function cancelDelete() {
-  _pendingDeleteId = null;
+  _pendingDeleteId   = null;
+  _pendingDeleteMode = null;
   document.getElementById('confirmOverlay').classList.remove('open');
 }
 
 async function confirmDelete() {
   if (!_pendingDeleteId) return;
-  const id  = _pendingDeleteId;
-  const btn = document.getElementById('confirmDeleteBtn');
+  const id   = _pendingDeleteId;
+  const mode = _pendingDeleteMode || 'lub';
+  const btn  = document.getElementById('confirmDeleteBtn');
   btn.textContent = 'Menghapus...';
   btn.disabled    = true;
   try {
     await fetch(getScriptUrl(), {
       method: 'POST',
       mode:   'no-cors',
-      body:   JSON.stringify({ action: 'deleteRecord', _delete_id: id })
+      body:   JSON.stringify({ action: 'deleteRecord', _delete_id: id, formMode: mode })
     });
-    records = records.filter(x => x._id !== id);
+    records = records.filter(x => !(x._id === id && getRecordMode(x) === mode));
     buildPetugasFilter();
     updateStats();
     renderTable();
@@ -364,6 +489,8 @@ function continueDraft(id) {
     alert('Data draft tidak ditemukan atau telah rusak.');
     return;
   }
+  const mode = draft._formMode || (draft._raw && draft._raw._formMode) || 'lub';
+  localStorage.setItem('cawi_form_mode', mode);
   localStorage.setItem('cawi_se2026_draft_v1', JSON.stringify(draft._raw));
   localStorage.setItem('cawi_draft_continue_id', id);
   window.location.href = 'index.html';

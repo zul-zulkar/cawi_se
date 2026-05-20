@@ -1,0 +1,111 @@
+
+<!-- ====== PETUNJUK MODAL ====== -->
+<div class="modal-overlay" id="petunjukOverlay" onclick="closePetunjuk()"></div>
+<div class="petunjuk-modal" id="petunjukModal">
+  <div class="petunjuk-header">
+    <h2>&#128203; Petunjuk Pengisian CAWI SE2026</h2>
+    <button class="modal-close-btn" onclick="closePetunjuk()">&#10005;</button>
+  </div>
+  <div class="petunjuk-body">
+    <div class="petunjuk-section">
+      <h3>Tentang CAWI SE2026</h3>
+      <p>CAWI (Computer Assisted Web Interviewing) adalah metode pengumpulan data Sensus Ekonomi 2026 secara daring. Data yang Anda isi bersifat <strong>RAHASIA</strong> dan dilindungi oleh UU No. 16 Tahun 1997 tentang Statistik.</p>
+    </div>
+    <div class="petunjuk-section">
+      <h3>Cara Pengisian</h3>
+      <ul>
+        <li>Isi semua kolom bertanda <strong class="req">*</strong> (wajib diisi)</li>
+        <li>Gunakan navigasi di sidebar kiri untuk berpindah antar blok</li>
+        <li>Klik <strong>Rekap &amp; Periksa</strong> sebelum submit untuk memeriksa isian</li>
+        <li>Pastikan semua data benar dan dapat dipertanggungjawabkan</li>
+      </ul>
+    </div>
+    <div class="petunjuk-section">
+      <h3>Isi Tiap Blok</h3>
+      <p><span class="petunjuk-badge">BLOK I</span> Keterangan tempat dan usaha/perusahaan — identitas, kegiatan usaha, tenaga kerja, keuangan (Pertanyaan 1–25)</p>
+      <p><span class="petunjuk-badge">BLOK II</span> Catatan kunjungan petugas — diisi oleh petugas pencacah lapangan</p>
+      <p><span class="petunjuk-badge">BLOK III</span> Identitas responden dan tanda tangan digital — konfirmasi dan submit</p>
+    </div>
+    <div class="petunjuk-section">
+      <h3>KBLI 2025</h3>
+      <p>Kode KBLI (Klasifikasi Baku Lapangan Usaha Indonesia) 2025 digunakan untuk mengklasifikasikan kegiatan ekonomi. Ketik kata kunci pada kolom pencarian KBLI untuk menemukan kode yang sesuai.</p>
+    </div>
+    <div class="petunjuk-section">
+      <h3>NIB &amp; NIK</h3>
+      <p><strong>NIB</strong> (Nomor Induk Berusaha) — 13 digit, diperoleh melalui sistem OSS di oss.go.id</p>
+      <p><strong>NIK</strong> (Nomor Induk Kependudukan) — 16 digit sesuai KTP pengusaha/penanggung jawab</p>
+    </div>
+    <div class="petunjuk-section">
+      <h3>Catatan Pendata</h3>
+      <p>Setiap kartu pertanyaan memiliki tombol <strong>+ Catatan</strong> di pojok kanan header. Gunakan ini untuk menambahkan observasi/keterangan lapangan per pertanyaan. Catatan akan tampil di tab <em>Catatan Pendata</em> pada rekap.</p>
+    </div>
+    <div class="petunjuk-section">
+      <h3>Pengiriman Data</h3>
+      <ul>
+        <li>Klik <strong>KIRIM / SUBMIT</strong> di BLOK III — sistem menampilkan rekap isian</li>
+        <li>Periksa tab <strong>Error</strong> dan perbaiki jika ada</li>
+        <li>Jika tidak ada error, tombol <strong>Kirim Data</strong> aktif</li>
+        <li>Konfirmasi untuk mengirim data ke server BPS</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- ====== RECAP MODAL ====== -->
+<div class="modal-overlay" id="recapOverlay"></div>
+<div class="recap-modal" id="recapModal">
+  <div class="recap-header">
+    <div>
+      <h2>&#128269; Rekap Isian</h2>
+      <div class="recap-header-sub">Periksa sebelum mengirim data</div>
+    </div>
+    <button class="modal-close-btn" onclick="closeRecap()">&#10005;</button>
+  </div>
+  <div class="recap-tabs" id="recapTabs">
+    <div class="recap-tab tab-error active" data-tab="error" onclick="showRecapTab('error')">
+      Error <span class="recap-tab-badge" id="badge-error">0</span>
+    </div>
+    <div class="recap-tab" data-tab="warning" onclick="showRecapTab('warning')">
+      Peringatan <span class="recap-tab-badge" id="badge-warning">0</span>
+    </div>
+    <div class="recap-tab" data-tab="kosong" onclick="showRecapTab('kosong')">
+      Kosong <span class="recap-tab-badge" id="badge-kosong">0</span>
+    </div>
+    <div class="recap-tab" data-tab="catatan" onclick="showRecapTab('catatan')">
+      Catatan Pendata <span class="recap-tab-badge" id="badge-catatan">0</span>
+    </div>
+  </div>
+  <div class="recap-body" id="recapBody"></div>
+  <div class="recap-footer">
+    <button class="btn btn-secondary" onclick="closeRecap()">&#8592; Kembali &amp; Perbaiki</button>
+    <button class="btn btn-primary" id="confirmSubmitBtn" onclick="confirmSubmit()">&#128228; Kirim Data</button>
+  </div>
+</div>
+
+<!-- ====== RESTORE BANNER ====== -->
+<div id="restoreBanner" class="restore-banner" style="display:none">
+  <div class="banner-inner">
+    <span class="banner-msg">&#128190; <strong>Draft tersimpan ditemukan</strong> — lanjutkan isian sebelumnya?</span>
+    <span id="restoreBannerTs" class="banner-ts"></span>
+    <button onclick="restoreDraft()" class="banner-btn banner-btn-primary">&#128257; Muat Draft</button>
+    <button onclick="dismissRestore()" class="banner-btn banner-btn-secondary">Mulai Baru</button>
+  </div>
+</div>
+
+<!-- ====== EDIT MODE BANNER ====== -->
+<div id="editModeBanner" class="edit-mode-banner" style="display:none">
+  <div class="banner-inner">
+    <span class="banner-msg">&#9998; <strong>Mode Edit</strong> — periksa dan ubah data, lalu kirim. Pengiriman akan <strong>menimpa rekaman asli</strong>.</span>
+    <button onclick="cancelEditMode()" class="banner-btn banner-btn-outline">&#10005; Batal</button>
+  </div>
+</div>
+<!-- LEAVE GUARD MODAL -->
+<div class="modal-overlay" id="leaveGuardOverlay" onclick="leaveGuardCancel()"></div>
+<div class="leave-guard-modal" id="leaveGuardModal">
+  <div class="leave-guard-title">&#128190; Simpan progress sebelum keluar?</div>
+  <div class="leave-guard-sub">Isian form belum disimpan sebagai draft. Simpan dulu agar bisa dilanjutkan nanti dari halaman Daftar.</div>
+  <div class="leave-guard-btns">
+    <button class="btn-save" onclick="leaveGuardSave()">&#128190; Simpan Draft &amp; Keluar</button>
+    <button class="btn-leave" onclick="leaveGuardGo()">Keluar Tanpa Simpan</button>
+    <button class="btn-cancel" onclick="leaveGuardCancel()">Batal, Tetap di Sini</button>
+  </div>

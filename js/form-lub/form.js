@@ -62,6 +62,7 @@ function handleJaringan() {
       handleJumlahCabang();
     } else {
       lkp.classList.add('hidden');
+      updateSidebarLKP(0);
     }
   }
 }
@@ -72,12 +73,13 @@ function handleJumlahCabang() {
   if (!lkp || !wrap) return;
   if (getRadio('q10a') !== '2') { lkp.classList.add('hidden'); return; }
   const n = parseInt(document.getElementById('q10b_jumlah').value) || 0;
-  if (n <= 0) { lkp.classList.add('hidden'); return; }
+  if (n <= 0) { lkp.classList.add('hidden'); updateSidebarLKP(0); return; }
   lkp.classList.remove('hidden');
   const capped = Math.min(n, 50);
   // Only re-render if count changed
   if (wrap.dataset.count === String(capped)) return;
   wrap.dataset.count = capped;
+  updateSidebarLKP(capped);
   wrap.innerHTML = '';
   const provOpts = (typeof STATIC_PROVINSI !== 'undefined' ? STATIC_PROVINSI : [])
     .map(p => `<option value="${p.kode}">${p.nama}</option>`).join('');
@@ -169,9 +171,21 @@ async function loadKabupatenLKP(kdprov, idx) {
   sel.innerHTML = '<option value="">Memuat...</option>';
   sel.disabled = true;
   if (!kdprov) { sel.innerHTML = '<option value="">-- Pilih Kabupaten/Kota --</option>'; return; }
+  const staticKabs = (typeof STATIC_KABUPATEN !== 'undefined' && STATIC_KABUPATEN[kdprov]) || null;
+  if (staticKabs) {
+    sel.innerHTML = '<option value="">-- Pilih Kabupaten/Kota --</option>';
+    [...staticKabs].sort((a,b)=>a.nama.localeCompare(b.nama)).forEach(k => {
+      const o = document.createElement('option');
+      o.value = k.kode; o.textContent = k.nama;
+      sel.appendChild(o);
+    });
+    sel.disabled = false;
+    return;
+  }
   try {
     const res = await fetch(`https://esurvey.bps.go.id/lookup/api/v1/collections/668fcfe6-8ef4-4612-968a-d1330c03fe17/filter?version=1&filter=kdprov||eq||${kdprov}`,
       {headers:{'Accept':'application/json'}});
+    if (!res.ok) throw new Error('HTTP ' + res.status);
     const d = await res.json();
     sel.innerHTML = '<option value="">-- Pilih Kabupaten/Kota --</option>';
     (d.data || []).sort((a,b)=>a.namakab.localeCompare(b.namakab)).forEach(k => {
@@ -339,8 +353,11 @@ function markFieldFilled(el) {
 
 /* ====== SIDEBAR BLOK ACCORDION ====== */
 function toggleSidebarBlok(n) {
-  const list = document.getElementById('sidebarQList' + n);
-  const btn  = document.getElementById('sidebarExpandBtn' + n);
+  const mode = (typeof getFormMode === 'function') ? getFormMode() : 'lub';
+  const listPrefix = (mode === 'l') ? 'sidebarQListL' : 'sidebarQList';
+  const btnPrefix  = (mode === 'l') ? 'sidebarExpandBtnL' : 'sidebarExpandBtn';
+  const list = document.getElementById(listPrefix + n);
+  const btn  = document.getElementById(btnPrefix  + n);
   if (!list) return;
   const opening = list.classList.contains('hidden');
   list.classList.toggle('hidden');
@@ -350,6 +367,39 @@ function toggleSidebarBlok(n) {
 function goBlokAndScroll(blokNum, qId) {
   goBlok(blokNum);
   setTimeout(() => scrollToQuestion(qId), 280);
+}
+
+function scrollToId(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.scrollIntoView({behavior: 'smooth', block: 'start'});
+  el.style.backgroundColor = '#fffaeb';
+  setTimeout(() => {
+    el.style.transition = 'background-color 0.5s ease';
+    el.style.backgroundColor = 'transparent';
+    setTimeout(() => { el.style.transition = ''; }, 500);
+  }, 1200);
+}
+
+function goBlokAndScrollId(blokNum, id) {
+  goBlok(blokNum);
+  setTimeout(() => scrollToId(id), 280);
+}
+
+function updateSidebarLKP(count) {
+  const group = document.getElementById('sidebarLKPGroup');
+  const items = document.getElementById('sidebarLKPItems');
+  if (!group || !items) return;
+  if (count <= 0) { group.classList.add('hidden'); items.innerHTML = ''; return; }
+  group.classList.remove('hidden');
+  items.innerHTML = '';
+  for (let i = 1; i <= count; i++) {
+    const div = document.createElement('div');
+    div.className = 'sidebar-q-item sidebar-q-sub';
+    div.setAttribute('onclick', `goBlokAndScrollId(1,'lkp_card_${i}')`);
+    div.textContent = '↳ Cabang/Unit #' + i;
+    items.appendChild(div);
+  }
 }
 
 /* ====== BLOK OUTLINE FUNCTIONS ====== */

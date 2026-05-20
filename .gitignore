@@ -7,6 +7,9 @@ daftar_pegawai.xlsx
 node_modules/
 tests/coverage/
 
+# Backup lokal — jangan commit
+backup/
+
 # OS / editor
 .DS_Store
 Thumbs.db

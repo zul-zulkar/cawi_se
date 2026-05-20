@@ -28,6 +28,7 @@ async function checkPassword() {
   if (h === _activeHash) {
     sessionStorage.setItem(PW_SESSION_KEY, '1');
     document.getElementById('pwGate').style.display = 'none';
+    document.dispatchEvent(new Event('cawi-auth-ok'));
   } else {
     document.getElementById('pwError').style.display = 'block';
     document.getElementById('pwInput').value = '';
@@ -43,6 +44,8 @@ function logoutKuesioner() {
 (async function() {
   if (sessionStorage.getItem(PW_SESSION_KEY) === '1') {
     document.getElementById('pwGate').style.display = 'none';
+    // Dispatch on next tick so listeners (which are wired in DOMContentLoaded) have a chance to attach
+    setTimeout(() => document.dispatchEvent(new Event('cawi-auth-ok')), 0);
     return;
   }
   const input = document.getElementById('pwInput');

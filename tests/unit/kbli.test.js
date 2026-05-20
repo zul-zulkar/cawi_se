@@ -1,7 +1,7 @@
 import { extractFrom } from '../helpers/load-source.js'
 
 const { getKategoriFromKode, wordOverlapScore, scoreKBLI, getKategoriName } =
-  extractFrom('js/kbli.js', 'getKategoriFromKode', 'wordOverlapScore', 'scoreKBLI', 'getKategoriName')
+  extractFrom('js/shared/kbli.js', 'getKategoriFromKode', 'wordOverlapScore', 'scoreKBLI', 'getKategoriName')
 
 /* ─────────────── getKategoriFromKode() ─────────────── */
 describe('getKategoriFromKode()', () => {

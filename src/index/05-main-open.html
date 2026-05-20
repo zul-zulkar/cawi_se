@@ -1,0 +1,38 @@
+
+<!-- ====== MAIN CONTENT ====== -->
+<div class="main-content" id="mainContent">
+
+<!-- HEADER KOP — hanya tampil di Blok I -->
+<div class="header-kop" id="headerKop">
+  <div class="kop-inner">
+    <div class="kop-side">
+      <img class="kop-logo-bps" src="https://upload.wikimedia.org/wikipedia/commons/2/28/Lambang_Badan_Pusat_Statistik_%28BPS%29_Indonesia.svg" alt="BPS" onerror="this.style.display='none'"/>
+      <div class="kop-badge-rahasia">RAHASIA</div>
+    </div>
+    <div class="kop-center">
+      <img class="kop-garuda" src="https://upload.wikimedia.org/wikipedia/commons/thumb/9/90/National_emblem_of_Indonesia_Garuda_Pancasila.svg/1280px-National_emblem_of_Indonesia_Garuda_Pancasila.svg.png" alt="Garuda Pancasila" onerror="this.style.display='none'"/>
+      <div class="kop-rep">Republik Indonesia</div>
+      <div class="kop-sensus">Sensus Ekonomi 2026</div>
+    </div>
+    <div class="kop-side">
+      <img class="kop-logo-se" src="https://satudata.mojokertokab.go.id/onedata/global_assets/logo_se2026.png" alt="SE2026" onerror="this.style.display='none'"/>
+      <div class="kop-badge-cawi">CAWI</div>
+    </div>
+  </div>
+</div>
+
+<!-- BLOK NAV -->
+<div class="blok-nav-wrap">
+  <div class="blok-nav">
+    <div class="blok-tab active" data-blok="1" onclick="goBlok(1)">BLOK I</div>
+    <div class="blok-tab" data-blok="2" onclick="goBlok(2)">BLOK II</div>
+    <div class="blok-tab" data-blok="3" onclick="goBlok(3)">BLOK III</div>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:33%"></div></div>
+</div>
+
+<!-- MAIN -->
+<div class="form-container">
+<div id="alertBox" class="alert alert-error hidden"></div>
+
+<!-- ==================== FORM L.UB ==================== -->

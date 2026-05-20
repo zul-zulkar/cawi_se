@@ -14,9 +14,17 @@ function saveDraft() {
     document.querySelectorAll('input[type=radio]:checked').forEach(el => {
       vals['_r_' + el.name] = el.value;
     });
-    if (hasSig) {
+    // Checkbox state (L mode uses checkboxes, e.g., l2_m31e_*)
+    document.querySelectorAll('input[type=checkbox][id]').forEach(el => {
+      vals['_c_' + el.id] = el.checked ? '1' : '0';
+    });
+    if (typeof hasSig !== 'undefined' && hasSig) {
       try { vals['_sig'] = canvas.toDataURL('image/png'); } catch(e) {}
     }
+    if (typeof l5HasSig !== 'undefined' && l5HasSig && typeof l5Canvas !== 'undefined' && l5Canvas) {
+      try { vals['_sig_l'] = l5Canvas.toDataURL('image/png'); } catch(e) {}
+    }
+    vals['_formMode'] = (typeof getFormMode === 'function') ? getFormMode() : 'lub';
     vals['_ts'] = new Date().toISOString();
     localStorage.setItem(LS_KEY, JSON.stringify(vals));
     // Update status indicator
@@ -37,12 +45,26 @@ function restoreDraft() {
     const raw = localStorage.getItem(LS_KEY);
     if (!raw) return;
     const vals = JSON.parse(raw);
+    // Restore form mode FIRST so visible container matches before populating
+    if (vals['_formMode'] && typeof setFormMode === 'function') {
+      setFormMode(vals['_formMode']);
+      if (typeof applyFormMode === 'function') applyFormMode(vals['_formMode']);
+    }
+    // L mode: ensure anggota cards rendered before populating per-anggota fields
+    if (vals['_formMode'] === 'l' && vals['l1_jml_kk_anggota'] && typeof renderAnggotaCards === 'function') {
+      const inp = document.getElementById('l1_jml_kk_anggota');
+      if (inp) { inp.value = vals['l1_jml_kk_anggota']; renderAnggotaCards(); }
+    }
     // Restore inputs / selects / textareas
     Object.keys(vals).forEach(key => {
       if (key.startsWith('_r_')) {
         const name = key.slice(3);
         const radio = document.querySelector(`input[name="${name}"][value="${vals[key]}"]`);
         if (radio) { radio.checked = true; radio.dispatchEvent(new Event('change', {bubbles:true})); }
+      } else if (key.startsWith('_c_')) {
+        const id = key.slice(3);
+        const cb = document.getElementById(id);
+        if (cb && cb.type === 'checkbox') cb.checked = (vals[key] === '1');
       } else if (!key.startsWith('_')) {
         const el = document.getElementById(key);
         if (el && !el.readOnly && !el.disabled) {
@@ -58,22 +80,31 @@ function restoreDraft() {
       const entry = kbliData.find(d => d.kode === savedKode);
       if (entry) selectKBLI(entry);
     }
-    // Resync searchable select display texts
-    ['q1_provinsi','q2_kabupaten','q3_kecamatan','q4_kelurahan','q11e_provinsi','q11f_kabupaten'].forEach(id => {
+    // Resync searchable select display texts (L.UB + L mode)
+    ['q1_provinsi','q2_kabupaten','q3_kecamatan','q4_kelurahan','q11e_provinsi','q11f_kabupaten',
+     'l1_alamat_provinsi','l1_alamat_kab','l1_alamat_kec','l1_alamat_kel'].forEach(id => {
       const sel = document.getElementById(id);
       if (!sel || !sel.value) return;
       const inp = document.getElementById(id + '_inp');
       const opt = sel.options[sel.selectedIndex];
       if (inp && opt && opt.text) { inp.value = opt.text; inp.classList.add('has-value'); }
     });
-    // Restore signature
+    // Restore L.UB signature
     if (vals['_sig']) {
       const img = new Image();
       img.onload = () => { ctx.clearRect(0,0,canvas.width,canvas.height); ctx.drawImage(img,0,0); hasSig=true; updateProgress(); };
       img.src = vals['_sig'];
     }
+    // Restore L mode signature
+    if (vals['_sig_l'] && typeof l5Canvas !== 'undefined' && l5Canvas && typeof l5Ctx !== 'undefined' && l5Ctx) {
+      const imgL = new Image();
+      imgL.onload = () => { l5Ctx.clearRect(0,0,l5Canvas.width,l5Canvas.height); l5Ctx.drawImage(imgL,0,0); l5HasSig=true; updateProgress(); };
+      imgL.src = vals['_sig_l'];
+    }
     const hint = document.getElementById('sig-hint');
     if (hint && vals['_sig']) hint.textContent = 'Tanda tangan dimuat dari draft';
+    const hintL = document.getElementById('l5_sig_hint');
+    if (hintL && vals['_sig_l']) hintL.textContent = 'Tanda tangan dimuat dari draft';
     dismissRestore();
     updateProgress();
     const txt = document.getElementById('autosaveText');
@@ -108,24 +139,66 @@ function saveAsDraft() {
     document.querySelectorAll('input[type=radio]:checked').forEach(el => {
       raw['_r_' + el.name] = el.value;
     });
-    if (hasSig) { try { raw['_sig'] = canvas.toDataURL('image/png'); } catch(e) {} }
+    document.querySelectorAll('input[type=checkbox][id]').forEach(el => {
+      raw['_c_' + el.id] = el.checked ? '1' : '0';
+    });
+    if (typeof hasSig !== 'undefined' && hasSig) {
+      try { raw['_sig'] = canvas.toDataURL('image/png'); } catch(e) {}
+    }
+    if (typeof l5HasSig !== 'undefined' && l5HasSig && typeof l5Canvas !== 'undefined' && l5Canvas) {
+      try { raw['_sig_l'] = l5Canvas.toDataURL('image/png'); } catch(e) {}
+    }
+    const mode = (typeof getFormMode === 'function') ? getFormMode() : 'lub';
+    raw['_formMode'] = mode;
     raw['_ts'] = new Date().toISOString();
 
     const id = _currentDraftId || ('draft_' + Date.now());
-    const kecInp = document.getElementById('q3_kecamatan_inp');
-    const draft = {
-      _draftId:       id,
-      _ts:            raw['_ts'],
-      _isDraft:       true,
-      nama_perusahaan: raw['q5a_nama_perusahaan'] || '',
-      nama_komersial:  raw['q5b_nama_komersial']  || '',
-      kecamatan:      kecInp ? kecInp.value.trim() : '',
-      kecamatan_kd:   raw['q3_kecamatan']         || '',
-      petugas_nama:   raw['p_nama']               || '',
-      kbli_kode:      raw['q9g_kbli_kode']        || '',
-      kbli_judul:     raw['q9g_kbli_search']      || '',
-      _raw:           raw
-    };
+    let draft;
+    if (mode === 'l') {
+      // L mode: summary uses Kepala Keluarga + Nama Usaha
+      const kecInpL = document.getElementById('l1_alamat_kec_inp');
+      // Count anggota with filled nama
+      let jmlTerdata = 0;
+      const nAng = parseInt(raw['l1_jml_kk_anggota']) || 0;
+      for (let i = 1; i <= Math.min(nAng, 30); i++) {
+        if (raw['l_ang_' + i + '_nama']) jmlTerdata++;
+      }
+      draft = {
+        _draftId:        id,
+        _ts:             raw['_ts'],
+        _isDraft:        true,
+        _formMode:       'l',
+        nama_kk:         raw['l1_nama_kk']     || '',
+        nama_usaha:      raw['l2_nama_usaha']  || '',
+        jumlah_anggota:  nAng,
+        jumlah_terdata:  jmlTerdata,
+        kecamatan:       kecInpL ? kecInpL.value.trim() : '',
+        kecamatan_kd:    raw['l1_alamat_kec']  || '',
+        petugas_nama:    raw['l5_petugas_nama']|| '',
+        kbli_kode:       raw['l2_kbli_kode']   || '',
+        kbli_judul:      raw['l2_kbli_search'] || '',
+        // For backward compat with daftar render
+        nama_perusahaan: raw['l2_nama_usaha']  || '',
+        nama_komersial:  raw['l1_nama_kk']     || '',
+        _raw:            raw
+      };
+    } else {
+      const kecInp = document.getElementById('q3_kecamatan_inp');
+      draft = {
+        _draftId:        id,
+        _ts:             raw['_ts'],
+        _isDraft:        true,
+        _formMode:       'lub',
+        nama_perusahaan: raw['q5a_nama_perusahaan'] || '',
+        nama_komersial:  raw['q5b_nama_komersial']  || '',
+        kecamatan:       kecInp ? kecInp.value.trim() : '',
+        kecamatan_kd:    raw['q3_kecamatan']         || '',
+        petugas_nama:    raw['p_nama']               || '',
+        kbli_kode:       raw['q9g_kbli_kode']        || '',
+        kbli_judul:      raw['q9g_kbli_search']      || '',
+        _raw:            raw
+      };
+    }
 
     const list = getDraftList();
     const idx  = list.findIndex(d => d._draftId === id);
@@ -138,7 +211,10 @@ function saveAsDraft() {
     if (txt) txt.textContent = 'Draft tersimpan';
     const dot = document.getElementById('autosaveDot');
     if (dot) { dot.style.background = '#fc6c00'; setTimeout(() => { dot.style.background = 'rgba(255,255,255,.2)'; }, 3000); }
-    _showDraftToast(draft.nama_perusahaan || 'Draft baru');
+    const toastLabel = (mode === 'l')
+      ? (draft.nama_kk || draft.nama_usaha || 'Draft Rumah Tangga')
+      : (draft.nama_perusahaan || 'Draft baru');
+    _showDraftToast(toastLabel);
     return true;
   } catch(e) {
     console.error('Gagal simpan draft:', e);
