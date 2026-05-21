@@ -82,7 +82,7 @@ function collectAllProblemsL() {
       const sekolah = getRadio('l_ang_' + i + '_sekolah');
       if (!sekolah) e(prefix + ': Partisipasi Sekolah', 'Wajib diisi untuk umur ≥ 5', 1, 'l_ang_' + i + '_sekolah');
       // Ijazah required unless sekolah='0' (tidak pernah sekolah — field hidden)
-      if (sekolah !== '0' && !getVal('l_ang_' + i + '_ijazah')) e(prefix + ': Ijazah Tertinggi', 'Wajib diisi untuk umur ≥ 5', 1, 'l_ang_' + i + '_ijazah');
+      if (sekolah !== '0' && !getRadio('l_ang_' + i + '_ijazah')) e(prefix + ': Ijazah Tertinggi', 'Wajib diisi untuk umur ≥ 5', 1, 'l_ang_' + i + '_ijazah');
       if (!getRadio('l_ang_' + i + '_rekening')) e(prefix + ': Rekening Aktif', 'Wajib diisi untuk umur ≥ 5', 1, 'l_ang_' + i + '_rekening');
     }
     // Age-gated (≥10)
@@ -90,7 +90,7 @@ function collectAllProblemsL() {
       const profesi = getVal('l_ang_' + i + '_profesi');
       if (!profesi) e(prefix + ': Profesi Utama', 'Wajib diisi untuk umur ≥ 10', 1, 'l_ang_' + i + '_profesi');
       // Kedudukan required unless profesi='000' (tidak bekerja — field hidden)
-      if (profesi !== '000' && !getVal('l_ang_' + i + '_kedudukan')) e(prefix + ': Kedudukan Pekerjaan', 'Wajib diisi untuk umur ≥ 10', 1, 'l_ang_' + i + '_kedudukan');
+      if (profesi !== '000' && !getRadio('l_ang_' + i + '_kedudukan')) e(prefix + ': Kedudukan Pekerjaan', 'Wajib diisi untuk umur ≥ 10', 1, 'l_ang_' + i + '_kedudukan');
       if (!getRadio('l_ang_' + i + '_18a')) e(prefix + ': Pendapatan Pekerjaan', 'Belum dipilih', 1, 'l_ang_' + i + '_18a');
       if (!getRadio('l_ang_' + i + '_18b')) e(prefix + ': Pendapatan Keuntungan Usaha', 'Belum dipilih', 1, 'l_ang_' + i + '_18b');
       if (!getRadio('l_ang_' + i + '_18c')) e(prefix + ': Penerimaan Transfer/Pasif', 'Belum dipilih', 1, 'l_ang_' + i + '_18c');
@@ -243,13 +243,13 @@ function collectAllProblemsL() {
   if (getVal('l3_luas_lantai') === '') e('Rincian 5: Luas Lantai', 'Harus diisi', 3, 'l3_luas_lantai');
   if (!getVal('l3_lantai_bahan')) e('Rincian 6a: Bahan Lantai', 'Belum dipilih', 3, 'l3_lantai_bahan');
   const lantaiBahan = getVal('l3_lantai_bahan');
-  if (lantaiBahan && !['7','8','9'].includes(lantaiBahan) && !getVal('l3_lantai_kondisi')) e('Rincian 6b: Kondisi Lantai', 'Belum dipilih', 3, 'l3_lantai_kondisi');
+  if (lantaiBahan && !['7','8','9'].includes(lantaiBahan) && !getRadio('l3_lantai_kondisi')) e('Rincian 6b: Kondisi Lantai', 'Belum dipilih', 3, 'l3_lantai_kondisi');
   if (!getVal('l3_dinding_bahan')) e('Rincian 7a: Bahan Dinding', 'Belum dipilih', 3, 'l3_dinding_bahan');
   const dindingBahan = getVal('l3_dinding_bahan');
-  if (dindingBahan && !['6','7'].includes(dindingBahan) && !getVal('l3_dinding_kondisi')) e('Rincian 7b: Kondisi Dinding', 'Belum dipilih', 3, 'l3_dinding_kondisi');
+  if (dindingBahan && !['6','7'].includes(dindingBahan) && !getRadio('l3_dinding_kondisi')) e('Rincian 7b: Kondisi Dinding', 'Belum dipilih', 3, 'l3_dinding_kondisi');
   if (!getVal('l3_atap_bahan')) e('Rincian 8a: Bahan Atap', 'Belum dipilih', 3, 'l3_atap_bahan');
   const atapBahan = getVal('l3_atap_bahan');
-  if (atapBahan && !['5','7','8'].includes(atapBahan) && !getVal('l3_atap_kondisi')) e('Rincian 8b: Kondisi Atap', 'Belum dipilih', 3, 'l3_atap_kondisi');
+  if (atapBahan && !['5','7','8'].includes(atapBahan) && !getRadio('l3_atap_kondisi')) e('Rincian 8b: Kondisi Atap', 'Belum dipilih', 3, 'l3_atap_kondisi');
   const bab = getRadio('l3_bab');
   if (!bab) e('Rincian 9: Fasilitas BAB', 'Belum dipilih', 3, 'l3_bab');
   if (['1','2','3'].includes(bab) && !getRadio('l3_kloset')) e('Rincian 9: Jenis Kloset', 'Belum dipilih', 3, 'l3_kloset');
@@ -289,8 +289,8 @@ function collectAllProblemsL() {
   if (!getVal('l5_responden_nama')) e('Responden: Nama', 'Harus diisi', 5, 'l5_responden_nama');
   if (!getVal('l5_responden_hp')) e('Responden: Nomor HP', 'Harus diisi', 5, 'l5_responden_hp');
   else if (!isValidHP(getVal('l5_responden_hp'))) e('Responden: Nomor HP', 'Format tidak valid', 5, 'l5_responden_hp');
-  if (!getVal('l5_responden_email')) e('Responden: Email', 'Harus diisi', 5, 'l5_responden_email');
-  else if (!isValidEmail(getVal('l5_responden_email'))) e('Responden: Email', 'Format tidak valid', 5, 'l5_responden_email');
+  const l5Email = getVal('l5_responden_email');
+  if (l5Email && !isValidEmail(l5Email)) e('Responden: Email', 'Format email tidak valid', 5, 'l5_responden_email');
   if (!getVal('l5_tanggal')) e('Responden: Tanggal Pelaksanaan', 'Harus diisi', 5, 'l5_tanggal');
   if (typeof l5HasSig === 'undefined' || l5HasSig !== true) e('Tanda Tangan', 'Harus diisi — gambar di kotak tanda tangan', 5, 'l5_sigCanvas');
 

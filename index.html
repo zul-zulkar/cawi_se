@@ -1452,8 +1452,8 @@
         <input type="text" id="r_hp" placeholder="08xxxxxxxxxx"/>
       </div>
       <div class="form-group">
-        <label class="field-label">Email <span class="req">*</span></label>
-        <input type="email" id="r_email" placeholder="email@responden.com"/>
+        <label class="field-label">Email</label>
+        <input type="email" id="r_email" placeholder="email@responden.com (opsional)"/>
       </div>
       <div class="form-group">
         <label class="field-label">Tanggal Pelaksanaan <span class="req">*</span></label>
@@ -2564,10 +2564,7 @@
         <input type="number" id="l3_jml_keluarga" min="1" placeholder="1" oninput="handleJmlKeluargaL()"/>
         <div class="hint">Jika &gt; 1, isi nomor KK keluarga lain di b</div>
       </div>
-      <div class="form-group hidden" id="l3_kk_lain_wrap">
-        <label class="field-label">b. Nomor KK keluarga lain</label>
-        <textarea id="l3_kk_lain" rows="2" placeholder="Pisahkan dengan koma jika lebih dari satu"></textarea>
-      </div>
+      <div id="l3_kk_lain_wrap"></div>
     </div>
   </div>
 
@@ -2616,82 +2613,73 @@
         <label class="field-label">5. Luas lantai bangunan (m²) <span class="req">*</span></label>
         <input type="number" id="l3_luas_lantai" min="0" placeholder="0"/>
       </div>
-      <div class="inline-fields">
-        <div class="form-group">
-          <label class="field-label">6a. Bahan lantai utama</label>
-          <select id="l3_lantai_bahan" onchange="handleLantaiBahanL()">
-            <option value="">-- Pilih --</option>
-            <option value="1">1. Marmer/granit</option>
-            <option value="2">2. Keramik</option>
-            <option value="3">3. Parket/vinil/karpet</option>
-            <option value="4">4. Ubin/tegel/teraso</option>
-            <option value="5">5. Kayu/papan</option>
-            <option value="6">6. Semen/bata merah</option>
-            <option value="7">7. Bambu</option>
-            <option value="8">8. Tanah</option>
-            <option value="9">9. Lainnya</option>
-          </select>
-        </div>
-        <div id="l3_lantai_kondisi_wrap" class="form-group">
-          <label class="field-label">6b. Kondisi lantai</label>
-          <select id="l3_lantai_kondisi">
-            <option value="">-- Pilih --</option>
-            <option value="1">1. Baik</option>
-            <option value="2">2. Rusak ringan</option>
-            <option value="3">3. Rusak sedang</option>
-            <option value="4">4. Rusak berat</option>
-          </select>
+      <div class="form-group">
+        <label class="field-label">6a. Bahan lantai utama</label>
+        <select id="l3_lantai_bahan" onchange="handleLantaiBahanL()">
+          <option value="">-- Pilih --</option>
+          <option value="1">1. Marmer/granit</option>
+          <option value="2">2. Keramik</option>
+          <option value="3">3. Parket/vinil/karpet</option>
+          <option value="4">4. Ubin/tegel/teraso</option>
+          <option value="5">5. Kayu/papan</option>
+          <option value="6">6. Semen/bata merah</option>
+          <option value="7">7. Bambu</option>
+          <option value="8">8. Tanah</option>
+          <option value="9">9. Lainnya</option>
+        </select>
+      </div>
+      <div id="l3_lantai_kondisi_wrap" class="form-group">
+        <label class="field-label">6b. Kondisi lantai</label>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l3_lantai_kondisi" value="1"/> <span>1. Baik</span></label>
+          <label class="radio-item"><input type="radio" name="l3_lantai_kondisi" value="2"/> <span>2. Rusak ringan</span></label>
+          <label class="radio-item"><input type="radio" name="l3_lantai_kondisi" value="3"/> <span>3. Rusak sedang</span></label>
+          <label class="radio-item"><input type="radio" name="l3_lantai_kondisi" value="4"/> <span>4. Rusak berat</span></label>
         </div>
       </div>
-      <div class="inline-fields">
-        <div class="form-group">
-          <label class="field-label">7a. Bahan dinding utama</label>
-          <select id="l3_dinding_bahan" onchange="handleDindingBahanL()">
-            <option value="">-- Pilih --</option>
-            <option value="1">1. Tembok</option>
-            <option value="2">2. Plesteran anyaman bambu/kawat</option>
-            <option value="3">3. Kayu/papan/gipsum/GRC</option>
-            <option value="4">4. Anyaman bambu</option>
-            <option value="5">5. Batang kayu</option>
-            <option value="6">6. Bambu</option>
-            <option value="7">7. Lainnya</option>
-          </select>
-        </div>
-        <div id="l3_dinding_kondisi_wrap" class="form-group">
-          <label class="field-label">7b. Kondisi dinding</label>
-          <select id="l3_dinding_kondisi">
-            <option value="">-- Pilih --</option>
-            <option value="1">1. Baik</option>
-            <option value="2">2. Rusak ringan</option>
-            <option value="3">3. Rusak sedang</option>
-            <option value="4">4. Rusak berat</option>
-          </select>
+      <div class="form-group">
+        <label class="field-label">7a. Bahan dinding utama</label>
+        <select id="l3_dinding_bahan" onchange="handleDindingBahanL()">
+          <option value="">-- Pilih --</option>
+          <option value="1">1. Tembok</option>
+          <option value="2">2. Plesteran anyaman bambu/kawat</option>
+          <option value="3">3. Kayu/papan/gipsum/GRC</option>
+          <option value="4">4. Anyaman bambu</option>
+          <option value="5">5. Batang kayu</option>
+          <option value="6">6. Bambu</option>
+          <option value="7">7. Lainnya</option>
+        </select>
+      </div>
+      <div id="l3_dinding_kondisi_wrap" class="form-group">
+        <label class="field-label">7b. Kondisi dinding</label>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l3_dinding_kondisi" value="1"/> <span>1. Baik</span></label>
+          <label class="radio-item"><input type="radio" name="l3_dinding_kondisi" value="2"/> <span>2. Rusak ringan</span></label>
+          <label class="radio-item"><input type="radio" name="l3_dinding_kondisi" value="3"/> <span>3. Rusak sedang</span></label>
+          <label class="radio-item"><input type="radio" name="l3_dinding_kondisi" value="4"/> <span>4. Rusak berat</span></label>
         </div>
       </div>
-      <div class="inline-fields">
-        <div class="form-group">
-          <label class="field-label">8a. Bahan atap utama</label>
-          <select id="l3_atap_bahan" onchange="handleAtapBahanL()">
-            <option value="">-- Pilih --</option>
-            <option value="1">1. Beton</option>
-            <option value="2">2. Genteng</option>
-            <option value="3">3. Seng</option>
-            <option value="4">4. Asbes</option>
-            <option value="5">5. Bambu</option>
-            <option value="6">6. Kayu/sirap</option>
-            <option value="7">7. Jerami/ijuk/daun/rumbia</option>
-            <option value="8">8. Lainnya</option>
-          </select>
-        </div>
-        <div id="l3_atap_kondisi_wrap" class="form-group">
-          <label class="field-label">8b. Kondisi atap</label>
-          <select id="l3_atap_kondisi">
-            <option value="">-- Pilih --</option>
-            <option value="1">1. Baik</option>
-            <option value="2">2. Rusak ringan</option>
-            <option value="3">3. Rusak sedang</option>
-            <option value="4">4. Rusak berat</option>
-          </select>
+      <div class="form-group">
+        <label class="field-label">8a. Bahan atap utama</label>
+        <select id="l3_atap_bahan" onchange="handleAtapBahanL()">
+          <option value="">-- Pilih --</option>
+          <option value="1">1. Beton</option>
+          <option value="2">2. Genteng</option>
+          <option value="3">3. Seng</option>
+          <option value="4">4. Asbes</option>
+          <option value="5">5. Bambu</option>
+          <option value="6">6. Kayu/sirap</option>
+          <option value="7">7. Jerami/ijuk/daun/rumbia</option>
+          <option value="8">8. Lainnya</option>
+        </select>
+      </div>
+      <div id="l3_atap_kondisi_wrap" class="form-group">
+        <label class="field-label">8b. Kondisi atap</label>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l3_atap_kondisi" value="1"/> <span>1. Baik</span></label>
+          <label class="radio-item"><input type="radio" name="l3_atap_kondisi" value="2"/> <span>2. Rusak ringan</span></label>
+          <label class="radio-item"><input type="radio" name="l3_atap_kondisi" value="3"/> <span>3. Rusak sedang</span></label>
+          <label class="radio-item"><input type="radio" name="l3_atap_kondisi" value="4"/> <span>4. Rusak berat</span></label>
         </div>
       </div>
     </div>
@@ -2775,44 +2763,11 @@
       </div>
       <div class="hidden" id="l3_meteran_wrap">
         <div class="subsection-label">14. Detail Meteran (PLN bermeter)</div>
-        <div class="inline-fields">
-          <div class="form-group">
-            <label class="field-label">a. Jumlah meteran</label>
-            <input type="number" id="l3_meteran_jml" min="1" max="2" placeholder="1"/>
-          </div>
-          <div class="form-group">
-            <label class="field-label">b. Daya meteran 1 (W)</label>
-            <select id="l3_meteran_daya1">
-              <option value="">-- Pilih --</option>
-              <option value="450">450</option>
-              <option value="900">900</option>
-              <option value="1300">1.300</option>
-              <option value="2200">2.200</option>
-              <option value=">2200">&gt;2.200</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="field-label">b. Daya meteran 2 (W)</label>
-            <select id="l3_meteran_daya2">
-              <option value="">-- Pilih --</option>
-              <option value="450">450</option>
-              <option value="900">900</option>
-              <option value="1300">1.300</option>
-              <option value="2200">2.200</option>
-              <option value=">2200">&gt;2.200</option>
-            </select>
-          </div>
+        <div class="form-group">
+          <label class="field-label">a. Jumlah meteran</label>
+          <input type="number" id="l3_meteran_jml" min="1" max="2" placeholder="1" oninput="handleMeteranJmlL()"/>
         </div>
-        <div class="inline-fields">
-          <div class="form-group">
-            <label class="field-label">c. ID Pelanggan PLN 1 atau No Meteran 1</label>
-            <input type="text" id="l3_meteran_id1" placeholder="ID/Nomor"/>
-          </div>
-          <div class="form-group">
-            <label class="field-label">c. ID Pelanggan PLN 2 atau No Meteran 2</label>
-            <input type="text" id="l3_meteran_id2" placeholder="ID/Nomor"/>
-          </div>
-        </div>
+        <div id="l3_meteran_detail_wrap"></div>
       </div>
       <div class="inline-fields">
         <div class="form-group">
@@ -2993,12 +2948,16 @@
     <div class="section-body">
       <div class="form-group">
         <label class="field-label">Nama Petugas <span class="req">*</span></label>
-        <input type="text" id="l5_petugas_nama" placeholder="Nama petugas pendata"/>
+        <div class="ac-wrap">
+          <input type="text" id="l5_petugas_nama" placeholder="Ketik nama petugas untuk mencari..."
+                 oninput="filterPetugasL()" onblur="hidePetugasDropL()" autocomplete="off"/>
+          <div id="l5_petugasDrop" class="ac-drop"></div>
+        </div>
       </div>
       <div class="inline-fields">
         <div class="form-group">
           <label class="field-label">NIP / ID Petugas</label>
-          <input type="text" id="l5_petugas_nip" placeholder="NIP atau ID"/>
+          <input type="text" id="l5_petugas_nip" class="input-muted" placeholder="Terisi otomatis saat nama dipilih" readonly/>
         </div>
         <div class="form-group">
           <label class="field-label">No. HP Petugas</label>
@@ -3020,8 +2979,8 @@
         <input type="text" id="l5_responden_hp" placeholder="08xxxxxxxxxx"/>
       </div>
       <div class="form-group">
-        <label class="field-label">Email <span class="req">*</span></label>
-        <input type="email" id="l5_responden_email" placeholder="email@responden.com"/>
+        <label class="field-label">Email</label>
+        <input type="email" id="l5_responden_email" placeholder="email@responden.com (opsional)"/>
       </div>
       <div class="form-group">
         <label class="field-label">Tanggal Pelaksanaan <span class="req">*</span></label>

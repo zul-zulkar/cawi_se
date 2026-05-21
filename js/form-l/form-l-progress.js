@@ -53,12 +53,12 @@ function calcProgressL() {
     const umur = parseInt(getVal('l_ang_' + i + '_umur')) || 0;
     if (umur >= 5) {
       c(!!getRadio('l_ang_' + i + '_sekolah'));
-      c(!!getVal('l_ang_' + i + '_ijazah'));
+      c(!!getRadio('l_ang_' + i + '_ijazah'));
       c(!!getRadio('l_ang_' + i + '_rekening'));
     }
     if (umur >= 10) {
       c(!!getVal('l_ang_' + i + '_profesi'));
-      c(!!getVal('l_ang_' + i + '_kedudukan'));
+      c(!!getRadio('l_ang_' + i + '_kedudukan'));
       c(!!getRadio('l_ang_' + i + '_18a'));
       c(!!getRadio('l_ang_' + i + '_18b'));
       c(!!getRadio('l_ang_' + i + '_18c'));
@@ -159,11 +159,11 @@ function calcProgressL() {
   if (sm === '5') c(!!getVal('l3_status_lain'));
   c(getVal('l3_luas_lantai') !== '');
   c(!!getVal('l3_lantai_bahan'));
-  c(!!getVal('l3_lantai_kondisi'));
+  c(!!getRadio('l3_lantai_kondisi'));
   c(!!getVal('l3_dinding_bahan'));
-  c(!!getVal('l3_dinding_kondisi'));
+  c(!!getRadio('l3_dinding_kondisi'));
   c(!!getVal('l3_atap_bahan'));
-  c(!!getVal('l3_atap_kondisi'));
+  c(!!getRadio('l3_atap_kondisi'));
   const bab = getRadio('l3_bab');
   c(!!bab);
   if (['1','2','3'].includes(bab)) c(!!getRadio('l3_kloset'));

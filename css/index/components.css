@@ -43,9 +43,10 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .pct-label{color:#666}
 
 /* ====== CURRENCY ====== */
-.currency-input-wrap{position:relative}
-.currency-prefix{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:#999;font-size:13px;pointer-events:none;font-weight:600}
-.currency-input-wrap input{padding-left:36px}
+.currency-input-wrap{display:flex;align-items:stretch;border:1.5px solid #ddd;border-radius:5px;overflow:hidden;background:#fff;transition:border-color .2s,box-shadow .2s}
+.currency-prefix{display:flex;align-items:center;padding:0 8px 0 12px;color:#999;font-size:13px;pointer-events:none;font-weight:600;white-space:nowrap;background:#f7f4f0;border-right:1px solid #e5e0d8;flex-shrink:0}
+.currency-input-wrap input{border:none!important;border-radius:0!important;padding:9px 10px!important;flex:1;min-width:0;box-shadow:none!important;background:transparent!important}
+.currency-input-wrap:focus-within{border-color:#fc6c00;box-shadow:0 0 0 3px rgba(252,108,0,.13)}
 
 /* ====== READONLY TOTAL ====== */
 .total-field{background:#f0f7ff!important;font-weight:700!important;color:#1a5fa0!important;border-color:#c8dff5!important}
@@ -95,7 +96,7 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 
 /* ====== SIGNATURE ====== */
 .sig-wrap{border:2px dashed #d0c8c0;border-radius:8px;background:#fafaf8;position:relative;overflow:hidden}
-canvas#sigCanvas{display:block;cursor:crosshair;touch-action:none;max-width:100%}
+.sig-wrap canvas{display:block;cursor:crosshair;touch-action:none;max-width:100%}
 .sig-actions{display:flex;gap:10px;margin-top:10px;align-items:center}
 .sig-hint{font-size:12px;color:#888;line-height:2}
 .submit-alert{margin-top:14px}

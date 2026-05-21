@@ -167,8 +167,8 @@ function collectAllProblemsLUB() {
   if (!getVal('r_nama')) e('Responden: Nama', 'Harus diisi', 3, 'r_nama');
   if (!getVal('r_hp')) e('Responden: Nomor HP', 'Harus diisi', 3, 'r_hp');
   else if (!isValidHP(getVal('r_hp'))) e('Responden: Nomor HP', 'Format tidak valid', 3, 'r_hp');
-  if (!getVal('r_email')) e('Responden: Email', 'Harus diisi', 3, 'r_email');
-  else if (!isValidEmail(getVal('r_email'))) e('Responden: Email', 'Format tidak valid', 3, 'r_email');
+  const rEmail = getVal('r_email');
+  if (rEmail && !isValidEmail(rEmail)) e('Responden: Email', 'Format email tidak valid', 3, 'r_email');
   if (!getVal('r_tanggal')) e('Responden: Tanggal Pelaksanaan', 'Harus diisi', 3, 'r_tanggal');
   if (!hasSig) e('Tanda Tangan', 'Harus diisi — gambar di kotak tanda tangan', 3, 'sigCanvas');
 

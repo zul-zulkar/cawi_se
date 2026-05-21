@@ -32,9 +32,7 @@ function renderAnggotaCards() {
 function initAnggotaSearchable(i) {
   if (typeof makeSearchable !== 'function') return;
   makeSearchable(`l_ang_${i}_hubungan`, 'hubungan keluarga');
-  makeSearchable(`l_ang_${i}_ijazah`, 'ijazah terakhir');
   makeSearchable(`l_ang_${i}_profesi`, 'profesi/pekerjaan');
-  makeSearchable(`l_ang_${i}_kedudukan`, 'kedudukan pekerjaan');
   makeSearchable(`l_ang_${i}_dn_provinsi`, 'provinsi pindah');
 }
 
@@ -107,17 +105,19 @@ function anggotaCardHTML(i) {
         <label class="radio-item"><input type="radio" name="l_ang_${i}_alamat_dom" value="4"/> <span>4. Tidak sesuai KK &amp; KTP</span></label>
       </div>
     </div>
-    <div class="inline-fields hidden" id="l_ang_${i}_dn_wrap">
+    <div class="hidden" id="l_ang_${i}_dn_wrap">
       <div class="form-group">
         <label class="field-label">10DN.a. Provinsi domisili</label>
-        <select id="l_ang_${i}_dn_provinsi">
+        <select id="l_ang_${i}_dn_provinsi" onchange="handleDnProvinsiAnggota(${i})">
           <option value="">-- Pilih --</option>
           ${provOpts}
         </select>
       </div>
       <div class="form-group">
         <label class="field-label">10DN.b. Kab/Kota domisili</label>
-        <input type="text" id="l_ang_${i}_dn_kab" placeholder="Kabupaten/Kota domisili"/>
+        <select id="l_ang_${i}_dn_kab" disabled>
+          <option value="">-- Pilih Provinsi dulu --</option>
+        </select>
       </div>
     </div>
     <div class="form-group hidden" id="l_ang_${i}_ln_wrap">
@@ -164,16 +164,15 @@ function anggotaCardHTML(i) {
       <div id="l_ang_${i}_ijazah_wrap">
       <div class="form-group">
         <label class="field-label">15. Ijazah Tertinggi (≥5 thn)</label>
-        <select id="l_ang_${i}_ijazah">
-          <option value="">-- Pilih --</option>
-          <option value="0">0. Tidak punya ijazah SD</option>
-          <option value="1">1. SD/sederajat</option>
-          <option value="2">2. SMP/sederajat</option>
-          <option value="3">3. SMA/sederajat</option>
-          <option value="4">4. D1/D2/D3</option>
-          <option value="5">5. D4/S1/Profesi</option>
-          <option value="6">6. S2/S3</option>
-        </select>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l_ang_${i}_ijazah" value="0"/> <span>0. Tidak punya ijazah SD</span></label>
+          <label class="radio-item"><input type="radio" name="l_ang_${i}_ijazah" value="1"/> <span>1. SD/sederajat</span></label>
+          <label class="radio-item"><input type="radio" name="l_ang_${i}_ijazah" value="2"/> <span>2. SMP/sederajat</span></label>
+          <label class="radio-item"><input type="radio" name="l_ang_${i}_ijazah" value="3"/> <span>3. SMA/sederajat</span></label>
+          <label class="radio-item"><input type="radio" name="l_ang_${i}_ijazah" value="4"/> <span>4. D1/D2/D3</span></label>
+          <label class="radio-item"><input type="radio" name="l_ang_${i}_ijazah" value="5"/> <span>5. D4/S1/Profesi</span></label>
+          <label class="radio-item"><input type="radio" name="l_ang_${i}_ijazah" value="6"/> <span>6. S2/S3</span></label>
+        </div>
       </div>
       </div>
     </div>
@@ -188,16 +187,15 @@ function anggotaCardHTML(i) {
       <div id="l_ang_${i}_kedudukan_wrap">
       <div class="form-group">
         <label class="field-label">17. Status Kedudukan (≥10 thn)</label>
-        <select id="l_ang_${i}_kedudukan">
-          <option value="">-- Pilih --</option>
-          <option value="1">1. Berusaha sendiri</option>
-          <option value="2">2. Berusaha dibantu buruh</option>
-          <option value="3">3. Buruh/karyawan/swasta</option>
-          <option value="4">4. ASN/TNI/Polri/BUMN/BUMD</option>
-          <option value="5">5. Pekerja bebas</option>
-          <option value="6">6. Pekerja keluarga/tidak dibayar</option>
-          <option value="9">9. Tidak tahu</option>
-        </select>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l_ang_${i}_kedudukan" value="1"/> <span>1. Berusaha sendiri</span></label>
+          <label class="radio-item"><input type="radio" name="l_ang_${i}_kedudukan" value="2"/> <span>2. Berusaha dibantu buruh</span></label>
+          <label class="radio-item"><input type="radio" name="l_ang_${i}_kedudukan" value="3"/> <span>3. Buruh/karyawan/swasta</span></label>
+          <label class="radio-item"><input type="radio" name="l_ang_${i}_kedudukan" value="4"/> <span>4. ASN/TNI/Polri/BUMN/BUMD</span></label>
+          <label class="radio-item"><input type="radio" name="l_ang_${i}_kedudukan" value="5"/> <span>5. Pekerja bebas</span></label>
+          <label class="radio-item"><input type="radio" name="l_ang_${i}_kedudukan" value="6"/> <span>6. Pekerja keluarga/tidak dibayar</span></label>
+          <label class="radio-item"><input type="radio" name="l_ang_${i}_kedudukan" value="9"/> <span>9. Tidak tahu</span></label>
+        </div>
       </div>
       </div>
       <div class="form-group">
@@ -524,6 +522,46 @@ function loadKelurahanL(kdprovkabkec) {
   if (typeof syncSearchable === 'function') syncSearchable('l1_alamat_kel', 'kelurahan/desa keluarga');
 }
 
+/* --- Per-anggota DN kab/kota regional loader --- */
+async function handleDnProvinsiAnggota(i) {
+  const prov = document.getElementById('l_ang_' + i + '_dn_provinsi')?.value;
+  const sel  = document.getElementById('l_ang_' + i + '_dn_kab');
+  if (!sel) return;
+  if (!prov) {
+    sel.innerHTML = '<option value="">-- Pilih Provinsi dulu --</option>';
+    sel.disabled = true;
+    return;
+  }
+  sel.innerHTML = '<option value="">Memuat...</option>';
+  sel.disabled = true;
+  const staticKabs = (typeof STATIC_KABUPATEN !== 'undefined' && STATIC_KABUPATEN[prov]) || null;
+  if (staticKabs) {
+    sel.innerHTML = '<option value="">-- Pilih Kabupaten/Kota --</option>';
+    [...staticKabs].sort((a, b) => a.nama.localeCompare(b.nama)).forEach(k => {
+      const o = document.createElement('option');
+      o.value = k.kode; o.textContent = k.nama;
+      sel.appendChild(o);
+    });
+    sel.disabled = false;
+    return;
+  }
+  try {
+    const res = await fetch(`https://esurvey.bps.go.id/lookup/api/v1/collections/668fcfe6-8ef4-4612-968a-d1330c03fe17/filter?version=1&filter=kdprov||eq||${prov}`,
+      { headers: { 'Accept': 'application/json' } });
+    const d = await res.json();
+    sel.innerHTML = '<option value="">-- Pilih --</option>';
+    (d.data || []).sort((a, b) => a.namakab.localeCompare(b.namakab)).forEach(k => {
+      const o = document.createElement('option');
+      o.value = k.kdprovkab; o.textContent = k.namakab;
+      sel.appendChild(o);
+    });
+    sel.disabled = false;
+  } catch (_) {
+    sel.innerHTML = '<option value="">-- Gagal memuat --</option>';
+    sel.disabled = false;
+  }
+}
+
 /* --- L2 conditional handlers --- */
 function handleKawasanL() {
   const v = getRadio('l2_kawasan');
@@ -677,7 +715,42 @@ function handleJenisBangunanL() {
 
 function handleJmlKeluargaL() {
   const v = parseInt(document.getElementById('l3_jml_keluarga').value) || 1;
-  document.getElementById('l3_kk_lain_wrap').classList.toggle('hidden', v <= 1);
+  const wrap = document.getElementById('l3_kk_lain_wrap');
+  if (!wrap) return;
+  if (v <= 1) { wrap.innerHTML = ''; return; }
+  let html = '';
+  for (let j = 2; j <= v; j++) {
+    html += `<div class="form-group" style="margin-top:8px">
+      <label class="field-label">b. Nomor KK Keluarga #${j}</label>
+      <input type="text" id="l3_kk_lain_${j}" maxlength="16" placeholder="16 digit Nomor KK"/>
+    </div>`;
+  }
+  wrap.innerHTML = html;
+}
+
+function handleMeteranJmlL() {
+  const n = Math.min(Math.max(parseInt(document.getElementById('l3_meteran_jml')?.value) || 0, 1), 2);
+  const wrap = document.getElementById('l3_meteran_detail_wrap');
+  if (!wrap) return;
+  const dayaOpts = `<option value="">-- Pilih --</option>
+    <option value="450">450</option><option value="900">900</option>
+    <option value="1300">1.300</option><option value="2200">2.200</option>
+    <option value=">2200">&gt;2.200</option>`;
+  let html = '';
+  for (let j = 1; j <= n; j++) {
+    html += `<div class="inline-fields" style="margin-top:8px">
+      <div class="form-group">
+        <label class="field-label">b. Daya meteran ${j} (W)</label>
+        <select id="l3_meteran_daya${j}">${dayaOpts}</select>
+      </div>
+      <div class="form-group">
+        <label class="field-label">c. ID Pelanggan PLN ${j}</label>
+        <input type="text" id="l3_meteran_id${j}" placeholder="ID/Nomor"/>
+      </div>
+    </div>`;
+  }
+  wrap.innerHTML = html;
+  if (typeof updateProgress === 'function') updateProgress();
 }
 
 function handleStatusMilikL() {

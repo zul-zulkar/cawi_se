@@ -76,7 +76,7 @@ describe('collectAllProblemsL — empty form', () => {
     expect(hasErr(result, 'l5_petugas_nama')).toBe(true)
     expect(hasErr(result, 'l5_responden_nama')).toBe(true)
     expect(hasErr(result, 'l5_responden_hp')).toBe(true)
-    expect(hasErr(result, 'l5_responden_email')).toBe(true)
+    expect(hasErr(result, 'l5_responden_email')).toBe(false) // email is now optional
     expect(hasErr(result, 'l5_tanggal')).toBe(true)
     expect(hasErr(result, 'l5_sigCanvas')).toBe(true)
   })

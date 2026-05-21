@@ -12,12 +12,16 @@
     <div class="section-body">
       <div class="form-group">
         <label class="field-label">Nama Petugas <span class="req">*</span></label>
-        <input type="text" id="l5_petugas_nama" placeholder="Nama petugas pendata"/>
+        <div class="ac-wrap">
+          <input type="text" id="l5_petugas_nama" placeholder="Ketik nama petugas untuk mencari..."
+                 oninput="filterPetugasL()" onblur="hidePetugasDropL()" autocomplete="off"/>
+          <div id="l5_petugasDrop" class="ac-drop"></div>
+        </div>
       </div>
       <div class="inline-fields">
         <div class="form-group">
           <label class="field-label">NIP / ID Petugas</label>
-          <input type="text" id="l5_petugas_nip" placeholder="NIP atau ID"/>
+          <input type="text" id="l5_petugas_nip" class="input-muted" placeholder="Terisi otomatis saat nama dipilih" readonly/>
         </div>
         <div class="form-group">
           <label class="field-label">No. HP Petugas</label>
@@ -39,8 +43,8 @@
         <input type="text" id="l5_responden_hp" placeholder="08xxxxxxxxxx"/>
       </div>
       <div class="form-group">
-        <label class="field-label">Email <span class="req">*</span></label>
-        <input type="email" id="l5_responden_email" placeholder="email@responden.com"/>
+        <label class="field-label">Email</label>
+        <input type="email" id="l5_responden_email" placeholder="email@responden.com (opsional)"/>
       </div>
       <div class="form-group">
         <label class="field-label">Tanggal Pelaksanaan <span class="req">*</span></label>

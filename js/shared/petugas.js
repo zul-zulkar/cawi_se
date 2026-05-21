@@ -65,3 +65,33 @@ function hidePetugasDrop() {
     if (drop) drop.style.display = 'none';
   }, 150);
 }
+
+/* --- L5 petugas autocomplete (same PEGAWAI data, different element IDs) --- */
+function filterPetugasL() {
+  const q = (document.getElementById('l5_petugas_nama')?.value || '').trim().toLowerCase();
+  const drop = document.getElementById('l5_petugasDrop');
+  if (!drop) return;
+  if (!q) { drop.style.display = 'none'; return; }
+  const matches = PEGAWAI.filter(p => p.nama.toLowerCase().includes(q)).slice(0, 10);
+  if (!matches.length) { drop.style.display = 'none'; return; }
+  drop.innerHTML = matches.map(p =>
+    `<div class="ac-item" onmousedown="selectPetugasL(this)" data-nama="${p.nama.replace(/"/g,'&quot;')}" data-nip="${p.nip}">
+      <div class="ac-name">${p.nama}</div>
+      <div class="ac-sub">${p.jabatan}</div>
+    </div>`
+  ).join('');
+  drop.style.display = 'block';
+}
+
+function selectPetugasL(el) {
+  document.getElementById('l5_petugas_nama').value = el.dataset.nama;
+  document.getElementById('l5_petugas_nip').value  = el.dataset.nip;
+  document.getElementById('l5_petugasDrop').style.display = 'none';
+}
+
+function hidePetugasDropL() {
+  setTimeout(() => {
+    const drop = document.getElementById('l5_petugasDrop');
+    if (drop) drop.style.display = 'none';
+  }, 150);
+}

@@ -87,8 +87,9 @@ describe('empty form — general', () => {
   })
 
   it('flags blok-3 required fields (petugas & responden)', () => {
-    for (const f of ['p_nama', 'r_nama', 'r_hp', 'r_email', 'r_tanggal'])
+    for (const f of ['p_nama', 'r_nama', 'r_hp', 'r_tanggal'])
       expect(hasErr(result, f)).toBe(true)
+    expect(hasErr(result, 'r_email')).toBe(false) // email is now optional
   })
 })
 
