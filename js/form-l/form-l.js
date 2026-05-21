@@ -52,6 +52,7 @@ function anggotaCardHTML(i) {
     <span id="l_ang_toggle_${i}">&#9660;</span>
   </div>
   <div class="anggota-body" id="l_ang_body_${i}">
+    <div class="anggota-ctx-bar"><span class="anggota-ctx-label">Anggota ke-${i}:</span><span id="l_ang_${i}_ctx_nama" class="anggota-ctx-nama">&nbsp;(nama belum diisi)</span></div>
     <div class="anggota-subsection-label">A. Identitas (r5-r13)</div>
     <div class="inline-fields">
       <div class="form-group">
@@ -312,8 +313,11 @@ function toggleAnggotaCard(i) {
 
 function updateAnggotaNamePreview(i) {
   const el = document.getElementById('l_ang_' + i + '_nama');
+  const name = el ? el.value.trim() : '';
   const out = document.getElementById('l_ang_' + i + '_name_preview');
-  if (out && el) out.textContent = el.value.trim() ? '— ' + el.value.trim() : '';
+  if (out) out.textContent = name ? '— ' + name : '';
+  const ctx = document.getElementById('l_ang_' + i + '_ctx_nama');
+  if (ctx) ctx.textContent = name ? ' ' + name : ' (nama belum diisi)';
 }
 
 function updateSidebarAnggota(count) {

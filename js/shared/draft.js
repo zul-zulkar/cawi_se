@@ -71,6 +71,12 @@ function restoreDraft() {
           el.value = vals[key];
           el.dispatchEvent(new Event('input', {bubbles:true}));
           el.dispatchEvent(new Event('change', {bubbles:true}));
+        } else if (!el && vals[key]) {
+          // Backward-compat: key may belong to a radio group (e.g. field converted from select→radio)
+          if (!document.querySelector(`input[type=radio][name="${key}"]:checked`)) {
+            const radio = document.querySelector(`input[type=radio][name="${key}"][value="${vals[key]}"]`);
+            if (radio) { radio.checked = true; radio.dispatchEvent(new Event('change', {bubbles:true})); }
+          }
         }
       }
     });
