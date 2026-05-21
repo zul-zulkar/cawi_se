@@ -827,19 +827,18 @@ function handleAsetRumahL() {
 }
 
 /* --- L5 signature (separate canvas from L.UB) --- */
-let l5Canvas, l5Ctx, l5Drawing = false, l5HasSig = false, l5CanvasRect = null;
+let l5Canvas, l5Ctx, l5Drawing = false, l5HasSig = false;
 
 function initL5Signature() {
   l5Canvas = document.getElementById('l5_sigCanvas');
   if (!l5Canvas) return;
   l5Ctx = l5Canvas.getContext('2d');
-  window.addEventListener('resize', () => { l5CanvasRect = null; });
   const getPosL5 = (e) => {
-    if (!l5CanvasRect) l5CanvasRect = l5Canvas.getBoundingClientRect();
-    const scaleX = l5Canvas.width / l5CanvasRect.width;
-    const scaleY = l5Canvas.height / l5CanvasRect.height;
-    if (e.touches) return {x:(e.touches[0].clientX - l5CanvasRect.left)*scaleX, y:(e.touches[0].clientY - l5CanvasRect.top)*scaleY};
-    return {x:(e.clientX - l5CanvasRect.left)*scaleX, y:(e.clientY - l5CanvasRect.top)*scaleY};
+    const r = l5Canvas.getBoundingClientRect();
+    const scaleX = l5Canvas.width / r.width;
+    const scaleY = l5Canvas.height / r.height;
+    if (e.touches) return {x:(e.touches[0].clientX - r.left)*scaleX, y:(e.touches[0].clientY - r.top)*scaleY};
+    return {x:(e.clientX - r.left)*scaleX, y:(e.clientY - r.top)*scaleY};
   };
   l5Canvas.addEventListener('mousedown', e => { l5Drawing = true; const p=getPosL5(e); l5Ctx.beginPath(); l5Ctx.moveTo(p.x,p.y); });
   l5Canvas.addEventListener('mousemove', e => { if(!l5Drawing) return; const p=getPosL5(e); l5Ctx.lineTo(p.x,p.y); l5Ctx.strokeStyle='#000'; l5Ctx.lineWidth=2; l5Ctx.lineCap='round'; l5Ctx.stroke(); l5HasSig=true; });
@@ -1143,3 +1142,5 @@ function loadEditModeL(r) {
     return true;
   } catch(e) { console.error('Gagal load edit mode L:', e); return false; }
 }
+
+initL5Signature();

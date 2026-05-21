@@ -287,17 +287,16 @@ function calcModal() {
 
 const canvas = document.getElementById('sigCanvas');
 const ctx = canvas.getContext('2d');
-let drawing = false, hasSig = false, canvasRect = null;
-window.addEventListener('resize', () => { canvasRect = null; });
+let drawing = false, hasSig = false;
 
 function getPos(e) {
-  if (!canvasRect) canvasRect = canvas.getBoundingClientRect();
-  const scaleX = canvas.width / canvasRect.width;
-  const scaleY = canvas.height / canvasRect.height;
+  const r = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / r.width;
+  const scaleY = canvas.height / r.height;
   if (e.touches) {
-    return {x:(e.touches[0].clientX - canvasRect.left)*scaleX, y:(e.touches[0].clientY - canvasRect.top)*scaleY};
+    return {x:(e.touches[0].clientX - r.left)*scaleX, y:(e.touches[0].clientY - r.top)*scaleY};
   }
-  return {x:(e.clientX - canvasRect.left)*scaleX, y:(e.clientY - canvasRect.top)*scaleY};
+  return {x:(e.clientX - r.left)*scaleX, y:(e.clientY - r.top)*scaleY};
 }
 
 canvas.addEventListener('mousedown', e => { drawing=true; const p=getPos(e); ctx.beginPath(); ctx.moveTo(p.x,p.y); });
