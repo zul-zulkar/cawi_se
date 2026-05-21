@@ -22,10 +22,20 @@ function renderAnggotaCards() {
   wrap.innerHTML = '';
   for (let i = 1; i <= capped; i++) {
     wrap.insertAdjacentHTML('beforeend', anggotaCardHTML(i));
+    initAnggotaSearchable(i);
   }
   updateSidebarAnggota(capped);
   updateJmlPendataan();
   if (typeof updateProgress === 'function') updateProgress();
+}
+
+function initAnggotaSearchable(i) {
+  if (typeof makeSearchable !== 'function') return;
+  makeSearchable(`l_ang_${i}_hubungan`, 'hubungan keluarga');
+  makeSearchable(`l_ang_${i}_ijazah`, 'ijazah terakhir');
+  makeSearchable(`l_ang_${i}_profesi`, 'profesi/pekerjaan');
+  makeSearchable(`l_ang_${i}_kedudukan`, 'kedudukan pekerjaan');
+  makeSearchable(`l_ang_${i}_dn_provinsi`, 'provinsi pindah');
 }
 
 function anggotaCardHTML(i) {
@@ -146,11 +156,12 @@ function anggotaCardHTML(i) {
       <div class="form-group">
         <label class="field-label">14. Partisipasi sekolah (≥5 thn)</label>
         <div class="radio-group">
-          <label class="radio-item"><input type="radio" name="l_ang_${i}_sekolah" value="0"/> <span>0. Tidak/belum pernah</span></label>
-          <label class="radio-item"><input type="radio" name="l_ang_${i}_sekolah" value="1"/> <span>1. Masih sekolah</span></label>
-          <label class="radio-item"><input type="radio" name="l_ang_${i}_sekolah" value="2"/> <span>2. Tidak bersekolah lagi</span></label>
+          <label class="radio-item"><input type="radio" name="l_ang_${i}_sekolah" value="0" onchange="handleSekolahAnggota(${i})"/> <span>0. Tidak/belum pernah</span></label>
+          <label class="radio-item"><input type="radio" name="l_ang_${i}_sekolah" value="1" onchange="handleSekolahAnggota(${i})"/> <span>1. Masih sekolah</span></label>
+          <label class="radio-item"><input type="radio" name="l_ang_${i}_sekolah" value="2" onchange="handleSekolahAnggota(${i})"/> <span>2. Tidak bersekolah lagi</span></label>
         </div>
       </div>
+      <div id="l_ang_${i}_ijazah_wrap">
       <div class="form-group">
         <label class="field-label">15. Ijazah Tertinggi (≥5 thn)</label>
         <select id="l_ang_${i}_ijazah">
@@ -164,15 +175,17 @@ function anggotaCardHTML(i) {
           <option value="6">6. S2/S3</option>
         </select>
       </div>
+      </div>
     </div>
     <div id="l_ang_${i}_sosek10plus_wrap">
       <div class="form-group">
         <label class="field-label">16. Profesi Pekerjaan Utama (≥10 thn)</label>
-        <select id="l_ang_${i}_profesi">
+        <select id="l_ang_${i}_profesi" onchange="handleProfesiAnggota(${i})">
           <option value="">-- Pilih --</option>
           ${profesiOpts}
         </select>
       </div>
+      <div id="l_ang_${i}_kedudukan_wrap">
       <div class="form-group">
         <label class="field-label">17. Status Kedudukan (≥10 thn)</label>
         <select id="l_ang_${i}_kedudukan">
@@ -186,37 +199,44 @@ function anggotaCardHTML(i) {
           <option value="9">9. Tidak tahu</option>
         </select>
       </div>
+      </div>
       <div class="form-group">
         <label class="field-label">18a. Pendapatan dari Pekerjaan</label>
         <div class="radio-group">
-          <label class="radio-item"><input type="radio" name="l_ang_${i}_18a" value="1"/> <span>1. Ya</span></label>
-          <label class="radio-item"><input type="radio" name="l_ang_${i}_18a" value="2"/> <span>2. Tidak</span></label>
-          <label class="radio-item"><input type="radio" name="l_ang_${i}_18a" value="9"/> <span>9. Tidak tahu</span></label>
+          <label class="radio-item"><input type="radio" name="l_ang_${i}_18a" value="1" onchange="handlePendapatanAnggota(${i},'18a')"/> <span>1. Ya</span></label>
+          <label class="radio-item"><input type="radio" name="l_ang_${i}_18a" value="2" onchange="handlePendapatanAnggota(${i},'18a')"/> <span>2. Tidak</span></label>
+          <label class="radio-item"><input type="radio" name="l_ang_${i}_18a" value="9" onchange="handlePendapatanAnggota(${i},'18a')"/> <span>9. Tidak tahu</span></label>
         </div>
-        <div class="currency-input-wrap" style="margin-top:8px"><span class="currency-prefix">Rp</span>
-          <input type="text" id="l_ang_${i}_18a_nilai" class="currency-field" oninput="formatCurrency(this)" placeholder="0"/>
+        <div class="hidden" id="l_ang_${i}_18a_nilai_wrap">
+          <div class="currency-input-wrap" style="margin-top:8px"><span class="currency-prefix">Rp</span>
+            <input type="text" id="l_ang_${i}_18a_nilai" class="currency-field" oninput="formatCurrency(this)" placeholder="0"/>
+          </div>
         </div>
       </div>
       <div class="form-group">
         <label class="field-label">18b. Pendapatan Keuntungan Usaha</label>
         <div class="radio-group">
-          <label class="radio-item"><input type="radio" name="l_ang_${i}_18b" value="1"/> <span>1. Ya</span></label>
-          <label class="radio-item"><input type="radio" name="l_ang_${i}_18b" value="2"/> <span>2. Tidak</span></label>
-          <label class="radio-item"><input type="radio" name="l_ang_${i}_18b" value="9"/> <span>9. Tidak tahu</span></label>
+          <label class="radio-item"><input type="radio" name="l_ang_${i}_18b" value="1" onchange="handlePendapatanAnggota(${i},'18b')"/> <span>1. Ya</span></label>
+          <label class="radio-item"><input type="radio" name="l_ang_${i}_18b" value="2" onchange="handlePendapatanAnggota(${i},'18b')"/> <span>2. Tidak</span></label>
+          <label class="radio-item"><input type="radio" name="l_ang_${i}_18b" value="9" onchange="handlePendapatanAnggota(${i},'18b')"/> <span>9. Tidak tahu</span></label>
         </div>
-        <div class="currency-input-wrap" style="margin-top:8px"><span class="currency-prefix">Rp</span>
-          <input type="text" id="l_ang_${i}_18b_nilai" class="currency-field" oninput="formatCurrency(this)" placeholder="0"/>
+        <div class="hidden" id="l_ang_${i}_18b_nilai_wrap">
+          <div class="currency-input-wrap" style="margin-top:8px"><span class="currency-prefix">Rp</span>
+            <input type="text" id="l_ang_${i}_18b_nilai" class="currency-field" oninput="formatCurrency(this)" placeholder="0"/>
+          </div>
         </div>
       </div>
       <div class="form-group">
         <label class="field-label">18c. Penerimaan Transfer/Passive (pensiun, kupon SBN)</label>
         <div class="radio-group">
-          <label class="radio-item"><input type="radio" name="l_ang_${i}_18c" value="1"/> <span>1. Ya</span></label>
-          <label class="radio-item"><input type="radio" name="l_ang_${i}_18c" value="2"/> <span>2. Tidak</span></label>
-          <label class="radio-item"><input type="radio" name="l_ang_${i}_18c" value="9"/> <span>9. Tidak tahu</span></label>
+          <label class="radio-item"><input type="radio" name="l_ang_${i}_18c" value="1" onchange="handlePendapatanAnggota(${i},'18c')"/> <span>1. Ya</span></label>
+          <label class="radio-item"><input type="radio" name="l_ang_${i}_18c" value="2" onchange="handlePendapatanAnggota(${i},'18c')"/> <span>2. Tidak</span></label>
+          <label class="radio-item"><input type="radio" name="l_ang_${i}_18c" value="9" onchange="handlePendapatanAnggota(${i},'18c')"/> <span>9. Tidak tahu</span></label>
         </div>
-        <div class="currency-input-wrap" style="margin-top:8px"><span class="currency-prefix">Rp</span>
-          <input type="text" id="l_ang_${i}_18c_nilai" class="currency-field" oninput="formatCurrency(this)" placeholder="0"/>
+        <div class="hidden" id="l_ang_${i}_18c_nilai_wrap">
+          <div class="currency-input-wrap" style="margin-top:8px"><span class="currency-prefix">Rp</span>
+            <input type="text" id="l_ang_${i}_18c_nilai" class="currency-field" oninput="formatCurrency(this)" placeholder="0"/>
+          </div>
         </div>
       </div>
     </div>
@@ -353,8 +373,8 @@ function handleKeberadaanAnggota(i) {
   if (dnWrap)  dnWrap.classList.toggle('hidden', v !== '3');
   // r10LN visible only when v=4
   if (lnWrap)  lnWrap.classList.toggle('hidden', v !== '4');
-  // r9b (alamat domisili) visible for v=1,3,4,5 (i.e. not STOP)
-  if (domWrap) domWrap.classList.toggle('hidden', STOP || !v);
+  // r9b (alamat domisili) only for v=1 (tinggal di rumah ini)
+  if (domWrap) domWrap.classList.toggle('hidden', v !== '1');
 
   if (typeof updateProgress === 'function') updateProgress();
 }
@@ -390,17 +410,56 @@ function handleAgeGatedAnggota(i) {
   if (typeof updateProgress === 'function') updateProgress();
 }
 
+/* --- Per-anggota conditional handlers --- */
+function handleSekolahAnggota(i) {
+  const v = getRadio('l_ang_' + i + '_sekolah');
+  const w = document.getElementById('l_ang_' + i + '_ijazah_wrap');
+  if (w) w.classList.toggle('hidden', v === '0');
+  if (typeof updateProgress === 'function') updateProgress();
+}
+
+function handleProfesiAnggota(i) {
+  const v = document.getElementById('l_ang_' + i + '_profesi')?.value;
+  const w = document.getElementById('l_ang_' + i + '_kedudukan_wrap');
+  if (w) w.classList.toggle('hidden', v === '000');
+  if (typeof updateProgress === 'function') updateProgress();
+}
+
+function handlePendapatanAnggota(i, key) {
+  const v = getRadio('l_ang_' + i + '_' + key);
+  const w = document.getElementById('l_ang_' + i + '_' + key + '_nilai_wrap');
+  if (w) w.classList.toggle('hidden', v !== '1');
+  if (typeof updateProgress === 'function') updateProgress();
+}
+
 /* --- L1 regional dropdowns --- */
+function loadProvinsiL() {
+  const sel = document.getElementById('l1_alamat_provinsi');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">-- Pilih Provinsi --</option>';
+  const list = (typeof STATIC_PROVINSI !== 'undefined') ? STATIC_PROVINSI : [];
+  list.forEach(d => {
+    const o = document.createElement('option');
+    o.value = d.kode; o.textContent = d.nama;
+    sel.appendChild(o);
+  });
+  if (typeof syncSearchable === 'function') syncSearchable('l1_alamat_provinsi', 'provinsi keluarga');
+}
+
 async function loadKabupatenL(kdprov) {
   const sel = document.getElementById('l1_alamat_kab');
   if (!sel) return;
   sel.innerHTML = '<option value="">Memuat...</option>';
   sel.disabled = true;
-  // Reset child dropdowns
   ['l1_alamat_kec', 'l1_alamat_kel'].forEach(id => {
     const s = document.getElementById(id);
     if (s) { s.innerHTML = '<option value="">--</option>'; s.disabled = true; }
   });
+  if (typeof syncSearchable === 'function') {
+    syncSearchable('l1_alamat_kab', 'kabupaten/kota keluarga');
+    syncSearchable('l1_alamat_kec', 'kecamatan keluarga');
+    syncSearchable('l1_alamat_kel', 'kelurahan/desa keluarga');
+  }
   if (!kdprov) { sel.innerHTML = '<option value="">-- Pilih Kabupaten/Kota --</option>'; return; }
   const staticKabs = (typeof STATIC_KABUPATEN !== 'undefined' && STATIC_KABUPATEN[kdprov]) || null;
   if (staticKabs) {
@@ -411,6 +470,7 @@ async function loadKabupatenL(kdprov) {
       sel.appendChild(o);
     });
     sel.disabled = false;
+    if (typeof syncSearchable === 'function') syncSearchable('l1_alamat_kab', 'kabupaten/kota keluarga');
     return;
   }
   try {
@@ -424,6 +484,7 @@ async function loadKabupatenL(kdprov) {
       sel.appendChild(o);
     });
     sel.disabled = false;
+    if (typeof syncSearchable === 'function') syncSearchable('l1_alamat_kab', 'kabupaten/kota keluarga');
   } catch (e) {
     sel.innerHTML = '<option value="">-- Gagal memuat --</option>';
     sel.disabled = false;
@@ -436,7 +497,8 @@ function loadKecamatanL(kdprovkab) {
   sel.innerHTML = '<option value="">-- Pilih Kecamatan --</option>';
   const child = document.getElementById('l1_alamat_kel');
   if (child) { child.innerHTML = '<option value="">--</option>'; child.disabled = true; }
-  if (!kdprovkab) { sel.disabled = true; return; }
+  if (typeof syncSearchable === 'function') syncSearchable('l1_alamat_kel', 'kelurahan/desa keluarga');
+  if (!kdprovkab) { sel.disabled = true; if (typeof syncSearchable === 'function') syncSearchable('l1_alamat_kec', 'kecamatan keluarga'); return; }
   const stk = (typeof STATIC_KECAMATAN !== 'undefined' && STATIC_KECAMATAN[kdprovkab]) || [];
   stk.forEach(k => {
     const o = document.createElement('option');
@@ -444,13 +506,14 @@ function loadKecamatanL(kdprovkab) {
     sel.appendChild(o);
   });
   sel.disabled = false;
+  if (typeof syncSearchable === 'function') syncSearchable('l1_alamat_kec', 'kecamatan keluarga');
 }
 
 function loadKelurahanL(kdprovkabkec) {
   const sel = document.getElementById('l1_alamat_kel');
   if (!sel) return;
   sel.innerHTML = '<option value="">-- Pilih Kelurahan/Desa --</option>';
-  if (!kdprovkabkec) { sel.disabled = true; return; }
+  if (!kdprovkabkec) { sel.disabled = true; if (typeof syncSearchable === 'function') syncSearchable('l1_alamat_kel', 'kelurahan/desa keluarga'); return; }
   const stk = (typeof STATIC_KELURAHAN !== 'undefined' && STATIC_KELURAHAN[kdprovkabkec]) || [];
   stk.forEach(k => {
     const o = document.createElement('option');
@@ -458,6 +521,7 @@ function loadKelurahanL(kdprovkabkec) {
     sel.appendChild(o);
   });
   sel.disabled = false;
+  if (typeof syncSearchable === 'function') syncSearchable('l1_alamat_kel', 'kelurahan/desa keluarga');
 }
 
 /* --- L2 conditional handlers --- */
@@ -512,6 +576,8 @@ function handleJaringanL() {
   const v = getRadio('l2_jaringan');
   document.getElementById('l2_jml_cabang_wrap').classList.toggle('hidden', v !== '2');
   document.getElementById('l2_kp_wrap').classList.toggle('hidden', !['3', '4', '5', '6'].includes(v));
+  const notice = document.getElementById('l2_unit_pembantu_notice');
+  if (notice) notice.classList.toggle('hidden', v !== '6');
 }
 
 function handleInternetL() {
@@ -605,6 +671,8 @@ function handleJenisBangunanL() {
   const v = getRadio('l3_jenis_bangunan');
   document.getElementById('l3_lantai_apt_wrap').classList.toggle('hidden', !(v === '3' || v === '4'));
   document.getElementById('l3_bangunan_lain_wrap').classList.toggle('hidden', v !== '5');
+  const jmlSec = document.getElementById('l3_jml_keluarga_section');
+  if (jmlSec) jmlSec.classList.toggle('hidden', v === '5');
 }
 
 function handleJmlKeluargaL() {
@@ -616,12 +684,44 @@ function handleStatusMilikL() {
   const v = getRadio('l3_status_milik');
   document.getElementById('l3_bukti_wrap').classList.toggle('hidden', v !== '1');
   document.getElementById('l3_status_lain_wrap').classList.toggle('hidden', v !== '5');
+  const lbl = document.getElementById('l3_sewa_label');
+  if (lbl) {
+    const lblMap = {
+      '1': '4. Perkiraan sewa sebulan jika disewakan (Rp)',
+      '2': '4. Sewa sebulan yang dibayar (Rp)',
+      '3': '4. Perkiraan sewa sebulan jika disewakan (Rp)',
+      '4': '4. Perkiraan sewa sebulan (Rp)',
+      '5': '4. Perkiraan sewa sebulan (Rp)',
+    };
+    lbl.textContent = lblMap[v] || '4. Perkiraan sewa sebulan (Rp)';
+  }
 }
 
 function handleBABL() {
   const v = getRadio('l3_bab');
   // kloset only if v ∈ {1,2,3}
   document.getElementById('l3_kloset_wrap').classList.toggle('hidden', !['1','2','3'].includes(v));
+  // tinja hidden when no toilet facility (4=MCK umum, 5=ada tapi tidak dipakai, 6=tidak ada)
+  const tinjaWrap = document.getElementById('l3_tinja_wrap');
+  if (tinjaWrap) tinjaWrap.classList.toggle('hidden', ['4','5','6'].includes(v));
+}
+
+function handleLantaiBahanL() {
+  const v = document.getElementById('l3_lantai_bahan')?.value;
+  const w = document.getElementById('l3_lantai_kondisi_wrap');
+  if (w) w.classList.toggle('hidden', ['7','8','9'].includes(v));
+}
+
+function handleDindingBahanL() {
+  const v = document.getElementById('l3_dinding_bahan')?.value;
+  const w = document.getElementById('l3_dinding_kondisi_wrap');
+  if (w) w.classList.toggle('hidden', ['6','7'].includes(v));
+}
+
+function handleAtapBahanL() {
+  const v = document.getElementById('l3_atap_bahan')?.value;
+  const w = document.getElementById('l3_atap_kondisi_wrap');
+  if (w) w.classList.toggle('hidden', ['5','7','8'].includes(v));
 }
 
 function handleListrikL() {

@@ -1997,6 +1997,9 @@
         <label class="field-label">b. Jumlah cabang &amp; unit usaha di bawah kantor pusat <span class="req">*</span></label>
         <input type="number" id="l2_jml_cabang" min="0" placeholder="0"/>
       </div>
+      <div class="notice-box hidden" id="l2_unit_pembantu_notice">
+        <strong>PENDATAAN SELESAI</strong> — Unit Pembantu/Penunjang tidak didata lebih lanjut di kuesioner ini. Isikan saja identitas kantor pusat di bawah dan hentikan pengisian.
+      </div>
       <div class="hidden" id="l2_kp_wrap">
         <div class="subsection-label">15. Informasi Kantor Pusat</div>
         <div class="inline-fields">
@@ -2553,7 +2556,7 @@
   </div>
 
   <!-- L3.2 Jumlah Keluarga -->
-  <div class="section-card">
+  <div class="section-card" id="l3_jml_keluarga_section">
     <div class="section-header" id="sec-L3-2">2. Jumlah Keluarga dalam 1 Rumah</div>
     <div class="section-body">
       <div class="form-group">
@@ -2597,7 +2600,7 @@
         <input type="text" id="l3_status_lain" placeholder="Status"/>
       </div>
       <div class="form-group">
-        <label class="field-label">4. Perkiraan sewa sebulan (Rp)</label>
+        <label class="field-label" id="l3_sewa_label">4. Perkiraan sewa sebulan (Rp)</label>
         <div class="currency-input-wrap"><span class="currency-prefix">Rp</span>
           <input type="text" id="l3_sewa" class="currency-field" oninput="formatCurrency(this)" placeholder="0"/>
         </div>
@@ -2616,7 +2619,7 @@
       <div class="inline-fields">
         <div class="form-group">
           <label class="field-label">6a. Bahan lantai utama</label>
-          <select id="l3_lantai_bahan">
+          <select id="l3_lantai_bahan" onchange="handleLantaiBahanL()">
             <option value="">-- Pilih --</option>
             <option value="1">1. Marmer/granit</option>
             <option value="2">2. Keramik</option>
@@ -2629,7 +2632,7 @@
             <option value="9">9. Lainnya</option>
           </select>
         </div>
-        <div class="form-group">
+        <div id="l3_lantai_kondisi_wrap" class="form-group">
           <label class="field-label">6b. Kondisi lantai</label>
           <select id="l3_lantai_kondisi">
             <option value="">-- Pilih --</option>
@@ -2643,7 +2646,7 @@
       <div class="inline-fields">
         <div class="form-group">
           <label class="field-label">7a. Bahan dinding utama</label>
-          <select id="l3_dinding_bahan">
+          <select id="l3_dinding_bahan" onchange="handleDindingBahanL()">
             <option value="">-- Pilih --</option>
             <option value="1">1. Tembok</option>
             <option value="2">2. Plesteran anyaman bambu/kawat</option>
@@ -2654,7 +2657,7 @@
             <option value="7">7. Lainnya</option>
           </select>
         </div>
-        <div class="form-group">
+        <div id="l3_dinding_kondisi_wrap" class="form-group">
           <label class="field-label">7b. Kondisi dinding</label>
           <select id="l3_dinding_kondisi">
             <option value="">-- Pilih --</option>
@@ -2668,7 +2671,7 @@
       <div class="inline-fields">
         <div class="form-group">
           <label class="field-label">8a. Bahan atap utama</label>
-          <select id="l3_atap_bahan">
+          <select id="l3_atap_bahan" onchange="handleAtapBahanL()">
             <option value="">-- Pilih --</option>
             <option value="1">1. Beton</option>
             <option value="2">2. Genteng</option>
@@ -2680,7 +2683,7 @@
             <option value="8">8. Lainnya</option>
           </select>
         </div>
-        <div class="form-group">
+        <div id="l3_atap_kondisi_wrap" class="form-group">
           <label class="field-label">8b. Kondisi atap</label>
           <select id="l3_atap_kondisi">
             <option value="">-- Pilih --</option>
@@ -2719,7 +2722,7 @@
           <label class="radio-item"><input type="radio" name="l3_kloset" value="4"/> <span>4. Cemplung/cubluk</span></label>
         </div>
       </div>
-      <div class="form-group">
+      <div class="form-group" id="l3_tinja_wrap">
         <div class="subsection-label">11. Pembuangan akhir tinja</div>
         <div class="radio-group">
           <label class="radio-item"><input type="radio" name="l3_tinja" value="1"/> <span>1. Tangki septik</span></label>

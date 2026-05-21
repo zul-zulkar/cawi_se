@@ -61,7 +61,7 @@ function collectAllProblemsL() {
     if (!keb) e(prefix + ': Keberadaan', 'Belum dipilih', 1, 'l_ang_' + i + '_keberadaan');
     const STOP = (keb === '2' || keb === '6' || keb === '7');
     if (STOP) continue; // STOP-state: skip rest of validations
-    if (!getRadio('l_ang_' + i + '_alamat_dom')) e(prefix + ': Alamat Domisili', 'Belum dipilih', 1, 'l_ang_' + i + '_alamat_dom');
+    if (keb === '1' && !getRadio('l_ang_' + i + '_alamat_dom')) e(prefix + ': Alamat Domisili', 'Belum dipilih (wajib jika tinggal di rumah ini)', 1, 'l_ang_' + i + '_alamat_dom');
     if (keb === '3' && !getVal('l_ang_' + i + '_dn_provinsi')) e(prefix + ': Provinsi Domisili (DN)', 'Harus dipilih jika pindah dalam negeri', 1, 'l_ang_' + i + '_dn_provinsi');
     if (keb === '4' && !getVal('l_ang_' + i + '_ln_negara')) e(prefix + ': Negara Domisili (LN)', 'Harus diisi jika pindah luar negeri', 1, 'l_ang_' + i + '_ln_negara');
     if (!getRadio('l_ang_' + i + '_kawin')) e(prefix + ': Status Perkawinan', 'Belum dipilih', 1, 'l_ang_' + i + '_kawin');
@@ -79,14 +79,18 @@ function collectAllProblemsL() {
     if (hub === '2' && umur > 0 && umur < 15) w(prefix + ': Istri/Suami', `Pasangan berumur ${umur} tahun — verifikasi`, 1, 'l_ang_' + i + '_hubungan');
     // Age-gated (≥5)
     if (umur >= 5) {
-      if (!getRadio('l_ang_' + i + '_sekolah')) e(prefix + ': Partisipasi Sekolah', 'Wajib diisi untuk umur ≥ 5', 1, 'l_ang_' + i + '_sekolah');
-      if (!getVal('l_ang_' + i + '_ijazah')) e(prefix + ': Ijazah Tertinggi', 'Wajib diisi untuk umur ≥ 5', 1, 'l_ang_' + i + '_ijazah');
+      const sekolah = getRadio('l_ang_' + i + '_sekolah');
+      if (!sekolah) e(prefix + ': Partisipasi Sekolah', 'Wajib diisi untuk umur ≥ 5', 1, 'l_ang_' + i + '_sekolah');
+      // Ijazah required unless sekolah='0' (tidak pernah sekolah — field hidden)
+      if (sekolah !== '0' && !getVal('l_ang_' + i + '_ijazah')) e(prefix + ': Ijazah Tertinggi', 'Wajib diisi untuk umur ≥ 5', 1, 'l_ang_' + i + '_ijazah');
       if (!getRadio('l_ang_' + i + '_rekening')) e(prefix + ': Rekening Aktif', 'Wajib diisi untuk umur ≥ 5', 1, 'l_ang_' + i + '_rekening');
     }
     // Age-gated (≥10)
     if (umur >= 10) {
-      if (!getVal('l_ang_' + i + '_profesi')) e(prefix + ': Profesi Utama', 'Wajib diisi untuk umur ≥ 10', 1, 'l_ang_' + i + '_profesi');
-      if (!getVal('l_ang_' + i + '_kedudukan')) e(prefix + ': Kedudukan Pekerjaan', 'Wajib diisi untuk umur ≥ 10', 1, 'l_ang_' + i + '_kedudukan');
+      const profesi = getVal('l_ang_' + i + '_profesi');
+      if (!profesi) e(prefix + ': Profesi Utama', 'Wajib diisi untuk umur ≥ 10', 1, 'l_ang_' + i + '_profesi');
+      // Kedudukan required unless profesi='000' (tidak bekerja — field hidden)
+      if (profesi !== '000' && !getVal('l_ang_' + i + '_kedudukan')) e(prefix + ': Kedudukan Pekerjaan', 'Wajib diisi untuk umur ≥ 10', 1, 'l_ang_' + i + '_kedudukan');
       if (!getRadio('l_ang_' + i + '_18a')) e(prefix + ': Pendapatan Pekerjaan', 'Belum dipilih', 1, 'l_ang_' + i + '_18a');
       if (!getRadio('l_ang_' + i + '_18b')) e(prefix + ': Pendapatan Keuntungan Usaha', 'Belum dipilih', 1, 'l_ang_' + i + '_18b');
       if (!getRadio('l_ang_' + i + '_18c')) e(prefix + ': Penerimaan Transfer/Pasif', 'Belum dipilih', 1, 'l_ang_' + i + '_18c');
@@ -97,6 +101,9 @@ function collectAllProblemsL() {
     const krK = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p'].filter(k => !getRadio('l_ang_' + i + '_kronis_' + k));
     if (krK.length > 0) k(prefix + ': Penyakit Kronis', krK.length + ' kategori belum diisi (boleh dilewat)', 1, 'l_ang_' + i + '_kronis_a');
   }
+  // Validasi: anggota pertama harus Kepala Keluarga
+  if (capped >= 1 && getVal('l_ang_1_hubungan') && getVal('l_ang_1_hubungan') !== '1')
+    e('Anggota #1: Hubungan Keluarga', 'Anggota pertama harus Kepala Keluarga (pilih kode 1)', 1, 'l_ang_1_hubungan');
   // Validasi: jumlah pendataan = jumlah anggota terisi nama
   const jmlPdt = parseInt(getVal('l1_jml_pendataan')) || 0;
   if (jmlAng > 0 && jmlPdt < jmlAng) w('Rincian 2b: Jumlah Pendataan', `Baru ${jmlPdt} dari ${jmlAng} anggota terdata namanya`, 1, 'l1_jml_pendataan');
@@ -228,22 +235,25 @@ function collectAllProblemsL() {
   if (!jb) e('Rincian 1: Jenis Bangunan', 'Belum dipilih', 3, 'l3_jenis_bangunan');
   if ((jb === '3' || jb === '4') && !getVal('l3_lantai_apt')) e('Rincian 1: Lantai Apartemen', 'Harus diisi jika rusun/apartemen', 3, 'l3_lantai_apt');
   if (jb === '5' && !getVal('l3_bangunan_lain')) e('Rincian 1: Jenis Bangunan Lainnya', 'Harus diisi jika memilih Lainnya', 3, 'l3_bangunan_lain');
-  if (getVal('l3_jml_keluarga') === '') e('Rincian 2: Jumlah Keluarga', 'Harus diisi', 3, 'l3_jml_keluarga');
+  if (jb !== '5' && getVal('l3_jml_keluarga') === '') e('Rincian 2: Jumlah Keluarga', 'Harus diisi', 3, 'l3_jml_keluarga');
   const sm = getRadio('l3_status_milik');
   if (!sm) e('Rincian 3: Status Kepemilikan', 'Belum dipilih', 3, 'l3_status_milik');
   if (sm === '1' && !getRadio('l3_bukti')) e('Rincian 3: Bukti Kepemilikan', 'Belum dipilih', 3, 'l3_bukti');
   if (sm === '5' && !getVal('l3_status_lain')) e('Rincian 3: Status Lainnya', 'Harus diisi jika memilih Lainnya', 3, 'l3_status_lain');
   if (getVal('l3_luas_lantai') === '') e('Rincian 5: Luas Lantai', 'Harus diisi', 3, 'l3_luas_lantai');
   if (!getVal('l3_lantai_bahan')) e('Rincian 6a: Bahan Lantai', 'Belum dipilih', 3, 'l3_lantai_bahan');
-  if (!getVal('l3_lantai_kondisi')) e('Rincian 6b: Kondisi Lantai', 'Belum dipilih', 3, 'l3_lantai_kondisi');
+  const lantaiBahan = getVal('l3_lantai_bahan');
+  if (lantaiBahan && !['7','8','9'].includes(lantaiBahan) && !getVal('l3_lantai_kondisi')) e('Rincian 6b: Kondisi Lantai', 'Belum dipilih', 3, 'l3_lantai_kondisi');
   if (!getVal('l3_dinding_bahan')) e('Rincian 7a: Bahan Dinding', 'Belum dipilih', 3, 'l3_dinding_bahan');
-  if (!getVal('l3_dinding_kondisi')) e('Rincian 7b: Kondisi Dinding', 'Belum dipilih', 3, 'l3_dinding_kondisi');
+  const dindingBahan = getVal('l3_dinding_bahan');
+  if (dindingBahan && !['6','7'].includes(dindingBahan) && !getVal('l3_dinding_kondisi')) e('Rincian 7b: Kondisi Dinding', 'Belum dipilih', 3, 'l3_dinding_kondisi');
   if (!getVal('l3_atap_bahan')) e('Rincian 8a: Bahan Atap', 'Belum dipilih', 3, 'l3_atap_bahan');
-  if (!getVal('l3_atap_kondisi')) e('Rincian 8b: Kondisi Atap', 'Belum dipilih', 3, 'l3_atap_kondisi');
+  const atapBahan = getVal('l3_atap_bahan');
+  if (atapBahan && !['5','7','8'].includes(atapBahan) && !getVal('l3_atap_kondisi')) e('Rincian 8b: Kondisi Atap', 'Belum dipilih', 3, 'l3_atap_kondisi');
   const bab = getRadio('l3_bab');
   if (!bab) e('Rincian 9: Fasilitas BAB', 'Belum dipilih', 3, 'l3_bab');
   if (['1','2','3'].includes(bab) && !getRadio('l3_kloset')) e('Rincian 9: Jenis Kloset', 'Belum dipilih', 3, 'l3_kloset');
-  if (!getRadio('l3_tinja')) e('Rincian 10: Tempat Pembuangan Tinja', 'Belum dipilih', 3, 'l3_tinja');
+  if (!['4','5','6'].includes(bab) && !getRadio('l3_tinja')) e('Rincian 11: Tempat Pembuangan Tinja', 'Belum dipilih', 3, 'l3_tinja');
   if (!getVal('l3_air')) e('Rincian 11: Sumber Air Minum', 'Belum dipilih', 3, 'l3_air');
   const lst = getRadio('l3_listrik');
   if (!lst) e('Rincian 12: Sumber Listrik', 'Belum dipilih', 3, 'l3_listrik');

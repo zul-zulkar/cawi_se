@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
   makeSearchable('q2_kabupaten', 'kabupaten/kota');
   makeSearchable('q3_kecamatan', 'kecamatan');
   makeSearchable('q4_kelurahan', 'kelurahan/desa');
+  makeSearchable('q11d_negara', 'negara');
   makeSearchable('q11e_provinsi', 'provinsi kantor pusat');
   makeSearchable('q11f_kabupaten', 'kabupaten/kota kantor pusat');
   // L mode regional dropdowns
@@ -17,6 +18,12 @@ document.addEventListener('DOMContentLoaded', () => {
     makeSearchable('l1_alamat_kab', 'kabupaten/kota keluarga');
     makeSearchable('l1_alamat_kec', 'kecamatan keluarga');
     makeSearchable('l1_alamat_kel', 'kelurahan/desa keluarga');
+    loadProvinsiL();
+    // L mode static selects with > 5 options
+    makeSearchable('l3_lantai_bahan', 'bahan lantai');
+    makeSearchable('l3_dinding_bahan', 'bahan dinding');
+    makeSearchable('l3_atap_bahan', 'bahan atap');
+    makeSearchable('l3_air', 'sumber air minum');
   }
 
   // Auto-select Bali [51] and Buleleng [5108] – fixed domicile
