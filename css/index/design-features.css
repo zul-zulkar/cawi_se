@@ -20,6 +20,26 @@
 }
 
 /* ========================================================
+   DROPDOWN OVERFLOW FIX — lift section-card when its dropdown
+   is open so it doesn't get covered by the next section card.
+   ======================================================== */
+.section-card{ position: relative; }
+.section-card:has(.ss-dropdown.open),
+.section-card:has(.autocomplete-list.open),
+.section-card:has(.ac-drop[style*="block"]){
+  z-index: 250;
+}
+.ss-dropdown.open,
+.autocomplete-list.open,
+.ac-drop{
+  z-index: 999 !important;
+  box-shadow: 0 12px 28px -8px rgba(24,24,27,.18), 0 4px 10px rgba(24,24,27,.08);
+}
+/* Fallback for browsers without :has() — bump baseline z-index of the form-group
+   containing a search wrap when focused so dropdown still overlays */
+.form-group:focus-within{ position: relative; z-index: 5; }
+
+/* ========================================================
    CONDITIONAL VISIBILITY — KBLI Halal/BPOM + L2 kode 6
    ======================================================== */
 .section-card.kbli-hidden{ display: none !important; }

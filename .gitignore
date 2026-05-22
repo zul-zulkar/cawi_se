@@ -14,3 +14,8 @@ backup/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Claude Code — pengaturan lokal, bukan bagian dari aplikasi
+.claude/
+CLAUDE.md
+.claude.json

@@ -3,11 +3,11 @@
   <div class="pw-card">
     <div class="pw-title">CAWI</div>
     <div class="pw-subtitle">SE2026 — BPS Buleleng</div>
-    <div class="pw-restricted">&#128274; AKSES TERBATAS — PETUGAS BPS</div>
+    <div class="pw-restricted"><i class="bi bi-shield-lock-fill"></i> AKSES TERBATAS — PETUGAS BPS</div>
     <input type="password" id="pwInput" class="pw-input" placeholder="Masukkan kata sandi"
       onkeydown="if(event.key==='Enter')checkPassword()"/>
-    <div id="pwError">&#10005; Kata sandi salah</div>
-    <button type="button" class="pw-btn" onclick="checkPassword()">&#128274; Masuk</button>
+    <div id="pwError"><i class="bi bi-exclamation-circle-fill"></i> Kata sandi salah</div>
+    <button type="button" class="pw-btn" onclick="checkPassword()"><i class="bi bi-unlock-fill"></i> Masuk</button>
     <p class="pw-note">Hanya untuk petugas pencacah resmi<br/>Sensus Ekonomi 2026 BPS Buleleng</p>
   </div>
 </div>
@@ -30,7 +30,7 @@
         <div class="mode-btn-desc">Kuesioner SE2026-L. Untuk usaha rumah tangga + pendataan keluarga (DTSEN): perumahan, aset, dan sosial ekonomi tiap anggota keluarga.</div>
       </button>
     </div>
-    <button type="button" id="modeCancelBtn" class="mode-card-cancel" onclick="hideModeGate()" style="display:none">Batal</button>
+    <button type="button" id="modeCancelBtn" class="mode-card-cancel" onclick="hideModeGate()" style="display:none"><i class="bi bi-x-lg"></i> Batal</button>
   </div>
 </div>
 

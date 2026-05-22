@@ -1,6 +1,6 @@
 import { extractFrom } from '../helpers/load-source.js'
 
-const { STATIC_KABUPATEN } = extractFrom('data.js', 'STATIC_KABUPATEN')
+const { STATIC_KABUPATEN } = extractFrom('js/data/regional.js', 'STATIC_KABUPATEN')
 
 const PROV_CODES = [
   '11','12','13','14','15','16','17','18','19','21',

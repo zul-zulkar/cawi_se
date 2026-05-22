@@ -1,11 +1,11 @@
 <!-- MOBILE TOPBAR -->
 <div class="mobile-topbar" id="mobileTopbar">
-  <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleSidebar()">&#9776;</button>
+  <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><i class="bi bi-list"></i></button>
   <div class="mobile-title">CAWI <span>SE2026</span></div>
   <div class="mobile-topbar-actions">
-    <button class="mobile-action-btn" onclick="togglePetunjuk()">? Petunjuk</button>
-    <button class="mobile-action-btn" onclick="showRecap()">&#128269; Rekap</button>
-    <button class="mobile-action-btn mobile-action-btn-submit" onclick="showRecap()">&#128228; Submit</button>
+    <button class="mobile-action-btn" onclick="togglePetunjuk()" title="Petunjuk"><i class="bi bi-info-circle"></i><span class="mobile-btn-text"> Petunjuk</span></button>
+    <button class="mobile-action-btn" onclick="showRecap()" title="Rekap"><i class="bi bi-search"></i><span class="mobile-btn-text"> Rekap</span></button>
+    <button class="mobile-action-btn mobile-action-btn-submit" onclick="showRecap()" title="Submit"><i class="bi bi-send-fill"></i><span class="mobile-btn-text"> Submit</span></button>
   </div>
 </div>
 

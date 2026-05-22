@@ -6,22 +6,38 @@ Aplikasi web formulir pendataan **Sensus Ekonomi 2026** berbasis CAWI (Computer 
 
 ## Versi
 
-**v2.0 — Dual Mode Kuesioner (L.UB + L Rumah Tangga)**
+**v2.1 — Design System Refresh + UX Polish**
 
-Fitur utama:
+Fitur utama (kumulatif sejak v1.0):
+
+### Inti pendataan
 - **Pre-selector modal** saat login — pilih jenis pendataan: **Usaha/Perusahaan Besar (L.UB)** atau **Rumah Tangga (L)**
 - **Kuesioner SE2026-L** lengkap dalam 5 Blok: Keluarga & Anggota, Usaha, Perumahan & Aset, Catatan, Petugas/Responden
 - **Kuesioner SE2026 L.UB** lengkap dengan dukungan L.KP (kantor cabang dinamis hingga 50 unit)
 - **Anggota keluarga dinamis** (max 30) dengan **STOP-state** (Meninggal/Pisah KK/Tidak Ditemukan) dan **age-gated fields** (≥5 untuk sekolah/ijazah/rekening/disabilitas, ≥10 untuk profesi/pendapatan)
-- **187 kode profesi** SE2026-L (`data-profesi.js`)
+- **187 kode profesi** SE2026-L (`js/data/profesi.js`)
 - **Dual sheet routing** otomatis: `SE2026_Responses` + `SE2026_LKP` untuk L.UB; `SE2026_L_Responses` + `SE2026_L_Anggota` untuk L
-- **Tombol Ganti Jenis** di sidebar untuk switch mode (dengan konfirmasi)
-- **Halaman Daftar** dengan badge berwarna (orange `L.UB` / biru `L`) dan filter "Jenis Pendataan"
-- **Draft auto-save** + restore lengkap dengan `_formMode`, tanda tangan terpisah per mode
 - **Mata uang** format Indonesia 2 desimal: `1.234.567,89`
 - **KBLI 2025** scored search (1520 entri) — bobot kode/judul/uraian
+- **KBLI conditional** — Field Halal (L.UB Q15, L Q19) & BPOM (L.UB Q16, L Q20) otomatis muncul/tersembunyi berdasarkan `master/KBLI Halal.csv` (386 kode) & `master/KBLI BPOM.csv` (94 kode)
+- **L Q14a = 6 (Unit Pembantu/Penunjang)** → pendataan otomatis selesai: hanya kantor pusat info + langsung ke BLOK V untuk submit
+
+### UX & desain
+- **Bootstrap Icons** (v1.11) untuk semua icon — konsisten lintas halaman
+- **Topbar desktop sticky** dengan Submit + Rekap & Periksa di tiap halaman
+- **Mobile topbar** dengan hamburger + Petunjuk + Rekap + Submit
+- **Sidebar Ganti Kuesioner** tombol prominent + auto-refresh ke BLOK I mode baru
+- **25 tombol Petunjuk** terstruktur (Termasuk/Tidak Termasuk/Catatan) di field-field penting L.UB & L Blok II
+- **Smooth animations** untuk expand/collapse, blok transitions, modal in/out
+- **Loading spinner** di gate password + submit overlay (cycle saat hash dimuat)
+- **Atur Tampilan** modal dengan font size, kerapatan, tipografi, palet warna (5 pilihan), kontras tinggi, auto-save interval
+- **Scroll offset** otomatis di bawah topbar agar pertanyaan yang diklik dari sidebar tidak tertutup
+
+### Infrastruktur
+- **Halaman Daftar** dengan badge berwarna (orange `L.UB` / biru `L`) dan filter "Jenis Pendataan"
+- **Draft auto-save** + restore lengkap dengan `_formMode`, tanda tangan terpisah per mode
 - **GPS geolokasi** dengan map preview, password gate dengan SHA-256 hash, panel admin terpisah
-- **488 unit test** menjamin kebenaran logika progres, validasi, dispatch mode, dan filter daftar
+- **535 unit test** (47 baru: KBLI filters, settings, loading helpers)
 
 ---
 
@@ -45,84 +61,115 @@ Aplikasi siap dipakai tanpa konfigurasi tambahan — sudah terhubung ke deployme
 
 ```
 cawi_se/
-├── index.html              # Formulir isian utama (L.UB + L mode-switch)
+├── index.html              # Formulir isian utama (L.UB + L mode-switch, AUTO-GENERATED)
 ├── daftar.html             # Dashboard rekap entri data (badge L.UB/L + filter mode)
 ├── admin.html              # Panel admin (password, sheet URL, pegawai)
-├── data.js                 # Data statis kecamatan & kelurahan Bali
-├── data-profesi.js         # 187 kode profesi SE2026-L (untuk L mode r16)
-├── google-apps-script.js   # Backend Apps Script (dual-sheet routing)
+├── README.md               # Dokumentasi (file ini)
+├── package.json            # Scripts: build:html, test, coverage
 ├── netlify.toml            # Konfigurasi deployment Netlify
+├── vitest.config.js        # Konfigurasi unit-test runner
+│
+├── server/
+│   └── google-apps-script.js   # Backend Apps Script (dual-sheet routing) — copy ke script.google.com
 │
 ├── master/
-│   ├── kbli.json           # Kamus KBLI 2025 (1520 entri)
-│   └── kuesioner/          # PDF + extracted text SE2026-L sumber
+│   ├── kbli.json               # Kamus KBLI 2025 (1520 entri)
+│   ├── KBLI Halal.csv          # 386 kode KBLI eligible Sertifikasi Halal (Q15/Q19 trigger)
+│   ├── KBLI BPOM.csv           # 94 kode KBLI eligible Izin Edar BPOM (Q16/Q20 trigger)
+│   └── kuesioner/              # PDF + extracted text SE2026-L/L.UB/L.KP sumber
 │
 ├── src/
-│   └── index/               # Partial HTML — gabungkan via `npm run build:html`
-│       ├── 01-head.html              # <head> + Leaflet/font + 5 CSS link
-│       ├── 02-gates.html             # Password gate + Mode pre-selector
-│       ├── 03-shell-open.html        # Mobile topbar + sidebar overlay + app-layout open
-│       ├── 04-sidebar.html           # Sidebar (L.UB + L navigation)
-│       ├── 05-main-open.html         # Main + header-kop + blok-nav + form-container
-│       ├── 06-form-lub.html          # Form L.UB lengkap (3 Blok)
-│       ├── 07-form-l-blok1.html      # L Blok I — Keluarga & Anggota
-│       ├── 08-form-l-blok2.html      # L Blok II — Usaha
-│       ├── 09-form-l-blok3.html      # L Blok III — Perumahan & Aset
-│       ├── 10-form-l-blok4.html      # L Blok IV — Catatan
-│       ├── 11-form-l-blok5.html      # L Blok V — Petugas & Responden
-│       ├── 12-shell-close.html       # Close form-container + footer
-│       ├── 13-modals.html            # Petunjuk + Recap + Leave-guard modals
-│       ├── 14-scripts.html           # <script> tags (urutan loading)
-│       └── 15-end.html               # </body></html>
+│   └── index/                  # Partial HTML — gabungkan via `npm run build:html`
+│       ├── 01-head.html        # <head> + Leaflet/Bootstrap Icons/font + CSS link
+│       ├── 02-gates.html       # Password gate + Mode pre-selector
+│       ├── 03-shell-open.html  # Mobile topbar + sidebar overlay
+│       ├── 04-sidebar.html     # Sidebar (L.UB + L navigation + Ganti Kuesioner + Actions)
+│       ├── 05-main-open.html   # Desktop topbar + header-kop + blok-nav
+│       ├── 06-form-lub.html    # Form L.UB lengkap (3 Blok, dengan Petunjuk Q5e/13/14/19/20/22/23)
+│       ├── 07-11 form-l-blok*.html  # L Blok I–V (Petunjuk di Blok II Q8/9/13/17/18/23/24/26/27/30/31)
+│       ├── 12-shell-close.html # Close form-container + footer
+│       ├── 13-modals.html      # Petunjuk + Recap + Leave-guard + Settings (Atur Tampilan) + Submit Loading
+│       ├── 14-scripts.html     # <script> tags (urutan loading)
+│       └── 15-end.html         # </body></html>
 │
 ├── tools/
-│   └── build-html.js        # Concat src/index/*.html → index.html (no deps)
+│   └── build-html.js           # Concat src/index/*.html → index.html (no deps)
 │
 ├── css/
-│   ├── index/                # Pecahan CSS formulir utama
-│   │   ├── base.css                  # Reset, utility (.hidden, .alert, .spinner)
-│   │   ├── layout.css                # Header-kop, sidebar, blok-nav, footer, mobile-topbar, banners
-│   │   ├── components.css            # Form fields, autocomplete, KBLI, signature, lokasi, buttons, cards, remark
-│   │   ├── modals.css                # Overlay, petunjuk, recap, leave-guard, pw-gate, mode-gate
-│   │   └── form-l.css                # L mode: anggota card, mode-aware containers, mode badge
-│   ├── daftar.css           # Styling dashboard (termasuk badge L.UB/L)
-│   └── admin.css            # Styling panel admin
+│   ├── core/                   # Token + primitive lintas halaman
+│   │   ├── design-tokens.css   # CSS variables (palet, ink, rule, shadow, type, radii) + animasi global
+│   │   └── design-system.css   # Primitif: .pill, .badge, .ds-btn, .ds-card, modal, toast
+│   ├── index/                  # CSS spesifik halaman kuesioner
+│   │   ├── base.css            # Reset, utility (.hidden, .alert, .spinner)
+│   │   ├── layout.css          # Header-kop, sidebar, blok-nav, footer, mobile-topbar
+│   │   ├── components.css      # Form fields, autocomplete, KBLI, signature, lokasi
+│   │   ├── modals.css          # Petunjuk, recap, leave-guard, pw-gate, mode-gate
+│   │   ├── form-l.css          # L mode: anggota card, mode-aware containers
+│   │   ├── design-overrides.css # Override legacy class dengan design tokens
+│   │   └── design-features.css # Topbar, settings modal, loading overlay, smooth UX, scroll offset
+│   ├── daftar/
+│   │   ├── index.css           # Base styling dashboard
+│   │   └── design.css          # Design overrides (tabel, filter, modal view/confirm)
+│   └── admin/
+│       ├── index.css           # Base styling panel admin
+│       └── design.css          # Design overrides (gate, kartu, status row, button family)
 │
 └── js/
-    ├── config.js            # DEFAULT_SCRIPT_URL Apps Script
+    ├── config.js               # DEFAULT_SCRIPT_URL Apps Script
     │
-    ├── auth/                # Gate password
-    │   ├── auth.js          # Kuesioner password
-    │   ├── auth-daftar.js   # Daftar password
-    │   └── auth-admin.js    # Admin password
+    ├── data/                   # Master data lokal
+    │   ├── regional.js         # STATIC_KABUPATEN, STATIC_KECAMATAN, STATIC_KELURAHAN Bali
+    │   └── profesi.js          # 187 kode profesi SE2026-L
     │
-    ├── form-lub/            # L.UB (Usaha Besar) — fitur lama
-    │   ├── form.js                  # Handler radio, kalkulasi, validasi L.UB
-    │   ├── form-progress.js         # calcProgress dispatcher (L.UB default)
-    │   └── form-validation.js       # collectAllProblems dispatcher (L.UB default)
+    ├── auth/                   # Gate password (loading spinner cycle)
+    │   ├── auth.js             # Kuesioner password + wobble on error
+    │   ├── auth-daftar.js      # Daftar password
+    │   └── auth-admin.js       # Admin password
     │
-    ├── form-l/              # L (Rumah Tangga) — fitur SE2026-L
-    │   ├── form-l.js                # ⭐ Anggota dinamis, STOP-state, age-gated, loadEditModeL
-    │   ├── form-l-progress.js       # ⭐ calcProgressL
-    │   └── form-l-validation.js     # ⭐ collectAllProblemsL
+    ├── form-lub/               # L.UB (Usaha Besar)
+    │   ├── form.js             # Handler radio, kalkulasi, validasi L.UB
+    │   ├── form-progress.js    # calcProgress dispatcher (L.UB default)
+    │   └── form-validation.js  # collectAllProblems dispatcher (L.UB default)
     │
-    ├── pages/               # Bootstrap per halaman
-    │   ├── index-init.js            # DOMContentLoaded — wire mode gate, anggota init
-    │   ├── daftar-main.js           # Dashboard + filter + badge + view L/L.UB
-    │   └── admin-main.js            # Panel admin
+    ├── form-l/                 # L (Rumah Tangga)
+    │   ├── form-l.js           # Anggota dinamis, STOP-state, age-gated, L Q14a=6 end-of-survey
+    │   ├── form-l-progress.js  # calcProgressL
+    │   └── form-l-validation.js # collectAllProblemsL
     │
-    └── shared/              # Util & komponen lintas halaman
-        ├── utils.js                 # SHA-256, esc(), fmtDate()
-        ├── form-mode.js             # ⭐ Mode L.UB/L (storage, switch, gate modal)
-        ├── ui.js                    # makeSearchable(), goBlok() (mode-aware)
-        ├── map.js                   # Geolokasi
-        ├── regional.js              # loadProvinsi/Kecamatan/Kelurahan
-        ├── kbli.js                  # Pencarian KBLI 2025 (scored)
-        ├── petugas.js               # Data & dropdown pegawai
-        ├── draft.js                 # Auto-save & restore (_formMode + TTD L)
-        ├── submit.js                # collectData/collectDataL, mode-aware submit & edit
-        └── backup.js                # Helper export/import lokal
+    ├── pages/                  # Bootstrap per halaman
+    │   ├── index-init.js       # DOMContentLoaded — wire mode gate, anggota init
+    │   ├── daftar-main.js      # Dashboard + filter + badge + view L/L.UB
+    │   └── admin-main.js       # Panel admin
+    │
+    └── shared/                 # Util & komponen lintas halaman
+        ├── utils.js            # SHA-256, esc(), fmtDate()
+        ├── form-mode.js        # Mode L.UB/L (storage, switch, auto-refresh to BLOK I)
+        ├── ui.js               # makeSearchable(), goBlok() (mode-aware), updateDeskTopbar()
+        ├── map.js              # Geolokasi
+        ├── regional.js         # loadProvinsi/Kecamatan/Kelurahan
+        ├── kbli.js             # Pencarian KBLI 2025 (scored)
+        ├── kbli-filters.js     # Halal/BPOM conditional show/hide based on KBLI selection
+        ├── petugas.js          # Data & dropdown pegawai
+        ├── draft.js            # Auto-save & restore (_formMode + TTD L)
+        ├── submit.js           # collectData/collectDataL, mode-aware submit & edit
+        ├── settings.js         # Atur Tampilan: fontSize/density/font/palette/contrast/hints/autosave
+        ├── loading.js          # showLoadingOverlay(), setButtonLoading(), showToast()
+        └── backup.js           # Helper export/import lokal
 ```
+
+### Filosofi struktur
+
+**Root minim** — hanya 3 HTML entry-point + config (package, netlify, vitest) + README. Semua data, kode, dan style ada di subfolder fungsional.
+
+**CSS dipisah `core/` vs per-halaman** — `core/design-tokens.css` + `core/design-system.css` di-load di semua 3 halaman. Per-halaman folder berisi base style + design overrides yang men-cascade di atas tokens.
+
+**JS modular per fungsi**:
+- `data/` — static lookup tables
+- `auth/`, `pages/`, `forms/` — masing-masing punya entry point sendiri
+- `shared/` — utility yang dipakai 2+ halaman
+- `config.js` di root `js/` untuk runtime URL config
+
+**`server/`** — file Apps Script (`google-apps-script.js`) yang di-copy-paste ke script.google.com saat deployment. Bukan client-side code.
 
 ### Build pipeline
 
@@ -140,7 +187,7 @@ Banner peringatan auto-generated dimasukkan otomatis di puncak file output.
 
 ## Menjalankan Test Suite
 
-Proyek ini dilengkapi 488 unit test dengan [Vitest](https://vitest.dev/).
+Proyek ini dilengkapi **535 unit test** dengan [Vitest](https://vitest.dev/).
 
 ### Prasyarat
 Node.js v18+. Cek dengan `node --version`. Instal dari [nodejs.org](https://nodejs.org) atau `winget install OpenJS.NodeJS.LTS`.
@@ -156,9 +203,9 @@ npm run coverage        # HTML report di tests/coverage/
 
 Output saat semua lolos:
 ```
- Test Files  12 passed (12)
-      Tests  488 passed (488)
-   Duration  ~1.4s
+ Test Files  15 passed (15)
+      Tests  535 passed (535)
+   Duration  ~1s
 ```
 
 ### Cakupan Test
@@ -167,11 +214,14 @@ tests/unit/
 ├── utils.test.js            # esc(), fmtDate(), sha256()
 ├── validators.test.js       # isValidHP(), isValidEmail(), parseCurrency()
 ├── kbli.test.js             # getKategoriFromKode(), scoreKBLI(), dll.
-├── kabupaten.test.js        # STATIC_KABUPATEN integrity
+├── kbli-filters.test.js     # ⭐ NEW — Halal/BPOM CSV load + apply() show/hide (16 test)
+├── kabupaten.test.js        # STATIC_KABUPATEN integrity (Bali, dll.)
 ├── draft.test.js            # getDraftList(), deleteDraftById()
 ├── form-progress.test.js    # calcProgress L.UB (~75 test)
 ├── form-validation.test.js  # collectAllProblems L.UB (~130 test)
 ├── form-mode.test.js        # getFormMode/setFormMode/applyFormMode (15 test)
+├── settings.test.js         # ⭐ NEW — defaults, restore, palette tinting (17 test)
+├── loading.test.js          # ⭐ NEW — setButtonLoading, showLoadingOverlay, showToast (14 test)
 ├── anggota-card.test.js     # STOP-state, age-gated, template (33 test)
 ├── form-l-progress.test.js  # calcProgressL (32 test)
 ├── form-l-validation.test.js# collectAllProblemsL (47 test)
@@ -179,6 +229,15 @@ tests/unit/
 ```
 
 Fungsi-fungsi browser script dimuat ke konteks test via `new Function()` + mock DOM minimal — **tidak ada perubahan pada source file** dan tidak ada runtime browser yang dibutuhkan.
+
+### Lapisan test (deep)
+
+1. **Pure utilities** (`utils`, `validators`) — input/output deterministik
+2. **Lookup tables** (`kabupaten`, `kbli`) — integritas data dan helper scoring
+3. **State machines** (`form-mode`, `draft`) — transitions + side effects via mocked DOM
+4. **Form logic** (`form-progress`, `form-validation`, `form-l-*`, `anggota-card`) — branching ratusan kasus
+5. **Layout dependencies** (`daftar-render`) — render filter + badge logic
+6. **UX modules** (`settings`, `loading`, `kbli-filters`) — preferensi user, loading state, conditional fields
 
 ---
 
@@ -205,7 +264,7 @@ Sheet kosong tidak masalah — Apps Script akan auto-create tab `SE2026_Response
 
 ### 3. Setup Google Apps Script
 1. Buka [script.google.com](https://script.google.com) → **New Project**
-2. Hapus isi `Code.gs`, paste seluruh isi [`google-apps-script.js`](google-apps-script.js)
+2. Hapus isi `Code.gs`, paste seluruh isi [`server/google-apps-script.js`](server/google-apps-script.js)
 3. Ganti `SHEET_ID` di baris 15:
    ```javascript
    const SHEET_ID = "ID_SHEET_ANDA_DI_SINI";
@@ -232,8 +291,10 @@ Buka [`js/config.js`](js/config.js) dan ganti:
 const DEFAULT_SCRIPT_URL = "https://script.google.com/macros/s/<<URL_BARU>>/exec";
 ```
 
-### 5. Sesuaikan Data Wilayah & Pegawai
-- **Data wilayah** (kecamatan, kelurahan, kabupaten) di [`data.js`](data.js) — edit sesuai wilayah BPS Anda
+### 5. Sesuaikan Data Wilayah, Profesi & Pegawai
+- **Data wilayah** (kecamatan, kelurahan, kabupaten) di [`js/data/regional.js`](js/data/regional.js) — edit sesuai wilayah BPS Anda
+- **Daftar profesi** di [`js/data/profesi.js`](js/data/profesi.js)
+- **KBLI conditional list** di [`master/KBLI Halal.csv`](master/KBLI%20Halal.csv) dan [`master/KBLI BPOM.csv`](master/KBLI%20BPOM.csv) — edit sesuai aturan terbaru
 - **Daftar pegawai** lewat admin panel → kartu **Daftar Pegawai** → tambah/edit/hapus
 
 ### 6. Deploy ke Hosting
@@ -262,107 +323,95 @@ Panduan untuk menguji sendiri fitur dual-mode dari nol sampai data masuk ke spre
 ### TEST 1 — Bootstrap & Mode Gate
 
 1. **Buka `index.html`** di browser (lokal atau hosted)
-2. Login dengan password `Kuesioner08!`
+2. Login dengan password `Kuesioner08!` — ✅ tombol Masuk menampilkan spinner cycle saat hash dimuat
 3. ✅ **Cek**: Modal **"Pilih Jenis Pendataan"** muncul dengan 2 tombol (L.UB / L)
 4. Buka DevTools Console → ketik `localStorage.getItem('cawi_form_mode')` → harus `null`
 5. Pilih **L.UB (Usaha/Perusahaan Besar)** → modal hilang
 6. Cek lagi `localStorage.getItem('cawi_form_mode')` → harus `"lub"`
-7. Header tab harus tampil "BLOK I / II / III" (L.UB)
+7. ✅ Topbar desktop menampilkan judul + tombol Submit/Rekap
 
-### TEST 2 — L.UB Submit (Regression — pastikan tidak rusak)
+### TEST 2 — L.UB Submit (Regression)
 
 1. Lanjut dari TEST 1 (mode L.UB)
-2. Isi minimal field wajib:
-   - Lokasi: provinsi/kab Bali sudah default → pilih kecamatan & kelurahan
-   - Q5a Nama Perusahaan, Q5b Komersial, alamat, kodepos 5-digit, HP
-   - Q5d Kawasan (pilih), Q6a NIB, Q7a Badan Usaha, Q7d Laporan
-   - Q8 Pengusaha (nama, JK, umur 17-120, NIK 16 digit)
-   - Q9 Kegiatan + KBLI (cari "Warung" pilih 1)
-   - Q10a Jaringan, Q12 Internet, Q13-Q19 isi radio
-   - Q20 pekerja, Q21 tahun, Q22-Q25 nominal (Q25 sum = 100%)
-   - Blok II Lokasi GPS, Blok III Petugas, Responden, Tanggal, **Tanda tangan**
-3. Klik **Rekap** → tab Error harus kosong
-4. Klik **KIRIM**
-5. ✅ **Cek di spreadsheet**: row baru di sheet `SE2026_Responses`
-6. ✅ **Cek di `daftar.html`**: badge orange `L.UB`, nama perusahaan terisi
+2. Isi minimal field wajib (lihat petunjuk per field — klik tombol 💡 **Petunjuk** untuk struktur Termasuk/Tidak Termasuk)
+3. Pilih KBLI yang **ada di Halal.csv** (mis. `10120` Daging) → ✅ Q15 (Halal) & Q16 (BPOM) tetap terlihat
+4. Pilih KBLI yang **tidak ada di kedua list** (mis. `99999` jika diset) → ✅ Q15 & Q16 tersembunyi otomatis
+5. Klik **Rekap & Periksa** di topbar → tab Error harus kosong
+6. Klik **Submit** → overlay loading dengan spinner muncul
+7. ✅ **Cek di spreadsheet**: row baru di sheet `SE2026_Responses`
+8. ✅ **Cek di `daftar.html`**: badge orange `L.UB`, nama perusahaan terisi
 
-### TEST 3 — Ganti Mode ke L (Rumah Tangga)
+### TEST 3 — Ganti Mode (auto-refresh)
 
-1. Buka `index.html` (sesi baru — bisa logout/login ulang atau hapus `localStorage.cawi_form_mode`)
-2. ✅ Modal mode gate muncul lagi → pilih **L (Rumah Tangga)**
-3. ✅ Sidebar berubah: tampil "BLOK I (Keluarga & Anggota) / II (Usaha) / III (Perumahan) / IV (Catatan) / V (Petugas)"
-4. Badge sidebar atas harus biru bertulisan **"L"**
+1. Klik **Ganti Kuesioner** di sidebar (kartu oranye)
+2. ✅ Modal "Pilih Jenis Pendataan" muncul; pilih **L (Rumah Tangga)**
+3. ✅ Tanpa perlu klik sidebar — kuesioner **langsung berpindah** ke BLOK I mode L
+4. ✅ Toast hijau: "Kuesioner diganti ke L (Rumah Tangga)"
+5. ✅ Sidebar berubah: tampil "BLOK I (Keluarga) / II (Usaha) / III (Perumahan) / IV (Catatan) / V (Petugas)"
+6. ✅ Badge sidebar atas: biru "L"
 
-### TEST 4 — L Mode: Anggota Dinamis
+### TEST 4 — L Mode: Q14a kode 6 (Pendataan Selesai)
 
-1. Di Blok I, isi `Jumlah Anggota Keluarga = 3`
-2. ✅ 3 anggota card otomatis ter-generate (tiap card collapsible "A. Identitas" + "B. Sosial Ekonomi")
-3. Di sidebar Blok I, scroll → harus muncul daftar "↳ Anggota #1, #2, #3" — klik salah satu untuk auto-scroll
+1. Di Blok II, isi Q14a Jaringan = **6. Unit Pembantu/Penunjang**
+2. ✅ Notice amber muncul: "PENDATAAN SELESAI" + tombol "Lanjut ke BLOK V"
+3. ✅ Section Q16–Q33 di Blok II otomatis tersembunyi
+4. ✅ Sidebar BLOK III & IV di-dim (tidak bisa diklik)
+5. Klik tombol **Lanjut ke BLOK V** → langsung pindah ke tanda tangan & submit
 
-### TEST 5 — L Mode: STOP State
+### TEST 5 — L Mode: Anggota Dinamis + STOP State + Age-gated
 
-1. Pada Anggota #2, pilih **r9a Keberadaan = 2 (Meninggal)**
-2. ✅ Cek visual:
-   - Card #2 muncul badge merah **"STOP — Meninggal"**
-   - Sub-section setelah r9a (alamat domisili, sosek, disabilitas) **hilang**
-3. Ulang dengan nilai 6 (Pisah KK) dan 7 (Tidak Ditemukan) — badge text harus update sesuai
+1. Di Blok I, isi `Jumlah Anggota Keluarga = 3` → ✅ 3 anggota card ter-generate
+2. Klik link anggota di sidebar → ✅ scroll dengan offset di bawah topbar (tidak tertutup)
+3. Pada Anggota #2, pilih `r9a Keberadaan = 2 (Meninggal)`
+4. ✅ Card #2 badge merah "STOP — Meninggal"; sub-section sosek hilang
+5. Atur tanggal lahir Anggota #1 → ✅ r14/r15/r19/r20-21 muncul saat umur ≥5, r16/r17 muncul saat umur ≥10
 
-### TEST 6 — L Mode: Age-gated Fields
+### TEST 6 — Petunjuk Toggle
 
-Anggota #1, set **tgl lahir berbeda** dan amati:
+1. Pada Q9 form-l Blok II (Jenis Usaha) → klik tombol **💡 Petunjuk**
+2. ✅ Box expand smooth dengan struktur:
+   - **Termasuk** (hijau, checkmark) — 6 klasifikasi jenis usaha
+   - **Catatan** (background cream) — aturan kode 1-2 vs 3-6
+3. Klik lagi → ✅ tombol berubah jadi ✕ "Tutup Petunjuk" (hitam), box collapse smooth
 
-| Tanggal Lahir | Umur Auto | r14 (sekolah) | r15 (ijazah) | r16 (profesi) | r19 (rekening) | r20–21 (disab/kronis) |
-|---|---|---|---|---|---|---|
-| 2024-01-01 | 1 | tersembunyi | tersembunyi | tersembunyi | tersembunyi | tersembunyi |
-| 2020-01-01 | 5 | **muncul** | **muncul** | tersembunyi | **muncul** | **muncul** |
-| 2010-01-01 | 15 | muncul | muncul | **muncul** | muncul | muncul |
+### TEST 7 — Atur Tampilan (Settings)
 
-✅ Field umur autofill, ✅ visibilitas wraps sesuai threshold (≥5 dan ≥10)
+1. Klik **Atur Tampilan** di sidebar
+2. ✅ Modal muncul dengan 7 row + tombol Reset/Selesai
+3. Ubah Palet warna ke **Navy** → ✅ semua aksen oranye berubah biru navy live
+4. Toggle **Tampilkan keterangan field** off → ✅ hint italic oranye sembunyi
+5. Ubah Ukuran teks ke **Besar** → ✅ font scale up
+6. Tutup modal → reload halaman → ✅ pengaturan persistent
+7. Klik **Reset** → ✅ confirm → kembali ke default
 
-### TEST 7 — L Mode: Pindah Domisili
+### TEST 8 — Mobile Topbar
 
-1. Anggota #3, pilih **r9a Keberadaan = 3 (Pindah Dalam Negeri)**
-2. ✅ Field `Provinsi Domisili (DN)` + `Kab/Kota` muncul; field `Negara LN` **tetap hidden**
-3. Ganti ke nilai 4 (Pindah LN) → DN hidden, **Negara LN muncul**
+1. Resize browser ke <880px atau buka di HP
+2. ✅ Sidebar tersembunyi, hamburger menu muncul
+3. ✅ Topbar mobile menampilkan: hamburger + CAWI SE2026 + ❓Petunjuk + 🔍Rekap + 📤**Submit** (pojok kanan; bukan tombol Keluar)
+4. Klik hamburger → ✅ sidebar slide in
 
-### TEST 8 — L Mode: Submit Lengkap
+### TEST 9 — KBLI Conditional (Halal/BPOM)
 
-1. Isi minimal:
-   - **Blok I**: Nama KK, NIK KK 16-digit, No KK 16-digit, alamat lengkap, kodepos 5-digit, 1 anggota lengkap (dewasa umur ≥10) — termasuk profesi, kedudukan, 18a/b/c
-   - **Blok II**: Nama Usaha, alamat, jenis usaha radio, NIB radio (boleh "tidak ada" + alasan), badan usaha, pengusaha lengkap, kegiatan utama, KBLI, pekerja L/P, tahun operasi (mis. 2020 → tahunan section muncul), isi y26-y29 (modal y29 sum = 100%)
-   - **Blok III**: jenis bangunan, status milik, semua bahan/kondisi/BAB/listrik/air, makanan/non-makanan, **10 aset bergerak & tidak bergerak (boleh 0)**
-   - **Blok IV**: catatan (opsional)
-   - **Blok V**: petugas nama, responden lengkap, tanggal, **tanda tangan**
-2. Klik **Rekap** → tab Error harus kosong (warning OK)
-3. Klik **KIRIM**
-4. ✅ **Cek spreadsheet**:
-   - Sheet `SE2026_L_Responses` baru terbuat (header biru) → row baru
-   - Sheet `SE2026_L_Anggota` baru terbuat → 1 row per anggota non-STOP
-5. ✅ **Cek `daftar.html`**: entri baru dengan **badge biru "L"**, nama KK terisi
-6. ✅ **Cek folder Drive**: `CAWI_SE2026_L_TTD` → file `TTD_L_<nama>_<ts>.png` tersimpan
+1. Di L Blok II, pilih KBLI `10120` (Pengolahan Daging — di Halal + BPOM)
+2. ✅ Section L Q19 (Halal) dan L Q20 (BPOM) tetap terlihat
+3. Ganti KBLI ke `41011` (Konstruksi — tidak di kedua list)
+4. ✅ Section L Q19 dan L Q20 otomatis tersembunyi
+5. Ganti KBLI ke kode yang hanya di Halal.csv (mis. `01111` Pertanian Jagung)
+6. ✅ Hanya L Q19 (Halal) terlihat; L Q20 (BPOM) tersembunyi
 
-### TEST 9 — Daftar: Filter & View
+### TEST 10 — Submit & Daftar
 
-1. Buka `daftar.html` → login `Daftar08!`
-2. ✅ Tampil 2 entri (L.UB dari TEST 2 + L dari TEST 8) dengan kolom **"Jenis"** berisi badge
-3. Filter **Jenis Pendataan = L** → hanya record L tersisa
-4. Filter **= L.UB** → hanya record L.UB tersisa
-5. Search "Budi" (nama KK L) → ✅ record L tampil
-6. Klik 👁️ **View** pada record L → section "Anggota Keluarga (1)" + "Perumahan & Aset" tampil
+1. Submit dari Blok V → ✅ overlay loading muncul dengan spinner cycle
+2. Buka `daftar.html` → ✅ entri tampil dengan badge biru "L"
+3. Filter Jenis Pendataan = L → ✅ hanya record L
+4. Hapus record → ✅ row + anggota cascade-delete di spreadsheet
 
-### TEST 10 — Draft Save & Restore
+### TEST 11 — Sidebar Dropdown Overlay
 
-1. Buka `index.html` mode L → isi sebagian (nama KK, 2 anggota)
-2. Klik **Simpan Draft**
-3. ✅ Toast hijau "Draft tersimpan" muncul, ✅ entri di daftar dengan badge L
-4. Refresh `index.html` (atau logout/login) → buka daftar → klik ▶️ **Lanjutkan** pada draft
-5. ✅ Kembali ke index dengan mode L ter-restore, anggota card ter-render dari draft
-
-### TEST 11 — Hapus Record
-
-1. Di `daftar.html`, hapus record L (klik 🗑️ pada baris badge L)
-2. ✅ Record hilang dari daftar
-3. ✅ **Cek spreadsheet**: row hilang dari `SE2026_L_Responses`, anggota-anggotanya hilang dari `SE2026_L_Anggota` (cascade delete)
+1. Di Blok I, klik dropdown **Kecamatan** (searchable select)
+2. ✅ Dropdown muncul **di atas** section card berikutnya (tidak tertutup)
+3. Pilih satu kecamatan → ✅ dropdown menutup, value terisi
 
 ### TEST 12 — Apps Script Logs (Troubleshooting)
 
@@ -411,6 +460,7 @@ Password aktif diambil dari sheet `CAWI_Config`. Jika belum dikonfigurasi (sheet
   - `cawi_edit_mode` → record yang sedang di-edit (dari halaman daftar)
   - `cawi_draft_continue_id` → ID draft yang sedang dilanjutkan
   - `cawi_script_url_override` → URL Apps Script kustom (per device)
+  - `cawi_settings_v1` → preferensi Atur Tampilan (font, density, palette, autosave)
 
 ---
 
@@ -426,7 +476,24 @@ Formulir pakai kamus KBLI 2025 (`master/kbli.json`, 1520 entri) dengan algoritma
 | Judul prefix/contains | 45–60 |
 | Uraian contains/word overlap | 12–20 |
 
-Hasil top-15 ditampilkan dengan uraian + kategori.
+Hasil top-15 ditampilkan dengan uraian + kategori. Setelah pemilihan, `js/shared/kbli-filters.js` otomatis menentukan apakah field Halal & BPOM perlu ditampilkan berdasarkan CSV master.
+
+---
+
+## Design System
+
+### Token (`css/core/design-tokens.css`)
+Semua warna, shadow, radius, dan tipografi terdefinisi sebagai CSS variable. Mengganti palette di Atur Tampilan memperbarui token live tanpa reload — semua komponen (tombol, kartu, banner, badge) ikut menyesuaikan.
+
+### Primitif (`css/core/design-system.css`)
+- `.pill`, `.badge`, `.ds-btn`, `.ds-card`, `.toast`, `.modal-backdrop`
+- Variant: `.primary`, `.danger`, `.ghost`, `.outline-*`
+- Animasi: `fadeIn`, `fadeUp`, `scaleIn`, `wobble`, `spin`
+
+### Icon Framework
+**Bootstrap Icons v1.11** via CDN (`<link>` di semua 3 halaman). Klas `<i class="bi bi-<name>"></i>` — lihat [icons.getbootstrap.com](https://icons.getbootstrap.com) untuk daftar.
+
+Contoh penggunaan di sidebar: `bi-floppy-fill` (Simpan Draft), `bi-gear-fill` (Atur Tampilan), `bi-info-circle-fill` (Petunjuk), `bi-search` (Rekap), `bi-card-list` (Daftar), `bi-box-arrow-left` (Keluar).
 
 ---
 
@@ -435,11 +502,15 @@ Hasil top-15 ditampilkan dengan uraian + kategori.
 | Masalah | Solusi |
 |---|---|
 | Modal mode gate tidak muncul | `localStorage.removeItem('cawi_form_mode')` lalu reload |
-| Anggota card tidak muncul setelah isi jumlah | Cek Console → harus tidak ada error `STATIC_PROFESI undefined` (cek tag `<script src="data-profesi.js">` di index.html) |
+| Anggota card tidak muncul setelah isi jumlah | Cek Console → harus tidak ada error `STATIC_PROFESI undefined` (cek tag `<script src="js/data/profesi.js">` di index.html) |
 | Badge L/L.UB tidak tampil di daftar | Hard refresh **Ctrl+Shift+R** untuk reload JS terbaru; cek `getRecordMode(records[0])` di Console |
 | Sheet L tidak terbuat saat submit | Cek Apps Script Executions → kemungkinan error `Cannot read formMode` → pastikan deployment versi terbaru |
 | Tanda tangan L tidak masuk Drive | Cek folder `CAWI_SE2026_L_TTD` di Drive akun yang deploy Apps Script — buat manual jika permission Drive belum diberi |
 | Submit gagal — Apps Script error 403 | Deploy ulang Web App dengan **Who has access: Anyone** |
 | KBLI search tidak ada hasil | Pastikan `master/kbli.json` ikut ter-upload ke hosting |
+| Halal/BPOM section selalu tampil/hilang | Cek `master/KBLI Halal.csv` & `KBLI BPOM.csv` ter-upload; cek di Console `kbliFilters.halalSize()` & `bpomSize()` |
 | Hapus L record menghapus L.UB | Pastikan frontend versi terbaru (kirim `formMode` di delete payload) — re-deploy frontend |
 | Password tidak dikenali | Pastikan online (hash dari sheet); reload halaman; fallback default tersedia jika sheet kosong |
+| Icon Bootstrap tidak muncul | Pastikan CDN `cdn.jsdelivr.net/npm/bootstrap-icons` terjangkau; cek Console untuk error 404 di link CSS |
+| Atur Tampilan tidak persistent | Cek `localStorage.getItem('cawi_settings_v1')` di Console; clear data lalu reload jika korup |
+| Dropdown Kecamatan tertutup section berikutnya | Hard refresh untuk memuat CSS `design-features.css` terbaru — fix via `.section-card:has(.ss-dropdown.open) { z-index: 250 }` |

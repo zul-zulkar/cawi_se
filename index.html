@@ -13,14 +13,15 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="css/index/design-tokens.css"/>
+<link rel="stylesheet" href="css/core/design-tokens.css"/>
 <link rel="stylesheet" href="css/index/base.css"/>
 <link rel="stylesheet" href="css/index/layout.css"/>
 <link rel="stylesheet" href="css/index/components.css"/>
 <link rel="stylesheet" href="css/index/modals.css"/>
 <link rel="stylesheet" href="css/index/form-l.css"/>
-<link rel="stylesheet" href="css/index/design-system.css"/>
+<link rel="stylesheet" href="css/core/design-system.css"/>
 <link rel="stylesheet" href="css/index/design-overrides.css"/>
 <link rel="stylesheet" href="css/index/design-features.css"/>
 </head>
@@ -31,11 +32,11 @@
   <div class="pw-card">
     <div class="pw-title">CAWI</div>
     <div class="pw-subtitle">SE2026 — BPS Buleleng</div>
-    <div class="pw-restricted">&#128274; AKSES TERBATAS — PETUGAS BPS</div>
+    <div class="pw-restricted"><i class="bi bi-shield-lock-fill"></i> AKSES TERBATAS — PETUGAS BPS</div>
     <input type="password" id="pwInput" class="pw-input" placeholder="Masukkan kata sandi"
       onkeydown="if(event.key==='Enter')checkPassword()"/>
-    <div id="pwError">&#10005; Kata sandi salah</div>
-    <button type="button" class="pw-btn" onclick="checkPassword()">&#128274; Masuk</button>
+    <div id="pwError"><i class="bi bi-exclamation-circle-fill"></i> Kata sandi salah</div>
+    <button type="button" class="pw-btn" onclick="checkPassword()"><i class="bi bi-unlock-fill"></i> Masuk</button>
     <p class="pw-note">Hanya untuk petugas pencacah resmi<br/>Sensus Ekonomi 2026 BPS Buleleng</p>
   </div>
 </div>
@@ -58,18 +59,18 @@
         <div class="mode-btn-desc">Kuesioner SE2026-L. Untuk usaha rumah tangga + pendataan keluarga (DTSEN): perumahan, aset, dan sosial ekonomi tiap anggota keluarga.</div>
       </button>
     </div>
-    <button type="button" id="modeCancelBtn" class="mode-card-cancel" onclick="hideModeGate()" style="display:none">Batal</button>
+    <button type="button" id="modeCancelBtn" class="mode-card-cancel" onclick="hideModeGate()" style="display:none"><i class="bi bi-x-lg"></i> Batal</button>
   </div>
 </div>
 
 <!-- MOBILE TOPBAR -->
 <div class="mobile-topbar" id="mobileTopbar">
-  <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleSidebar()">&#9776;</button>
+  <button class="hamburger-btn" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu"><i class="bi bi-list"></i></button>
   <div class="mobile-title">CAWI <span>SE2026</span></div>
   <div class="mobile-topbar-actions">
-    <button class="mobile-action-btn" onclick="togglePetunjuk()">? Petunjuk</button>
-    <button class="mobile-action-btn" onclick="showRecap()">&#128269; Rekap</button>
-    <button class="mobile-action-btn mobile-action-btn-submit" onclick="showRecap()">&#128228; Submit</button>
+    <button class="mobile-action-btn" onclick="togglePetunjuk()" title="Petunjuk"><i class="bi bi-info-circle"></i><span class="mobile-btn-text"> Petunjuk</span></button>
+    <button class="mobile-action-btn" onclick="showRecap()" title="Rekap"><i class="bi bi-search"></i><span class="mobile-btn-text"> Rekap</span></button>
+    <button class="mobile-action-btn mobile-action-btn-submit" onclick="showRecap()" title="Submit"><i class="bi bi-send-fill"></i><span class="mobile-btn-text"> Submit</span></button>
   </div>
 </div>
 
@@ -96,7 +97,7 @@
   <!-- GANTI KUESIONER — tombol prominent -->
   <div class="sidebar-switch-row">
     <button type="button" class="sidebar-switch-btn" onclick="switchFormMode()" title="Ganti antara L.UB dan L">
-      <span class="sidebar-switch-icon">&#8646;</span>
+      <span class="sidebar-switch-icon"><i class="bi bi-arrow-left-right"></i></span>
       <span class="sidebar-switch-text">
         <span class="sidebar-switch-label">Ganti Kuesioner</span>
         <span class="sidebar-switch-sub">L.UB &middot; L (Rumah Tangga)</span>
@@ -317,22 +318,22 @@
   <div class="sidebar-divider"></div>
   <div class="sidebar-actions">
     <button class="sidebar-btn sidebar-btn-primary" id="sidebarDraftBtn" onclick="saveAsDraft()">
-      <span class="sidebar-btn-icon">&#128190;</span> Simpan Draft
+      <i class="bi bi-floppy-fill sidebar-btn-icon"></i> Simpan Draft
     </button>
     <button class="sidebar-btn" onclick="openSettingsModal()">
-      <span class="sidebar-btn-icon">&#9881;</span> Atur Tampilan
+      <i class="bi bi-gear-fill sidebar-btn-icon"></i> Atur Tampilan
     </button>
     <button class="sidebar-btn" onclick="togglePetunjuk()">
-      <span class="sidebar-btn-icon">&#128203;</span> Petunjuk Pengisian
+      <i class="bi bi-info-circle-fill sidebar-btn-icon"></i> Petunjuk Pengisian
     </button>
     <button class="sidebar-btn" onclick="showRecap()">
-      <span class="sidebar-btn-icon">&#128269;</span> Rekap &amp; Periksa
+      <i class="bi bi-search sidebar-btn-icon"></i> Rekap &amp; Periksa
     </button>
     <button class="sidebar-btn" onclick="guardedNav('daftar.html', true)">
-      <span class="sidebar-btn-icon">&#128196;</span> Daftar Entri
+      <i class="bi bi-card-list sidebar-btn-icon"></i> Daftar Entri
     </button>
     <button class="sidebar-btn sidebar-btn-danger" onclick="guardedNav(logoutKuesioner)">
-      <span class="sidebar-btn-icon">&#128274;</span> Keluar
+      <i class="bi bi-box-arrow-left sidebar-btn-icon"></i> Keluar
     </button>
   </div>
   <div class="sidebar-autosave">
@@ -357,10 +358,10 @@
   </div>
   <div class="desk-topbar-actions">
     <button type="button" class="topbar-btn topbar-btn-outline" onclick="showRecap()" title="Periksa isian sebelum submit">
-      <span class="topbar-btn-icon">&#128269;</span><span class="topbar-btn-text">Rekap &amp; Periksa</span>
+      <i class="bi bi-search topbar-btn-icon"></i><span class="topbar-btn-text">Rekap &amp; Periksa</span>
     </button>
     <button type="button" class="topbar-btn topbar-btn-primary" onclick="showRecap()" title="Kirim data">
-      <span class="topbar-btn-icon">&#128228;</span><span class="topbar-btn-text">Submit</span>
+      <i class="bi bi-send-fill topbar-btn-icon"></i><span class="topbar-btn-text">Submit</span>
     </button>
   </div>
 </div>
@@ -559,7 +560,7 @@
         <input type="text" id="q5e_nama_kawasan" placeholder="Nama kawasan"/>
       </div>
 
-      <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_q5e',this)">&#128161; Petunjuk</button>
+      <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_q5e',this)"><i class="bi bi-lightbulb-fill"></i> Petunjuk</button>
       <div class="field-pj-box" id="pj_q5e">
         <div class="field-pj-title">5e. Nama Kawasan Operasi Usaha</div>
         <p>Tuliskan <strong>nama spesifik kawasan</strong> tempat usaha beroperasi sesuai jenis kawasan yang dipilih pada rincian 5d.</p>
@@ -721,7 +722,7 @@
         <div class="subsection-label">a. Kegiatan utama usaha/perusahaan</div>
         <label class="field-label">Deskripsi kegiatan utama <span class="req">*</span></label>
         <textarea id="q9a_kegiatan" placeholder="Tuliskan kegiatan utama usaha beserta produk dan cara penjualan..."></textarea>
-        <button class="field-pj-btn" onclick="toggleFieldPetunjuk('pj_q9a',this)">&#128161; Petunjuk</button>
+        <button class="field-pj-btn" onclick="toggleFieldPetunjuk('pj_q9a',this)"><i class="bi bi-lightbulb-fill"></i> Petunjuk</button>
         <div class="field-pj-box" id="pj_q9a">
           <div class="field-pj-title">Penjelasan Rincian 9a — Contoh Kegiatan Utama</div>
           <p>Tuliskan secara rinci kegiatan utama usaha, termasuk produk/jasa yang dihasilkan dan cara penjualannya:</p>
@@ -805,7 +806,7 @@
         <div class="subsection-label">d. Apa input yang digunakan?</div>
         <label class="field-label">Deskripsi input <span class="req">*</span></label>
         <textarea id="q9d_input" placeholder="Tuliskan bahan baku/input utama yang digunakan..."></textarea>
-        <button class="field-pj-btn" onclick="toggleFieldPetunjuk('pj_q9d',this)">&#128161; Petunjuk</button>
+        <button class="field-pj-btn" onclick="toggleFieldPetunjuk('pj_q9d',this)"><i class="bi bi-lightbulb-fill"></i> Petunjuk</button>
         <div class="field-pj-box" id="pj_q9d">
           <div class="field-pj-title">Contoh Pengisian — Input / Bahan Baku (Rincian 9d)</div>
           <p>Tuliskan bahan baku, bahan penolong, atau input utama yang digunakan dalam proses produksi/kegiatan:</p>
@@ -822,7 +823,7 @@
         <div class="subsection-label">e. Bagaimana proses mengubah input tersebut menjadi produk output (beserta alatnya)?</div>
         <label class="field-label">Deskripsi proses <span class="req">*</span></label>
         <textarea id="q9e_proses" placeholder="Jelaskan bagaimana input diubah menjadi produk/jasa yang dijual..."></textarea>
-        <button class="field-pj-btn" onclick="toggleFieldPetunjuk('pj_q9e',this)">&#128161; Petunjuk</button>
+        <button class="field-pj-btn" onclick="toggleFieldPetunjuk('pj_q9e',this)"><i class="bi bi-lightbulb-fill"></i> Petunjuk</button>
         <div class="field-pj-box" id="pj_q9e">
           <div class="field-pj-title">Contoh Pengisian — Proses Produksi (Rincian 9e)</div>
           <p>Jelaskan alur proses dari penerimaan input hingga produk/jasa siap dijual:</p>
@@ -838,7 +839,7 @@
         <div class="subsection-label">f. Apa produk utama yang dihasilkan?</div>
         <label class="field-label">Deskripsi produk <span class="req">*</span></label>
         <textarea id="q9f_produk" placeholder="Tuliskan produk barang atau jasa utama yang dijual/dihasilkan..."></textarea>
-        <button class="field-pj-btn" onclick="toggleFieldPetunjuk('pj_q9f',this)">&#128161; Petunjuk</button>
+        <button class="field-pj-btn" onclick="toggleFieldPetunjuk('pj_q9f',this)"><i class="bi bi-lightbulb-fill"></i> Petunjuk</button>
         <div class="field-pj-box" id="pj_q9f">
           <div class="field-pj-title">Contoh Pengisian — Produk Utama (Rincian 9f)</div>
           <p>Tuliskan produk barang atau jasa utama yang dihasilkan/dijual usaha ini:</p>
@@ -1062,7 +1063,7 @@
           <label class="radio-item"><input type="radio" name="q13b" value="2"/> <span>Tidak</span></label>
         </div>
       </div>
-      <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_q13',this)">&#128161; Petunjuk</button>
+      <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_q13',this)"><i class="bi bi-lightbulb-fill"></i> Petunjuk</button>
       <div class="field-pj-box" id="pj_q13">
         <div class="field-pj-title">13. Produk / Kegiatan Ramah Lingkungan</div>
         <div class="pj-section pj-include">
@@ -1102,7 +1103,7 @@
           <label class="radio-item"><input type="radio" name="q14" value="2"/> <span>Tidak</span></label>
         </div>
       </div>
-      <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_q14',this)">&#128161; Petunjuk</button>
+      <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_q14',this)"><i class="bi bi-lightbulb-fill"></i> Petunjuk</button>
       <div class="field-pj-box" id="pj_q14">
         <div class="field-pj-title">14. Produk Karya Seni / Kreatif / Teknologi</div>
         <div class="pj-section pj-include">
@@ -1246,7 +1247,7 @@
           <label class="radio-item"><input type="radio" name="q19c" value="2"/> <span>Tidak</span></label>
         </div>
       </div>
-      <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_q19',this)">&#128161; Petunjuk</button>
+      <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_q19',this)"><i class="bi bi-lightbulb-fill"></i> Petunjuk</button>
       <div class="field-pj-box" id="pj_q19">
         <div class="field-pj-title">19. Transaksi dengan Bukan Penduduk Indonesia</div>
         <p>Bukan penduduk adalah orang atau badan yang <strong>pusat kegiatan ekonominya berada di luar wilayah Indonesia</strong>, tanpa memandang kewarganegaraan. Termasuk WNI yang menetap dan bekerja di luar negeri &gt; 1 tahun, badan usaha asing, atau cabang perusahaan luar negeri.</p>
@@ -1293,7 +1294,7 @@
           <input type="number" id="q20c" readonly class="total-field" placeholder="0"/>
         </div>
       </div>
-      <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_q20',this)">&#128161; Petunjuk</button>
+      <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_q20',this)"><i class="bi bi-lightbulb-fill"></i> Petunjuk</button>
       <div class="field-pj-box" id="pj_q20">
         <div class="field-pj-title">20. Jumlah Pekerja per akhir 2025</div>
         <div class="pj-section pj-include">
@@ -1363,7 +1364,7 @@
         <label class="field-label">f. Total pengeluaran (a+b+c+d+e)</label>
         <div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="q22f" readonly class="total-field" placeholder="0,00"/></div>
       </div>
-      <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_q22',this)">&#128161; Petunjuk</button>
+      <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_q22',this)"><i class="bi bi-lightbulb-fill"></i> Petunjuk</button>
       <div class="field-pj-box" id="pj_q22">
         <div class="field-pj-title">22. Nilai Pengeluaran Tahun 2025</div>
         <div class="pj-section pj-include">
@@ -1434,7 +1435,7 @@
           <span class="pct-label">%</span>
         </div>
       </div>
-      <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_q23',this)">&#128161; Petunjuk</button>
+      <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_q23',this)"><i class="bi bi-lightbulb-fill"></i> Petunjuk</button>
       <div class="field-pj-box" id="pj_q23">
         <div class="field-pj-title">a. Nilai produksi/penjualan/pendapatan barang dan jasa</div>
         <div class="pj-section pj-include">
@@ -1956,7 +1957,7 @@
         <label class="field-label">e. Nama Kawasan <span class="req">*</span></label>
         <input type="text" id="l2_nama_kawasan" placeholder="Nama kawasan"/>
       </div>
-      <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_l2_q8',this)">&#128161; Petunjuk</button>
+      <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_l2_q8',this)"><i class="bi bi-lightbulb-fill"></i> Petunjuk</button>
       <div class="field-pj-box" id="pj_l2_q8">
         <div class="field-pj-title">8. Nama dan Alamat Usaha</div>
         <div class="pj-section pj-include">
@@ -2014,7 +2015,7 @@
           </div>
         </div>
       </div>
-      <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_l2_q9',this)">&#128161; Petunjuk</button>
+      <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_l2_q9',this)"><i class="bi bi-lightbulb-fill"></i> Petunjuk</button>
       <div class="field-pj-box" id="pj_l2_q9">
         <div class="field-pj-title">9. Jenis Usaha &amp; Lokasi Utama</div>
         <div class="pj-section pj-include">
@@ -2158,7 +2159,7 @@
       <div class="form-group">
         <label class="field-label">a. Kegiatan utama usaha <span class="req">*</span></label>
         <textarea id="l2_kegiatan_utama" rows="3" placeholder="Tuliskan selengkapnya kegiatan utama yang dilakukan"></textarea>
-        <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_l2_13a',this)">&#128161; Petunjuk</button>
+        <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_l2_13a',this)"><i class="bi bi-lightbulb-fill"></i> Petunjuk</button>
         <div class="field-pj-box" id="pj_l2_13a">
           <div class="field-pj-title">13a. Kegiatan Utama Usaha</div>
           <p>Tuliskan secara rinci kegiatan utama usaha, termasuk produk/jasa yang dihasilkan dan cara penjualannya.</p>
@@ -2225,7 +2226,7 @@
         <div class="form-group">
           <label class="field-label">d. Input yang digunakan</label>
           <textarea id="l2_input" rows="2" placeholder="Contoh: daging, tepung, kain, kayu"></textarea>
-          <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_l2_13d',this)">&#128161; Petunjuk</button>
+          <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_l2_13d',this)"><i class="bi bi-lightbulb-fill"></i> Petunjuk</button>
           <div class="field-pj-box" id="pj_l2_13d">
             <div class="field-pj-title">13d. Input / Bahan Baku</div>
             <p>Tuliskan bahan baku, bahan penolong, atau input utama yang digunakan dalam proses produksi/kegiatan.</p>
@@ -2244,7 +2245,7 @@
         <div class="form-group">
           <label class="field-label">e. Proses mengubah input jadi output</label>
           <textarea id="l2_proses" rows="2" placeholder="Contoh: menggiling, membakar, mengasapi"></textarea>
-          <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_l2_13e',this)">&#128161; Petunjuk</button>
+          <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_l2_13e',this)"><i class="bi bi-lightbulb-fill"></i> Petunjuk</button>
           <div class="field-pj-box" id="pj_l2_13e">
             <div class="field-pj-title">13e. Proses Produksi</div>
             <p>Jelaskan alur proses dari penerimaan input hingga produk/jasa siap dijual.</p>
@@ -2262,7 +2263,7 @@
       <div class="form-group">
         <label class="field-label">f. Produk utama yang dihasilkan <span class="req">*</span></label>
         <textarea id="l2_produk_utama" rows="2" placeholder="Contoh: padi, sosis, jasa renovasi"></textarea>
-        <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_l2_13f',this)">&#128161; Petunjuk</button>
+        <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_l2_13f',this)"><i class="bi bi-lightbulb-fill"></i> Petunjuk</button>
         <div class="field-pj-box" id="pj_l2_13f">
           <div class="field-pj-title">13f. Produk Utama</div>
           <p>Tuliskan produk barang atau jasa utama yang dihasilkan/dijual usaha ini.</p>
@@ -2463,7 +2464,7 @@
           <label class="radio-item"><input type="radio" name="l2_ramah_b" value="2"/> <span>2. Tidak</span></label>
         </div>
       </div>
-      <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_l2_17',this)">&#128161; Petunjuk</button>
+      <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_l2_17',this)"><i class="bi bi-lightbulb-fill"></i> Petunjuk</button>
       <div class="field-pj-box" id="pj_l2_17">
         <div class="field-pj-title">17. Produk Ramah Lingkungan</div>
         <div class="pj-section pj-include">
@@ -2503,7 +2504,7 @@
           <label class="radio-item"><input type="radio" name="l2_kreatif" value="2"/> <span>2. Tidak</span></label>
         </div>
       </div>
-      <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_l2_18',this)">&#128161; Petunjuk</button>
+      <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_l2_18',this)"><i class="bi bi-lightbulb-fill"></i> Petunjuk</button>
       <div class="field-pj-box" id="pj_l2_18">
         <div class="field-pj-title">18. Produk Karya Seni / Sastra / Desain / Teknologi / Warisan</div>
         <div class="pj-section pj-include">
@@ -2623,7 +2624,7 @@
           <label class="radio-item"><input type="radio" name="l2_nonpend_c" value="2"/> <span>2. Tidak</span></label>
         </div>
       </div>
-      <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_l2_23',this)">&#128161; Petunjuk</button>
+      <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_l2_23',this)"><i class="bi bi-lightbulb-fill"></i> Petunjuk</button>
       <div class="field-pj-box" id="pj_l2_23">
         <div class="field-pj-title">23. Transaksi dengan Bukan Penduduk Indonesia</div>
         <p>Bukan penduduk adalah orang atau badan yang <strong>pusat kegiatan ekonominya berada di luar wilayah Indonesia</strong>.</p>
@@ -2685,7 +2686,7 @@
           <input type="number" id="l2_pekerja_total2" class="input-muted" readonly placeholder="0"/>
         </div>
       </div>
-      <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_l2_24',this)">&#128161; Petunjuk</button>
+      <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_l2_24',this)"><i class="bi bi-lightbulb-fill"></i> Petunjuk</button>
       <div class="field-pj-box" id="pj_l2_24">
         <div class="field-pj-title">24. Pekerja</div>
         <div class="pj-section pj-include">
@@ -2731,7 +2732,7 @@
     <div class="section-body">
       <div class="subsection-label" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
         <span>26. Pengeluaran Tahun 2025</span>
-        <button class="field-pj-btn" style="margin:0" type="button" onclick="toggleFieldPetunjuk('pj_l2_26',this)">&#128161; Petunjuk</button>
+        <button class="field-pj-btn" style="margin:0" type="button" onclick="toggleFieldPetunjuk('pj_l2_26',this)"><i class="bi bi-lightbulb-fill"></i> Petunjuk</button>
       </div>
       <div class="field-pj-box" id="pj_l2_26">
         <div class="field-pj-title">26. Nilai Pengeluaran Tahun 2025</div>
@@ -2835,7 +2836,7 @@
           <input type="number" id="l2_y27d" min="0" max="100" placeholder="0-100"/>
         </div>
       </div>
-      <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_l2_y27',this)">&#128161; Petunjuk</button>
+      <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_l2_y27',this)"><i class="bi bi-lightbulb-fill"></i> Petunjuk</button>
       <div class="field-pj-box" id="pj_l2_y27">
         <div class="field-pj-title">a. Nilai produksi/penjualan/pendapatan barang dan jasa</div>
         <div class="pj-section pj-include">
@@ -2925,7 +2926,7 @@
     <div class="section-body">
       <div class="subsection-label" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
         <span>30. Pengeluaran Bulan Terakhir</span>
-        <button class="field-pj-btn" style="margin:0" type="button" onclick="toggleFieldPetunjuk('pj_l2_30',this)">&#128161; Petunjuk</button>
+        <button class="field-pj-btn" style="margin:0" type="button" onclick="toggleFieldPetunjuk('pj_l2_30',this)"><i class="bi bi-lightbulb-fill"></i> Petunjuk</button>
       </div>
       <div class="field-pj-box" id="pj_l2_30">
         <div class="field-pj-title">30. Pengeluaran Bulan Terakhir (2026)</div>
@@ -2972,7 +2973,7 @@
       </div>
       <div class="subsection-label subsection-label-spaced" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
         <span>31. Pendapatan Bulan Terakhir</span>
-        <button class="field-pj-btn" style="margin:0" type="button" onclick="toggleFieldPetunjuk('pj_l2_31',this)">&#128161; Petunjuk</button>
+        <button class="field-pj-btn" style="margin:0" type="button" onclick="toggleFieldPetunjuk('pj_l2_31',this)"><i class="bi bi-lightbulb-fill"></i> Petunjuk</button>
       </div>
       <div class="field-pj-box" id="pj_l2_31">
         <div class="field-pj-title">a. Nilai produksi/penjualan/pendapatan barang dan jasa</div>
@@ -3853,8 +3854,8 @@
 <script src="js/shared/settings.js"></script>
 <script src="js/shared/loading.js"></script>
 <!-- Data master (regional, profesi) -->
-<script src="data.js"></script>
-<script src="data-profesi.js"></script>
+<script src="js/data/regional.js"></script>
+<script src="js/data/profesi.js"></script>
 <!-- Auth + page bootstrap helpers -->
 <script src="js/auth/auth.js"></script>
 <script src="js/shared/petugas.js"></script>
