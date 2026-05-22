@@ -32,15 +32,45 @@ async function checkAdminPassword() {
   if (input.disabled) return;
   const pw = input.value;
   if (!pw) return;
-  const h = await sha256(pw);
-  if (h === _adminHash) {
-    sessionStorage.setItem(ADMIN_SESSION_KEY, '1');
-    document.getElementById('adminGate').style.display = 'none';
-    initPage();
-  } else {
-    document.getElementById('adminPwError').style.display = 'block';
-    document.getElementById('adminPwInput').value = '';
-    document.getElementById('adminPwInput').focus();
+  const btn = document.querySelector('#adminGate .gate-box button');
+  const errEl = document.getElementById('adminPwError');
+  const cardEl = document.querySelector('#adminGate .gate-box');
+  if (errEl) errEl.style.display = 'none';
+  input.disabled = true;
+  if (btn) {
+    btn.disabled = true;
+    btn.dataset.prevLabel = btn.innerHTML;
+    btn.innerHTML = '<span class="pw-spinner" aria-hidden="true"></span>Memverifikasi…';
+  }
+  try {
+    const [h] = await Promise.all([
+      sha256(pw),
+      new Promise(r => setTimeout(r, 280)),
+    ]);
+    if (h === _adminHash) {
+      sessionStorage.setItem(ADMIN_SESSION_KEY, '1');
+      const gate = document.getElementById('adminGate');
+      if (gate) {
+        gate.style.transition = 'opacity .35s ease';
+        gate.style.opacity = '0';
+        setTimeout(() => { gate.style.display = 'none'; initPage(); }, 350);
+      } else {
+        initPage();
+      }
+    } else {
+      if (errEl) errEl.style.display = 'block';
+      input.value = '';
+      input.focus();
+      if (cardEl) {
+        cardEl.classList.remove('wobble');
+        void cardEl.offsetWidth;
+        cardEl.classList.add('wobble');
+      }
+      if (btn) { btn.disabled = false; btn.innerHTML = btn.dataset.prevLabel || 'Masuk'; }
+    }
+  } finally {
+    input.disabled = false;
+    if (btn && btn.disabled) { btn.disabled = false; btn.innerHTML = btn.dataset.prevLabel || 'Masuk'; }
   }
 }
 
@@ -51,9 +81,15 @@ document.getElementById('adminPwInput').addEventListener('keydown', e => {
 (async function() {
   const input = document.getElementById('adminPwInput');
   const btn   = document.querySelector('#adminGate .gate-box button');
-  input.disabled    = true;
-  input.placeholder = 'Memuat…';
-  btn.disabled      = true;
+  if (input) {
+    input.disabled    = true;
+    input.placeholder = 'Memuat konfigurasi…';
+  }
+  if (btn) {
+    btn.disabled = true;
+    btn.dataset.initLabel = btn.innerHTML;
+    btn.innerHTML = '<span class="pw-spinner" aria-hidden="true"></span>Memuat…';
+  }
 
   await fetchConfig();
 
@@ -63,10 +99,16 @@ document.getElementById('adminPwInput').addEventListener('keydown', e => {
     return;
   }
 
-  input.disabled    = false;
-  input.placeholder = 'Kata sandi admin';
-  btn.disabled      = false;
-  input.focus();
+  if (input) {
+    input.disabled    = false;
+    input.placeholder = 'Kata sandi admin';
+    input.focus();
+  }
+  if (btn) {
+    btn.disabled = false;
+    btn.innerHTML = btn.dataset.initLabel || 'Masuk';
+    delete btn.dataset.initLabel;
+  }
 })();
 
 function logoutAdmin() {

@@ -4,6 +4,46 @@
    ========================================================= */
 
 /* ========================================================
+   MOBILE TOPBAR — Submit button (replaces Keluar)
+   ======================================================== */
+.mobile-action-btn-submit{
+  background: var(--orange);
+  color: #fff;
+  border-color: var(--orange);
+  font-weight: 700;
+  box-shadow: 0 3px 10px -3px rgba(237,108,0,.55);
+}
+.mobile-action-btn-submit:hover{
+  background: var(--orange-hot);
+  color: #fff;
+  border-color: var(--orange-hot);
+}
+
+/* ========================================================
+   SCROLL OFFSET — keep clicked questions below sticky topbar
+   ======================================================== */
+.section-card,
+.section-header,
+.blok-banner,
+.blok-outline,
+[id^="sec-"],
+[id^="lkp_card_"],
+[id^="l_ang_card_"]{
+  scroll-margin-top: 90px;
+}
+@media (max-width: 880px){
+  .section-card,
+  .section-header,
+  .blok-banner,
+  .blok-outline,
+  [id^="sec-"],
+  [id^="lkp_card_"],
+  [id^="l_ang_card_"]{
+    scroll-margin-top: 70px;
+  }
+}
+
+/* ========================================================
    DESKTOP TOPBAR (Submit + Rekap & Periksa + Tampilan)
    ======================================================== */
 .desk-topbar{

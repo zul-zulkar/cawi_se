@@ -281,22 +281,139 @@ input[type=datetime-local].field-filled:focus, textarea.field-filled:focus{
   .nav-actions .btn{ padding: 10px 14px; font-size: 13.5px; }
 }
 
-/* ====== Field petunjuk button (cleaner) ====== */
+/* ====== Field petunjuk button — esurvey/BPS style (pill, orange) ====== */
 .field-pj-btn{
-  display: inline-flex; align-items: center; gap: 6px;
-  font-size: 12px; font-weight: 600;
-  color: var(--orange);
-  background: var(--orange-faint);
-  border: 1px solid var(--orange-soft);
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 13px; font-weight: 600;
+  color: #fff;
+  background: var(--orange);
+  border: 1px solid var(--orange);
   border-radius: 999px;
-  padding: 5px 12px;
+  padding: 7px 16px;
   cursor: pointer;
-  transition: background .15s, color .15s;
-  margin-top: 8px;
+  transition: background .15s, border-color .15s, transform .08s, box-shadow .15s;
+  margin-top: 10px;
   font-family: inherit;
+  letter-spacing: .01em;
+  box-shadow: 0 4px 12px -4px rgba(237,108,0,.45);
 }
-.field-pj-btn:hover{ background: var(--orange-soft); color: #9a3412; }
-.field-pj-btn.open{ background: var(--orange); color: #fff; border-color: var(--orange); }
+.field-pj-btn:hover{
+  background: var(--orange-hot);
+  border-color: var(--orange-hot);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px -4px rgba(237,108,0,.55);
+}
+.field-pj-btn:active{ transform: translateY(0); }
+.field-pj-btn.open{
+  background: var(--ink);
+  border-color: var(--ink);
+  box-shadow: 0 4px 12px -4px rgba(24,24,27,.4);
+  font-size: 0;
+}
+.field-pj-btn.open::before{
+  content: '\2715  Tutup Petunjuk';
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  letter-spacing: .01em;
+  white-space: pre;
+}
+
+/* ====== Petunjuk box — structured (Termasuk / Tidak Termasuk / Catatan) ====== */
+.field-pj-box{
+  max-height: 0;
+  overflow: hidden;
+  opacity: 0;
+  background: var(--paper);
+  border: 1px solid var(--orange-soft);
+  border-left: 4px solid var(--orange);
+  border-radius: var(--r-md);
+  padding: 0 18px;
+  margin-top: 0;
+  transition: max-height .4s cubic-bezier(.4,0,.2,1), opacity .25s ease, padding .25s ease, margin .2s ease;
+  box-shadow: 0 2px 8px -4px rgba(237,108,0,.18);
+}
+.field-pj-box.open{
+  max-height: 2000px;
+  opacity: 1;
+  padding: 16px 18px 18px;
+  margin-top: 12px;
+}
+.field-pj-title{
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -.005em;
+  margin-bottom: 12px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--orange-soft);
+  text-transform: none;
+}
+.field-pj-box p{
+  font-size: 13px;
+  color: var(--ink-soft);
+  line-height: 1.65;
+  margin-bottom: 8px;
+}
+.field-pj-box ul{ padding-left: 18px; margin: 6px 0 10px; }
+.field-pj-box li{
+  font-size: 12.5px;
+  color: var(--ink-soft);
+  line-height: 1.65;
+  margin-bottom: 4px;
+}
+
+/* Example item (single illustration row) */
+.field-pj-ex{
+  font-size: 12.5px;
+  color: #5a3a20;
+  padding: 4px 0 4px 22px;
+  border-bottom: 1px dashed var(--orange-soft);
+  line-height: 1.55;
+  position: relative;
+}
+.field-pj-ex:last-child{ border-bottom: 0; }
+.field-pj-ex::before{
+  content: '\25CB';
+  position: absolute;
+  left: 4px;
+  color: var(--orange);
+  font-weight: 700;
+  font-size: 11px;
+}
+
+/* Structured sub-sections (used when content is split into Termasuk/Tidak/Catatan) */
+.field-pj-box .pj-section{ margin-top: 12px; }
+.field-pj-box .pj-section:first-of-type{ margin-top: 4px; }
+.field-pj-box .pj-section-title{
+  font-size: 12.5px; font-weight: 700;
+  margin-bottom: 6px;
+  letter-spacing: .01em;
+}
+.field-pj-box .pj-include .pj-section-title  { color: #166534; }
+.field-pj-box .pj-exclude .pj-section-title  { color: #991b1b; }
+.field-pj-box .pj-note    .pj-section-title  { color: var(--ink); }
+.field-pj-box .pj-list{
+  list-style: none; padding: 0; margin: 0;
+}
+.field-pj-box .pj-list li{
+  padding: 3px 0 3px 16px;
+  font-size: 12.5px; color: var(--ink-soft); line-height: 1.6;
+  position: relative;
+}
+.field-pj-box .pj-include .pj-list li{ color: #166534; }
+.field-pj-box .pj-include .pj-list li::before{
+  content: '\2713'; position: absolute; left: 0; color: var(--green); font-weight: 700;
+}
+.field-pj-box .pj-exclude .pj-list li{ color: #991b1b; }
+.field-pj-box .pj-exclude .pj-list li::before{
+  content: '\2715'; position: absolute; left: 0; color: var(--red); font-weight: 700;
+}
+.field-pj-box .pj-note p{
+  background: var(--cream); border-radius: var(--r-sm);
+  padding: 10px 12px; color: var(--ink); font-size: 12.5px; line-height: 1.65;
+  margin: 0;
+}
 
 /* ====== Field hint / muted ====== */
 .field-hint{ font-size: 12px; color: var(--ink-muted); margin-top: 4px; line-height: 1.5; }

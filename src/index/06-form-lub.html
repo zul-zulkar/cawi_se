@@ -299,7 +299,7 @@
         <div class="subsection-label">a. Kegiatan utama usaha/perusahaan</div>
         <label class="field-label">Deskripsi kegiatan utama <span class="req">*</span></label>
         <textarea id="q9a_kegiatan" placeholder="Tuliskan kegiatan utama usaha beserta produk dan cara penjualan..."></textarea>
-        <button class="field-pj-btn" onclick="toggleFieldPetunjuk('pj_q9a',this)">&#128203; Lihat Contoh</button>
+        <button class="field-pj-btn" onclick="toggleFieldPetunjuk('pj_q9a',this)">&#128203; Lihat Contoh#128161; Petunjuk</button>
         <div class="field-pj-box" id="pj_q9a">
           <div class="field-pj-title">Penjelasan Rincian 9a — Contoh Kegiatan Utama</div>
           <p>Tuliskan secara rinci kegiatan utama usaha, termasuk produk/jasa yang dihasilkan dan cara penjualannya:</p>
@@ -383,7 +383,7 @@
         <div class="subsection-label">d. Apa input yang digunakan?</div>
         <label class="field-label">Deskripsi input <span class="req">*</span></label>
         <textarea id="q9d_input" placeholder="Tuliskan bahan baku/input utama yang digunakan..."></textarea>
-        <button class="field-pj-btn" onclick="toggleFieldPetunjuk('pj_q9d',this)">&#128203; Lihat Contoh</button>
+        <button class="field-pj-btn" onclick="toggleFieldPetunjuk('pj_q9d',this)">&#128203; Lihat Contoh#128161; Petunjuk</button>
         <div class="field-pj-box" id="pj_q9d">
           <div class="field-pj-title">Contoh Pengisian — Input / Bahan Baku (Rincian 9d)</div>
           <p>Tuliskan bahan baku, bahan penolong, atau input utama yang digunakan dalam proses produksi/kegiatan:</p>
@@ -400,7 +400,7 @@
         <div class="subsection-label">e. Bagaimana proses mengubah input tersebut menjadi produk output (beserta alatnya)?</div>
         <label class="field-label">Deskripsi proses <span class="req">*</span></label>
         <textarea id="q9e_proses" placeholder="Jelaskan bagaimana input diubah menjadi produk/jasa yang dijual..."></textarea>
-        <button class="field-pj-btn" onclick="toggleFieldPetunjuk('pj_q9e',this)">&#128203; Lihat Contoh</button>
+        <button class="field-pj-btn" onclick="toggleFieldPetunjuk('pj_q9e',this)">&#128203; Lihat Contoh#128161; Petunjuk</button>
         <div class="field-pj-box" id="pj_q9e">
           <div class="field-pj-title">Contoh Pengisian — Proses Produksi (Rincian 9e)</div>
           <p>Jelaskan alur proses dari penerimaan input hingga produk/jasa siap dijual:</p>
@@ -416,7 +416,7 @@
         <div class="subsection-label">f. Apa produk utama yang dihasilkan?</div>
         <label class="field-label">Deskripsi produk <span class="req">*</span></label>
         <textarea id="q9f_produk" placeholder="Tuliskan produk barang atau jasa utama yang dijual/dihasilkan..."></textarea>
-        <button class="field-pj-btn" onclick="toggleFieldPetunjuk('pj_q9f',this)">&#128203; Lihat Contoh</button>
+        <button class="field-pj-btn" onclick="toggleFieldPetunjuk('pj_q9f',this)">&#128203; Lihat Contoh#128161; Petunjuk</button>
         <div class="field-pj-box" id="pj_q9f">
           <div class="field-pj-title">Contoh Pengisian — Produk Utama (Rincian 9f)</div>
           <p>Tuliskan produk barang atau jasa utama yang dihasilkan/dijual usaha ini:</p>
@@ -861,6 +861,37 @@
         <div class="inline-pct-row">
           <input type="number" id="q23d" class="input-short" min="0" max="100" placeholder="0"/>
           <span class="pct-label">%</span>
+        </div>
+      </div>
+      <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_q23',this)">&#128161; Petunjuk</button>
+      <div class="field-pj-box" id="pj_q23">
+        <div class="field-pj-title">a. Nilai produksi/penjualan/pendapatan barang dan jasa</div>
+        <div class="pj-section pj-include">
+          <div class="pj-section-title">Termasuk:</div>
+          <ul class="pj-list">
+            <li>Barang yang dijual baik yang diproduksi sendiri maupun tidak</li>
+            <li>Penjualan ekspor (FOB &mdash; Free On Board)</li>
+            <li>Penjualan atau transfer ke rekan bisnis/organisasi atau cabang di luar negeri</li>
+            <li>Pendapatan yang diperoleh dari pengangkutan barang yang tidak dijual perusahaan</li>
+            <li>Pendapatan jasa perbaikan dan layanan</li>
+            <li>Pendapatan dari kontrak, subkontrak, dan komisi</li>
+            <li>Pendapatan manajemen dari perusahaan/organisasi terkait maupun tidak</li>
+            <li>Pendapatan dari jasa pemasangan, berlangganan, dan keanggotaan</li>
+            <li>Pendapatan dari jasa iklan</li>
+            <li>Pendapatan royalti (hak cipta, hak paten, waralaba, dll)</li>
+            <li>Pendapatan dari sewa operasi</li>
+          </ul>
+        </div>
+        <div class="pj-section pj-exclude">
+          <div class="pj-section-title">Tidak Termasuk:</div>
+          <ul class="pj-list">
+            <li>Penjualan aset</li>
+            <li>Royalti dari penggunaan lahan di bawah pengaturan sewa mineral</li>
+          </ul>
+        </div>
+        <div class="pj-section pj-note">
+          <div class="pj-section-title">Catatan:</div>
+          <p>Nilai dicatat dalam Rupiah untuk seluruh kegiatan tahun 2025. Pada usaha pertanian, nilai produksi yang dicatat termasuk produksi yang dipanen, dikonsumsi sendiri, diolah sendiri, dijual, disimpan, digunakan sebagai upah/gaji, diberikan kepada pihak lain, hilang, pertambahan bobot ternak, serta nilai pembesaran tanaman kehutanan, sesuai dengan jenis dan satuan produksi.</p>
         </div>
       </div>
     </div>

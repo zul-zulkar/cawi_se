@@ -89,5 +89,6 @@ function toggleFieldPetunjuk(id, btn) {
   if (!box) return;
   const open = box.classList.toggle('open');
   btn.classList.toggle('open', open);
-  btn.innerHTML = open ? '&#10005; Tutup Petunjuk' : '&#128203; Lihat Contoh';
+  // Label is rendered via CSS (::before swap when .open) — keep original text in markup
+  btn.innerHTML = open ? '' : '&#128161; Petunjuk';
 }

@@ -53,9 +53,17 @@ function hideModeGate() {
 }
 
 function chooseMode(mode) {
-  setFormMode(mode);
+  const m = setFormMode(mode);
   hideModeGate();
+  // Reset to BLOK 1 of the chosen mode + refresh sidebar/main UI
+  if (typeof goBlok === 'function') {
+    try { goBlok(1); } catch (e) {}
+  }
   if (typeof updateProgress === 'function') updateProgress();
+  if (typeof updateDeskTopbar === 'function') updateDeskTopbar(1, m);
+  if (typeof showToast === 'function') {
+    showToast('Kuesioner diganti ke ' + (m === 'l' ? 'L (Rumah Tangga)' : 'L.UB (Usaha Besar)'), 'ok');
+  }
 }
 
 /* Switch via sidebar — warn if there's user data */

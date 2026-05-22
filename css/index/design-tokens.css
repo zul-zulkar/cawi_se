@@ -83,3 +83,16 @@ body{ background: var(--bg); color: var(--ink); font-family: var(--sans); font-s
 .tnum    { font-variant-numeric: tabular-nums; }
 .no-wrap { white-space: nowrap; }
 .mono    { font-family: var(--mono); }
+
+/* Universal gate spinner (used by gates in index/daftar/admin) */
+@keyframes spin { to { transform: rotate(360deg); } }
+.pw-spinner{
+  display: inline-block;
+  width: 14px; height: 14px;
+  border: 2px solid rgba(255,255,255,.4);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+  vertical-align: -3px;
+  margin-right: 8px;
+}
