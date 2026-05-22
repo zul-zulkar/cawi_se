@@ -1,0 +1,315 @@
+/* =========================================================
+   CAWI SE 2026 — design overrides for legacy markup
+   Targets existing classes (no HTML change) to apply tokens.
+   ========================================================= */
+
+/* ====== Section card (form blocks) — design's blok-banner style ====== */
+.section-card{
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 20px;
+  overflow: visible;
+  transition: box-shadow .2s, border-color .2s;
+}
+.section-card:hover{
+  box-shadow: var(--shadow);
+  border-color: #d4d4d8;
+}
+.section-header{
+  background: var(--cream);
+  border-left: 4px solid var(--orange);
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  padding: 14px 18px;
+  font-weight: 700;
+  font-size: 13.5px;
+  color: #7a3000;
+  letter-spacing: .01em;
+  line-height: 1.4;
+  position: relative;
+}
+.section-header::after{
+  content:'';
+  position:absolute; left:18px; right:18px; bottom:-1px; height:2px;
+  background: linear-gradient(90deg, transparent, var(--orange-soft), transparent);
+}
+.section-body{ padding: 20px; }
+
+/* ====== Subsection ====== */
+.subsection-label{
+  font-weight: 700; color: var(--ink); margin: 14px 0 7px;
+  font-size: 13px; line-height: 1.5; letter-spacing: .01em;
+}
+.sub-indent{ margin-left: 20px; padding-left: 16px; border-left: 2px solid var(--rule); }
+
+/* ====== Form fields — design's input/select/textarea ====== */
+label.field-label{
+  display: block;
+  font-weight: 500;
+  margin-bottom: 6px;
+  font-size: 14px;
+  color: var(--ink);
+  line-height: 1.45;
+}
+label.field-label .req{ color: var(--red); margin-left: 2px; font-weight: 500; }
+.hint{
+  font-size: 12.5px; color: var(--orange);
+  margin-top: 4px; font-style: italic; line-height: 1.5; font-weight: 500;
+}
+input[type=text], input[type=number], input[type=email],
+input[type=date], input[type=datetime-local], textarea, select{
+  width: 100%;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: var(--r-sm);
+  padding: 10px 13px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--ink);
+  outline: none;
+  transition: border-color .15s, box-shadow .15s;
+}
+input[type=text]::placeholder,
+input[type=number]::placeholder,
+input[type=email]::placeholder,
+textarea::placeholder{ color: var(--ink-faint); }
+input[type=text]:hover, input[type=number]:hover, input[type=email]:hover,
+input[type=date]:hover, input[type=datetime-local]:hover, textarea:hover, select:hover{
+  border-color: #cfcfd4;
+}
+input[type=text]:focus, input[type=number]:focus, input[type=email]:focus,
+input[type=date]:focus, input[type=datetime-local]:focus, textarea:focus, select:focus{
+  border-color: var(--orange);
+  box-shadow: 0 0 0 3px var(--orange-faint);
+}
+input[readonly], input[disabled]{ background: var(--paper-2); color: var(--ink-muted); border-color: var(--rule); cursor: default; }
+textarea{ resize: vertical; min-height: 88px; line-height: 1.55; }
+select{
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+  cursor: pointer;
+}
+
+/* ====== Radio / checkbox (legacy markup) ====== */
+.radio-group, .checkbox-group{ display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
+.radio-item, .checkbox-item{
+  display: flex; align-items: flex-start; gap: 10px;
+  cursor: pointer; padding: 8px 12px;
+  border-radius: var(--r-sm);
+  border: 1px solid transparent;
+  transition: background .15s, border-color .15s;
+}
+.radio-item:hover, .checkbox-item:hover{
+  background: var(--orange-faint);
+  border-color: var(--orange-soft);
+}
+.radio-item input, .checkbox-item input{
+  margin-top: 2px; flex-shrink: 0;
+  width: 16px; height: 16px;
+  accent-color: var(--orange);
+  cursor: pointer;
+}
+.radio-item span, .checkbox-item span{ font-size: 14px; line-height: 1.5; color: var(--ink); }
+
+/* Filled field highlight (overrides base.css greens to softer tone) */
+input[type=text].field-filled, input[type=number].field-filled,
+input[type=email].field-filled, input[type=date].field-filled,
+input[type=datetime-local].field-filled, textarea.field-filled{
+  background: #f0fdf4;
+  border-color: #86efac;
+}
+input[type=text].field-filled:focus, input[type=number].field-filled:focus,
+input[type=email].field-filled:focus, input[type=date].field-filled:focus,
+input[type=datetime-local].field-filled:focus, textarea.field-filled:focus{
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(22,163,74,.15);
+}
+.radio-item.checked{
+  background: #f0fdf4 !important;
+  border-color: #86efac !important;
+}
+
+/* ====== Block banner (above form) ====== */
+.blok-banner{
+  background: linear-gradient(135deg, var(--orange) 0%, #d95a00 100%);
+  color: #fff;
+  padding: 18px 22px;
+  border-radius: var(--r-lg);
+  margin-bottom: 22px;
+  display: flex; align-items: center; gap: 16px;
+  box-shadow: 0 8px 24px -10px rgba(237,108,0,.45);
+}
+.blok-badge{
+  background: rgba(255,255,255,.22);
+  border: 1px solid rgba(255,255,255,.3);
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 11.5px; font-weight: 800; letter-spacing: .22em;
+  white-space: nowrap;
+}
+.blok-title-text{ font-size: 15.5px; font-weight: 700; letter-spacing: .01em; line-height: 1.3; }
+.blok-title-sub{ font-size: 12.5px; opacity: .9; margin-top: 3px; font-weight: 500; }
+
+/* ====== Buttons — primary/secondary/danger ====== */
+.btn{
+  padding: 10px 22px;
+  border: 1px solid var(--rule);
+  background: var(--paper);
+  color: var(--ink);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  font-size: 13.5px; font-weight: 500;
+  font-family: inherit;
+  letter-spacing: .01em;
+  transition: background .15s, border-color .15s, color .15s, transform .05s;
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  white-space: nowrap;
+}
+.btn:hover{ background: var(--paper-2); border-color: #d4d4d8; }
+.btn:active{ transform: translateY(1px); }
+.btn-primary{
+  background: var(--orange); color: #fff; border-color: var(--orange);
+  font-weight: 600;
+  box-shadow: 0 4px 14px -4px rgba(237,108,0,.45);
+}
+.btn-primary:hover{ background: var(--orange-hot); border-color: var(--orange-hot); }
+.btn-secondary{ background: var(--paper-2); color: var(--ink-soft); border-color: var(--rule); }
+.btn-secondary:hover{ background: var(--paper-3); color: var(--ink); border-color: #d4d4d8; }
+.btn-sm{ padding: 6px 12px; font-size: 12.5px; }
+.btn-danger{ background: #ef4444; color: #fff; border-color: #ef4444; }
+.btn-danger:hover{ background: var(--red); border-color: var(--red); }
+
+/* ====== Alert ====== */
+.alert{
+  padding: 12px 16px;
+  border-radius: var(--r-md);
+  margin-bottom: 16px;
+  font-size: 13px;
+  line-height: 1.5;
+  border: 1px solid var(--rule);
+  background: var(--paper);
+}
+.alert-error  { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+.alert-success{ background: #f0fdf4; border-color: #bbf7d0; color: #166534; }
+
+/* ====== Form container ====== */
+.form-container{ max-width: 1000px; margin: 22px auto; padding: 0 18px 80px; }
+
+/* ====== Spinner (cleaner) ====== */
+.spinner{
+  display: inline-block; width: 14px; height: 14px;
+  border: 2px solid var(--paper-3);
+  border-top-color: var(--orange);
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+  vertical-align: middle; margin-left: 6px;
+}
+@keyframes spin{ to { transform: rotate(360deg); } }
+
+/* ====== KBLI chip ====== */
+.kbli-chip{
+  margin-top: 8px;
+  padding: 12px 14px;
+  background: var(--green-soft);
+  border: 1px solid #86efac;
+  border-radius: var(--r-md);
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+}
+.kbli-chip-label{ font-size: 10.5px; font-weight: 800; color: #166534; letter-spacing: .12em; text-transform: uppercase; }
+.kbli-chip-text { font-size: 13px; font-weight: 600; color: #14532d; margin-top: 2px; }
+.kbli-chip-uraian{ font-size: 12px; color: #166534; margin-top: 6px; line-height: 1.55; }
+.kbli-chip-btn{
+  background: transparent; border: 1px solid #86efac; color: #166534;
+  padding: 6px 12px; border-radius: var(--r-sm); cursor: pointer;
+  font-size: 12px; font-weight: 600; font-family: inherit; white-space: nowrap;
+}
+.kbli-chip-btn:hover{ background: #f0fdf4; border-color: var(--green); }
+
+/* ====== Notice box ====== */
+.notice-box{
+  background: var(--amber-soft);
+  border: 1px solid #fcd34d;
+  border-radius: var(--r-md);
+  padding: 12px 16px;
+  font-size: 13px;
+  color: #78350f;
+  line-height: 1.55;
+  margin-bottom: 12px;
+}
+
+/* ====== Block bottom nav (legacy .nav-actions, restyled) ====== */
+.nav-actions{
+  position: sticky;
+  bottom: 0;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  background: linear-gradient(180deg, rgba(255,255,255,0) 0%, var(--bg) 40%, var(--bg) 100%);
+  padding: 20px 4px 14px;
+  z-index: 4;
+  margin-top: 28px;
+  gap: 12px;
+  border-top: 0;
+}
+.nav-actions > *:nth-child(1){ justify-self: start; }
+.nav-actions > *:nth-child(2){ justify-self: center; }
+.nav-actions > *:nth-child(3){ justify-self: end; }
+.nav-actions .btn{ padding: 11px 20px; font-size: 14px; border-radius: var(--r-md); }
+.nav-actions .btn-primary{ box-shadow: 0 8px 22px -8px rgba(237,108,0,.55); }
+.nav-actions .btn-nav-draft{
+  background: transparent;
+  border: 1px solid var(--orange-soft);
+  color: var(--orange);
+  padding: 9px 16px;
+  border-radius: var(--r-md);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background .15s, border-color .15s, color .15s;
+  display: inline-flex; align-items: center; gap: 6px;
+  white-space: nowrap;
+}
+.nav-actions .btn-nav-draft:hover{ background: var(--orange-faint); border-color: var(--orange); color: var(--orange-hot); }
+@media(max-width:720px){
+  .nav-actions{ grid-template-columns: 1fr 1fr; gap: 8px; padding: 14px 2px 10px; }
+  .nav-actions .btn-nav-draft{ grid-column: 1 / -1; order: 3; justify-self: stretch; text-align: center; justify-content: center; }
+  .nav-actions .btn{ padding: 10px 14px; font-size: 13.5px; }
+}
+
+/* ====== Field petunjuk button (cleaner) ====== */
+.field-pj-btn{
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 600;
+  color: var(--orange);
+  background: var(--orange-faint);
+  border: 1px solid var(--orange-soft);
+  border-radius: 999px;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+  margin-top: 8px;
+  font-family: inherit;
+}
+.field-pj-btn:hover{ background: var(--orange-soft); color: #9a3412; }
+.field-pj-btn.open{ background: var(--orange); color: #fff; border-color: var(--orange); }
+
+/* ====== Field hint / muted ====== */
+.field-hint{ font-size: 12px; color: var(--ink-muted); margin-top: 4px; line-height: 1.5; }
+
+/* ====== Petunjuk modal header gradient (lighter) ====== */
+.petunjuk-header{ background: linear-gradient(135deg, var(--orange), #c2410c); }
+.recap-header{ background: linear-gradient(135deg, var(--ink-2), #18181b); }
+.recap-tab.active{ color: var(--orange); border-bottom-color: var(--orange); background: var(--orange-faint); }
+.recap-tab.active .recap-tab-badge{ background: var(--orange); color: #fff; }
+
+/* ====== Leave-guard styling refresh ====== */
+.leave-guard-modal{ border-radius: var(--r-xl); border: 1px solid var(--rule); box-shadow: var(--shadow-lg); }
+.leave-guard-btns .btn-save{ background: var(--orange); border-radius: var(--r-sm); }
+.leave-guard-btns .btn-save:hover{ background: var(--orange-hot); }
+.leave-guard-btns .btn-leave{ background: var(--paper-2); color: var(--ink-soft); border-color: var(--rule); border-radius: var(--r-sm); }
+.leave-guard-btns .btn-leave:hover{ background: var(--paper-3); color: var(--ink); }

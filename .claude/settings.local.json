@@ -6,7 +6,10 @@
       "Bash(tar -xzf \"/c/Users/MyPC PRO/.claude/projects/d--innovations-cawi-se/8e3806f9-f4dd-4b66-9242-44d26ddf61d8/tool-results/webfetch-1779425571935-mfxzua.bin\" -C /tmp/design)",
       "Read(//tmp/**)",
       "Bash(npm run *)",
-      "PowerShell(npm run build:html)"
+      "PowerShell(npm run build:html)",
+      "Bash(unzip -q -o \"/d/innovations/cawi_se/backup/CAWI SE 2026-handoff.zip\" -d \"/d/innovations/cawi_se/.design_ref\")",
+      "Bash(\"/c/Program Files/nodejs/node.exe\" \"/d/innovations/cawi_se/tools/build-html.js\")",
+      "Bash(\"/c/Program Files/nodejs/node.exe\" node_modules/vitest/vitest.mjs run)"
     ]
   }
 }
