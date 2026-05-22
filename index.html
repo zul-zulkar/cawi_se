@@ -22,6 +22,7 @@
 <link rel="stylesheet" href="css/index/form-l.css"/>
 <link rel="stylesheet" href="css/index/design-system.css"/>
 <link rel="stylesheet" href="css/index/design-overrides.css"/>
+<link rel="stylesheet" href="css/index/design-features.css"/>
 </head>
 <body>
 
@@ -34,7 +35,7 @@
     <input type="password" id="pwInput" class="pw-input" placeholder="Masukkan kata sandi"
       onkeydown="if(event.key==='Enter')checkPassword()"/>
     <div id="pwError">&#10005; Kata sandi salah</div>
-    <button class="pw-btn" onclick="checkPassword()">Masuk</button>
+    <button type="button" class="pw-btn" onclick="checkPassword()">&#128274; Masuk</button>
     <p class="pw-note">Hanya untuk petugas pencacah resmi<br/>Sensus Ekonomi 2026 BPS Buleleng</p>
   </div>
 </div>
@@ -90,6 +91,17 @@
       <span id="sidebarModeLabel" class="mode-badge mode-badge-lub">L.UB</span>
       <button type="button" class="sidebar-mode-switch" onclick="switchFormMode()" title="Ganti jenis kuesioner">Ganti</button>
     </span>
+  </div>
+
+  <!-- GANTI KUESIONER — tombol prominent -->
+  <div class="sidebar-switch-row">
+    <button type="button" class="sidebar-switch-btn" onclick="switchFormMode()" title="Ganti antara L.UB dan L">
+      <span class="sidebar-switch-icon">&#8646;</span>
+      <span class="sidebar-switch-text">
+        <span class="sidebar-switch-label">Ganti Kuesioner</span>
+        <span class="sidebar-switch-sub">L.UB &middot; L (Rumah Tangga)</span>
+      </span>
+    </button>
   </div>
 
   <!-- ===== L.UB SIDEBAR GROUPS ===== -->
@@ -307,6 +319,9 @@
     <button class="sidebar-btn sidebar-btn-primary" id="sidebarDraftBtn" onclick="saveAsDraft()">
       <span class="sidebar-btn-icon">&#128190;</span> Simpan Draft
     </button>
+    <button class="sidebar-btn" onclick="openSettingsModal()">
+      <span class="sidebar-btn-icon">&#9881;</span> Atur Tampilan
+    </button>
     <button class="sidebar-btn" onclick="togglePetunjuk()">
       <span class="sidebar-btn-icon">&#128203;</span> Petunjuk Pengisian
     </button>
@@ -333,6 +348,28 @@
 
 <!-- ====== MAIN CONTENT ====== -->
 <div class="main-content" id="mainContent">
+
+<!-- DESKTOP TOPBAR — Submit + Rekap & Periksa -->
+<div class="desk-topbar" id="deskTopbar">
+  <div class="desk-topbar-text">
+    <div class="desk-topbar-title" id="deskTopbarTitle">Kuesioner CAWI SE2026</div>
+    <div class="desk-topbar-sub" id="deskTopbarSub">BLOK I — Identitas Usaha/Perusahaan</div>
+  </div>
+  <div class="desk-topbar-actions">
+    <button type="button" class="topbar-btn topbar-btn-ghost" onclick="openSettingsModal()" title="Atur tampilan">
+      <span class="topbar-btn-icon">&#9881;</span><span class="topbar-btn-text">Tampilan</span>
+    </button>
+    <button type="button" class="topbar-btn topbar-btn-ghost" onclick="togglePetunjuk()" title="Petunjuk pengisian">
+      <span class="topbar-btn-icon">&#128203;</span><span class="topbar-btn-text">Petunjuk</span>
+    </button>
+    <button type="button" class="topbar-btn topbar-btn-outline" onclick="showRecap()" title="Periksa isian sebelum submit">
+      <span class="topbar-btn-icon">&#128269;</span><span class="topbar-btn-text">Rekap &amp; Periksa</span>
+    </button>
+    <button type="button" class="topbar-btn topbar-btn-primary" onclick="showRecap()" title="Kirim data">
+      <span class="topbar-btn-icon">&#128228;</span><span class="topbar-btn-text">Submit</span>
+    </button>
+  </div>
+</div>
 
 <!-- HEADER KOP — hanya tampil di Blok I -->
 <div class="header-kop" id="headerKop">
@@ -3134,9 +3171,146 @@
   </div>
 </div>
 <!-- SUBMIT LOADING OVERLAY -->
-<div id="submitLoadingOverlay" style="display:none;position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.55);display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px">
-  <div style="width:52px;height:52px;border:5px solid rgba(255,255,255,.25);border-top-color:#fff;border-radius:50%;animation:spin .8s linear infinite"></div>
-  <div style="color:#fff;font-size:15px;font-weight:600;letter-spacing:.3px" id="submitLoadingText">Mengirim data…</div>
+<div id="submitLoadingOverlay" class="cawi-loading-overlay" style="display:none">
+  <div class="cawi-loading-card">
+    <div class="cawi-loading-spinner"></div>
+    <div class="cawi-loading-text" id="submitLoadingText">Mengirim data…</div>
+    <div class="cawi-loading-sub">Mohon tunggu sebentar</div>
+  </div>
+</div>
+
+<!-- ====== ATUR TAMPILAN (SETTINGS) MODAL ====== -->
+<div class="set-backdrop" id="setBackdrop" onclick="if(event.target===this)closeSettingsModal()" style="display:none">
+  <div class="set-modal" role="dialog" aria-modal="true" aria-labelledby="setTitle">
+    <div class="set-head">
+      <div>
+        <div class="set-title" id="setTitle">Atur Tampilan</div>
+        <div class="set-sub">Preferensi tampilan &amp; pengisian kuesioner</div>
+      </div>
+      <button class="set-x" onclick="closeSettingsModal()" aria-label="Tutup">&#10005;</button>
+    </div>
+    <div class="set-body">
+      <div class="set-section-label">TAMPILAN</div>
+
+      <div class="set-row">
+        <div class="set-row-left">
+          <div class="set-row-label">Ukuran teks</div>
+          <div class="set-row-hint">Skala font seluruh kuesioner.</div>
+        </div>
+        <div class="set-row-control">
+          <div class="set-seg" data-key="fontSize">
+            <button type="button" class="set-seg-btn" data-val="small">Kecil</button>
+            <button type="button" class="set-seg-btn on" data-val="medium">Sedang</button>
+            <button type="button" class="set-seg-btn" data-val="large">Besar</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="set-row">
+        <div class="set-row-left">
+          <div class="set-row-label">Kerapatan</div>
+          <div class="set-row-hint">Jarak antar pertanyaan dan field.</div>
+        </div>
+        <div class="set-row-control">
+          <div class="set-seg" data-key="density">
+            <button type="button" class="set-seg-btn" data-val="compact">Padat</button>
+            <button type="button" class="set-seg-btn on" data-val="comfortable">Nyaman</button>
+            <button type="button" class="set-seg-btn" data-val="spacious">Lega</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="set-row">
+        <div class="set-row-left">
+          <div class="set-row-label">Tipografi</div>
+          <div class="set-row-hint">Keluarga font untuk teks formulir.</div>
+        </div>
+        <div class="set-row-control">
+          <div class="set-seg" data-key="fontFamily">
+            <button type="button" class="set-seg-btn on" data-val="inter">Inter</button>
+            <button type="button" class="set-seg-btn" data-val="system">Sistem</button>
+            <button type="button" class="set-seg-btn" data-val="serif">Serif</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="set-row">
+        <div class="set-row-left">
+          <div class="set-row-label">Palet warna</div>
+          <div class="set-row-hint">Identitas aksen utama kuesioner.</div>
+        </div>
+        <div class="set-row-control">
+          <div class="set-palette" data-key="palette">
+            <button type="button" class="set-palette-chip on" data-val="orange" aria-label="Orange BPS" style="--c1:#ed6c00;--c2:#fdf2dd"></button>
+            <button type="button" class="set-palette-chip" data-val="navy" aria-label="Navy" style="--c1:#1e40af;--c2:#dbeafe"></button>
+            <button type="button" class="set-palette-chip" data-val="forest" aria-label="Forest" style="--c1:#047857;--c2:#d1fae5"></button>
+            <button type="button" class="set-palette-chip" data-val="graphite" aria-label="Graphite" style="--c1:#18181b;--c2:#e4e4e7"></button>
+            <button type="button" class="set-palette-chip" data-val="burgundy" aria-label="Burgundy" style="--c1:#9f1239;--c2:#fde2e7"></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="set-row">
+        <div class="set-row-left">
+          <div class="set-row-label">Kontras tinggi</div>
+          <div class="set-row-hint">Memperkuat warna teks dan garis.</div>
+        </div>
+        <div class="set-row-control">
+          <button type="button" class="set-toggle" data-key="highContrast" role="switch" aria-checked="false">
+            <span class="set-toggle-thumb"></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="set-section-label" style="margin-top:14px">BANTUAN PENGISIAN</div>
+
+      <div class="set-row">
+        <div class="set-row-left">
+          <div class="set-row-label">Tampilkan keterangan field</div>
+          <div class="set-row-hint">Teks miring oranye di bawah label.</div>
+        </div>
+        <div class="set-row-control">
+          <button type="button" class="set-toggle on" data-key="showHints" role="switch" aria-checked="true">
+            <span class="set-toggle-thumb"></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="set-row">
+        <div class="set-row-left">
+          <div class="set-row-label">Tampilkan nomor pertanyaan</div>
+          <div class="set-row-hint">Nomor di kiri tiap pertanyaan.</div>
+        </div>
+        <div class="set-row-control">
+          <button type="button" class="set-toggle on" data-key="showNumbers" role="switch" aria-checked="true">
+            <span class="set-toggle-thumb"></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="set-section-label" style="margin-top:14px">OTOMATIS</div>
+
+      <div class="set-row">
+        <div class="set-row-left">
+          <div class="set-row-label">Auto-save draft</div>
+          <div class="set-row-hint">Simpan draft lokal secara berkala.</div>
+        </div>
+        <div class="set-row-control">
+          <div class="set-seg" data-key="autosave">
+            <button type="button" class="set-seg-btn" data-val="off">Off</button>
+            <button type="button" class="set-seg-btn" data-val="30">30 dtk</button>
+            <button type="button" class="set-seg-btn on" data-val="60">60 dtk</button>
+            <button type="button" class="set-seg-btn" data-val="120">2 mnt</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="set-foot">
+      <button type="button" class="btn btn-secondary" onclick="resetSettings()">Reset</button>
+      <div style="flex:1"></div>
+      <button type="button" class="btn btn-primary" onclick="closeSettingsModal()">Selesai</button>
+    </div>
+  </div>
 </div>
 <!-- LEAVE GUARD MODAL -->
 <div class="modal-overlay" id="leaveGuardOverlay" onclick="leaveGuardCancel()"></div>
@@ -3152,6 +3326,8 @@
 <!-- Konfigurasi & util shared -->
 <script src="js/config.js"></script>
 <script src="js/shared/utils.js"></script>
+<script src="js/shared/settings.js"></script>
+<script src="js/shared/loading.js"></script>
 <!-- Data master (regional, profesi) -->
 <script src="data.js"></script>
 <script src="data-profesi.js"></script>

@@ -11,8 +11,34 @@ function goBlok(n) {
   const kop = document.getElementById('headerKop');
   if (kop) kop.classList.toggle('kop-hidden', n !== 1);
   if (typeof updateProgress === 'function') updateProgress();
+  if (typeof updateDeskTopbar === 'function') updateDeskTopbar(n, mode);
   window.scrollTo({top: 0, behavior: 'smooth'});
   closeSidebar();
+}
+
+/* ====== Desktop topbar — sync title with active blok ====== */
+function updateDeskTopbar(n, mode) {
+  const titleEl = document.getElementById('deskTopbarTitle');
+  const subEl   = document.getElementById('deskTopbarSub');
+  if (!titleEl || !subEl) return;
+  mode = mode || ((typeof getFormMode === 'function') ? getFormMode() : 'lub');
+  const isL = mode === 'l';
+  const head = isL ? 'Kuesioner SE2026-L' : 'Kuesioner SE2026-L.UB';
+  const lubBloks = {
+    1: 'BLOK I — Identitas Usaha/Perusahaan',
+    2: 'BLOK II — Catatan Kunjungan',
+    3: 'BLOK III — Identitas Responden',
+  };
+  const lBloks = {
+    1: 'BLOK I — Keluarga & Anggota',
+    2: 'BLOK II — Usaha / Perusahaan',
+    3: 'BLOK III — Perumahan & Aset',
+    4: 'BLOK IV — Catatan Pendata',
+    5: 'BLOK V — Petugas & Responden',
+  };
+  const map = isL ? lBloks : lubBloks;
+  titleEl.textContent = head;
+  subEl.textContent   = map[n] || ('BLOK ' + n);
 }
 
 

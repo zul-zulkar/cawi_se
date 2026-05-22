@@ -2,6 +2,28 @@
 <!-- ====== MAIN CONTENT ====== -->
 <div class="main-content" id="mainContent">
 
+<!-- DESKTOP TOPBAR — Submit + Rekap & Periksa -->
+<div class="desk-topbar" id="deskTopbar">
+  <div class="desk-topbar-text">
+    <div class="desk-topbar-title" id="deskTopbarTitle">Kuesioner CAWI SE2026</div>
+    <div class="desk-topbar-sub" id="deskTopbarSub">BLOK I — Identitas Usaha/Perusahaan</div>
+  </div>
+  <div class="desk-topbar-actions">
+    <button type="button" class="topbar-btn topbar-btn-ghost" onclick="openSettingsModal()" title="Atur tampilan">
+      <span class="topbar-btn-icon">&#9881;</span><span class="topbar-btn-text">Tampilan</span>
+    </button>
+    <button type="button" class="topbar-btn topbar-btn-ghost" onclick="togglePetunjuk()" title="Petunjuk pengisian">
+      <span class="topbar-btn-icon">&#128203;</span><span class="topbar-btn-text">Petunjuk</span>
+    </button>
+    <button type="button" class="topbar-btn topbar-btn-outline" onclick="showRecap()" title="Periksa isian sebelum submit">
+      <span class="topbar-btn-icon">&#128269;</span><span class="topbar-btn-text">Rekap &amp; Periksa</span>
+    </button>
+    <button type="button" class="topbar-btn topbar-btn-primary" onclick="showRecap()" title="Kirim data">
+      <span class="topbar-btn-icon">&#128228;</span><span class="topbar-btn-text">Submit</span>
+    </button>
+  </div>
+</div>
+
 <!-- HEADER KOP — hanya tampil di Blok I -->
 <div class="header-kop" id="headerKop">
   <div class="kop-inner">

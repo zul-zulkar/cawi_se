@@ -12,6 +12,17 @@
     </span>
   </div>
 
+  <!-- GANTI KUESIONER — tombol prominent -->
+  <div class="sidebar-switch-row">
+    <button type="button" class="sidebar-switch-btn" onclick="switchFormMode()" title="Ganti antara L.UB dan L">
+      <span class="sidebar-switch-icon">&#8646;</span>
+      <span class="sidebar-switch-text">
+        <span class="sidebar-switch-label">Ganti Kuesioner</span>
+        <span class="sidebar-switch-sub">L.UB &middot; L (Rumah Tangga)</span>
+      </span>
+    </button>
+  </div>
+
   <!-- ===== L.UB SIDEBAR GROUPS ===== -->
   <!-- BLOK I -->
   <div class="sidebar-blok-group sb-lub">
@@ -226,6 +237,9 @@
   <div class="sidebar-actions">
     <button class="sidebar-btn sidebar-btn-primary" id="sidebarDraftBtn" onclick="saveAsDraft()">
       <span class="sidebar-btn-icon">&#128190;</span> Simpan Draft
+    </button>
+    <button class="sidebar-btn" onclick="openSettingsModal()">
+      <span class="sidebar-btn-icon">&#9881;</span> Atur Tampilan
     </button>
     <button class="sidebar-btn" onclick="togglePetunjuk()">
       <span class="sidebar-btn-icon">&#128203;</span> Petunjuk Pengisian
