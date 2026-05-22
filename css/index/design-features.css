@@ -20,6 +20,46 @@
 }
 
 /* ========================================================
+   CONDITIONAL VISIBILITY — KBLI Halal/BPOM + L2 kode 6
+   ======================================================== */
+.section-card.kbli-hidden{ display: none !important; }
+
+/* L Q14a kode 6 (Unit Pembantu/Penunjang) → hide all sections
+   after Q14 inside Blok II; Blok III/IV stay nav-locked.
+   Class .pendataan-selesai-hide is applied by JS (handleJaringanL). */
+.section-card.pendataan-selesai-hide{ display: none !important; }
+
+body.l2-pendataan-selesai .sidebar-item#sidebarTabL3,
+body.l2-pendataan-selesai .sidebar-item#sidebarTabL4{
+  opacity: .5; pointer-events: none;
+}
+body.l2-pendataan-selesai #blokL3,
+body.l2-pendataan-selesai #blokL4{
+  display: none !important;
+}
+
+/* Pendataan selesai notice — emphasized */
+#l2_unit_pembantu_notice{
+  background: var(--amber-soft);
+  border: 1px solid #fcd34d;
+  border-left: 4px solid var(--amber);
+  border-radius: var(--r-md);
+  padding: 14px 18px;
+  margin: 14px 0;
+  font-size: 13.5px;
+  color: #78350f;
+  line-height: 1.65;
+  animation: fadeUp .25s ease both;
+}
+#l2_unit_pembantu_notice strong{
+  display: block;
+  font-size: 14px; font-weight: 800;
+  letter-spacing: .04em; text-transform: uppercase;
+  color: #92400e;
+  margin-bottom: 4px;
+}
+
+/* ========================================================
    SCROLL OFFSET — keep clicked questions below sticky topbar
    ======================================================== */
 .section-card,

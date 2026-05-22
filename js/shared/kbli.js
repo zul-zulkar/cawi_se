@@ -134,6 +134,7 @@ function selectKBLI(d) {
   }
   const isHotel = d.kategori === 'I' || (d.kode && d.kode.startsWith('55'));
   document.getElementById('q9i_hotel_wrap').classList.toggle('hidden', !isHotel);
+  if (window.kbliFilters) window.kbliFilters.apply(d.kode);
   updateProgress();
 }
 
@@ -150,6 +151,7 @@ function clearKBLI() {
   }
   document.getElementById('q9i_hotel_wrap').classList.add('hidden');
   document.querySelectorAll('input[name="q9i"]').forEach(r => r.checked = false);
+  if (window.kbliFilters) window.kbliFilters.apply('');
   updateProgress();
 }
 

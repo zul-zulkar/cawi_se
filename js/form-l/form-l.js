@@ -620,6 +620,21 @@ function handleJaringanL() {
   document.getElementById('l2_kp_wrap').classList.toggle('hidden', !['3', '4', '5', '6'].includes(v));
   const notice = document.getElementById('l2_unit_pembantu_notice');
   if (notice) notice.classList.toggle('hidden', v !== '6');
+  // Kode 6 = Unit Pembantu/Penunjang → pendataan selesai: hide all sections after L2.14
+  const isSelesai = (v === '6');
+  document.body.classList.toggle('l2-pendataan-selesai', isSelesai);
+  // Hide every section-card in #blokL2 whose header is sec-L2-16 onwards
+  const blok = document.getElementById('blokL2');
+  if (blok) {
+    blok.querySelectorAll('.section-card').forEach(card => {
+      const hdr = card.querySelector('.section-header');
+      if (!hdr || !hdr.id) return;
+      const m = hdr.id.match(/^sec-L2-(\d+)/);
+      if (m && parseInt(m[1], 10) >= 16) {
+        card.classList.toggle('pendataan-selesai-hide', isSelesai);
+      }
+    });
+  }
 }
 
 function handleInternetL() {
@@ -907,6 +922,7 @@ function selectKBLIL(entry) {
   // Show hotel wrap if KBLI starts with akomodasi prefix (551)
   const wrap = document.getElementById('l2_hotel_wrap');
   if (wrap) wrap.classList.toggle('hidden', !(entry.kode || '').startsWith('551'));
+  if (window.kbliFilters) window.kbliFilters.apply(entry.kode);
 }
 
 function clearKBLIL() {
@@ -918,6 +934,7 @@ function clearKBLIL() {
   if (chip) chip.style.display = 'none';
   const wrap = document.getElementById('l2_hotel_wrap');
   if (wrap) wrap.classList.add('hidden');
+  if (window.kbliFilters) window.kbliFilters.apply('');
 }
 
 /* ====== L MODE EDIT MODE LOADER ====== */

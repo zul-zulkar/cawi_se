@@ -73,6 +73,28 @@
         <label class="field-label">e. Nama Kawasan <span class="req">*</span></label>
         <input type="text" id="l2_nama_kawasan" placeholder="Nama kawasan"/>
       </div>
+      <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_l2_q8',this)">&#128161; Petunjuk</button>
+      <div class="field-pj-box" id="pj_l2_q8">
+        <div class="field-pj-title">8. Nama dan Alamat Usaha</div>
+        <div class="pj-section pj-include">
+          <div class="pj-section-title">b. Nama Komersial:</div>
+          <p>Nama yang dikenal masyarakat atau merek dagang (mis. &ldquo;Warung Mbok Yem&rdquo;, &ldquo;Bakso Pak Kumis&rdquo;). Jika tidak punya nama komersial, tulis sama dengan nama usaha pada rincian a.</p>
+        </div>
+        <div class="pj-section pj-include">
+          <div class="pj-section-title">c. Alamat Usaha:</div>
+          <p>Alamat fisik tempat kegiatan usaha utama dilakukan.</p>
+          <ul class="pj-list">
+            <li>Untuk usaha di dalam bangunan tempat tinggal: catat alamat rumah pemilik</li>
+            <li>Untuk usaha keliling: catat alamat tempat tinggal pemilik (basis usaha)</li>
+            <li>Untuk usaha di luar bangunan tetap: catat alamat tempat tinggal pemilik</li>
+            <li>Untuk usaha persewaan rumah: catat alamat tempat tinggal pemilik</li>
+          </ul>
+        </div>
+        <div class="pj-section pj-include">
+          <div class="pj-section-title">e. Nama Kawasan (jika 5d &ne; &ldquo;Di luar kawasan&rdquo;):</div>
+          <p>Tuliskan nama spesifik kawasan. Contoh: KEK Mandalika, Bandara Ngurah Rai, Pasar Pagi Asemka, Rest Area KM 57.</p>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -107,6 +129,25 @@
             <label class="field-label">b3. Kabupaten/Kota</label>
             <input type="text" id="l2_lokasi_kab" placeholder="Nama kab/kota (kode diisi BPS)"/>
           </div>
+        </div>
+      </div>
+      <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_l2_q9',this)">&#128161; Petunjuk</button>
+      <div class="field-pj-box" id="pj_l2_q9">
+        <div class="field-pj-title">9. Jenis Usaha &amp; Lokasi Utama</div>
+        <div class="pj-section pj-include">
+          <div class="pj-section-title">Klasifikasi Jenis Usaha:</div>
+          <ul class="pj-list">
+            <li><strong>1. Dalam bangunan tempat tinggal</strong> &mdash; warung di rumah, salon di garasi, jahit rumahan</li>
+            <li><strong>2. Usaha keliling</strong> &mdash; pedagang asongan, tukang sol sepatu, mie ayam dorongan</li>
+            <li><strong>3. Lokasi tetap di luar bangunan</strong> &mdash; tenda kaki lima, gerobak, lapak pasar (perlengkapan dibongkar-pasang)</li>
+            <li><strong>4. Konstruksi/tambang/galian perorangan</strong> &mdash; tukang bangunan, kontraktor kecil, penambang pasir</li>
+            <li><strong>5. Persewaan rumah/kamar/kantor</strong> &mdash; kos-kosan, kontrakan, ruko sewa</li>
+            <li><strong>6. Pertanian</strong> &mdash; petani, peternak, nelayan, pekebun</li>
+          </ul>
+        </div>
+        <div class="pj-section pj-note">
+          <div class="pj-section-title">Catatan:</div>
+          <p>Kode 1 atau 2 langsung lanjut ke rincian 10. Kode 3&ndash;6 wajib mengisi lokasi utama usaha (rincian b1, b2, b3).</p>
         </div>
       </div>
     </div>
@@ -234,6 +275,23 @@
       <div class="form-group">
         <label class="field-label">a. Kegiatan utama usaha <span class="req">*</span></label>
         <textarea id="l2_kegiatan_utama" rows="3" placeholder="Tuliskan selengkapnya kegiatan utama yang dilakukan"></textarea>
+        <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_l2_13a',this)">&#128161; Petunjuk</button>
+        <div class="field-pj-box" id="pj_l2_13a">
+          <div class="field-pj-title">13a. Kegiatan Utama Usaha</div>
+          <p>Tuliskan secara rinci kegiatan utama usaha, termasuk produk/jasa yang dihasilkan dan cara penjualannya.</p>
+          <div class="pj-section pj-include">
+            <div class="pj-section-title">Contoh Pengisian:</div>
+            <div class="field-pj-ex">menggiling daging ikan menjadi sosis dan dijual di rumah/online</div>
+            <div class="field-pj-ex">membuat kebab di rumah dan dititipkan di warung</div>
+            <div class="field-pj-ex">jasa borongan/konstruksi rumah</div>
+            <div class="field-pj-ex">menjual mobil bekas di showroom</div>
+            <div class="field-pj-ex">menjual kaset video game yang dibeli dari pihak lain di marketplace</div>
+            <div class="field-pj-ex">angkutan bus antarkota antarprovinsi</div>
+            <div class="field-pj-ex">menyewakan kos bulanan</div>
+            <div class="field-pj-ex">membuat desain kemasan botol minuman</div>
+            <div class="field-pj-ex">meracik jamu secara langsung untuk siap konsumsi di sebuah kedai</div>
+          </div>
+        </div>
       </div>
       <div class="form-group">
         <div class="subsection-label">b1. Memproduksi barang di lokasi ini?</div>
@@ -284,15 +342,58 @@
         <div class="form-group">
           <label class="field-label">d. Input yang digunakan</label>
           <textarea id="l2_input" rows="2" placeholder="Contoh: daging, tepung, kain, kayu"></textarea>
+          <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_l2_13d',this)">&#128161; Petunjuk</button>
+          <div class="field-pj-box" id="pj_l2_13d">
+            <div class="field-pj-title">13d. Input / Bahan Baku</div>
+            <p>Tuliskan bahan baku, bahan penolong, atau input utama yang digunakan dalam proses produksi/kegiatan.</p>
+            <div class="pj-section pj-include">
+              <div class="pj-section-title">Contoh Pengisian:</div>
+              <div class="field-pj-ex">tepung terigu, mentega, telur, gula, susu (usaha pembuatan roti/kue)</div>
+              <div class="field-pj-ex">kayu jati, kayu mahoni, baut, plitur (usaha mebel)</div>
+              <div class="field-pj-ex">ikan nila, ikan bandeng, tepung roti, bumbu (usaha pengolahan ikan)</div>
+              <div class="field-pj-ex">pakaian/tekstil dari distributor atau produsen (usaha perdagangan)</div>
+              <div class="field-pj-ex">semen, pasir, bata, besi tulangan (usaha konstruksi)</div>
+              <div class="field-pj-ex">tenaga/waktu pengerjaan (usaha jasa seperti konsultasi, salon)</div>
+              <div class="field-pj-ex">tidak ada bahan baku fisik (usaha jasa pendidikan, keuangan, dll.)</div>
+            </div>
+          </div>
         </div>
         <div class="form-group">
           <label class="field-label">e. Proses mengubah input jadi output</label>
           <textarea id="l2_proses" rows="2" placeholder="Contoh: menggiling, membakar, mengasapi"></textarea>
+          <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_l2_13e',this)">&#128161; Petunjuk</button>
+          <div class="field-pj-box" id="pj_l2_13e">
+            <div class="field-pj-title">13e. Proses Produksi</div>
+            <p>Jelaskan alur proses dari penerimaan input hingga produk/jasa siap dijual.</p>
+            <div class="pj-section pj-include">
+              <div class="pj-section-title">Contoh Pengisian:</div>
+              <div class="field-pj-ex">membeli bahan &rarr; mengolah/memasak &rarr; mengemas &rarr; menjual langsung/online</div>
+              <div class="field-pj-ex">menerima pesanan &rarr; memotong/menjahit bahan &rarr; finishing &rarr; mengirim ke pelanggan</div>
+              <div class="field-pj-ex">membeli barang dari distributor &rarr; menyimpan di gudang &rarr; menjual eceran</div>
+              <div class="field-pj-ex">menerima pelanggan &rarr; mengerjakan jasa &rarr; mengecek kualitas &rarr; menerima pembayaran</div>
+              <div class="field-pj-ex">mengumpulkan bahan baku &rarr; memproses di pabrik &rarr; mengemas &rarr; mendistribusikan</div>
+            </div>
+          </div>
         </div>
       </div>
       <div class="form-group">
         <label class="field-label">f. Produk utama yang dihasilkan <span class="req">*</span></label>
         <textarea id="l2_produk_utama" rows="2" placeholder="Contoh: padi, sosis, jasa renovasi"></textarea>
+        <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_l2_13f',this)">&#128161; Petunjuk</button>
+        <div class="field-pj-box" id="pj_l2_13f">
+          <div class="field-pj-title">13f. Produk Utama</div>
+          <p>Tuliskan produk barang atau jasa utama yang dihasilkan/dijual usaha ini.</p>
+          <div class="pj-section pj-include">
+            <div class="pj-section-title">Contoh Pengisian:</div>
+            <div class="field-pj-ex">roti tawar, donat, kue brownies, kue kering (usaha bakery)</div>
+            <div class="field-pj-ex">meja makan, kursi tamu, lemari dari kayu jati (usaha mebel)</div>
+            <div class="field-pj-ex">ikan goreng siap saji, nugget ikan, bakso ikan (usaha pengolahan ikan)</div>
+            <div class="field-pj-ex">pakaian batik, kemeja, celana, kaos (usaha perdagangan tekstil)</div>
+            <div class="field-pj-ex">jasa potong rambut, creambath, warna rambut (usaha salon)</div>
+            <div class="field-pj-ex">jasa perbaikan AC, kulkas, mesin cuci (usaha servis elektronik)</div>
+            <div class="field-pj-ex">bangunan rumah/ruko/gedung sesuai pesanan (usaha konstruksi)</div>
+          </div>
+        </div>
       </div>
       <div class="form-group">
         <label class="field-label">g. Kode KBLI (5 digit) <span class="req">*</span></label>
@@ -350,7 +451,11 @@
         <input type="number" id="l2_jml_cabang" min="0" placeholder="0"/>
       </div>
       <div class="notice-box hidden" id="l2_unit_pembantu_notice">
-        <strong>PENDATAAN SELESAI</strong> — Unit Pembantu/Penunjang tidak didata lebih lanjut di kuesioner ini. Isikan saja identitas kantor pusat di bawah dan hentikan pengisian.
+        <strong>PENDATAAN SELESAI</strong>
+        Unit Pembantu/Penunjang tidak didata lebih lanjut di kuesioner ini. Isikan identitas kantor pusat di bawah, lalu lanjut ke <strong>BLOK V</strong> untuk tanda tangan &amp; submit. Pertanyaan 16&ndash;33 tidak akan ditampilkan.
+        <div style="margin-top:12px">
+          <button type="button" class="btn btn-primary btn-sm" onclick="goBlok(5)">&#10148; Lanjut ke BLOK V</button>
+        </div>
       </div>
       <div class="hidden" id="l2_kp_wrap">
         <div class="subsection-label">15. Informasi Kantor Pusat</div>
@@ -475,6 +580,32 @@
           <label class="radio-item"><input type="radio" name="l2_ramah_b" value="2"/> <span>2. Tidak</span></label>
         </div>
       </div>
+      <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_l2_17',this)">&#128161; Petunjuk</button>
+      <div class="field-pj-box" id="pj_l2_17">
+        <div class="field-pj-title">17. Produk Ramah Lingkungan</div>
+        <div class="pj-section pj-include">
+          <div class="pj-section-title">a. Produk ramah lingkungan &mdash; Termasuk:</div>
+          <ul class="pj-list">
+            <li>Produk hasil daur ulang atau bahan baku terbarukan</li>
+            <li>Produk hemat energi/air atau bersertifikat eco-label</li>
+            <li>Kemasan biodegradable, reusable, atau ramah lingkungan</li>
+            <li>Jasa yang mengurangi emisi (mis. kendaraan listrik, energi hijau)</li>
+          </ul>
+        </div>
+        <div class="pj-section pj-include">
+          <div class="pj-section-title">b. Input perlindungan lingkungan &mdash; Termasuk:</div>
+          <ul class="pj-list">
+            <li>Pengelolaan limbah dan air buangan secara mandiri</li>
+            <li>Penggunaan energi terbarukan (PLTS, biogas)</li>
+            <li>Pembelian peralatan hemat energi (LED, motor efisien)</li>
+            <li>Bahan baku bersertifikat lingkungan (FSC, RSPO, organik)</li>
+          </ul>
+        </div>
+        <div class="pj-section pj-note">
+          <div class="pj-section-title">Catatan:</div>
+          <p>Untuk &ldquo;sebagian&rdquo;: minimal satu lini produk atau proses memenuhi kriteria ramah lingkungan. Berikan jawaban berdasarkan kondisi sepanjang tahun pelaporan.</p>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -487,6 +618,24 @@
         <div class="radio-group">
           <label class="radio-item"><input type="radio" name="l2_kreatif" value="1"/> <span>1. Ya</span></label>
           <label class="radio-item"><input type="radio" name="l2_kreatif" value="2"/> <span>2. Tidak</span></label>
+        </div>
+      </div>
+      <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_l2_18',this)">&#128161; Petunjuk</button>
+      <div class="field-pj-box" id="pj_l2_18">
+        <div class="field-pj-title">18. Produk Karya Seni / Sastra / Desain / Teknologi / Warisan</div>
+        <div class="pj-section pj-include">
+          <div class="pj-section-title">Termasuk:</div>
+          <ul class="pj-list">
+            <li>Karya seni rupa, musik, film, sastra, atau pertunjukan</li>
+            <li>Desain produk, fashion, kemasan, atau interior</li>
+            <li>Perangkat lunak/teknologi kreatif (aplikasi, game, AI)</li>
+            <li>Warisan budaya tradisional sebagai motif/identitas (batik, tenun, ukir)</li>
+            <li>Lisensi/royalti pada hak cipta, paten, merek, atau waralaba</li>
+          </ul>
+        </div>
+        <div class="pj-section pj-note">
+          <div class="pj-section-title">Catatan:</div>
+          <p>Pilih &ldquo;Ya&rdquo; bila salah satu kategori di atas dimanfaatkan secara reguler dalam aktivitas usaha selama tahun pelaporan.</p>
         </div>
       </div>
     </div>
@@ -591,6 +740,32 @@
           <label class="radio-item"><input type="radio" name="l2_nonpend_c" value="2"/> <span>2. Tidak</span></label>
         </div>
       </div>
+      <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_l2_23',this)">&#128161; Petunjuk</button>
+      <div class="field-pj-box" id="pj_l2_23">
+        <div class="field-pj-title">23. Transaksi dengan Bukan Penduduk Indonesia</div>
+        <p>Bukan penduduk adalah orang atau badan yang <strong>pusat kegiatan ekonominya berada di luar wilayah Indonesia</strong>.</p>
+        <div class="pj-section pj-include">
+          <div class="pj-section-title">Termasuk:</div>
+          <ul class="pj-list">
+            <li>Ekspor barang (FOB) dan jasa ke luar negeri</li>
+            <li>Penjualan ke wisatawan asing (oleh-oleh, restoran, hotel)</li>
+            <li>Layanan online lintas-batas (freelance, royalti digital, dropship)</li>
+            <li>Impor bahan baku atau jasa dari luar negeri</li>
+            <li>Pembelian konsultan, software, pelatihan dari luar negeri</li>
+          </ul>
+        </div>
+        <div class="pj-section pj-exclude">
+          <div class="pj-section-title">Tidak Termasuk:</div>
+          <ul class="pj-list">
+            <li>Transaksi dengan WNA yang menetap di Indonesia &gt; 1 tahun</li>
+            <li>Transaksi dengan cabang asing yang berbadan hukum Indonesia</li>
+          </ul>
+        </div>
+        <div class="pj-section pj-note">
+          <div class="pj-section-title">Catatan:</div>
+          <p>Periode cakupan: 1 Mei 2024 s.d. 31 Agustus 2026. Jawab &ldquo;Ya&rdquo; jika minimal satu kali transaksi terjadi.</p>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -627,6 +802,31 @@
           <input type="number" id="l2_pekerja_total2" class="input-muted" readonly placeholder="0"/>
         </div>
       </div>
+      <button class="field-pj-btn" type="button" onclick="toggleFieldPetunjuk('pj_l2_24',this)">&#128161; Petunjuk</button>
+      <div class="field-pj-box" id="pj_l2_24">
+        <div class="field-pj-title">24. Pekerja</div>
+        <div class="pj-section pj-include">
+          <div class="pj-section-title">Termasuk:</div>
+          <ul class="pj-list">
+            <li>Pemilik usaha yang aktif bekerja di usaha tersebut</li>
+            <li>Pekerja tetap dan tidak tetap</li>
+            <li>Pekerja keluarga yang dibayar maupun tidak dibayar</li>
+            <li>Pekerja paruh waktu, musiman, dan harian</li>
+          </ul>
+        </div>
+        <div class="pj-section pj-exclude">
+          <div class="pj-section-title">Tidak Termasuk:</div>
+          <ul class="pj-list">
+            <li>Pekerja outsourcing yang bekerja di tempat lain</li>
+            <li>Konsultan eksternal/freelance yang hanya sesekali memberi jasa</li>
+            <li>Pemilik saham/investor pasif yang tidak bekerja</li>
+          </ul>
+        </div>
+        <div class="pj-section pj-note">
+          <div class="pj-section-title">Catatan:</div>
+          <p>Jika usaha beroperasi tahun 2026: gunakan <strong>rata-rata per bulan</strong>. Jika usaha beroperasi sebelum 2026: gunakan jumlah <strong>per 31 Desember 2025</strong> atau rata-rata 2025. Isi pekerja laki-laki dan perempuan secara terpisah; total akan otomatis terhitung. Juga isi pemisahan dibayar/tidak dibayar.</p>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -646,7 +846,53 @@
   <div class="section-card hidden" id="l2_tahunan_wrap">
     <div class="section-header" id="sec-L2-26">26-29. Keuangan Tahun 2025</div>
     <div class="section-body">
-      <div class="subsection-label">26. Pengeluaran Tahun 2025</div>
+      <div class="subsection-label" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+        <span>26. Pengeluaran Tahun 2025</span>
+        <button class="field-pj-btn" style="margin:0" type="button" onclick="toggleFieldPetunjuk('pj_l2_26',this)">&#128161; Petunjuk</button>
+      </div>
+      <div class="field-pj-box" id="pj_l2_26">
+        <div class="field-pj-title">26. Nilai Pengeluaran Tahun 2025</div>
+        <div class="pj-section pj-include">
+          <div class="pj-section-title">a. Upah/gaji + jaminan sosial:</div>
+          <ul class="pj-list">
+            <li>Gaji pokok, tunjangan, bonus, lembur seluruh pekerja</li>
+            <li>Iuran BPJS Kesehatan dan BPJS Ketenagakerjaan</li>
+            <li>THR dan tunjangan lainnya</li>
+          </ul>
+        </div>
+        <div class="pj-section pj-include">
+          <div class="pj-section-title">b. Biaya produksi:</div>
+          <ul class="pj-list">
+            <li>Bahan baku, bahan penolong, bahan kemasan</li>
+            <li>Subkontrak produksi (makloon)</li>
+          </ul>
+        </div>
+        <div class="pj-section pj-include">
+          <div class="pj-section-title">c. Biaya pembelian barang yang dijual:</div>
+          <ul class="pj-list">
+            <li>Harga pokok pembelian barang dagangan (untuk usaha perdagangan)</li>
+          </ul>
+        </div>
+        <div class="pj-section pj-include">
+          <div class="pj-section-title">d. Biaya operasional:</div>
+          <ul class="pj-list">
+            <li>Listrik, air, gas, internet, pulsa, telepon</li>
+            <li>Sewa tempat, alat, kendaraan</li>
+            <li>Pemeliharaan, perbaikan, transportasi</li>
+          </ul>
+        </div>
+        <div class="pj-section pj-include">
+          <div class="pj-section-title">e. Biaya non-operasional:</div>
+          <ul class="pj-list">
+            <li>Bunga pinjaman, biaya bank, pajak (selain PPh karyawan)</li>
+            <li>Kerugian penjualan aset, denda, kerugian valas</li>
+          </ul>
+        </div>
+        <div class="pj-section pj-note">
+          <div class="pj-section-title">Catatan:</div>
+          <p>Isi nilai dalam Rupiah untuk seluruh kegiatan tahun 2025. Total (f) akan otomatis terhitung. Jika nilai tidak diketahui pasti, gunakan estimasi terbaik dari pembukuan usaha.</p>
+        </div>
+      </div>
       <div class="inline-fields">
         <div class="form-group"><label class="field-label">a. Upah/gaji + jaminan sosial</label>
           <div class="currency-input-wrap"><span class="currency-prefix">Rp</span>
@@ -794,7 +1040,29 @@
   <div class="section-card hidden" id="l2_bulanan_wrap">
     <div class="section-header" id="sec-L2-30">30-33. Keuangan Bulan Terakhir (2026)</div>
     <div class="section-body">
-      <div class="subsection-label">30. Pengeluaran Bulan Terakhir</div>
+      <div class="subsection-label" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+        <span>30. Pengeluaran Bulan Terakhir</span>
+        <button class="field-pj-btn" style="margin:0" type="button" onclick="toggleFieldPetunjuk('pj_l2_30',this)">&#128161; Petunjuk</button>
+      </div>
+      <div class="field-pj-box" id="pj_l2_30">
+        <div class="field-pj-title">30. Pengeluaran Bulan Terakhir (2026)</div>
+        <p>Catat pengeluaran <strong>bulan terakhir yang lengkap</strong> di tahun 2026, bukan rata-rata. Bila bulan berjalan belum lengkap, gunakan bulan sebelumnya.</p>
+        <div class="pj-section pj-include">
+          <div class="pj-section-title">a. Upah/gaji + jaminan sosial:</div>
+          <ul class="pj-list">
+            <li>Gaji bulanan + tunjangan + lembur seluruh pekerja</li>
+            <li>Iuran BPJS bulan tersebut</li>
+          </ul>
+        </div>
+        <div class="pj-section pj-include">
+          <div class="pj-section-title">b. Biaya produksi &mdash; c. Pembelian barang dagang &mdash; d. Operasional &mdash; e. Non-operasional:</div>
+          <p>Lihat penjelasan yang sama seperti rincian 26 (tahunan) &mdash; gunakan nilai bulanan.</p>
+        </div>
+        <div class="pj-section pj-note">
+          <div class="pj-section-title">Catatan:</div>
+          <p>Total (f) terhitung otomatis. Pastikan periode yang dijadikan acuan sama dengan rincian 31 (Pendapatan bulan terakhir).</p>
+        </div>
+      </div>
       <div class="inline-fields">
         <div class="form-group"><label class="field-label">a. Upah/gaji</label>
           <div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="l2_m30a" class="currency-field" oninput="formatCurrency(this);calcL2Bulanan()" placeholder="0"/></div>
@@ -819,7 +1087,37 @@
           <div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="l2_m30f" class="currency-field input-muted" readonly placeholder="0"/></div>
         </div>
       </div>
-      <div class="subsection-label subsection-label-spaced">31. Pendapatan Bulan Terakhir</div>
+      <div class="subsection-label subsection-label-spaced" style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+        <span>31. Pendapatan Bulan Terakhir</span>
+        <button class="field-pj-btn" style="margin:0" type="button" onclick="toggleFieldPetunjuk('pj_l2_31',this)">&#128161; Petunjuk</button>
+      </div>
+      <div class="field-pj-box" id="pj_l2_31">
+        <div class="field-pj-title">a. Nilai produksi/penjualan/pendapatan barang dan jasa</div>
+        <div class="pj-section pj-include">
+          <div class="pj-section-title">Termasuk:</div>
+          <ul class="pj-list">
+            <li>Barang yang dijual baik yang diproduksi sendiri maupun tidak</li>
+            <li>Penjualan ekspor (FOB &mdash; Free On Board)</li>
+            <li>Penjualan/transfer ke rekan bisnis atau cabang di luar negeri</li>
+            <li>Pendapatan pengangkutan barang yang tidak dijual perusahaan</li>
+            <li>Pendapatan jasa perbaikan, layanan, kontrak, subkontrak, komisi</li>
+            <li>Pendapatan manajemen, berlangganan, keanggotaan, iklan</li>
+            <li>Pendapatan royalti (hak cipta, hak paten, waralaba)</li>
+            <li>Pendapatan dari sewa operasi</li>
+          </ul>
+        </div>
+        <div class="pj-section pj-exclude">
+          <div class="pj-section-title">Tidak Termasuk:</div>
+          <ul class="pj-list">
+            <li>Penjualan aset</li>
+            <li>Royalti dari penggunaan lahan di bawah pengaturan sewa mineral</li>
+          </ul>
+        </div>
+        <div class="pj-section pj-note">
+          <div class="pj-section-title">Catatan:</div>
+          <p>Pada usaha pertanian, nilai produksi mencakup yang dipanen, dikonsumsi sendiri, diolah sendiri, dijual, disimpan, dipakai untuk upah/gaji, diberikan ke pihak lain, hilang, pertambahan bobot ternak, atau pembesaran tanaman kehutanan. Periode acuan: bulan terakhir yang lengkap di tahun 2026 (sama dengan rincian 30).</p>
+        </div>
+      </div>
       <div class="inline-fields">
         <div class="form-group"><label class="field-label">a. Produksi/penjualan</label>
           <div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="l2_m31a" class="currency-field" oninput="formatCurrency(this);calcL2Bulanan()" placeholder="0"/></div>
