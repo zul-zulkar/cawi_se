@@ -102,6 +102,28 @@ npm test
 
 ---
 
+## Changelog
+
+### v2.1 — Design Refresh & UX Polish
+- **Design system** baru — token warna/font, palet 5 pilihan (orange/navy/forest/graphite/burgundy), kontras tinggi
+- **Topbar sticky** desktop + mobile dengan Submit & Rekap; mobile menukar Keluar → Submit
+- **Atur Tampilan** modal (font size, density, palette, hints, autosave) — persistent di `localStorage`
+- **Loading UX** — spinner cycle saat verifikasi password, overlay saat submit, smooth animations
+- **KBLI conditional** — field Halal & BPOM otomatis muncul/sembunyi berdasarkan `master/KBLI Halal.csv` & `KBLI BPOM.csv`
+- **L Q14a = 6** (Unit Pembantu/Penunjang) → pendataan otomatis selesai, langsung ke BLOK V
+- **25 tombol Petunjuk** terstruktur di field-field kritikal L.UB & L Blok II
+- **Bootstrap Icons** v1.11 menggantikan emoji/SVG inline
+- **Reorganisasi file** — CSS ke `css/core/` + per-halaman, data ke `js/data/`, Apps Script ke `server/`
+- **+47 unit test** baru (kbli-filters, settings, loading) — total 535
+
+### v2.0 — Dual Mode (L.UB + L)
+- Tambah kuesioner **SE2026-L** (rumah tangga) berdampingan dengan **L.UB**
+- **Mode gate** saat login untuk memilih jenis pendataan
+- **Anggota dinamis** (max 30) dengan STOP-state & age-gated fields
+- Dual-sheet routing: `SE2026_L_Responses` + `SE2026_L_Anggota`
+
+---
+
 ## Lisensi & Kontak
 
 Dibuat untuk internal BPS. Untuk pertanyaan tentang deployment asli (password, endpoint produksi), hubungi pengelola proyek asal.
