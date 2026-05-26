@@ -970,10 +970,41 @@ function loadEditModeL(r) {
     setVal('l1_nik_kk', r.nik_kk);
     setVal('l1_no_kk', r.no_kk);
     setVal('l1_jml_kk_anggota', r.jml_anggota);
-    setVal('l1_alamat_provinsi', r.provinsi_kd);
-    setVal('l1_alamat_kab', r.kabupaten_kd);
-    setVal('l1_alamat_kec', r.kecamatan_kd);
-    setVal('l1_alamat_kel', r.kelurahan_kd);
+    // Alamat KK: cascade provinsi → kab → kec → kel dengan update display text
+    // setVal tidak digunakan agar onchange tidak memicu double-load;
+    // setiap level di-set langsung lalu display input (_inp) diperbarui manual.
+    (function() {
+      const _setDirect = (id, val) => {
+        const el = document.getElementById(id);
+        if (el && val != null && val !== '') el.value = val;
+      };
+      const _syncDisp = (id) => {
+        const sel = document.getElementById(id);
+        const inp = document.getElementById(id + '_inp');
+        if (!sel || !inp) return;
+        const opt = sel.options[sel.selectedIndex];
+        if (opt && opt.value && opt.text) { inp.value = opt.text; inp.classList.add('has-value'); }
+      };
+      if (!r.provinsi_kd) return;
+      _setDirect('l1_alamat_provinsi', r.provinsi_kd);
+      _syncDisp('l1_alamat_provinsi');
+      // loadKabupatenL bisa async (API) atau sync (static data) — gunakan Promise.resolve()
+      Promise.resolve(typeof loadKabupatenL === 'function' ? loadKabupatenL(r.provinsi_kd) : null)
+        .then(() => {
+          _setDirect('l1_alamat_kab', r.kabupaten_kd);
+          _syncDisp('l1_alamat_kab');
+          if (r.kabupaten_kd && typeof loadKecamatanL === 'function') {
+            loadKecamatanL(r.kabupaten_kd); // sinkron (STATIC_KECAMATAN)
+            _setDirect('l1_alamat_kec', r.kecamatan_kd);
+            _syncDisp('l1_alamat_kec');
+            if (r.kecamatan_kd && typeof loadKelurahanL === 'function') {
+              loadKelurahanL(r.kecamatan_kd); // sinkron (STATIC_KELURAHAN)
+              _setDirect('l1_alamat_kel', r.kelurahan_kd);
+              _syncDisp('l1_alamat_kel');
+            }
+          }
+        });
+    })();
     setRadio('l1_klasifikasi', r.klasifikasi);
     setVal('l1_kodepos', r.kode_pos);
     setVal('l1_kode_sls', r.kode_sls);
@@ -1063,9 +1094,19 @@ function loadEditModeL(r) {
     setVal('l2_kbli_kode', r.kbli_kode);
     setVal('l2_kbli_search', r.kbli_judul);
     setVal('l2_kbli_kategori', r.kbli_kategori);
-    if (r.kbli_kode && typeof kbliData !== 'undefined' && kbliData.length) {
-      const entry = kbliData.find(d => d.kode === r.kbli_kode);
-      if (entry && typeof selectKBLIL === 'function') selectKBLIL(entry);
+    // KBLI chip — defer until kbliData resolves (preloadKBLI adalah singleton)
+    if (r.kbli_kode) {
+      // Terapkan filter KBLI segera (aman meski CSV belum selesai)
+      if (window.kbliFilters) {
+        window.kbliFilters.apply(r.kbli_kode);
+        window.kbliFilters.load().then(() => window.kbliFilters.apply(r.kbli_kode));
+      }
+      if (typeof preloadKBLI === 'function') {
+        preloadKBLI().then(() => {
+          const entry = kbliData.find(d => d.kode === r.kbli_kode);
+          if (entry && typeof selectKBLIL === 'function') selectKBLIL(entry);
+        });
+      }
     }
     setRadio('l2_hotel', r.klasifikasi_hotel);
     setRadio('l2_jaringan', r.jaringan);

@@ -851,10 +851,17 @@ function loadEditMode() {
       if (radio) { radio.checked = true; radio.dispatchEvent(new Event('change', {bubbles:true})); }
     });
 
-    // KBLI chip
-    if (r.kbli_kode && typeof kbliData !== 'undefined' && kbliData.length) {
-      const entry = kbliData.find(d => d.kode === r.kbli_kode);
-      if (entry && typeof selectKBLI === 'function') selectKBLI(entry);
+    // KBLI chip — defer until kbliData resolves (preloadKBLI adalah singleton)
+    if (r.kbli_kode) {
+      // Terapkan filter KBLI segera (aman meski CSV belum selesai)
+      if (window.kbliFilters) {
+        window.kbliFilters.apply(r.kbli_kode);
+        window.kbliFilters.load().then(() => window.kbliFilters.apply(r.kbli_kode));
+      }
+      preloadKBLI().then(() => {
+        const entry = kbliData.find(d => d.kode === r.kbli_kode);
+        if (entry && typeof selectKBLI === 'function') selectKBLI(entry);
+      });
     }
 
     // Lokasi: q1=Bali, q2=Buleleng sudah di-set default.
@@ -882,6 +889,32 @@ function loadEditMode() {
               if (opt && opt.text) { kelInp.value = opt.text; kelInp.classList.add('has-value'); }
             }
           }
+        }
+      }
+    }
+
+    // Q11e Provinsi + Q11f Kabupaten Kantor Pusat
+    if (r.kp_provinsi) {
+      const selQ11e = document.getElementById('q11e_provinsi');
+      if (selQ11e) {
+        selQ11e.value = r.kp_provinsi;
+        const inpQ11e = document.getElementById('q11e_provinsi_inp');
+        const optQ11e = selQ11e.options[selQ11e.selectedIndex];
+        if (inpQ11e && optQ11e && optQ11e.text) {
+          inpQ11e.value = optQ11e.text; inpQ11e.classList.add('has-value');
+        }
+        if (r.kp_kabupaten && typeof loadKabupaten === 'function') {
+          loadKabupaten(r.kp_provinsi, 'q11f_kabupaten', 'spinner-kab-kp').then(() => {
+            const selQ11f = document.getElementById('q11f_kabupaten');
+            if (selQ11f) {
+              selQ11f.value = r.kp_kabupaten;
+              const inpQ11f = document.getElementById('q11f_kabupaten_inp');
+              const optQ11f = selQ11f.options[selQ11f.selectedIndex];
+              if (inpQ11f && optQ11f && optQ11f.text) {
+                inpQ11f.value = optQ11f.text; inpQ11f.classList.add('has-value');
+              }
+            }
+          });
         }
       }
     }

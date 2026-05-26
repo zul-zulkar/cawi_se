@@ -1,6 +1,8 @@
 // KBLI: load dari master/kbli.json (dengan uraian lengkap)
 let kbliData = [];
-async function preloadKBLI() {
+let _kbliReady = null; // singleton promise — prevents double-fetch on concurrent callers
+
+async function _doPreloadKBLI() {
   const inp = document.getElementById('q9g_kbli_search');
   if (inp) inp.placeholder = 'Memuat data KBLI 2025…';
   try {
@@ -24,6 +26,12 @@ async function preloadKBLI() {
     })) : [];
   }
   if (inp) inp.placeholder = `🔍 Cari KBLI 2025… (${kbliData.length} kode tersedia)`;
+}
+
+/* preloadKBLI() — singleton: semua pemanggil berbagi satu Promise yang sama. */
+function preloadKBLI() {
+  if (!_kbliReady) _kbliReady = _doPreloadKBLI();
+  return _kbliReady;
 }
 
 function getKategoriFromKode(kode) {
