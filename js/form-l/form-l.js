@@ -1,4 +1,4 @@
-/* ====== L FORM HANDLERS ====== */
+﻿/* ====== L FORM HANDLERS ====== */
 
 /* --- L1 Anggota Cards --- */
 function renderAnggotaCards() {
@@ -318,6 +318,12 @@ function updateAnggotaNamePreview(i) {
   if (out) out.textContent = name ? '— ' + name : '';
   const ctx = document.getElementById('l_ang_' + i + '_ctx_nama');
   if (ctx) ctx.textContent = name ? ' ' + name : ' (nama belum diisi)';
+  // Perbarui data-ang-nama pada card agar tiap pertanyaan menampilkan nama via CSS ::after
+  const card = document.getElementById('l_ang_card_' + i);
+  if (card) {
+    if (name) card.setAttribute('data-ang-nama', name);
+    else card.removeAttribute('data-ang-nama');
+  }
 }
 
 function updateSidebarAnggota(count) {
@@ -1055,6 +1061,16 @@ function loadEditModeL(r) {
               setRadio('l_ang_' + i + '_kronis_' + s, parts[idx]));
           }
           setVal('l_ang_' + i + '_kronis_q_lain', a.kronis_lain);
+          // Sync searchable select display texts (profesi, hubungan, dn_provinsi, dll)
+          // setelah setVal, _inp text wajib disync manual karena makeSearchable tidak auto-update
+          ['hubungan', 'profesi', 'dn_provinsi'].forEach(field => {
+            const sel = document.getElementById('l_ang_' + i + '_' + field);
+            if (!sel || !sel.value) return;
+            const inp = document.getElementById('l_ang_' + i + '_' + field + '_inp');
+            if (!inp) return;
+            const opt = Array.from(sel.options).find(o => o.value === sel.value);
+            if (opt) { inp.value = opt.text; inp.classList.add('has-value'); }
+          });
         });
       } catch(_e) { console.warn('Gagal parse anggota_data:', _e); }
       if (typeof updateProgress === 'function') updateProgress();

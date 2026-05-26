@@ -374,12 +374,12 @@ function collectDataL() {
           const umur = parseInt(rec.umur) || 0;
           if (umur >= 5) {
             rec.sekolah  = getRadio('l_ang_' + i + '_sekolah');
-            rec.ijazah   = getVal('l_ang_' + i + '_ijazah');
+            rec.ijazah   = getRadio('l_ang_' + i + '_ijazah');   // radio group, bukan getVal
             rec.rekening = getRadio('l_ang_' + i + '_rekening');
           }
           if (umur >= 10) {
-            rec.profesi      = getVal('l_ang_' + i + '_profesi');
-            rec.kedudukan    = getVal('l_ang_' + i + '_kedudukan');
+            rec.profesi      = getVal('l_ang_' + i + '_profesi'); // select dengan id, getVal benar
+            rec.kedudukan    = getRadio('l_ang_' + i + '_kedudukan'); // radio group, bukan getVal
             rec.pend_18a     = getRadio('l_ang_' + i + '_18a');
             rec.pend_18a_nilai = parseCurrency(getVal('l_ang_' + i + '_18a_nilai'));
             rec.pend_18b     = getRadio('l_ang_' + i + '_18b');

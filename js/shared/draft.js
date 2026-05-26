@@ -108,14 +108,14 @@ function restoreDraft() {
         });
       }
     })();
-    // Resync searchable select display texts (L.UB + L mode)
-    ['q1_provinsi','q2_kabupaten','q3_kecamatan','q4_kelurahan','q11e_provinsi','q11f_kabupaten',
-     'l1_alamat_provinsi','l1_alamat_kab','l1_alamat_kec','l1_alamat_kel'].forEach(id => {
-      const sel = document.getElementById(id);
-      if (!sel || !sel.value) return;
-      const inp = document.getElementById(id + '_inp');
-      const opt = sel.options[sel.selectedIndex];
-      if (inp && opt && opt.text) { inp.value = opt.text; inp.classList.add('has-value'); }
+    // Resync SEMUA searchable select display texts (L.UB + L mode + anggota cards)
+    // Tangani seluruh select[data-ss-init] sekaligus — profesi, hubungan, provinsi, dll.
+    document.querySelectorAll('select[data-ss-init]').forEach(sel => {
+      if (!sel.value) return;
+      const inp = document.getElementById(sel.id + '_inp');
+      if (!inp) return;
+      const opt = Array.from(sel.options).find(o => o.value === sel.value);
+      if (opt) { inp.value = opt.text; inp.classList.add('has-value'); }
     });
     // Restore L.UB signature
     if (vals['_sig']) {

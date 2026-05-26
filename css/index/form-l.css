@@ -27,3 +27,15 @@ body.mode-l .sidebar-blok-group.sb-l{display:block}
 .anggota-subsection-label{font-size:11.5px;font-weight:800;color:#2b6cb0;letter-spacing:1px;text-transform:uppercase;padding:10px 0 8px;border-bottom:1.5px solid #e6f0ff;margin-bottom:12px}
 .anggota-age-locked{opacity:.5;pointer-events:none;background:#fafafa}
 .anggota-age-locked-note{font-size:11px;color:#888;font-style:italic;padding:6px 0}
+
+/* ====== NAMA ANGGOTA per-pertanyaan (via data-ang-nama attribute) ====== */
+/* Setiap field-label dalam card yg sudah terisi nama akan menampilkan nama sebagai badge kecil */
+.anggota-card[data-ang-nama] .field-label::after{
+  content:' — ' attr(data-ang-nama);
+  color:#c05621;
+  font-size:10px;
+  font-weight:600;
+  font-style:normal;
+}
+/* Header & ctx-bar tidak perlu double-display nama */
+.anggota-header .field-label::after,.anggota-ctx-bar .field-label::after{content:none}
