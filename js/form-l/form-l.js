@@ -1035,10 +1035,10 @@ function loadEditModeL(r) {
           setVal('l_ang_' + i + '_tgl_lahir', a.tgl_lahir);
           if (typeof computeUmurAnggota === 'function') computeUmurAnggota(i);
           setRadio('l_ang_' + i + '_sekolah', a.sekolah);
-          setVal('l_ang_' + i + '_ijazah', a.ijazah);
+          setRadio('l_ang_' + i + '_ijazah', a.ijazah);   // radio, bukan setVal
           setRadio('l_ang_' + i + '_rekening', a.rekening);
           setVal('l_ang_' + i + '_profesi', a.profesi);
-          setVal('l_ang_' + i + '_kedudukan', a.kedudukan);
+          setRadio('l_ang_' + i + '_kedudukan', a.kedudukan); // radio, bukan setVal
           setRadio('l_ang_' + i + '_18a', a.pend_18a);
           setCurrency('l_ang_' + i + '_18a_nilai', a.pend_18a_nilai);
           setRadio('l_ang_' + i + '_18b', a.pend_18b);
@@ -1154,9 +1154,9 @@ function loadEditModeL(r) {
     setVal('l3_status_lain', r.status_lain);
     setCurrency('l3_sewa', r.sewa);
     setVal('l3_luas_lantai', r.luas_lantai);
-    setVal('l3_lantai_bahan', r.lantai_bahan); setVal('l3_lantai_kondisi', r.lantai_kondisi);
-    setVal('l3_dinding_bahan', r.dinding_bahan); setVal('l3_dinding_kondisi', r.dinding_kondisi);
-    setVal('l3_atap_bahan', r.atap_bahan); setVal('l3_atap_kondisi', r.atap_kondisi);
+    setVal('l3_lantai_bahan', r.lantai_bahan);   setRadio('l3_lantai_kondisi',  r.lantai_kondisi);
+    setVal('l3_dinding_bahan', r.dinding_bahan); setRadio('l3_dinding_kondisi', r.dinding_kondisi);
+    setVal('l3_atap_bahan', r.atap_bahan);       setRadio('l3_atap_kondisi',    r.atap_kondisi);
     setRadio('l3_bab', r.bab);
     setRadio('l3_kloset', r.kloset);
     setRadio('l3_tinja', r.tinja);
@@ -1184,8 +1184,10 @@ function loadEditModeL(r) {
     setVal('l5_responden_hp', r.responden_hp);
     setVal('l5_responden_email', r.responden_email);
     setVal('l5_tanggal', (r.tanggal_pelaksanaan || '').substring(0, 10));
-    // Signature (best-effort)
-    if (r.tanda_tangan && typeof l5Canvas !== 'undefined' && l5Canvas && typeof l5Ctx !== 'undefined' && l5Ctx) {
+    // Tanda tangan: server menyimpan "[ada]"/("[kosong]") bukan data aktual.
+    // Hanya restore jika nilai adalah base64 data URL (misal dari draft lokal).
+    const _ttd = r.tanda_tangan || '';
+    if (_ttd.startsWith('data:image/') && typeof l5Canvas !== 'undefined' && l5Canvas && typeof l5Ctx !== 'undefined' && l5Ctx) {
       const img = new Image();
       img.onload = () => {
         l5Ctx.clearRect(0, 0, l5Canvas.width, l5Canvas.height);
@@ -1193,7 +1195,13 @@ function loadEditModeL(r) {
         l5HasSig = true;
         if (typeof updateProgress === 'function') updateProgress();
       };
-      img.src = r.tanda_tangan;
+      img.src = _ttd;
+      const hintL = document.getElementById('l5_sig_hint');
+      if (hintL) hintL.textContent = 'Tanda tangan dimuat dari data sebelumnya.';
+    } else {
+      // Server menyimpan TTD ke Drive — tidak bisa dipulihkan di sini
+      const hintL = document.getElementById('l5_sig_hint');
+      if (hintL && _ttd) hintL.textContent = 'Tanda tangan sebelumnya tersimpan di server. Silakan tanda tangan ulang.';
     }
     _editRecordId = r._id || null;
     if (typeof updateProgress === 'function') updateProgress();

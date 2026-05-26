@@ -497,11 +497,11 @@ function collectDataL() {
     sewa:              parseCurrency(getVal('l3_sewa')),
     luas_lantai:       getVal('l3_luas_lantai'),
     lantai_bahan:      getVal('l3_lantai_bahan'),
-    lantai_kondisi:    getVal('l3_lantai_kondisi'),
+    lantai_kondisi:    getRadio('l3_lantai_kondisi'),    // radio, bukan getVal
     dinding_bahan:     getVal('l3_dinding_bahan'),
-    dinding_kondisi:   getVal('l3_dinding_kondisi'),
+    dinding_kondisi:   getRadio('l3_dinding_kondisi'),  // radio, bukan getVal
     atap_bahan:        getVal('l3_atap_bahan'),
-    atap_kondisi:      getVal('l3_atap_kondisi'),
+    atap_kondisi:      getRadio('l3_atap_kondisi'),     // radio, bukan getVal
     bab:               getRadio('l3_bab'),
     kloset:            getRadio('l3_kloset'),
     tinja:             getRadio('l3_tinja'),
@@ -950,6 +950,13 @@ function loadEditMode() {
         if (typeof updateProgress === 'function') updateProgress();
       }, 500);
     } else if (typeof updateProgress === 'function') updateProgress();
+
+    // Tanda tangan L.UB: server menyimpan "[ada]" bukan data aktual — tampilkan hint
+    const _ttdLUB = r.tanda_tangan || '';
+    if (_ttdLUB && !_ttdLUB.startsWith('data:image/')) {
+      const hintLUB = document.getElementById('sig-hint');
+      if (hintLUB) hintLUB.textContent = 'Tanda tangan sebelumnya tersimpan di server. Silakan tanda tangan ulang.';
+    }
 
     return true;
   } catch(e) { console.error('Gagal load edit mode:', e); return false; }

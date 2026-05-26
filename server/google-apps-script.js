@@ -319,6 +319,29 @@ function applyTextFormat(sheet, rowNum, d) {
   });
 }
 
+// Format kolom L mode yang berisi angka tapi harus disimpan sebagai teks
+// Kolom (1-indexed) sesuai L_FIELD_NAMES: nik_kk=3, no_kk=4, kode_pos=16,
+// hp_usaha=32, pengusaha_nik=47, petugas_nip=173, petugas_hp=174, responden_hp=176
+function applyTextFormatL(sheet, rowNum, d) {
+  var textFields = [
+    { col: 3,   val: d.nik_kk },
+    { col: 4,   val: d.no_kk },
+    { col: 16,  val: d.kode_pos },
+    { col: 32,  val: d.hp_usaha },
+    { col: 47,  val: d.pengusaha_nik },
+    { col: 173, val: d.petugas_nip },
+    { col: 174, val: d.petugas_hp },
+    { col: 176, val: d.responden_hp }
+  ];
+  textFields.forEach(function(f) {
+    if (f.val !== null && f.val !== undefined && f.val !== '') {
+      var cell = sheet.getRange(rowNum, f.col);
+      cell.setNumberFormat('@');
+      cell.setValue(String(f.val));
+    }
+  });
+}
+
 // Timpa rekaman yang ada berdasarkan _id
 function updateRecord(sheet, d, editId) {
   var targetRow = editId + 1;
@@ -774,6 +797,7 @@ function insertLRecord(d) {
   var sheet = getOrInitLSheet(ss);
   sheet.appendRow(buildRowL(d));
   var newId = sheet.getLastRow() - 1;
+  applyTextFormatL(sheet, sheet.getLastRow(), d); // jaga angka nol di depan (HP, NIK, dll)
   saveLAnggota(sheet, newId, d);
   if (d.tanda_tangan && d.tanda_tangan.length > 100) {
     try { saveTandaTanganL(d); } catch(e) { Logger.log("Gagal simpan TTD L: " + e.message); }
@@ -790,6 +814,7 @@ function updateLRecord(d, editId) {
     return jsonResponse({ status: "error", message: "Rekaman L tidak ditemukan (id=" + editId + ")" });
   }
   sheet.getRange(targetRow, 1, 1, L_HEADERS.length).setValues([buildRowL(d)]);
+  applyTextFormatL(sheet, targetRow, d); // jaga angka nol di depan (HP, NIK, dll)
   deleteLAnggota(sheet, editId);
   saveLAnggota(sheet, editId, d);
   if (d.tanda_tangan && d.tanda_tangan.length > 100) {
