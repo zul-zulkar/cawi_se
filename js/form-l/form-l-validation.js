@@ -161,15 +161,26 @@ function collectAllProblemsL() {
   if (!jR) e('Rincian 16a: Jaringan Usaha', 'Belum dipilih', 2, 'l2_jaringan');
   if (jR === '2' && !getVal('l2_jml_cabang')) e('Rincian 16b: Jumlah Cabang', 'Harus diisi', 2, 'l2_jml_cabang');
   if (!getRadio('l2_internet')) e('Rincian 17a: Penggunaan Internet', 'Belum dipilih', 2, 'l2_internet');
-  if (!getRadio('l2_halal')) e('Rincian 20a: Sertifikat Halal', 'Belum dipilih', 2, 'l2_halal');
-  if (getRadio('l2_halal') === '1') {
-    if (getVal('l2_halal_b') === '') e('Rincian 20b: Jumlah Varian Halal', 'Harus diisi', 2, 'l2_halal_b');
-    if (getVal('l2_halal_c') === '') e('Rincian 20c: Jumlah Varian Belum Halal', 'Harus diisi', 2, 'l2_halal_c');
+  /* Cek apakah section Halal/BPOM ditampilkan (bisa tersembunyi oleh kbli-filters) */
+  const _hHalal = document.getElementById('sec-L2-19');
+  const _cHalal = _hHalal && _hHalal.closest('.section-card');
+  const showL2Halal = !_cHalal || !_cHalal.classList.contains('kbli-hidden');
+  const _hBpom  = document.getElementById('sec-L2-20');
+  const _cBpom  = _hBpom  && _hBpom.closest('.section-card');
+  const showL2Bpom  = !_cBpom  || !_cBpom.classList.contains('kbli-hidden');
+  if (showL2Halal) {
+    if (!getRadio('l2_halal')) e('Rincian 20a: Sertifikat Halal', 'Belum dipilih', 2, 'l2_halal');
+    if (getRadio('l2_halal') === '1') {
+      if (getVal('l2_halal_b') === '') e('Rincian 20b: Jumlah Varian Halal', 'Harus diisi', 2, 'l2_halal_b');
+      if (getVal('l2_halal_c') === '') e('Rincian 20c: Jumlah Varian Belum Halal', 'Harus diisi', 2, 'l2_halal_c');
+    }
   }
-  if (!getRadio('l2_bpom')) e('Rincian 21a: Izin Edar BPOM', 'Belum dipilih', 2, 'l2_bpom');
-  if (getRadio('l2_bpom') === '1') {
-    if (getVal('l2_bpom_b') === '') e('Rincian 21b: Jumlah Varian BPOM', 'Harus diisi', 2, 'l2_bpom_b');
-    if (getVal('l2_bpom_c') === '') e('Rincian 21c: Jumlah Varian Belum BPOM', 'Harus diisi', 2, 'l2_bpom_c');
+  if (showL2Bpom) {
+    if (!getRadio('l2_bpom')) e('Rincian 21a: Izin Edar BPOM', 'Belum dipilih', 2, 'l2_bpom');
+    if (getRadio('l2_bpom') === '1') {
+      if (getVal('l2_bpom_b') === '') e('Rincian 21b: Jumlah Varian BPOM', 'Harus diisi', 2, 'l2_bpom_b');
+      if (getVal('l2_bpom_c') === '') e('Rincian 21c: Jumlah Varian Belum BPOM', 'Harus diisi', 2, 'l2_bpom_c');
+    }
   }
   if (getVal('l2_pekerja_l') === '') e('Rincian 23a: Pekerja Laki-laki', 'Harus diisi (isi 0 jika tidak ada)', 2, 'l2_pekerja_l');
   if (getVal('l2_pekerja_p') === '') e('Rincian 23b: Pekerja Perempuan', 'Harus diisi (isi 0 jika tidak ada)', 2, 'l2_pekerja_p');

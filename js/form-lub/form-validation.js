@@ -101,15 +101,26 @@ function collectAllProblemsLUB() {
   if (!getRadio('q13a')) e('Pertanyaan 13a: Ramah Lingkungan', 'Belum dipilih', 1, 'q13a');
   if (!getRadio('q13b')) e('Pertanyaan 13b: Biaya Lingkungan', 'Belum dipilih', 1, 'q13b');
   if (!getRadio('q14')) e('Pertanyaan 14: Produk Kreatif', 'Belum dipilih', 1, 'q14');
-  if (!getRadio('q15a')) e('Pertanyaan 15a: Sertifikat Halal', 'Belum dipilih', 1, 'q15a');
-  if (getRadio('q15a') === '1') {
-    if (!getVal('q15b')) e('Pertanyaan 15b: Jumlah Varian Halal', 'Harus diisi', 1, 'q15b');
-    if (!getVal('q15c')) e('Pertanyaan 15c: Jumlah Varian Belum Halal', 'Harus diisi', 1, 'q15c');
+  /* Cek apakah section Halal/BPOM ditampilkan (bisa tersembunyi oleh kbli-filters) */
+  const _hHalal = document.getElementById('sec-15');
+  const _cHalal = _hHalal && _hHalal.closest('.section-card');
+  const showHalal = !_cHalal || !_cHalal.classList.contains('kbli-hidden');
+  const _hBpom  = document.getElementById('sec-16');
+  const _cBpom  = _hBpom  && _hBpom.closest('.section-card');
+  const showBpom  = !_cBpom  || !_cBpom.classList.contains('kbli-hidden');
+  if (showHalal) {
+    if (!getRadio('q15a')) e('Pertanyaan 15a: Sertifikat Halal', 'Belum dipilih', 1, 'q15a');
+    if (getRadio('q15a') === '1') {
+      if (!getVal('q15b')) e('Pertanyaan 15b: Jumlah Varian Halal', 'Harus diisi', 1, 'q15b');
+      if (!getVal('q15c')) e('Pertanyaan 15c: Jumlah Varian Belum Halal', 'Harus diisi', 1, 'q15c');
+    }
   }
-  if (!getRadio('q16a')) e('Pertanyaan 16a: Izin Edar BPOM', 'Belum dipilih', 1, 'q16a');
-  if (getRadio('q16a') === '1') {
-    if (!getVal('q16b')) e('Pertanyaan 16b: Jumlah Varian BPOM', 'Harus diisi', 1, 'q16b');
-    if (!getVal('q16c')) e('Pertanyaan 16c: Jumlah Varian Belum BPOM', 'Harus diisi', 1, 'q16c');
+  if (showBpom) {
+    if (!getRadio('q16a')) e('Pertanyaan 16a: Izin Edar BPOM', 'Belum dipilih', 1, 'q16a');
+    if (getRadio('q16a') === '1') {
+      if (!getVal('q16b')) e('Pertanyaan 16b: Jumlah Varian BPOM', 'Harus diisi', 1, 'q16b');
+      if (!getVal('q16c')) e('Pertanyaan 16c: Jumlah Varian Belum BPOM', 'Harus diisi', 1, 'q16c');
+    }
   }
   if (!getRadio('q17')) e('Pertanyaan 17: Mitra KDKMP', 'Belum dipilih', 1, 'q17');
   if (!getRadio('q18')) e('Pertanyaan 18: Program MBG', 'Belum dipilih', 1, 'q18');
