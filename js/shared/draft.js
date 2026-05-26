@@ -80,12 +80,27 @@ function restoreDraft() {
         }
       }
     });
-    // Restore KBLI chip if kode was saved
+    // Restore KBLI chip & kbliFilters untuk L.UB mode
     const savedKode = vals['q9g_kbli_kode'];
-    if (savedKode && kbliData.length) {
+    if (savedKode && typeof kbliData !== 'undefined' && kbliData.length) {
       const entry = kbliData.find(d => d.kode === savedKode);
-      if (entry) selectKBLI(entry);
+      if (entry && typeof selectKBLI === 'function') selectKBLI(entry);
     }
+    // Restore KBLI chip & kbliFilters untuk L mode
+    const savedKodeL = vals['l2_kbli_kode'];
+    if (savedKodeL && typeof kbliData !== 'undefined' && kbliData.length) {
+      const entryL = kbliData.find(d => d.kode === savedKodeL);
+      if (entryL && typeof selectKBLIL === 'function') selectKBLIL(entryL);
+    }
+    // Re-apply kbliFilters setelah restore (pastikan Halal/BPOM tersembunyi jika KBLI tidak memerlukan).
+    // Menggunakan load() agar aman meski CSV belum selesai dimuat (load idempoten).
+    (function() {
+      const restMode = vals['_formMode'] || 'lub';
+      const restKbli = restMode === 'l' ? savedKodeL : savedKode;
+      if (restKbli && window.kbliFilters) {
+        window.kbliFilters.load().then(function() { window.kbliFilters.apply(restKbli); });
+      }
+    })();
     // Resync searchable select display texts (L.UB + L mode)
     ['q1_provinsi','q2_kabupaten','q3_kecamatan','q4_kelurahan','q11e_provinsi','q11f_kabupaten',
      'l1_alamat_provinsi','l1_alamat_kab','l1_alamat_kec','l1_alamat_kel'].forEach(id => {

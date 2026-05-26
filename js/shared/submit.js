@@ -82,13 +82,20 @@ function validateBlok1() {
   if (!getRadio('q13a')) return 'Pertanyaan 13a: Pilih produk ramah lingkungan?';
   if (!getRadio('q13b')) return 'Pertanyaan 13b: Pilih biaya/investasi lingkungan?';
   if (!getRadio('q14')) return 'Pertanyaan 14: Pilih apakah menggunakan produk kreatif?';
-  if (!getRadio('q15a')) return 'Pertanyaan 15a: Pilih sertifikat halal?';
-  if (getRadio('q15a') === '1') {
+  /* Cek apakah section Halal/BPOM ditampilkan (bisa tersembunyi oleh kbli-filters) */
+  const _vH15 = document.getElementById('sec-15');
+  const _cH15 = _vH15 && _vH15.closest('.section-card');
+  const _showQ15 = !_cH15 || !_cH15.classList.contains('kbli-hidden');
+  const _vH16 = document.getElementById('sec-16');
+  const _cH16 = _vH16 && _vH16.closest('.section-card');
+  const _showQ16 = !_cH16 || !_cH16.classList.contains('kbli-hidden');
+  if (_showQ15 && !getRadio('q15a')) return 'Pertanyaan 15a: Pilih sertifikat halal?';
+  if (_showQ15 && getRadio('q15a') === '1') {
     if (getVal('q15b') === '') return 'Pertanyaan 15b: Isi jumlah varian sudah halal BPJPH';
     if (getVal('q15c') === '') return 'Pertanyaan 15c: Isi jumlah varian belum halal BPJPH';
   }
-  if (!getRadio('q16a')) return 'Pertanyaan 16a: Pilih izin edar?';
-  if (getRadio('q16a') === '1') {
+  if (_showQ16 && !getRadio('q16a')) return 'Pertanyaan 16a: Pilih izin edar?';
+  if (_showQ16 && getRadio('q16a') === '1') {
     if (getVal('q16b') === '') return 'Pertanyaan 16b: Isi jumlah varian sudah izin BPOM';
     if (getVal('q16c') === '') return 'Pertanyaan 16c: Isi jumlah varian belum izin BPOM';
   }
