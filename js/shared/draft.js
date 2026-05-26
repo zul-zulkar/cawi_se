@@ -92,13 +92,20 @@ function restoreDraft() {
       const entryL = kbliData.find(d => d.kode === savedKodeL);
       if (entryL && typeof selectKBLIL === 'function') selectKBLIL(entryL);
     }
-    // Re-apply kbliFilters setelah restore (pastikan Halal/BPOM tersembunyi jika KBLI tidak memerlukan).
-    // Menggunakan load() agar aman meski CSV belum selesai dimuat (load idempoten).
+    // Re-apply kbliFilters setelah restore.
+    // 1) Panggil apply() SEGERA (sinkron) agar seksi Halal/BPOM langsung tersembunyi
+    //    tanpa menunggu CSV selesai dimuat (aman karena untuk KBLI di luar Halal/BPOM
+    //    hasilnya tetap benar meski Set masih kosong).
+    // 2) Setelah CSV selesai dimuat, panggil lagi agar kode yg ADA di daftar Halal/BPOM
+    //    ditampilkan kembali dengan benar (singleton load() mencegah double-fetch).
     (function() {
       const restMode = vals['_formMode'] || 'lub';
       const restKbli = restMode === 'l' ? savedKodeL : savedKode;
       if (restKbli && window.kbliFilters) {
-        window.kbliFilters.load().then(function() { window.kbliFilters.apply(restKbli); });
+        window.kbliFilters.apply(restKbli);                              // (1) langsung
+        window.kbliFilters.load().then(function() {                      // (2) setelah load
+          window.kbliFilters.apply(restKbli);
+        });
       }
     })();
     // Resync searchable select display texts (L.UB + L mode)

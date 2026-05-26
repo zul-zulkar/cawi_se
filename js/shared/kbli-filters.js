@@ -6,6 +6,7 @@
   const _halal = new Set();
   const _bpom  = new Set();
   let _loaded = false;
+  let _loadPromise = null; // singleton — prevents double-fetch on concurrent calls
 
   async function loadCsv(path, set) {
     try {
@@ -23,13 +24,16 @@
     } catch (e) { /* fail soft → empty set, fields shown by default */ }
   }
 
-  async function load() {
-    if (_loaded) return;
-    await Promise.all([
-      loadCsv('master/KBLI Halal.csv', _halal),
-      loadCsv('master/KBLI BPOM.csv',  _bpom),
-    ]);
-    _loaded = true;
+  /* load() is a singleton: all concurrent callers share one Promise. */
+  function load() {
+    if (_loaded) return Promise.resolve();
+    if (!_loadPromise) {
+      _loadPromise = Promise.all([
+        loadCsv('master/KBLI Halal.csv', _halal),
+        loadCsv('master/KBLI BPOM.csv',  _bpom),
+      ]).then(function() { _loaded = true; });
+    }
+    return _loadPromise;
   }
 
   function isHalal(kode) { return _halal.has(String(kode || '').trim()); }
