@@ -307,7 +307,7 @@ function collectDataLUB() {
     responden_hp: getVal('r_hp'),
     responden_email: getVal('r_email'),
     tanggal_pelaksanaan: getVal('r_tanggal'),
-    tanda_tangan: hasSig ? canvas.toDataURL('image/png') : ''
+    tanda_tangan: hasSig ? _getSigData(canvas) : ''
   };
   if (_editRecordId) data._edit_id = _editRecordId;
   return data;
@@ -542,7 +542,7 @@ function collectDataL() {
     responden_email:   getVal('l5_responden_email'),
     tanggal_pelaksanaan: getVal('l5_tanggal'),
     tanda_tangan: (typeof l5HasSig !== 'undefined' && l5HasSig && typeof l5Canvas !== 'undefined' && l5Canvas)
-      ? l5Canvas.toDataURL('image/png') : '',
+      ? _getSigData(l5Canvas) : '',
   };
   if (_editRecordId) data._edit_id = _editRecordId;
   return data;
@@ -658,6 +658,23 @@ async function submitForm() {
   }
 }
 
+
+/* ====== SIGNATURE HELPER ======
+ * Menghasilkan data URL tanda tangan yang cukup kecil untuk disimpan di Google Sheets
+ * (batas sel ≈ 50.000 karakter). Coba PNG dulu; jika terlalu besar, fallback ke JPEG.
+ * Fungsi ini dibaca oleh collectData(), collectDataL(), dan draft save functions. */
+function _getSigData(canvasEl) {
+  if (!canvasEl) return '';
+  try {
+    const png = canvasEl.toDataURL('image/png');
+    if (png.length <= 40000) return png;
+    const jpg8 = canvasEl.toDataURL('image/jpeg', 0.8);
+    if (jpg8.length <= 40000) return jpg8;
+    const jpg5 = canvasEl.toDataURL('image/jpeg', 0.5);
+    if (jpg5.length <= 40000) return jpg5;
+    return canvasEl.toDataURL('image/jpeg', 0.3);
+  } catch(e) { return ''; }
+}
 
 /* ====== EDIT MODE (dari daftar.html) ====== */
 const EDIT_KEY = 'cawi_edit_mode';
@@ -951,9 +968,22 @@ function loadEditMode() {
       }, 500);
     } else if (typeof updateProgress === 'function') updateProgress();
 
-    // Tanda tangan L.UB: server menyimpan "[ada]" bukan data aktual — tampilkan hint
+    // Tanda tangan L.UB
     const _ttdLUB = r.tanda_tangan || '';
-    if (_ttdLUB && !_ttdLUB.startsWith('data:image/')) {
+    if (_ttdLUB.startsWith('data:image/') && typeof canvas !== 'undefined' && canvas && typeof ctx !== 'undefined' && ctx) {
+      // GAS kini menyimpan base64 langsung — pulihkan ke canvas
+      const imgLUB = new Image();
+      imgLUB.onload = () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(imgLUB, 0, 0);
+        hasSig = true;
+        if (typeof updateProgress === 'function') updateProgress();
+      };
+      imgLUB.src = _ttdLUB;
+      const hintLUB = document.getElementById('sig-hint');
+      if (hintLUB) hintLUB.textContent = 'Tanda tangan dimuat dari data sebelumnya.';
+    } else if (_ttdLUB && _ttdLUB !== '[kosong]') {
+      // Rekaman lama — server hanya menyimpan "[ada]"
       const hintLUB = document.getElementById('sig-hint');
       if (hintLUB) hintLUB.textContent = 'Tanda tangan sebelumnya tersimpan di server. Silakan tanda tangan ulang.';
     }

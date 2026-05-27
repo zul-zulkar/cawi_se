@@ -863,11 +863,37 @@ function initL5Signature() {
   };
   l5Canvas.addEventListener('mousedown', e => { l5Drawing = true; const p=getPosL5(e); l5Ctx.beginPath(); l5Ctx.moveTo(p.x,p.y); });
   l5Canvas.addEventListener('mousemove', e => { if(!l5Drawing) return; const p=getPosL5(e); l5Ctx.lineTo(p.x,p.y); l5Ctx.strokeStyle='#000'; l5Ctx.lineWidth=2; l5Ctx.lineCap='round'; l5Ctx.stroke(); l5HasSig=true; });
-  l5Canvas.addEventListener('mouseup',    () => { l5Drawing=false; l5Ctx.beginPath(); if (typeof updateProgress==='function') updateProgress(); });
+  l5Canvas.addEventListener('mouseup',    () => { l5Drawing=false; l5Ctx.beginPath(); if (typeof updateProgress==='function') updateProgress(); _saveL5Sig(); });
   l5Canvas.addEventListener('mouseleave', () => { l5Drawing=false; l5Ctx.beginPath(); });
   l5Canvas.addEventListener('touchstart', e => { e.preventDefault(); l5Drawing=true; const p=getPosL5(e); l5Ctx.beginPath(); l5Ctx.moveTo(p.x,p.y); }, {passive:false});
   l5Canvas.addEventListener('touchmove',  e => { e.preventDefault(); if(!l5Drawing) return; const p=getPosL5(e); l5Ctx.lineTo(p.x,p.y); l5Ctx.strokeStyle='#000'; l5Ctx.lineWidth=2; l5Ctx.lineCap='round'; l5Ctx.stroke(); l5HasSig=true; }, {passive:false});
-  l5Canvas.addEventListener('touchend',   () => { l5Drawing=false; l5Ctx.beginPath(); if (typeof updateProgress==='function') updateProgress(); });
+  l5Canvas.addEventListener('touchend',   () => { l5Drawing=false; l5Ctx.beginPath(); if (typeof updateProgress==='function') updateProgress(); _saveL5Sig(); });
+}
+
+/* Simpan tanda tangan L ke localStorage segera setelah setiap stroke selesai.
+ * Ini memastikan _sig_l selalu sinkron di LS_KEY (autosave) maupun di named draft (_raw),
+ * sehingga draft continue dari daftar.html pun mendapatkan tanda tangan terbaru. */
+function _saveL5Sig() {
+  if (!l5HasSig || !l5Canvas) return;
+  try {
+    const sig = l5Canvas.toDataURL('image/png');
+    const lsKey     = typeof LS_KEY    !== 'undefined' ? LS_KEY    : 'cawi_se2026_draft_v1';
+    const lsDrafts  = typeof LS_DRAFTS !== 'undefined' ? LS_DRAFTS : 'cawi_se2026_drafts_v1';
+    // 1. Update autosave entry (LS_KEY)
+    const raw = JSON.parse(localStorage.getItem(lsKey) || '{}');
+    raw['_sig_l'] = sig;
+    localStorage.setItem(lsKey, JSON.stringify(raw));
+    // 2. Update named draft entry (_raw._sig_l) agar continueDraft() ikut terbaru
+    const cid = typeof _currentDraftId !== 'undefined' ? _currentDraftId : null;
+    if (cid) {
+      const list = JSON.parse(localStorage.getItem(lsDrafts) || '[]');
+      const idx = list.findIndex(function(d) { return d._draftId === cid; });
+      if (idx >= 0 && list[idx]._raw) {
+        list[idx]._raw['_sig_l'] = sig;
+        localStorage.setItem(lsDrafts, JSON.stringify(list));
+      }
+    }
+  } catch(e) {}
 }
 
 function clearSignatureL() {

@@ -166,7 +166,9 @@ function buildRow(d) {
     // Blok III — Responden
     d.responden_nama, d.responden_hp, d.responden_email,
     d.tanggal_pelaksanaan,
-    d.tanda_tangan ? "[ada]" : "[kosong]",
+    // Simpan base64 asli jika cukup kecil (batas sel ~50k); fallback ke "[ada]"
+    (d.tanda_tangan && d.tanda_tangan.startsWith("data:") && d.tanda_tangan.length <= 45000)
+      ? d.tanda_tangan : (d.tanda_tangan ? "[ada]" : "[kosong]"),
     // Q19c + L.KP
     d.transaksi_beli_jasa_nonpenduduk,
     d.lkp_data || ''
@@ -696,7 +698,12 @@ const L_FIELD_NAMES = [
 function buildRowL(d) {
   // Build row dari L_FIELD_NAMES — urutan dijamin match L_HEADERS
   return L_FIELD_NAMES.map(function(key) {
-    if (key === "tanda_tangan") return d.tanda_tangan ? "[ada]" : "[kosong]";
+    if (key === "tanda_tangan") {
+      if (!d.tanda_tangan) return "[kosong]";
+      // Simpan base64 asli jika cukup kecil (batas sel ~50k); fallback ke "[ada]"
+      return (d.tanda_tangan.startsWith("data:") && d.tanda_tangan.length <= 45000)
+        ? d.tanda_tangan : "[ada]";
+    }
     var v = d[key];
     return (v === null || v === undefined) ? "" : v;
   });

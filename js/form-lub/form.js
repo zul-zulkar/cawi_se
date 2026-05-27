@@ -301,11 +301,35 @@ function getPos(e) {
 
 canvas.addEventListener('mousedown', e => { drawing=true; const p=getPos(e); ctx.beginPath(); ctx.moveTo(p.x,p.y); });
 canvas.addEventListener('mousemove', e => { if(!drawing) return; const p=getPos(e); ctx.lineTo(p.x,p.y); ctx.strokeStyle='#000'; ctx.lineWidth=2; ctx.lineCap='round'; ctx.stroke(); hasSig=true; });
-canvas.addEventListener('mouseup', ()=>{ drawing=false; ctx.beginPath(); });
+canvas.addEventListener('mouseup', ()=>{ drawing=false; ctx.beginPath(); _saveLUBSig(); });
 canvas.addEventListener('mouseleave', ()=>{ drawing=false; ctx.beginPath(); });
 canvas.addEventListener('touchstart', e=>{ e.preventDefault(); drawing=true; const p=getPos(e); ctx.beginPath(); ctx.moveTo(p.x,p.y); }, {passive:false});
 canvas.addEventListener('touchmove', e=>{ e.preventDefault(); if(!drawing) return; const p=getPos(e); ctx.lineTo(p.x,p.y); ctx.strokeStyle='#000'; ctx.lineWidth=2; ctx.lineCap='round'; ctx.stroke(); hasSig=true; }, {passive:false});
-canvas.addEventListener('touchend', ()=>{ drawing=false; ctx.beginPath(); });
+canvas.addEventListener('touchend', ()=>{ drawing=false; ctx.beginPath(); _saveLUBSig(); });
+
+/* Simpan tanda tangan L.UB ke localStorage segera setelah setiap stroke. */
+function _saveLUBSig() {
+  if (!hasSig || !canvas) return;
+  try {
+    const sig      = canvas.toDataURL('image/png');
+    const lsKey    = typeof LS_KEY    !== 'undefined' ? LS_KEY    : 'cawi_se2026_draft_v1';
+    const lsDrafts = typeof LS_DRAFTS !== 'undefined' ? LS_DRAFTS : 'cawi_se2026_drafts_v1';
+    // 1. Update autosave entry
+    const raw = JSON.parse(localStorage.getItem(lsKey) || '{}');
+    raw['_sig'] = sig;
+    localStorage.setItem(lsKey, JSON.stringify(raw));
+    // 2. Update named draft entry
+    const cid = typeof _currentDraftId !== 'undefined' ? _currentDraftId : null;
+    if (cid) {
+      const list = JSON.parse(localStorage.getItem(lsDrafts) || '[]');
+      const idx = list.findIndex(function(d) { return d._draftId === cid; });
+      if (idx >= 0 && list[idx]._raw) {
+        list[idx]._raw['_sig'] = sig;
+        localStorage.setItem(lsDrafts, JSON.stringify(list));
+      }
+    }
+  } catch(e) {}
+}
 
 function clearSignature() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
