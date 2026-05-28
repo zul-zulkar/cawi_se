@@ -55,7 +55,6 @@ function filterPetugas() {
 
 function selectPetugas(el) {
   document.getElementById('p_nama').value = el.dataset.nama;
-  document.getElementById('p_nip').value  = el.dataset.nip;
   document.getElementById('petugasDrop').style.display = 'none';
 }
 
@@ -85,7 +84,6 @@ function filterPetugasL() {
 
 function selectPetugasL(el) {
   document.getElementById('l5_petugas_nama').value = el.dataset.nama;
-  document.getElementById('l5_petugas_nip').value  = el.dataset.nip;
   document.getElementById('l5_petugasDrop').style.display = 'none';
 }
 

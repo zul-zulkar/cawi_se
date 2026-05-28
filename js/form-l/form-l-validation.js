@@ -294,7 +294,6 @@ function collectAllProblemsL() {
 
   /* === BLOK V: Petugas & Responden === */
   if (!getVal('l5_petugas_nama')) e('Petugas: Nama', 'Harus diisi', 5, 'l5_petugas_nama');
-  if (!getVal('l5_petugas_nip')) k('Petugas: NIP/ID', 'Tidak diisi (opsional)', 5, 'l5_petugas_nip');
   if (!getVal('l5_petugas_hp')) k('Petugas: Nomor HP', 'Tidak diisi (opsional)', 5, 'l5_petugas_hp');
   else if (!isValidHP(getVal('l5_petugas_hp'))) e('Petugas: Nomor HP', 'Format tidak valid', 5, 'l5_petugas_hp');
   if (!getVal('l5_responden_nama')) e('Responden: Nama', 'Harus diisi', 5, 'l5_responden_nama');

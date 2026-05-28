@@ -1662,15 +1662,9 @@
           <div id="petugasDrop" class="ac-drop"></div>
         </div>
       </div>
-      <div class="inline-fields">
-        <div class="form-group">
-          <label class="field-label">NIP / ID Petugas</label>
-          <input type="text" id="p_nip" class="input-muted" placeholder="Terisi otomatis saat nama dipilih" readonly/>
-        </div>
-        <div class="form-group">
-          <label class="field-label">No. HP Petugas</label>
-          <input type="text" id="p_hp" placeholder="08xxxxxxxxxx"/>
-        </div>
+      <div class="form-group">
+        <label class="field-label">No. HP Petugas</label>
+        <input type="text" id="p_hp" placeholder="08xxxxxxxxxx"/>
       </div>
     </div>
   </div>
@@ -1837,9 +1831,10 @@
       </div>
       <div class="form-group">
         <label class="field-label">i. Alamat (Jalan/Gang/Nomor/RT/RW) <span class="req">*</span></label>
-        <input type="text" id="l1_alamat_detail" placeholder="Detail alamat lengkap"/>
+        <input type="text" id="l1_alamat_detail" placeholder="Detail alamat lengkap" oninput="_autoSplitAlamat18i(this.value)"/>
       </div>
-      <div class="inline-fields">
+      <!-- 18j & 18k: tersembunyi dari tampilan, diisi otomatis dari 18i -->
+      <div class="inline-fields" style="display:none" aria-hidden="true">
         <div class="form-group">
           <label class="field-label">j. Nama Jalan</label>
           <input type="text" id="l1_nama_jalan" placeholder="Nama Jalan (atau '-' jika tidak ada)"/>
@@ -3519,15 +3514,9 @@
           <div id="l5_petugasDrop" class="ac-drop"></div>
         </div>
       </div>
-      <div class="inline-fields">
-        <div class="form-group">
-          <label class="field-label">NIP / ID Petugas</label>
-          <input type="text" id="l5_petugas_nip" class="input-muted" placeholder="Terisi otomatis saat nama dipilih" readonly/>
-        </div>
-        <div class="form-group">
-          <label class="field-label">No. HP Petugas</label>
-          <input type="text" id="l5_petugas_hp" placeholder="08xxxxxxxxxx"/>
-        </div>
+      <div class="form-group">
+        <label class="field-label">No. HP Petugas</label>
+        <input type="text" id="l5_petugas_hp" placeholder="08xxxxxxxxxx"/>
       </div>
     </div>
   </div>

@@ -200,7 +200,7 @@ function anggotaCardHTML(i) {
       </div>
       </div>
       <div class="form-group">
-        <label class="field-label">18a. Pendapatan dari Pekerjaan</label>
+        <label class="field-label">18a. Pendapatan dari Pekerjaan <span style="font-weight:400;color:#666">(per bulan)</span></label>
         <div class="radio-group">
           <label class="radio-item"><input type="radio" name="l_ang_${i}_18a" value="1" onchange="handlePendapatanAnggota(${i},'18a')"/> <span>1. Ya</span></label>
           <label class="radio-item"><input type="radio" name="l_ang_${i}_18a" value="2" onchange="handlePendapatanAnggota(${i},'18a')"/> <span>2. Tidak</span></label>
@@ -213,7 +213,7 @@ function anggotaCardHTML(i) {
         </div>
       </div>
       <div class="form-group">
-        <label class="field-label">18b. Pendapatan Keuntungan Usaha</label>
+        <label class="field-label">18b. Pendapatan Keuntungan Usaha <span style="font-weight:400;color:#666">(per bulan)</span></label>
         <div class="radio-group">
           <label class="radio-item"><input type="radio" name="l_ang_${i}_18b" value="1" onchange="handlePendapatanAnggota(${i},'18b')"/> <span>1. Ya</span></label>
           <label class="radio-item"><input type="radio" name="l_ang_${i}_18b" value="2" onchange="handlePendapatanAnggota(${i},'18b')"/> <span>2. Tidak</span></label>
@@ -226,7 +226,7 @@ function anggotaCardHTML(i) {
         </div>
       </div>
       <div class="form-group">
-        <label class="field-label">18c. Penerimaan Transfer/Passive (pensiun, kupon SBN)</label>
+        <label class="field-label">18c. Penerimaan Transfer/Passive (pensiun, kupon SBN) <span style="font-weight:400;color:#666">(per bulan)</span></label>
         <div class="radio-group">
           <label class="radio-item"><input type="radio" name="l_ang_${i}_18c" value="1" onchange="handlePendapatanAnggota(${i},'18c')"/> <span>1. Ya</span></label>
           <label class="radio-item"><input type="radio" name="l_ang_${i}_18c" value="2" onchange="handlePendapatanAnggota(${i},'18c')"/> <span>2. Tidak</span></label>
@@ -901,6 +901,23 @@ function clearSignatureL() {
   l5Ctx.clearRect(0, 0, l5Canvas.width, l5Canvas.height);
   l5HasSig = false;
   if (typeof updateProgress === 'function') updateProgress();
+}
+
+/* --- Auto-split alamat 18i → 18j (nama jalan) & 18k (nomor rumah) --- */
+function _autoSplitAlamat18i(val) {
+  var jEl = document.getElementById('l1_nama_jalan');
+  var nEl = document.getElementById('l1_no_rumah');
+  if (!jEl || !nEl) return;
+  if (!val) { jEl.value = ''; nEl.value = ''; return; }
+  // Ekstrak nomor rumah: setelah "No." / "Nomor " / "No " (case-insensitive)
+  var nomorMatch = val.match(/\bNo\.?\s*(\d+[A-Za-z]?)/i) || val.match(/\bNomor\s+(\d+[A-Za-z]?)/i);
+  var nomor = nomorMatch ? nomorMatch[1] : '';
+  // Ekstrak nama jalan: strip prefix Jl./Jalan/Gang/Gg., ambil sampai sebelum "No."/"RT"/"RW"/","
+  var stripped = val.replace(/^(Jl\.|Jalan|Gang|Gg\.)\s+/i, '');
+  var jalanMatch = stripped.match(/^(.+?)(?:\s+No\.?\s|\s+RT[\s\d]|\s+RW[\s\d]|,|$)/i);
+  var jalan = jalanMatch ? jalanMatch[1].trim() : stripped.split(',')[0].trim();
+  jEl.value = jalan;
+  nEl.value = nomor;
 }
 
 /* --- L mode KBLI search (separate from L.UB) --- */
