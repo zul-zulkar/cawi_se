@@ -442,12 +442,33 @@ function collectDataL() {
     kp_provinsi:      getVal('l2_kp_provinsi'),
     kp_kab:           getVal('l2_kp_kab'),
     internet:         getRadio('l2_internet'),
+    /* 16b: tujuan internet */
+    internet_b1:      getRadio('l2_internet_b1'),
+    internet_b2:      getRadio('l2_internet_b2'),
+    internet_b3:      getRadio('l2_internet_b3'),
+    internet_b4:      getRadio('l2_internet_b4'),
+    internet_b5:      getRadio('l2_internet_b5'),
+    internet_b6:      getRadio('l2_internet_b6'),
+    /* 16c: teknologi digital */
+    teknologi:        getRadio('l2_teknologi'),
+    /* 17: ramah lingkungan */
+    ramah_lingkungan: getRadio('l2_ramah_a'),
+    biaya_lingkungan: getRadio('l2_ramah_b'),
+    /* 18: produk kreatif */
+    produk_kreatif:   getRadio('l2_kreatif'),
     halal:            getRadio('l2_halal'),
     halal_b:          getVal('l2_halal_b'),
     halal_c:          getVal('l2_halal_c'),
     bpom:             getRadio('l2_bpom'),
     bpom_b:           getVal('l2_bpom_b'),
     bpom_c:           getVal('l2_bpom_c'),
+    /* 21-22: kemitraan */
+    mitra_kdkmp:      getRadio('l2_mitra_kdkmp'),
+    program_mbg:      getRadio('l2_mbg'),
+    /* 23: transaksi non-penduduk */
+    transaksi_barang_nonpenduduk:    getRadio('l2_nonpend_a'),
+    transaksi_jual_jasa_nonpenduduk: getRadio('l2_nonpend_b'),
+    transaksi_beli_jasa_nonpenduduk: getRadio('l2_nonpend_c'),
     pekerja_l:        getVal('l2_pekerja_l'),
     pekerja_p:        getVal('l2_pekerja_p'),
     pekerja_dibayar:  getVal('l2_pekerja_dibayar'),

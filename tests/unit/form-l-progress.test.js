@@ -5,18 +5,25 @@ import { fileURLToPath } from 'node:url'
 const ROOT   = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 const SOURCE = readFileSync(resolve(ROOT, 'js/form-l/form-l-progress.js'), 'utf8')
 
-function mockEl(value = '', isHidden = false) {
-  return { value, classList: { contains: cls => cls === 'hidden' && isHidden } }
+function mockEl(value = '', { hidden = false, kbliHidden = false } = {}) {
+  return {
+    value,
+    classList: {
+      contains: cls =>
+        (cls === 'hidden' && hidden) || (cls === 'kbli-hidden' && kbliHidden),
+    },
+    closest: () => null,
+  }
 }
 
 function makeCalc({ fields = {}, radios = {}, elements = {}, l5HasSig = false } = {}) {
   const noop = () => {}
   const dom  = { ...elements }
   const mockDoc = {
-    getElementById:  id => dom[id] ?? null,
-    querySelectorAll: () => ({ forEach: noop }),
+    getElementById:   id  => dom[id] ?? null,
+    querySelectorAll: ()  => ({ forEach: noop }),
     addEventListener: noop,
-    createElement:   () => ({}),
+    createElement:    ()  => ({}),
   }
   const fn = new Function(
     'document', 'window',
@@ -197,16 +204,102 @@ describe('calcProgressL() — per anggota', () => {
     expect(r2.filled).toBe(r.filled + 1)
   })
 
-  it('age >= 5 adds sekolah/ijazah/rekening requirements', () => {
+  // ── alamat_dom: hanya wajib saat keb=1 ──────────────────────────────────
+  it('keberadaan=1 requires alamat_dom (tinggal di rumah ini)', () => {
+    const r1 = calc({ fields: { l1_jml_kk_anggota: '1' }, radios: { 'l_ang_1_keberadaan': '1' } })
+    const r2 = calc({
+      fields: { l1_jml_kk_anggota: '1' },
+      radios: { 'l_ang_1_keberadaan': '1', 'l_ang_1_alamat_dom': '1' },
+    })
+    expect(r2.filled).toBe(r1.filled + 1)
+  })
+
+  it('keberadaan=3 does NOT require alamat_dom (not at this address)', () => {
+    const rKeb1 = calc({
+      fields: { l1_jml_kk_anggota: '1' },
+      radios: { 'l_ang_1_keberadaan': '1' },
+    })
+    const rKeb3 = calc({
+      fields: { l1_jml_kk_anggota: '1' },
+      radios: { 'l_ang_1_keberadaan': '3' },
+    })
+    // keb=3 total should be lower by 1 (no alamat_dom slot, but has dn_provinsi slot)
+    // The key point: filling alamat_dom for keb=3 adds nothing
+    const rKeb3WithDom = calc({
+      fields: { l1_jml_kk_anggota: '1' },
+      radios: { 'l_ang_1_keberadaan': '3', 'l_ang_1_alamat_dom': '1' },
+    })
+    expect(rKeb3WithDom.filled).toBe(rKeb3.filled) // alamat_dom not counted for keb=3
+  })
+
+  it('keberadaan=5 does NOT require alamat_dom (anggota baru)', () => {
+    const r = calc({ fields: { l1_jml_kk_anggota: '1' }, radios: { 'l_ang_1_keberadaan': '5' } })
+    const rWithDom = calc({
+      fields: { l1_jml_kk_anggota: '1' },
+      radios: { 'l_ang_1_keberadaan': '5', 'l_ang_1_alamat_dom': '1' },
+    })
+    expect(rWithDom.filled).toBe(r.filled) // no extra
+  })
+
+  // ── sekolah/ijazah/rekening ──────────────────────────────────────────────
+  it('age >= 5 adds sekolah + ijazah + rekening requirements (3 fields)', () => {
     const rUnder5 = calc({ fields: { l1_jml_kk_anggota: '1', 'l_ang_1_umur': '3' } })
     const r5plus  = calc({ fields: { l1_jml_kk_anggota: '1', 'l_ang_1_umur': '7' } })
     expect(r5plus.total).toBe(rUnder5.total + 3)
   })
 
-  it('age >= 10 adds profesi/kedudukan/18a/18b/18c requirements', () => {
+  it('sekolah=0 (tidak pernah sekolah): ijazah slot removed', () => {
+    const rSekolah0 = calc({
+      fields: { l1_jml_kk_anggota: '1', 'l_ang_1_umur': '7' },
+      radios: { 'l_ang_1_sekolah': '0' },
+    })
+    const rSekolah1 = calc({
+      fields: { l1_jml_kk_anggota: '1', 'l_ang_1_umur': '7' },
+      radios: { 'l_ang_1_sekolah': '1' },
+    })
+    // sekolah=0 removes ijazah slot (-1 total)
+    expect(rSekolah0.total).toBe(rSekolah1.total - 1)
+  })
+
+  it('sekolah=0 filled counts +1, but ijazah filling adds nothing extra', () => {
+    const base = calc({
+      fields: { l1_jml_kk_anggota: '1', 'l_ang_1_umur': '7' },
+      radios: { 'l_ang_1_sekolah': '0' },
+    })
+    const withIjazah = calc({
+      fields: { l1_jml_kk_anggota: '1', 'l_ang_1_umur': '7' },
+      radios: { 'l_ang_1_sekolah': '0', 'l_ang_1_ijazah': '3' },
+    })
+    expect(withIjazah.filled).toBe(base.filled) // ijazah not in total for sekolah=0
+  })
+
+  // ── profesi/kedudukan ────────────────────────────────────────────────────
+  it('age >= 10 adds profesi + kedudukan + 18a/18b/18c requirements (5 fields)', () => {
     const r5  = calc({ fields: { l1_jml_kk_anggota: '1', 'l_ang_1_umur': '7' } })
     const r10 = calc({ fields: { l1_jml_kk_anggota: '1', 'l_ang_1_umur': '12' } })
     expect(r10.total).toBe(r5.total + 5)
+  })
+
+  it('profesi=000 (tidak bekerja): kedudukan slot removed', () => {
+    const rProf000 = calc({
+      fields: { l1_jml_kk_anggota: '1', 'l_ang_1_umur': '12', 'l_ang_1_profesi': '000' },
+    })
+    const rProfOth = calc({
+      fields: { l1_jml_kk_anggota: '1', 'l_ang_1_umur': '12', 'l_ang_1_profesi': '075' },
+    })
+    // profesi=000 removes kedudukan slot (-1 total)
+    expect(rProf000.total).toBe(rProfOth.total - 1)
+  })
+
+  it('profesi=000 filled counts +1, but kedudukan filling adds nothing extra', () => {
+    const base = calc({
+      fields: { l1_jml_kk_anggota: '1', 'l_ang_1_umur': '12', 'l_ang_1_profesi': '000' },
+    })
+    const withKed = calc({
+      fields: { l1_jml_kk_anggota: '1', 'l_ang_1_umur': '12', 'l_ang_1_profesi': '000' },
+      radios: { 'l_ang_1_kedudukan': '1' },
+    })
+    expect(withKed.filled).toBe(base.filled) // kedudukan not in total for profesi=000
   })
 
   it('multiple anggota: STOP for some, age-gated for others', () => {
@@ -226,7 +319,6 @@ describe('calcProgressL() — per anggota', () => {
 
   it('caps anggota at 30', () => {
     const r = calc({ fields: { l1_jml_kk_anggota: '50' } })
-    // total reflects up to 30 anggota only (or 0 if cap is rejected)
     expect(r.total).toBeLessThan(2000)
   })
 })
@@ -243,7 +335,6 @@ describe('calcProgressL() — Blok II Usaha', () => {
   it('kawasan=10 (luar) does not require nama_kawasan', () => {
     const base = calc()
     const r = calc({ radios: { l2_kawasan: '10' } })
-    // kawasan radio counted; nama_kawasan NOT required when v=10
     expect(r.filled).toBe(base.filled + 1)
   })
 
@@ -320,6 +411,58 @@ describe('calcProgressL() — Blok II Usaha', () => {
     expect(r2.filled).toBe(r1.filled + 1)
   })
 
+  // ── Rincian 16a/b/c ─────────────────────────────────────────────────────
+  it('internet (16a) radio counts', () => {
+    const base = calc()
+    const r = calc({ radios: { l2_internet: '2' } })
+    expect(r.filled).toBe(base.filled + 1)
+  })
+
+  it('internet=1 opens 16b (6 tujuan sub-fields)', () => {
+    const rNo  = calc({ radios: { l2_internet: '2' } })
+    const rYes = calc({ radios: { l2_internet: '1' } })
+    expect(rYes.total).toBe(rNo.total + 6)
+  })
+
+  it('internet=1 with all b1-b6 filled counts all 6', () => {
+    const r1 = calc({ radios: { l2_internet: '1' } })
+    const r2 = calc({
+      radios: {
+        l2_internet: '1',
+        l2_internet_b1: '1', l2_internet_b2: '2', l2_internet_b3: '2',
+        l2_internet_b4: '1', l2_internet_b5: '1', l2_internet_b6: '2',
+      },
+    })
+    expect(r2.filled).toBe(r1.filled + 6)
+  })
+
+  it('teknologi (16c) radio counts', () => {
+    const base = calc()
+    const r = calc({ radios: { l2_teknologi: '1' } })
+    expect(r.filled).toBe(base.filled + 1)
+  })
+
+  // ── Rincian 17a/17b ──────────────────────────────────────────────────────
+  it('ramah_a (17a) counts', () => {
+    const base = calc()
+    const r = calc({ radios: { l2_ramah_a: '1' } })
+    expect(r.filled).toBe(base.filled + 1)
+  })
+
+  it('ramah_b (17b) counts', () => {
+    const base = calc()
+    const r = calc({ radios: { l2_ramah_b: '2' } })
+    expect(r.filled).toBe(base.filled + 1)
+  })
+
+  // ── Rincian 18 ───────────────────────────────────────────────────────────
+  it('kreatif (18) counts', () => {
+    const base = calc()
+    const r = calc({ radios: { l2_kreatif: '2' } })
+    expect(r.filled).toBe(base.filled + 1)
+  })
+
+  // ── Halal/BPOM ───────────────────────────────────────────────────────────
   it('halal=1 requires halal_b and halal_c', () => {
     const r1 = calc({ radios: { l2_halal: '1' } })
     const r2 = calc({ radios: { l2_halal: '1' }, fields: { l2_halal_b: '5', l2_halal_c: '2' } })
@@ -330,6 +473,26 @@ describe('calcProgressL() — Blok II Usaha', () => {
     const r1 = calc({ radios: { l2_bpom: '1' } })
     const r2 = calc({ radios: { l2_bpom: '1' }, fields: { l2_bpom_b: '3', l2_bpom_c: '1' } })
     expect(r2.filled).toBe(r1.filled + 2)
+  })
+
+  // ── Rincian 21/22 ────────────────────────────────────────────────────────
+  it('mitra_kdkmp (21) counts', () => {
+    const base = calc()
+    const r = calc({ radios: { l2_mitra_kdkmp: '2' } })
+    expect(r.filled).toBe(base.filled + 1)
+  })
+
+  it('mbg (22) counts', () => {
+    const base = calc()
+    const r = calc({ radios: { l2_mbg: '5' } })
+    expect(r.filled).toBe(base.filled + 1)
+  })
+
+  // ── Rincian 23 ───────────────────────────────────────────────────────────
+  it('nonpend_a/b/c (23) each count independently', () => {
+    const base = calc()
+    const r = calc({ radios: { l2_nonpend_a: '2', l2_nonpend_b: '2', l2_nonpend_c: '2' } })
+    expect(r.filled).toBe(base.filled + 3)
   })
 
   it('tahun_operasi must be in 1900-2026', () => {
@@ -346,9 +509,8 @@ describe('calcProgressL() — Blok II Usaha', () => {
     }
     const r = calc({
       fields,
-      elements: { l2_tahunan_wrap: mockEl('', false), l2_bulanan_wrap: mockEl('', true) },
+      elements: { l2_tahunan_wrap: mockEl('', { hidden: false }), l2_bulanan_wrap: mockEl('', { hidden: true }) },
     })
-    // 6 fields + 1 sum-check = 7
     expect(r.filled).toBeGreaterThanOrEqual(7)
   })
 
@@ -359,11 +521,11 @@ describe('calcProgressL() — Blok II Usaha', () => {
     }
     const r = calc({
       fields,
-      elements: { l2_tahunan_wrap: mockEl('', false), l2_bulanan_wrap: mockEl('', true) },
+      elements: { l2_tahunan_wrap: mockEl('', { hidden: false }), l2_bulanan_wrap: mockEl('', { hidden: true }) },
     })
     const allRight = calc({
       fields: { ...fields, l2_y29f: '5' },
-      elements: { l2_tahunan_wrap: mockEl('', false), l2_bulanan_wrap: mockEl('', true) },
+      elements: { l2_tahunan_wrap: mockEl('', { hidden: false }), l2_bulanan_wrap: mockEl('', { hidden: true }) },
     })
     expect(allRight.filled).toBe(r.filled + 1)
   })
@@ -382,6 +544,68 @@ describe('calcProgressL() — Blok III Perumahan', () => {
     const r1 = calc({ radios: { l3_jenis_bangunan: '5' } })
     const r2 = calc({ radios: { l3_jenis_bangunan: '5' }, fields: { l3_bangunan_lain: 'Kos' } })
     expect(r2.filled).toBe(r1.filled + 1)
+  })
+
+  it('jenis_bangunan=5 does NOT require jml_keluarga (slot replaced by bangunan_lain)', () => {
+    // jb=5 swaps jml_keluarga for bangunan_lain, so total stays equal between jb=1 and jb=5
+    const r5 = calc({ radios: { l3_jenis_bangunan: '5' } })
+    const r1 = calc({ radios: { l3_jenis_bangunan: '1' } })
+    expect(r5.total).toBe(r1.total)  // net delta = 0 (remove jml_keluarga, add bangunan_lain)
+
+    // Verify: filling jml_keluarga when jb=5 adds nothing
+    const r5WithJml = calc({ radios: { l3_jenis_bangunan: '5' }, fields: { l3_jml_keluarga: '2' } })
+    expect(r5WithJml.filled).toBe(r5.filled)
+  })
+
+  it('jml_keluarga required when jenis_bangunan=1 (biasa)', () => {
+    const r1 = calc({ radios: { l3_jenis_bangunan: '1' } })
+    const r2 = calc({ radios: { l3_jenis_bangunan: '1' }, fields: { l3_jml_keluarga: '1' } })
+    expect(r2.filled).toBe(r1.filled + 1)
+  })
+
+  // ── lantai kondisi conditional ───────────────────────────────────────────
+  it('lantai_kondisi required when lantai_bahan=1 (bukan tanah/bambu)', () => {
+    const r1 = calc({ fields: { l3_lantai_bahan: '1' } })
+    const r2 = calc({ fields: { l3_lantai_bahan: '1' }, radios: { l3_lantai_kondisi: '1' } })
+    expect(r2.filled).toBe(r1.filled + 1)
+  })
+
+  it('lantai_kondisi NOT required when lantai_bahan=7 (tanah)', () => {
+    const rTanah = calc({ fields: { l3_lantai_bahan: '7' } })
+    const rTanahWithKond = calc({ fields: { l3_lantai_bahan: '7' }, radios: { l3_lantai_kondisi: '1' } })
+    expect(rTanahWithKond.filled).toBe(rTanah.filled) // no extra slot
+  })
+
+  it('lantai_kondisi NOT required when lantai_bahan=8 (bambu)', () => {
+    const r = calc({ fields: { l3_lantai_bahan: '8' } })
+    const rWith = calc({ fields: { l3_lantai_bahan: '8' }, radios: { l3_lantai_kondisi: '1' } })
+    expect(rWith.filled).toBe(r.filled)
+  })
+
+  // ── dinding kondisi conditional ──────────────────────────────────────────
+  it('dinding_kondisi required when dinding_bahan=1 (bukan bambu/lainnya)', () => {
+    const r1 = calc({ fields: { l3_dinding_bahan: '1' } })
+    const r2 = calc({ fields: { l3_dinding_bahan: '1' }, radios: { l3_dinding_kondisi: '2' } })
+    expect(r2.filled).toBe(r1.filled + 1)
+  })
+
+  it('dinding_kondisi NOT required when dinding_bahan=6 (bambu)', () => {
+    const r = calc({ fields: { l3_dinding_bahan: '6' } })
+    const rWith = calc({ fields: { l3_dinding_bahan: '6' }, radios: { l3_dinding_kondisi: '1' } })
+    expect(rWith.filled).toBe(r.filled)
+  })
+
+  // ── atap kondisi conditional ─────────────────────────────────────────────
+  it('atap_kondisi required when atap_bahan=1 (bukan ijuk/lainnya)', () => {
+    const r1 = calc({ fields: { l3_atap_bahan: '1' } })
+    const r2 = calc({ fields: { l3_atap_bahan: '1' }, radios: { l3_atap_kondisi: '2' } })
+    expect(r2.filled).toBe(r1.filled + 1)
+  })
+
+  it('atap_kondisi NOT required when atap_bahan=5 (ijuk/rumbia)', () => {
+    const r = calc({ fields: { l3_atap_bahan: '5' } })
+    const rWith = calc({ fields: { l3_atap_bahan: '5' }, radios: { l3_atap_kondisi: '1' } })
+    expect(rWith.filled).toBe(r.filled)
   })
 
   it('status_milik=1 requires bukti radio', () => {
@@ -407,8 +631,27 @@ describe('calcProgressL() — Blok III Perumahan', () => {
 
   it('bab=4 does not require kloset', () => {
     const r1 = calc({ radios: { l3_bab: '4' } })
-    // No additional kloset slot opened — kloset not added to total
-    expect(r1.filled).toBe(1) // just bab
+    const r2 = calc({ radios: { l3_bab: '4', l3_kloset: '1' } })
+    expect(r2.filled).toBe(r1.filled) // kloset not counted for bab=4
+  })
+
+  // ── tinja conditional ────────────────────────────────────────────────────
+  it('tinja required when bab=1 (jamban sendiri)', () => {
+    const r1 = calc({ radios: { l3_bab: '1' } })
+    const r2 = calc({ radios: { l3_bab: '1', l3_tinja: '1' } })
+    expect(r2.filled).toBe(r1.filled + 1)
+  })
+
+  it('tinja NOT required when bab=4 (tanpa fasilitas/alam terbuka)', () => {
+    const r = calc({ radios: { l3_bab: '4' } })
+    const rWith = calc({ radios: { l3_bab: '4', l3_tinja: '1' } })
+    expect(rWith.filled).toBe(r.filled) // tinja not in total
+  })
+
+  it('tinja NOT required when bab=5', () => {
+    const r = calc({ radios: { l3_bab: '5' } })
+    const rWith = calc({ radios: { l3_bab: '5', l3_tinja: '1' } })
+    expect(rWith.filled).toBe(r.filled)
   })
 
   it('listrik=1 requires meteran_jml', () => {
@@ -437,16 +680,26 @@ describe('calcProgressL() — Blok V Petugas/Responden', () => {
     expect(r.filled).toBe(base.filled + 1)
   })
 
-  it('responden_hp + responden_email require valid format', () => {
+  it('responden_hp requires valid format and counts', () => {
     const base = calc()
-    const r = calc({ fields: {
-      l5_responden_hp: '081234567890',
-      l5_responden_email: 'foo@bar.com',
-    }})
-    expect(r.filled).toBe(base.filled + 2)
+    const r = calc({ fields: { l5_responden_hp: '081234567890' } })
+    expect(r.filled).toBe(base.filled + 1)
   })
 
-  it('invalid email does not count', () => {
+  it('invalid responden_hp does not count', () => {
+    const r = calc({ fields: { l5_responden_hp: '12345' } })
+    expect(r.filled).toBe(0)
+  })
+
+  it('responden_email is OPTIONAL — does not affect filled or total', () => {
+    const base = calc()
+    // Filling email adds nothing
+    const rEmail = calc({ fields: { l5_responden_email: 'foo@bar.com' } })
+    expect(rEmail.filled).toBe(base.filled)
+    expect(rEmail.total).toBe(base.total)
+  })
+
+  it('invalid email also has no effect (email is excluded from progress)', () => {
     const r = calc({ fields: { l5_responden_email: 'not-an-email' } })
     expect(r.filled).toBe(0)
   })
@@ -456,12 +709,18 @@ describe('calcProgressL() — Blok V Petugas/Responden', () => {
     const r = calc({ l5HasSig: true })
     expect(r.filled).toBe(base.filled + 1)
   })
+
+  it('tanggal counts', () => {
+    const base = calc()
+    const r = calc({ fields: { l5_tanggal: '2026-05-01' } })
+    expect(r.filled).toBe(base.filled + 1)
+  })
 })
 
 // ─── COMPLETE FORM ───────────────────────────────────────────────────────────
 
 describe('calcProgressL() — complete form', () => {
-  it('all base fields + 1 non-STOP adult anggota reaches near 100%', () => {
+  it('all mandatory fields filled reaches >= 95% (near-complete)', () => {
     const r = calc({
       fields: {
         l1_nama_kk: 'Budi', l1_nik_kk: '1234567890123456', l1_no_kk: '1234567890123456',
@@ -470,10 +729,9 @@ describe('calcProgressL() — complete form', () => {
         l1_alamat_kec: '510801', l1_alamat_kel: '5108010001',
         l1_kodepos: '81111',
         l1_alamat_detail: 'Jl. A No.1', l1_nama_jalan: 'A', l1_no_rumah: '1',
-        // Anggota #1
+        // Anggota #1 (umur 45, non-STOP, keb=1)
         'l_ang_1_nama': 'Budi', 'l_ang_1_hubungan': '1', 'l_ang_1_tgl_lahir': '1980-01-01',
-        'l_ang_1_umur': '45', 'l_ang_1_ijazah': '3',
-        'l_ang_1_profesi': '075', 'l_ang_1_kedudukan': '1',
+        'l_ang_1_umur': '45', 'l_ang_1_profesi': '075',
         // Blok II
         l2_nama_usaha: 'Warung', l2_alamat: 'Jl. A',
         l2_pengusaha_nama: 'Budi', l2_pengusaha_umur: '45',
@@ -483,37 +741,40 @@ describe('calcProgressL() — complete form', () => {
         l2_pekerja_l: '1', l2_pekerja_p: '0',
         l2_tahun_operasi: '2020',
         // Blok III
-        l3_jml_keluarga: '1',
-        l3_luas_lantai: '60',
-        l3_lantai_bahan: '1', l3_lantai_kondisi: '1',
-        l3_dinding_bahan: '1', l3_dinding_kondisi: '1',
-        l3_atap_bahan: '1', l3_atap_kondisi: '1',
+        l3_jml_keluarga: '1', l3_luas_lantai: '60',
+        l3_lantai_bahan: '1', l3_dinding_bahan: '1', l3_atap_bahan: '1',
         l3_air: '1',
         l3_makanan_mgg: '500000', l3_nonmakanan_bln: '1000000', l3_nonmakanan_thn: '2000000',
         l3_aset_gas3: '0', l3_aset_gas5: '0', l3_aset_kulkas: '0', l3_aset_ac: '0',
         l3_aset_emas: '0', l3_aset_komputer: '0', l3_aset_motor: '1', l3_aset_mobil: '0',
         l3_aset_tanah: '0', l3_aset_rumah: '0',
         // Blok V
-        l5_petugas_nama: 'Andi',
-        l5_responden_nama: 'Budi',
-        l5_responden_hp: '081234567890',
-        l5_responden_email: 'budi@test.com',
-        l5_tanggal: '2026-05-01',
+        l5_petugas_nama: 'Andi', l5_responden_nama: 'Budi',
+        l5_responden_hp: '081234567890', l5_tanggal: '2026-05-01',
       },
       radios: {
         l1_klasifikasi: '1', l1_sesuai_kk: '1',
         'l_ang_1_keberadaan': '1', 'l_ang_1_alamat_dom': '1',
         'l_ang_1_kawin': '2', 'l_ang_1_jk': '1', 'l_ang_1_sekolah': '2',
-        'l_ang_1_rekening': '2', 'l_ang_1_18a': '1', 'l_ang_1_18b': '2', 'l_ang_1_18c': '2',
+        'l_ang_1_ijazah': '3', 'l_ang_1_rekening': '2',
+        'l_ang_1_kedudukan': '1',
+        'l_ang_1_18a': '1', 'l_ang_1_18b': '2', 'l_ang_1_18c': '2',
         l2_kawasan: '10', l2_jenis_usaha: '1', l2_punya_nib: '2', l2_nib_alasan: '3',
         l2_badan_usaha: '13', l2_pengusaha_jk: '1',
         l2_b1: '2', l2_b2: '1', l2_c: '4',
-        l2_jaringan: '1', l2_internet: '2', l2_halal: '2', l2_bpom: '2',
+        l2_jaringan: '1',
+        l2_internet: '2', l2_teknologi: '2',
+        l2_ramah_a: '3', l2_ramah_b: '2',
+        l2_kreatif: '2',
+        l2_halal: '2', l2_bpom: '2',
+        l2_mitra_kdkmp: '2', l2_mbg: '5',
+        l2_nonpend_a: '2', l2_nonpend_b: '2', l2_nonpend_c: '2',
         l3_jenis_bangunan: '1', l3_status_milik: '1', l3_bukti: '1',
+        l3_lantai_kondisi: '2', l3_dinding_kondisi: '2', l3_atap_kondisi: '2',
         l3_bab: '1', l3_kloset: '1', l3_tinja: '1', l3_listrik: '2',
       },
       l5HasSig: true,
     })
-    expect(r.pct).toBeGreaterThanOrEqual(80)
+    expect(r.pct).toBeGreaterThanOrEqual(95)
   })
 })

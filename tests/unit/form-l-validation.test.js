@@ -455,9 +455,15 @@ describe('collectAllProblemsL — Blok V', () => {
     expect(errText(r, 'l5_responden_hp')).toMatch(/[Ff]ormat/)
   })
 
-  it('petugas_nip kosong → kosong list (opsional)', () => {
+  it('petugas_hp kosong → kosong list (opsional)', () => {
     const r = collect()
-    expect(r.kosong.some(k => k.field === 'l5_petugas_nip')).toBe(true)
+    expect(r.kosong.some(k => k.field === 'l5_petugas_hp')).toBe(true)
+  })
+
+  it('petugas_nip not tracked (not required, not in kosong — field exists in DOM only)', () => {
+    // l5_petugas_nip is filled by autocomplete; validation doesn't track it
+    const r = collect()
+    expect(r.errors.some(e => e.field === 'l5_petugas_nip')).toBe(false)
   })
 
   it('petugas_hp invalid → error', () => {
@@ -499,5 +505,260 @@ describe('collectAllProblemsL — blok routing', () => {
     const r = collect()
     const e = r.errors.find(x => x.field === 'l5_petugas_nama')
     expect(e?.blok).toBe(5)
+  })
+})
+
+// ─── Blok II: Rincian 16-23 — newly added validation fields ─────────────────
+
+describe('collectAllProblemsL — Blok II Rincian 16a: Internet', () => {
+  it('internet required when empty', () => {
+    expect(hasErr(collect(), 'l2_internet')).toBe(true)
+  })
+
+  it('internet error carries blok=2 and Rincian 16a label', () => {
+    const r = collect()
+    const e = r.errors.find(e => e.field === 'l2_internet')
+    expect(e?.blok).toBe(2)
+    expect(e?.label).toMatch(/16a/)
+  })
+
+  it('internet=2 clears error', () => {
+    expect(hasErr(collect({ radios: { l2_internet: '2' } }), 'l2_internet')).toBe(false)
+  })
+})
+
+describe('collectAllProblemsL — Blok II Rincian 16b: Tujuan Internet (kondisional)', () => {
+  it('internet=1 requires internet_b1 through b6', () => {
+    const r = collect({ radios: { l2_internet: '1' } })
+    for (const s of ['b1','b2','b3','b4','b5','b6'])
+      expect(hasErr(r, 'l2_internet_' + s)).toBe(true)
+  })
+
+  it('internet=2 does NOT require internet_b1-b6', () => {
+    const r = collect({ radios: { l2_internet: '2' } })
+    for (const s of ['b1','b2','b3','b4','b5','b6'])
+      expect(hasErr(r, 'l2_internet_' + s)).toBe(false)
+  })
+
+  it('internet empty → b1-b6 also not required (gate not triggered)', () => {
+    const r = collect()
+    for (const s of ['b1','b2','b3','b4','b5','b6'])
+      expect(hasErr(r, 'l2_internet_' + s)).toBe(false)
+  })
+
+  it('internet_b errors carry blok=2', () => {
+    const r = collect({ radios: { l2_internet: '1' } })
+    expect(r.errors.find(e => e.field === 'l2_internet_b3')?.blok).toBe(2)
+  })
+
+  it('internet=1 with all b1-b6 filled → no b errors', () => {
+    const r = collect({
+      radios: {
+        l2_internet: '1',
+        l2_internet_b1: '1', l2_internet_b2: '2', l2_internet_b3: '2',
+        l2_internet_b4: '1', l2_internet_b5: '1', l2_internet_b6: '2',
+      }
+    })
+    for (const s of ['b1','b2','b3','b4','b5','b6'])
+      expect(hasErr(r, 'l2_internet_' + s)).toBe(false)
+  })
+})
+
+describe('collectAllProblemsL — Blok II Rincian 16c: Teknologi Digital', () => {
+  it('teknologi required when empty', () => {
+    expect(hasErr(collect(), 'l2_teknologi')).toBe(true)
+  })
+
+  it('teknologi error label matches Rincian 16c', () => {
+    expect(collect().errors.find(e => e.field === 'l2_teknologi')?.label).toMatch(/16c/)
+  })
+
+  it('teknologi error carries blok=2', () => {
+    expect(collect().errors.find(e => e.field === 'l2_teknologi')?.blok).toBe(2)
+  })
+
+  it('teknologi=1 clears error', () => {
+    expect(hasErr(collect({ radios: { l2_teknologi: '1' } }), 'l2_teknologi')).toBe(false)
+  })
+
+  it('teknologi=2 clears error', () => {
+    expect(hasErr(collect({ radios: { l2_teknologi: '2' } }), 'l2_teknologi')).toBe(false)
+  })
+})
+
+describe('collectAllProblemsL — Blok II Rincian 17a/17b: Ramah Lingkungan', () => {
+  it('ramah_a (17a) required when empty', () => {
+    expect(hasErr(collect(), 'l2_ramah_a')).toBe(true)
+  })
+
+  it('ramah_a error label matches Rincian 17a', () => {
+    expect(collect().errors.find(e => e.field === 'l2_ramah_a')?.label).toMatch(/17a/)
+  })
+
+  it('ramah_a=1 clears error', () => {
+    expect(hasErr(collect({ radios: { l2_ramah_a: '1' } }), 'l2_ramah_a')).toBe(false)
+  })
+
+  it('ramah_b (17b) required when empty', () => {
+    expect(hasErr(collect(), 'l2_ramah_b')).toBe(true)
+  })
+
+  it('ramah_b error label matches Rincian 17b', () => {
+    expect(collect().errors.find(e => e.field === 'l2_ramah_b')?.label).toMatch(/17b/)
+  })
+
+  it('ramah_b=2 clears error', () => {
+    expect(hasErr(collect({ radios: { l2_ramah_b: '2' } }), 'l2_ramah_b')).toBe(false)
+  })
+
+  it('ramah_a and ramah_b are independent — both needed', () => {
+    const rA = collect({ radios: { l2_ramah_a: '1' } })
+    expect(hasErr(rA, 'l2_ramah_b')).toBe(true)  // b still required
+    const rB = collect({ radios: { l2_ramah_b: '1' } })
+    expect(hasErr(rB, 'l2_ramah_a')).toBe(true)  // a still required
+  })
+})
+
+describe('collectAllProblemsL — Blok II Rincian 18: Produk Kreatif', () => {
+  it('kreatif required when empty', () => {
+    expect(hasErr(collect(), 'l2_kreatif')).toBe(true)
+  })
+
+  it('kreatif error label matches Rincian 18', () => {
+    expect(collect().errors.find(e => e.field === 'l2_kreatif')?.label).toMatch(/18/)
+  })
+
+  it('kreatif error carries blok=2', () => {
+    expect(collect().errors.find(e => e.field === 'l2_kreatif')?.blok).toBe(2)
+  })
+
+  it('kreatif=2 clears error', () => {
+    expect(hasErr(collect({ radios: { l2_kreatif: '2' } }), 'l2_kreatif')).toBe(false)
+  })
+})
+
+describe('collectAllProblemsL — Blok II Rincian 21/22: Kemitraan & MBG', () => {
+  it('mitra_kdkmp (21) required when empty', () => {
+    expect(hasErr(collect(), 'l2_mitra_kdkmp')).toBe(true)
+  })
+
+  it('mitra_kdkmp error label matches Rincian 21', () => {
+    expect(collect().errors.find(e => e.field === 'l2_mitra_kdkmp')?.label).toMatch(/21/)
+  })
+
+  it('mitra_kdkmp=1 clears error', () => {
+    expect(hasErr(collect({ radios: { l2_mitra_kdkmp: '1' } }), 'l2_mitra_kdkmp')).toBe(false)
+  })
+
+  it('mbg (22) required when empty', () => {
+    expect(hasErr(collect(), 'l2_mbg')).toBe(true)
+  })
+
+  it('mbg error label matches Rincian 22', () => {
+    expect(collect().errors.find(e => e.field === 'l2_mbg')?.label).toMatch(/22/)
+  })
+
+  it('mbg=5 clears error', () => {
+    expect(hasErr(collect({ radios: { l2_mbg: '5' } }), 'l2_mbg')).toBe(false)
+  })
+})
+
+describe('collectAllProblemsL — Blok II Rincian 23: Transaksi Non-Penduduk', () => {
+  it('nonpend_a (23a) required when empty', () => {
+    expect(hasErr(collect(), 'l2_nonpend_a')).toBe(true)
+  })
+
+  it('nonpend_a error label matches Rincian 23a', () => {
+    expect(collect().errors.find(e => e.field === 'l2_nonpend_a')?.label).toMatch(/23a/)
+  })
+
+  it('nonpend_b (23b) required when empty', () => {
+    expect(hasErr(collect(), 'l2_nonpend_b')).toBe(true)
+  })
+
+  it('nonpend_b error label matches Rincian 23b', () => {
+    expect(collect().errors.find(e => e.field === 'l2_nonpend_b')?.label).toMatch(/23b/)
+  })
+
+  it('nonpend_c (23c) required when empty', () => {
+    expect(hasErr(collect(), 'l2_nonpend_c')).toBe(true)
+  })
+
+  it('nonpend_c error label matches Rincian 23c', () => {
+    expect(collect().errors.find(e => e.field === 'l2_nonpend_c')?.label).toMatch(/23c/)
+  })
+
+  it('nonpend_a/b/c are independent — filling one does not clear others', () => {
+    const r = collect({ radios: { l2_nonpend_a: '2' } })
+    expect(hasErr(r, 'l2_nonpend_b')).toBe(true)
+    expect(hasErr(r, 'l2_nonpend_c')).toBe(true)
+  })
+
+  it('filling all three clears all three errors', () => {
+    const r = collect({ radios: { l2_nonpend_a: '2', l2_nonpend_b: '2', l2_nonpend_c: '2' } })
+    expect(hasErr(r, 'l2_nonpend_a')).toBe(false)
+    expect(hasErr(r, 'l2_nonpend_b')).toBe(false)
+    expect(hasErr(r, 'l2_nonpend_c')).toBe(false)
+  })
+
+  it('all three carry blok=2', () => {
+    const r = collect()
+    expect(r.errors.find(e => e.field === 'l2_nonpend_a')?.blok).toBe(2)
+    expect(r.errors.find(e => e.field === 'l2_nonpend_b')?.blok).toBe(2)
+    expect(r.errors.find(e => e.field === 'l2_nonpend_c')?.blok).toBe(2)
+  })
+})
+
+describe('collectAllProblemsL — Blok II section numbering (Rincian 24/25)', () => {
+  it('pekerja_l error labeled Rincian 24 (not 23)', () => {
+    expect(collect().errors.find(e => e.field === 'l2_pekerja_l')?.label).toMatch(/24/)
+  })
+
+  it('pekerja_p error labeled Rincian 24 (not 23)', () => {
+    expect(collect().errors.find(e => e.field === 'l2_pekerja_p')?.label).toMatch(/24/)
+  })
+
+  it('tahun_operasi error labeled Rincian 25 (not 24)', () => {
+    expect(collect().errors.find(e => e.field === 'l2_tahun_operasi')?.label).toMatch(/25/)
+  })
+
+  it('no field is labeled Rincian 23a that is also pekerja (no label collision)', () => {
+    const r = collect()
+    // nonpend fields use 23a/23b/23c; pekerja uses 24a/24b — no collision
+    const e23a = r.errors.filter(e => e.label?.includes('23a'))
+    expect(e23a.every(e => e.field?.includes('nonpend'))).toBe(true)
+  })
+})
+
+describe('collectAllProblemsL — new B2 fields: bulk fill', () => {
+  it('filling all 9 new unconditional B2 radios removes all their errors', () => {
+    const r = collect({
+      radios: {
+        l2_internet:     '2',  // '2' = tidak pakai internet → no 16b sub-fields
+        l2_teknologi:    '2',
+        l2_ramah_a:      '2',
+        l2_ramah_b:      '2',
+        l2_kreatif:      '2',
+        l2_mitra_kdkmp:  '2',
+        l2_mbg:          '2',
+        l2_nonpend_a:    '2',
+        l2_nonpend_b:    '2',
+        l2_nonpend_c:    '2',
+      }
+    })
+    for (const f of ['l2_internet','l2_teknologi','l2_ramah_a','l2_ramah_b',
+                     'l2_kreatif','l2_mitra_kdkmp','l2_mbg',
+                     'l2_nonpend_a','l2_nonpend_b','l2_nonpend_c'])
+      expect(hasErr(r, f)).toBe(false)
+  })
+
+  it('generates at least 9 more errors when new B2 fields are empty (baseline check)', () => {
+    const r = collect()
+    const newRequiredFields = [
+      'l2_teknologi','l2_ramah_a','l2_ramah_b','l2_kreatif',
+      'l2_mitra_kdkmp','l2_mbg','l2_nonpend_a','l2_nonpend_b','l2_nonpend_c',
+    ]
+    const foundErrors = newRequiredFields.filter(f => r.errors.some(e => e.field === f))
+    expect(foundErrors.length).toBe(newRequiredFields.length)
   })
 })

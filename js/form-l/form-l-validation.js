@@ -160,7 +160,22 @@ function collectAllProblemsL() {
   const jR = getRadio('l2_jaringan');
   if (!jR) e('Rincian 16a: Jaringan Usaha', 'Belum dipilih', 2, 'l2_jaringan');
   if (jR === '2' && !getVal('l2_jml_cabang')) e('Rincian 16b: Jumlah Cabang', 'Harus diisi', 2, 'l2_jml_cabang');
-  if (!getRadio('l2_internet')) e('Rincian 17a: Penggunaan Internet', 'Belum dipilih', 2, 'l2_internet');
+  if (!getRadio('l2_internet')) e('Rincian 16a: Penggunaan Internet', 'Belum dipilih', 2, 'l2_internet');
+  /* 16b: Tujuan penggunaan internet (kondisional: internet=1) */
+  if (getRadio('l2_internet') === '1') {
+    const ibLabels = ['Menerima pesanan','Produksi','Distribusi','Beli bahan baku','Promosi','Lainnya'];
+    ['b1','b2','b3','b4','b5','b6'].forEach((s, idx) => {
+      if (!getRadio('l2_internet_' + s)) e('Rincian 16b' + s + ': Tujuan Internet (' + ibLabels[idx] + ')', 'Belum dipilih', 2, 'l2_internet_' + s);
+    });
+  }
+  /* 16c: Teknologi digital (AI / IoT / Big Data / dll.) */
+  if (!getRadio('l2_teknologi')) e('Rincian 16c: Teknologi Digital', 'Belum dipilih', 2, 'l2_teknologi');
+  /* 17a: Produk ramah lingkungan */
+  if (!getRadio('l2_ramah_a')) e('Rincian 17a: Produk Ramah Lingkungan', 'Belum dipilih', 2, 'l2_ramah_a');
+  /* 17b: Input perlindungan lingkungan */
+  if (!getRadio('l2_ramah_b')) e('Rincian 17b: Input Perlindungan Lingkungan', 'Belum dipilih', 2, 'l2_ramah_b');
+  /* 18: Produk karya seni / sastra / desain / teknologi / warisan */
+  if (!getRadio('l2_kreatif')) e('Rincian 18: Produk Karya Seni/Desain/Teknologi/Warisan', 'Belum dipilih', 2, 'l2_kreatif');
   /* Cek apakah section Halal/BPOM ditampilkan (bisa tersembunyi oleh kbli-filters) */
   const _hHalal = document.getElementById('sec-L2-19');
   const _cHalal = _hHalal && _hHalal.closest('.section-card');
@@ -182,15 +197,23 @@ function collectAllProblemsL() {
       if (getVal('l2_bpom_c') === '') e('Rincian 21c: Jumlah Varian Belum BPOM', 'Harus diisi', 2, 'l2_bpom_c');
     }
   }
-  if (getVal('l2_pekerja_l') === '') e('Rincian 23a: Pekerja Laki-laki', 'Harus diisi (isi 0 jika tidak ada)', 2, 'l2_pekerja_l');
-  if (getVal('l2_pekerja_p') === '') e('Rincian 23b: Pekerja Perempuan', 'Harus diisi (isi 0 jika tidak ada)', 2, 'l2_pekerja_p');
+  /* 21: Kemitraan KDKMP */
+  if (!getRadio('l2_mitra_kdkmp')) e('Rincian 21: Mitra Koperasi Desa/Kelurahan Merah Putih', 'Belum dipilih', 2, 'l2_mitra_kdkmp');
+  /* 22: Program MBG */
+  if (!getRadio('l2_mbg')) e('Rincian 22: Program Makan Bergizi Gratis', 'Belum dipilih', 2, 'l2_mbg');
+  /* 23: Transaksi dengan non-penduduk Indonesia */
+  if (!getRadio('l2_nonpend_a')) e('Rincian 23a: Transaksi Penjualan/Pembelian Barang Non-Penduduk', 'Belum dipilih', 2, 'l2_nonpend_a');
+  if (!getRadio('l2_nonpend_b')) e('Rincian 23b: Transaksi Penjualan Jasa Non-Penduduk', 'Belum dipilih', 2, 'l2_nonpend_b');
+  if (!getRadio('l2_nonpend_c')) e('Rincian 23c: Transaksi Pembelian Jasa Non-Penduduk', 'Belum dipilih', 2, 'l2_nonpend_c');
+  if (getVal('l2_pekerja_l') === '') e('Rincian 24a: Pekerja Laki-laki', 'Harus diisi (isi 0 jika tidak ada)', 2, 'l2_pekerja_l');
+  if (getVal('l2_pekerja_p') === '') e('Rincian 24b: Pekerja Perempuan', 'Harus diisi (isi 0 jika tidak ada)', 2, 'l2_pekerja_p');
   const totPekerja = (parseInt(getVal('l2_pekerja_l'))||0) + (parseInt(getVal('l2_pekerja_p'))||0);
   if (getVal('l2_pekerja_l') !== '' && getVal('l2_pekerja_p') !== '' && totPekerja === 0)
-    w('Rincian 23: Jumlah Pekerja', 'Total 0 pekerja — verifikasi (rumah tangga biasanya ≥ 1)', 2, 'l2_pekerja_l');
-  else if (totPekerja > 500) w('Rincian 23: Jumlah Pekerja', `Total ${totPekerja} pekerja — verifikasi (usaha rumah tangga umumnya kecil)`, 2, 'l2_pekerja_l');
+    w('Rincian 24: Jumlah Pekerja', 'Total 0 pekerja — verifikasi (rumah tangga biasanya ≥ 1)', 2, 'l2_pekerja_l');
+  else if (totPekerja > 500) w('Rincian 24: Jumlah Pekerja', `Total ${totPekerja} pekerja — verifikasi (usaha rumah tangga umumnya kecil)`, 2, 'l2_pekerja_l');
   const yr = parseInt(getVal('l2_tahun_operasi'));
-  if (!getVal('l2_tahun_operasi')) e('Rincian 24: Tahun Operasi', 'Harus diisi', 2, 'l2_tahun_operasi');
-  else if (yr < 1900 || yr > 2026) e('Rincian 24: Tahun Operasi', 'Harus antara 1900–2026', 2, 'l2_tahun_operasi');
+  if (!getVal('l2_tahun_operasi')) e('Rincian 25: Tahun Operasi', 'Harus diisi', 2, 'l2_tahun_operasi');
+  else if (yr < 1900 || yr > 2026) e('Rincian 25: Tahun Operasi', 'Harus antara 1900–2026', 2, 'l2_tahun_operasi');
   /* Tahunan vs Bulanan validation */
   const lTahunanW = document.getElementById('l2_tahunan_wrap');
   const lBulananW = document.getElementById('l2_bulanan_wrap');

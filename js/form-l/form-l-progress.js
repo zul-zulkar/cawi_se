@@ -5,6 +5,25 @@
  * (STOP / age-gated aware) + Blok II/III/V (catatan opsional).
  *
  * Returns { pct, filled, total } — sama struktur dengan calcProgress L.UB.
+ *
+ * KONSISTENSI dengan collectAllProblemsL:
+ *  - alamat_dom   : hanya wajib saat keb=1 (tinggal di rumah ini)
+ *  - ijazah       : tidak wajib saat sekolah=0 (tidak/belum pernah sekolah)
+ *  - kedudukan    : tidak wajib saat profesi=000 (tidak bekerja)
+ *  - jml_keluarga : tidak wajib saat jb=5 (lainnya)
+ *  - lantai_kondisi/dinding_kondisi/atap_kondisi: hanya wajib untuk material
+ *    tertentu (bukan tanah/bambu/ijuk/lainnya yang tidak memiliki kondisi)
+ *  - tinja        : tidak wajib saat bab in {4,5,6} (tanpa fasilitas/alam/lain)
+ *  - email        : opsional — tidak dihitung dalam progress
+ *  - halal/bpom   : ikuti kbli-hidden sama seperti validation
+ *
+ * Blok II Rincian yang sekarang dihitung:
+ *  16a internet, 16b tujuan internet (kondisional), 16c teknologi,
+ *  17a ramah lingkungan, 17b biaya/input lingkungan,
+ *  18 produk kreatif,
+ *  19 halal (kondisional kbli), 20 bpom (kondisional kbli),
+ *  21 mitra kdkmp, 22 program mbg,
+ *  23a/b/c transaksi non-penduduk
  */
 function calcProgressL() {
   let t = 0, f = 0;
@@ -32,7 +51,7 @@ function calcProgressL() {
   for (let i = 1; i <= capped; i++) {
     c(!!getVal('l_ang_' + i + '_nama'));
     const nikA = getVal('l_ang_' + i + '_nik');
-    // NIK boleh kosong; tapi jika diisi, harus 16-digit. Tidak dihitung wajib (skip non-required NIK).
+    // NIK boleh kosong; tapi jika diisi, harus 16-digit.
     if (nikA) c(nikA.length === 16);
     c(!!getVal('l_ang_' + i + '_hubungan'));
     const keb = getRadio('l_ang_' + i + '_keberadaan');
@@ -40,8 +59,8 @@ function calcProgressL() {
     // STOP-state (2=Meninggal, 6=Pisah KK, 7=Tidak Ditemukan): skip per-anggota detail
     const STOP = (keb === '2' || keb === '6' || keb === '7');
     if (STOP) continue;
-    // Non-STOP: alamat domisili wajib
-    c(!!getRadio('l_ang_' + i + '_alamat_dom'));
+    // r9b (alamat domisili): hanya wajib saat keb=1 (tinggal di rumah ini)
+    if (keb === '1') c(!!getRadio('l_ang_' + i + '_alamat_dom'));
     // r10DN.a wajib jika keberadaan=3 (pindah DN)
     if (keb === '3') c(!!getVal('l_ang_' + i + '_dn_provinsi'));
     // r10LN wajib jika keberadaan=4 (pindah LN)
@@ -49,16 +68,21 @@ function calcProgressL() {
     c(!!getRadio('l_ang_' + i + '_kawin'));
     c(!!getRadio('l_ang_' + i + '_jk'));
     c(!!getVal('l_ang_' + i + '_tgl_lahir'));
-    // Age-gated
+    // Age-gated (≥5)
     const umur = parseInt(getVal('l_ang_' + i + '_umur')) || 0;
     if (umur >= 5) {
-      c(!!getRadio('l_ang_' + i + '_sekolah'));
-      c(!!getRadio('l_ang_' + i + '_ijazah'));
+      const sekolah = getRadio('l_ang_' + i + '_sekolah');
+      c(!!sekolah);
+      // Ijazah tidak wajib saat sekolah=0 (tidak/belum pernah sekolah — field hidden)
+      if (sekolah !== '0') c(!!getRadio('l_ang_' + i + '_ijazah'));
       c(!!getRadio('l_ang_' + i + '_rekening'));
     }
+    // Age-gated (≥10)
     if (umur >= 10) {
-      c(!!getVal('l_ang_' + i + '_profesi'));
-      c(!!getRadio('l_ang_' + i + '_kedudukan'));
+      const profesi = getVal('l_ang_' + i + '_profesi');
+      c(!!profesi);
+      // Kedudukan tidak wajib saat profesi=000 (tidak bekerja — field hidden)
+      if (profesi !== '000') c(!!getRadio('l_ang_' + i + '_kedudukan'));
       c(!!getRadio('l_ang_' + i + '_18a'));
       c(!!getRadio('l_ang_' + i + '_18b'));
       c(!!getRadio('l_ang_' + i + '_18c'));
@@ -104,17 +128,52 @@ function calcProgressL() {
   const jR = getRadio('l2_jaringan');
   c(!!jR);
   if (jR === '2') c(!!getVal('l2_jml_cabang'));
-  c(!!getRadio('l2_internet'));
-  c(!!getRadio('l2_halal'));
-  if (getRadio('l2_halal') === '1') {
-    c(getVal('l2_halal_b') !== '');
-    c(getVal('l2_halal_c') !== '');
+  /* Rincian 16a: Internet */
+  const intV = getRadio('l2_internet');
+  c(!!intV);
+  /* Rincian 16b: Tujuan penggunaan internet (kondisional: internet=1) */
+  if (intV === '1') {
+    ['l2_internet_b1','l2_internet_b2','l2_internet_b3',
+     'l2_internet_b4','l2_internet_b5','l2_internet_b6'].forEach(n => c(!!getRadio(n)));
   }
-  c(!!getRadio('l2_bpom'));
-  if (getRadio('l2_bpom') === '1') {
-    c(getVal('l2_bpom_b') !== '');
-    c(getVal('l2_bpom_c') !== '');
+  /* Rincian 16c: Teknologi digital */
+  c(!!getRadio('l2_teknologi'));
+  /* Rincian 17a: Produk ramah lingkungan */
+  c(!!getRadio('l2_ramah_a'));
+  /* Rincian 17b: Input perlindungan lingkungan */
+  c(!!getRadio('l2_ramah_b'));
+  /* Rincian 18: Produk karya seni/sastra/desain/teknologi/warisan */
+  c(!!getRadio('l2_kreatif'));
+  /* Rincian 19/20: Halal & BPOM — ikuti kbli-hidden sama seperti validation */
+  const _hHalalP = document.getElementById('sec-L2-19');
+  const _cHalalP = _hHalalP && _hHalalP.closest('.section-card');
+  const showL2HalalP = !_cHalalP || !_cHalalP.classList.contains('kbli-hidden');
+  const _hBpomP  = document.getElementById('sec-L2-20');
+  const _cBpomP  = _hBpomP  && _hBpomP.closest('.section-card');
+  const showL2BpomP  = !_cBpomP  || !_cBpomP.classList.contains('kbli-hidden');
+  if (showL2HalalP) {
+    c(!!getRadio('l2_halal'));
+    if (getRadio('l2_halal') === '1') {
+      c(getVal('l2_halal_b') !== '');
+      c(getVal('l2_halal_c') !== '');
+    }
   }
+  if (showL2BpomP) {
+    c(!!getRadio('l2_bpom'));
+    if (getRadio('l2_bpom') === '1') {
+      c(getVal('l2_bpom_b') !== '');
+      c(getVal('l2_bpom_c') !== '');
+    }
+  }
+  /* Rincian 21: Mitra KDKMP */
+  c(!!getRadio('l2_mitra_kdkmp'));
+  /* Rincian 22: Program MBG */
+  c(!!getRadio('l2_mbg'));
+  /* Rincian 23: Transaksi non-penduduk */
+  c(!!getRadio('l2_nonpend_a'));
+  c(!!getRadio('l2_nonpend_b'));
+  c(!!getRadio('l2_nonpend_c'));
+  /* Pekerja & tahun operasi */
   c(getVal('l2_pekerja_l') !== '');
   c(getVal('l2_pekerja_p') !== '');
   const yr = parseInt(getVal('l2_tahun_operasi'));
@@ -152,22 +211,30 @@ function calcProgressL() {
   c(!!jb);
   if (jb === '3' || jb === '4') c(!!getVal('l3_lantai_apt'));
   if (jb === '5') c(!!getVal('l3_bangunan_lain'));
-  c(getVal('l3_jml_keluarga') !== '');
+  // jml_keluarga tidak wajib saat jb=5 (Lainnya)
+  if (jb !== '5') c(getVal('l3_jml_keluarga') !== '');
   const sm = getRadio('l3_status_milik');
   c(!!sm);
   if (sm === '1') c(!!getRadio('l3_bukti'));
   if (sm === '5') c(!!getVal('l3_status_lain'));
   c(getVal('l3_luas_lantai') !== '');
   c(!!getVal('l3_lantai_bahan'));
-  c(!!getRadio('l3_lantai_kondisi'));
+  // lantai_kondisi: tidak wajib saat bahan tanah/bambu/lainnya (7,8,9)
+  const lantaiBahan = getVal('l3_lantai_bahan');
+  if (lantaiBahan && !['7','8','9'].includes(lantaiBahan)) c(!!getRadio('l3_lantai_kondisi'));
   c(!!getVal('l3_dinding_bahan'));
-  c(!!getRadio('l3_dinding_kondisi'));
+  // dinding_kondisi: tidak wajib saat bahan bambu/lainnya (6,7)
+  const dindingBahan = getVal('l3_dinding_bahan');
+  if (dindingBahan && !['6','7'].includes(dindingBahan)) c(!!getRadio('l3_dinding_kondisi'));
   c(!!getVal('l3_atap_bahan'));
-  c(!!getRadio('l3_atap_kondisi'));
+  // atap_kondisi: tidak wajib saat bahan ijuk/rumbia/lainnya (5,7,8)
+  const atapBahan = getVal('l3_atap_bahan');
+  if (atapBahan && !['5','7','8'].includes(atapBahan)) c(!!getRadio('l3_atap_kondisi'));
   const bab = getRadio('l3_bab');
   c(!!bab);
   if (['1','2','3'].includes(bab)) c(!!getRadio('l3_kloset'));
-  c(!!getRadio('l3_tinja'));
+  // tinja: tidak wajib saat bab in {4,5,6} (tanpa fasilitas / alam terbuka / lainnya)
+  if (bab && !['4','5','6'].includes(bab)) c(!!getRadio('l3_tinja'));
   c(!!getVal('l3_air'));
   const lst = getRadio('l3_listrik');
   c(!!lst);
@@ -175,7 +242,7 @@ function calcProgressL() {
   c(getVal('l3_makanan_mgg') !== '');
   c(getVal('l3_nonmakanan_bln') !== '');
   c(getVal('l3_nonmakanan_thn') !== '');
-  // Aset bergerak: angka (boleh 0 — tetap dihitung jika diisi)
+  // Aset bergerak/tidak bergerak: angka (boleh 0 — tetap dihitung jika diisi)
   ['l3_aset_gas3','l3_aset_gas5','l3_aset_kulkas','l3_aset_ac','l3_aset_emas','l3_aset_komputer',
    'l3_aset_motor','l3_aset_mobil','l3_aset_tanah','l3_aset_rumah'].forEach(id => c(getVal(id) !== ''));
 
@@ -184,8 +251,7 @@ function calcProgressL() {
   c(!!getVal('l5_responden_nama'));
   const hpR = getVal('l5_responden_hp');
   c(!!hpR && isValidHP(hpR));
-  const emR = getVal('l5_responden_email');
-  c(!!emR && isValidEmail(emR));
+  // Email opsional — tidak dihitung dalam progress (konsisten dengan validation)
   c(!!getVal('l5_tanggal'));
   c(typeof l5HasSig !== 'undefined' && l5HasSig === true);
 
