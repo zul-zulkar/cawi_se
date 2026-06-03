@@ -21,6 +21,10 @@ const CONFIG_SHEET_NAME = "CAWI_Config";
 const L_SHEET_NAME       = "SE2026_L_Responses";
 const L_ANGGOTA_SHEET    = "SE2026_L_Anggota";
 
+// Portal Petugas — sheet daftar PPL & PML (dikelola manual di Sheets)
+const PPL_SHEET_NAME = "PPL";
+const PML_SHEET_NAME = "PML";
+
 // Header SE2026_LKP sheet (satu baris per kantor cabang)
 const LKP_HEADERS = [
   "Record ID", "Timestamp", "Nama Perusahaan",
@@ -182,6 +186,7 @@ function doPost(e) {
     if (d.action === "getConfig")  return getConfigResponse();
     if (d.action === "setConfig")  return setConfigResponse(d.key, d.value);
     if (d.action === "getRecords") return getRecordsResponse();
+    if (d.action === "getPetugas") return getPetugasResponse();
 
     // === MODE DISPATCHER: L mode pakai sheet terpisah ===
     const mode = (d.formMode === 'l') ? 'l' : 'lub';
@@ -532,13 +537,50 @@ function setConfigResponse(key, value) {
   }
 }
 
-// Endpoint GET — kembalikan semua rekaman sebagai JSON (L.UB + L merged)
+// Endpoint GET — default kembalikan semua rekaman; dukung ?action=getConfig dan ?action=getPetugas
+// untuk Portal Petugas (petugas.html) yang fetch via GET tanpa CORS preflight.
 function doGet(e) {
   try {
+    var action = (e && e.parameter && e.parameter.action) ? String(e.parameter.action) : "";
+    if (action === "getConfig")  return getConfigResponse();
+    if (action === "getPetugas") return getPetugasResponse();
     return getRecordsResponse();
   } catch(err) {
     return jsonResponse({ status: "error", message: err.message });
   }
+}
+
+// Baca sheet PPL (Nama, Email, PML) dan PML (Nama, Email) lalu kembalikan
+// sebagai daftar terstruktur untuk halaman petugas. Skip header dan baris kosong.
+function getPetugasResponse() {
+  try {
+    const ss = SpreadsheetApp.openById(SHEET_ID);
+    return jsonResponse({
+      status: "ok",
+      data: {
+        ppl: readPetugasSheet(ss, PPL_SHEET_NAME, true),
+        pml: readPetugasSheet(ss, PML_SHEET_NAME, false)
+      }
+    });
+  } catch(err) {
+    return jsonResponse({ status: "error", message: err.message });
+  }
+}
+
+function readPetugasSheet(ss, name, includePml) {
+  var sheet = ss.getSheetByName(name);
+  if (!sheet || sheet.getLastRow() < 2) return [];
+  var values = sheet.getDataRange().getValues();
+  var rows = [];
+  for (var i = 1; i < values.length; i++) {
+    var nama  = cellStr(values[i][0]).trim();
+    var email = cellStr(values[i][1]).trim();
+    if (!nama && !email) continue;
+    var row = { nama: nama, email: email };
+    if (includePml) row.pml_email = cellStr(values[i][2]).trim();
+    rows.push(row);
+  }
+  return rows;
 }
 
 // ============================================================

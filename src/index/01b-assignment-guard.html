@@ -1,0 +1,99 @@
+<!-- ============================================================
+     ASSIGNMENT GUARD — wajib dimuat dari Portal Petugas (index.html).
+     Kuesioner HANYA bisa dibuka via ?draft=cawi_..._<uuid>&mode=L|LUB
+     yang cocok dengan entry di localStorage `cawi_assignments`.
+     Tanpa itu → redirect ke index.html (portal).
+     ============================================================ -->
+<script>
+(function () {
+  'use strict';
+  var PORTAL_URL        = 'index.html';
+  var AUTH_KEY          = 'cawi_auth_v1';
+  var FORM_MODE_KEY     = 'cawi_form_mode';
+  var ASSIGNMENT_KEY    = 'cawi_assignments';
+  var GLOBAL_DRAFT_KEY  = 'cawi_se2026_draft_v1';
+
+  function backToPortal() { window.location.replace(PORTAL_URL); }
+
+  // 1) Wajib sudah auth lewat portal
+  if (sessionStorage.getItem(AUTH_KEY) !== '1') return backToPortal();
+
+  // Bypass guard untuk workflow admin dari daftar.html:
+  // - edit/duplicate record yang sudah tersubmit (cawi_edit_mode)
+  // - lanjutkan draft (cawi_draft_continue_id)
+  // Workflow ini tidak melalui assignment; auth tetap wajib.
+  if (localStorage.getItem('cawi_edit_mode') ||
+      localStorage.getItem('cawi_draft_continue_id')) {
+    return;
+  }
+
+  // 2) Wajib ada ?draft= dan ?mode= di URL
+  var params   = new URLSearchParams(window.location.search);
+  var draftKey = params.get('draft');
+  var modeRaw  = params.get('mode');
+  if (!draftKey || !modeRaw) return backToPortal();
+
+  // 3) Draft key wajib match assignment yang valid
+  var assigns;
+  try { assigns = JSON.parse(localStorage.getItem(ASSIGNMENT_KEY) || '[]'); }
+  catch (e) { return backToPortal(); }
+  var found = null;
+  for (var i = 0; i < assigns.length; i++) {
+    if (assigns[i] && assigns[i].draft_key === draftKey) { found = assigns[i]; break; }
+  }
+  if (!found) return backToPortal();
+
+  // 4) Set mode form sebelum mode-gate logic jalan, agar kuesioner langsung dibuka
+  var mode = (modeRaw === 'L' || modeRaw === 'l') ? 'l' : 'lub';
+  localStorage.setItem(FORM_MODE_KEY, mode);
+
+  // Simpan referensi ke window untuk dipakai listener lain (mis. submit hook)
+  window.__cawiActiveAssignment = found;
+  window.__cawiActiveDraftKey   = draftKey;
+
+  // 5) DRAFT BINDING: muat draft per-assignment ke global key sebelum form load.
+  //    Ini memastikan kuesioner unik per assignment — autosave global dari sesi
+  //    sebelumnya tidak bocor ke assignment lain.
+  try {
+    var perAssign = localStorage.getItem(draftKey);
+    if (perAssign) {
+      localStorage.setItem(GLOBAL_DRAFT_KEY, perAssign);
+    } else {
+      // Belum pernah diisi → kosongkan global key supaya tidak mewarisi data lain
+      localStorage.removeItem(GLOBAL_DRAFT_KEY);
+    }
+  } catch (e) {}
+
+  // 6) DRAFT SYNC-BACK: salin global draft ke per-assignment key secara berkala
+  //    dan saat unload, agar progres tersimpan ke assignment yang benar.
+  function syncDraftBack() {
+    try {
+      var v = localStorage.getItem(GLOBAL_DRAFT_KEY);
+      if (v) localStorage.setItem(draftKey, v);
+    } catch (e) {}
+  }
+  setInterval(syncDraftBack, 30000);
+  window.addEventListener('beforeunload', syncDraftBack);
+
+  // 7) POST-SUBMIT HOOK: dispatch dari submit.js. Update status assignment
+  //    jadi `submitted`, hapus draft per-assignment, redirect ke portal.
+  window.addEventListener('cawi:submit-success', function () {
+    try {
+      var list = JSON.parse(localStorage.getItem(ASSIGNMENT_KEY) || '[]');
+      var nowIso = new Date().toISOString();
+      for (var j = 0; j < list.length; j++) {
+        if (list[j] && list[j].draft_key === draftKey) {
+          list[j].status     = 'submitted';
+          list[j].updated_at = nowIso;
+          break;
+        }
+      }
+      localStorage.setItem(ASSIGNMENT_KEY, JSON.stringify(list));
+      localStorage.removeItem(draftKey);
+      localStorage.removeItem(GLOBAL_DRAFT_KEY);
+    } catch (e) {}
+    // Beri waktu user lihat pesan sukses sebentar, lalu kembali ke portal
+    setTimeout(backToPortal, 1500);
+  });
+})();
+</script>

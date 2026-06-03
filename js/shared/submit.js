@@ -648,6 +648,12 @@ async function submitForm() {
     if (_currentDraftId) { deleteDraftById(_currentDraftId); }
     // Mark form clean so leave-guard / beforeunload don't prompt after submit
     if (typeof _formDirty !== 'undefined') _formDirty = false;
+    // Beritahu listener (mis. assignment guard) bahwa submit sukses
+    try {
+      window.dispatchEvent(new CustomEvent('cawi:submit-success', {
+        detail: { formMode: data.formMode, wasEdit: wasEdit }
+      }));
+    } catch(_e) {}
     // Simpan ringkasan ke daftar lokal
     try {
       const LS_REC = 'cawi_se2026_records_v1';

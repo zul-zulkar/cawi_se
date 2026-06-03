@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * tools/build-html.js — concatenate src/index/*.html partials → index.html
+ * tools/build-html.js — concatenate src/index/*.html partials → kuesioner.html
  *
  * Usage:
  *   node tools/build-html.js
@@ -9,7 +9,8 @@
  * Partial naming convention: NN-name.html where NN is a 2-digit order prefix.
  * Files are concatenated in lexical order so the prefix governs the layout.
  *
- * Output: project root index.html (overwritten).
+ * Output: project root kuesioner.html (overwritten).
+ * Note: index.html sekarang adalah Portal Petugas (hand-written, bukan generated).
  */
 
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
@@ -18,7 +19,7 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT      = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const PARTIALS  = resolve(ROOT, 'src/index');
-const OUT_FILE  = resolve(ROOT, 'index.html');
+const OUT_FILE  = resolve(ROOT, 'kuesioner.html');
 
 function main() {
   const files = readdirSync(PARTIALS)

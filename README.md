@@ -8,13 +8,15 @@ Repo ini dirancang agar BPS daerah lain bisa **duplikasi dengan cepat** — cuku
 
 ## Cara Pakai Cepat (Demo)
 
-Endpoint default sudah aktif (sandbox publik). Cukup buka `index.html` di browser.
+Endpoint default sudah aktif (sandbox publik). Buka `index.html` di browser — halaman utama adalah **Portal Petugas**: login, pilih petugas, lalu kelola/buka assignment. Kuesioner hanya dapat dibuka melalui assignment.
 
 | Akses | Password Default |
 |---|---|
-| Kuesioner | `Kuesioner08!` |
-| Daftar | `Daftar08!` |
-| Admin | `Admin08!` |
+| Portal Petugas (`index.html`) | `Kuesioner08!` |
+| Daftar (`daftar.html`) | `Daftar08!` |
+| Admin (`admin.html`) | `Admin08!` |
+
+> Kuesioner berada di `kuesioner.html` dan dilindungi guard: hanya bisa dibuka via `?draft=<key>&mode=L|LUB` yang cocok dengan assignment milik petugas login.
 
 > ⚠️ Endpoint default menulis ke sheet publik — hanya untuk demo. Untuk operasi resmi, ikuti **Duplikasi** di bawah.
 
@@ -75,9 +77,11 @@ const DEFAULT_SCRIPT_URL = "https://script.google.com/macros/s/.../exec";
 
 ```
 cawi_se/
-├── index.html        # Formulir utama (auto-generated dari src/index/*)
-├── daftar.html       # Dashboard rekap entri
+├── index.html        # Portal Petugas (hand-written) — halaman utama
+├── kuesioner.html    # Formulir kuesioner (auto-generated dari src/index/*)
+├── daftar.html       # Dashboard rekap entri (admin)
 ├── admin.html        # Panel admin
+├── petugas.html      # Alias redirect ke index.html (backward compat)
 ├── server/           # Google Apps Script (backend)
 ├── master/           # KBLI 2025 + Halal/BPOM CSV
 ├── src/index/        # Partial HTML — gabungkan via `npm run build:html`
@@ -87,7 +91,7 @@ cawi_se/
 └── tools/            # build-html.js
 ```
 
-> Jangan edit `index.html` langsung — perubahan ditimpa saat build. Edit di `src/index/*.html` lalu jalankan `npm run build:html`.
+> Jangan edit `kuesioner.html` langsung — perubahan ditimpa saat build. Edit di `src/index/*.html` lalu jalankan `npm run build:html`. File `index.html` adalah portal hand-written dan **tidak** di-generate oleh build script.
 
 ---
 

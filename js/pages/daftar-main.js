@@ -166,7 +166,7 @@ function renderTable() {
     container.innerHTML = `<div class="empty-state">
       <div class="empty-icon">&#128196;</div>
       <div class="empty-text">Belum ada entri tersimpan.<br/>Submit form atau simpan draft dari halaman kuesioner.</div>
-      <a href="index.html" class="btn btn-primary">&#43; Mulai Entri Baru</a>
+      <a href="index.html" class="btn btn-primary">&#43; Buka Portal Petugas</a>
     </div>`;
     return;
   }
@@ -419,7 +419,7 @@ function editRecord(id, mode) {
   if (!r) return;
   localStorage.setItem('cawi_form_mode', getRecordMode(r));
   localStorage.setItem('cawi_edit_mode', JSON.stringify(r));
-  window.location.href = 'index.html';
+  window.location.href = 'kuesioner.html';
 }
 
 /* ====== DUPLIKAT ====== */
@@ -436,7 +436,7 @@ function duplicateRecord(id, mode) {
   copy.tanggal_pelaksanaan   = '';
   localStorage.setItem('cawi_form_mode', getRecordMode(r));
   localStorage.setItem('cawi_edit_mode', JSON.stringify(copy));
-  window.location.href = 'index.html';
+  window.location.href = 'kuesioner.html';
 }
 
 /* ====== HAPUS (server record) ====== */
@@ -501,7 +501,7 @@ function continueDraft(id) {
   localStorage.setItem('cawi_form_mode', mode);
   localStorage.setItem('cawi_se2026_draft_v1', JSON.stringify(draft._raw));
   localStorage.setItem('cawi_draft_continue_id', id);
-  window.location.href = 'index.html';
+  window.location.href = 'kuesioner.html';
 }
 
 function deleteDraftLocal(id) {
@@ -546,8 +546,9 @@ function exportCSV() {
 }
 
 /* ====== NEW ENTRY ====== */
+// Sekarang entri baru WAJIB lewat assignment di Portal Petugas (index.html).
+// Tombol ini diarahkan ke portal, bukan langsung ke kuesioner.
 function newEntry() {
-  // Always clear mode so the pre-selector gate shows on index.html
   localStorage.removeItem('cawi_form_mode');
   window.location.href = 'index.html';
 }
