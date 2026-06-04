@@ -175,11 +175,16 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-/* ====== GUARDED NAVIGATION ====== */
+/* ====== GUARDED NAVIGATION ======
+ * Selalu konfirmasi sebelum keluar dari kuesioner. Konfirmasi tampil
+ * baik form sudah diubah maupun belum, karena assignment-driven workflow
+ * selalu perlu jejak yang jelas saat petugas keluar mid-isian. Pilih
+ * "Simpan Draft & Keluar" untuk auto-save + redirect; "Batal" untuk
+ * tetap di kuesioner.
+ */
 let _leaveAction = null;
 
 function guardedNav(urlOrFn, newTab) {
-  if (!_formDirty && !_currentDraftId) { _doLeaveNav(urlOrFn, newTab); return; }
   _leaveAction = { fn: urlOrFn, newTab: !!newTab };
   document.getElementById('leaveGuardOverlay').classList.add('open');
   document.getElementById('leaveGuardModal').classList.add('open');

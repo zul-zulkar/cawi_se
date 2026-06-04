@@ -189,6 +189,8 @@ function doPost(e) {
     if (d.action === "setConfig")  return setConfigResponse(d.key, d.value);
     if (d.action === "getRecords") return getRecordsResponse();
     if (d.action === "getPetugas") return getPetugasResponse();
+    if (d.action === "getPetugasByEmail") return getPetugasByEmailResponse(d.email);
+    if (d.action === "getPplUnderPml")    return getPplUnderPmlResponse(d.pml_email);
 
     // === MODE DISPATCHER: L mode pakai sheet terpisah ===
     const mode = (d.formMode === 'l') ? 'l' : 'lub';
@@ -609,6 +611,12 @@ function doGet(e) {
     var action = (e && e.parameter && e.parameter.action) ? String(e.parameter.action) : "";
     if (action === "getConfig")  return getConfigResponse();
     if (action === "getPetugas") return getPetugasResponse();
+    if (action === "getPetugasByEmail") {
+      return getPetugasByEmailResponse(e.parameter.email);
+    }
+    if (action === "getPplUnderPml") {
+      return getPplUnderPmlResponse(e.parameter.pml_email);
+    }
     return getRecordsResponse();
   } catch(err) {
     return jsonResponse({ status: "error", message: err.message });
@@ -627,6 +635,59 @@ function getPetugasResponse() {
         pml: readPetugasSheet(ss, PML_SHEET_NAME, false)
       }
     });
+  } catch(err) {
+    return jsonResponse({ status: "error", message: err.message });
+  }
+}
+
+// Cari satu petugas berdasarkan email. Cek dulu sheet PPL, lalu sheet PML.
+// Endpoint cepat untuk alur login terpadu (email + sandi sekaligus).
+function getPetugasByEmailResponse(email) {
+  try {
+    if (!email) return jsonResponse({ status: "ok", data: null });
+    var target = String(email).trim().toLowerCase();
+    if (!target) return jsonResponse({ status: "ok", data: null });
+    var ss = SpreadsheetApp.openById(SHEET_ID);
+    var ppl = readPetugasSheet(ss, PPL_SHEET_NAME, true);
+    for (var i = 0; i < ppl.length; i++) {
+      if (ppl[i].email.toLowerCase() === target) {
+        return jsonResponse({
+          status: "ok",
+          data: { nama: ppl[i].nama, email: ppl[i].email, peran: "PPL", pml_email: ppl[i].pml_email }
+        });
+      }
+    }
+    var pml = readPetugasSheet(ss, PML_SHEET_NAME, false);
+    for (var j = 0; j < pml.length; j++) {
+      if (pml[j].email.toLowerCase() === target) {
+        return jsonResponse({
+          status: "ok",
+          data: { nama: pml[j].nama, email: pml[j].email, peran: "PML" }
+        });
+      }
+    }
+    return jsonResponse({ status: "ok", data: null });
+  } catch(err) {
+    return jsonResponse({ status: "error", message: err.message });
+  }
+}
+
+// Kembalikan daftar PPL (email saja) yang berada di bawah PML tertentu.
+// Dipakai PML untuk filter assignment di portal — lebih ringan daripada
+// fetch seluruh sheet PPL kalau cuma butuh daftar bawahan.
+function getPplUnderPmlResponse(pml_email) {
+  try {
+    if (!pml_email) return jsonResponse({ status: "ok", data: [] });
+    var target = String(pml_email).trim().toLowerCase();
+    var ss = SpreadsheetApp.openById(SHEET_ID);
+    var ppl = readPetugasSheet(ss, PPL_SHEET_NAME, true);
+    var out = [];
+    for (var i = 0; i < ppl.length; i++) {
+      if ((ppl[i].pml_email || '').toLowerCase() === target) {
+        out.push({ nama: ppl[i].nama, email: ppl[i].email, pml_email: ppl[i].pml_email });
+      }
+    }
+    return jsonResponse({ status: "ok", data: out });
   } catch(err) {
     return jsonResponse({ status: "error", message: err.message });
   }

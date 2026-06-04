@@ -119,24 +119,7 @@
   .alert-error { background: #fef2f2; color: var(--red); border: 1px solid #fecaca; }
   .alert-info  { background: #eff6ff; color: var(--bps-blue); border: 1px solid #bfdbfe; }
 
-  /* Search & cards petugas */
   .section-title { font-weight: 700; font-size: 15px; margin: 0 0 12px; color: var(--text); }
-  .search-bar {
-    display: flex; gap: 8px; margin-bottom: 14px;
-  }
-  .search-bar .form-input { flex: 1; }
-
-  .petugas-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
-  .petugas-card {
-    background: #fff; border: 1px solid var(--border); border-radius: 10px;
-    padding: 14px; cursor: pointer;
-    transition: border-color 0.15s, box-shadow 0.15s, transform 0.05s;
-  }
-  .petugas-card:hover { border-color: var(--bps-blue); box-shadow: 0 4px 14px rgba(0,53,128,0.10); }
-  .petugas-card:active { transform: scale(0.995); }
-  .petugas-name { font-weight: 700; font-size: 14px; margin-bottom: 2px; }
-  .petugas-email { font-size: 12px; color: var(--muted); margin-bottom: 8px; word-break: break-all; }
-  .petugas-meta { font-size: 11px; color: var(--muted); }
 
   .badge {
     display: inline-block; padding: 2px 8px; border-radius: 999px;
@@ -286,20 +269,6 @@
     font-size: 12px; color: var(--muted); line-height: 1.5;
   }
 
-  /* Skeleton/empty hint untuk pencarian petugas */
-  .search-hint {
-    text-align: center; padding: 36px 18px;
-    color: var(--muted); font-size: 13px;
-    background: linear-gradient(180deg, #f8fafc, #ffffff);
-    border: 1px dashed var(--border); border-radius: 10px;
-  }
-  .search-hint-icon {
-    font-size: 28px; line-height: 1; margin-bottom: 8px; opacity: 0.6;
-  }
-  .search-hint-title {
-    font-weight: 700; color: var(--text); margin-bottom: 4px; font-size: 14px;
-  }
-
   /* Selectable list dalam modal (kecamatan/desa) */
   .modal-input-grid {
     display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
@@ -330,13 +299,20 @@
 </div>
 
 <!-- ============================================================
-     STEP 1 — Password Gate
+     STEP 1 — Login terpadu (email + sandi)
+     Petugas langsung identifikasi diri lewat email kantor,
+     tidak perlu telusuri daftar petugas.
      ============================================================ -->
 <div id="loginScreen" class="login-wrap">
   <div class="login-card">
     <h1 class="login-title">CAWI SE2026</h1>
     <div class="login-sub">Portal Petugas Lapangan</div>
-    <div id="loginError" class="alert alert-error hidden">Kata sandi salah</div>
+    <div id="loginError" class="alert alert-error hidden">Kombinasi email/sandi salah</div>
+    <div class="form-row">
+      <label class="form-label" for="loginEmail">Email Petugas</label>
+      <input type="email" id="loginEmail" class="form-input"
+             placeholder="nama@gmail.com" autocomplete="username" inputmode="email"/>
+    </div>
     <div class="form-row">
       <label class="form-label" for="loginPw">Kata Sandi</label>
       <input type="password" id="loginPw" class="form-input" placeholder="Masukkan kata sandi"
@@ -350,42 +326,12 @@
 </div>
 
 <!-- ============================================================
-     STEP 2 — Pilih Petugas
-     ============================================================ -->
-<div id="pickScreen" class="hidden">
-  <div class="topbar">
-    <div class="topbar-brand">CAWI SE2026 <small>· Pilih Petugas</small></div>
-    <div class="topbar-actions">
-      <button id="btnLogout">Keluar</button>
-    </div>
-  </div>
-  <div class="container">
-    <div class="card">
-      <h2 class="section-title">Cari & Pilih Petugas</h2>
-      <div class="search-bar">
-        <input type="text" id="searchInput" class="form-input"
-               placeholder="Cari nama atau email petugas..." autocomplete="off" disabled/>
-      </div>
-      <div id="petugasError" class="alert alert-error hidden"></div>
-      <div id="petugasHint" class="search-hint">
-        <div class="search-hint-icon">&#128269;</div>
-        <div class="search-hint-title">Ketik untuk mencari petugas</div>
-        <div>Masukkan sebagian nama atau email PPL / PML, lalu pilih kartu yang muncul.</div>
-        <div id="petugasCount" style="margin-top:10px;font-size:11px;letter-spacing:0.3px;opacity:0.75"></div>
-      </div>
-      <div id="petugasList" class="petugas-list hidden"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ============================================================
      STEP 3 — Daftar Assignment
      ============================================================ -->
 <div id="dashScreen" class="hidden">
   <div class="topbar">
     <div class="topbar-brand">CAWI SE2026 <small>· Portal Petugas</small></div>
     <div class="topbar-actions">
-      <button id="btnGantiPetugas">Ganti Petugas</button>
       <button id="btnLogout2">Keluar</button>
     </div>
   </div>
@@ -615,14 +561,15 @@
   // ===== Initial routing =====
   function init() {
     bindLogin();
-    bindPick();
     bindDash();
     bindModal();
 
     var authed = sessionStorage.getItem(SK_AUTH) === '1';
-    if (!authed) { goLogin(); return; }
     var active = readActivePetugas();
-    if (active) goDash(); else goPick();
+    if (authed && active) { goDash(); return; }
+    // Auth dan petugas aktif tidak konsisten → mulai dari login lagi
+    sessionStorage.removeItem(SK_ACTIVE);
+    goLogin();
   }
 
   function readActivePetugas() {
@@ -630,40 +577,65 @@
     catch(e) { return null; }
   }
 
-  // ===== STEP 1 — Login =====
+  // ===== STEP 1 — Login terpadu (email + sandi) =====
+  // PPL list (di-cache di _pplList) hanya dimuat lazy saat petugas
+  // login berperan PML (untuk filter assignment + canView).
+  var _pplList = [];
+
   function bindLogin() {
     $('loginBtn').addEventListener('click', doLogin);
-    $('loginPw').addEventListener('keydown', function (e) {
-      if (e.key === 'Enter') doLogin();
-    });
+    var onEnter = function (e) { if (e.key === 'Enter') doLogin(); };
+    $('loginPw').addEventListener('keydown', onEnter);
+    $('loginEmail').addEventListener('keydown', onEnter);
   }
 
   async function doLogin() {
-    var pw = $('loginPw').value || '';
+    var email = ($('loginEmail').value || '').trim();
+    var pw    = $('loginPw').value || '';
     hide('loginError');
-    if (!pw) { showLoginError('Masukkan kata sandi'); return; }
+    if (!email) { showLoginError('Masukkan email petugas'); return; }
+    if (!/^\S+@\S+\.\S+$/.test(email)) { showLoginError('Format email tidak valid'); return; }
+    if (!pw)    { showLoginError('Masukkan kata sandi'); return; }
     var btn = $('loginBtn');
     btn.disabled = true; btn.textContent = 'Memverifikasi…';
-    showGlobalLoading('Memverifikasi kata sandi', 'Menghubungi server BPS untuk validasi…');
+    showGlobalLoading('Memverifikasi kredensial', 'Mencocokkan email & kata sandi dengan basis data BPS…');
     try {
-      // Tahan minimal 320ms supaya loading terlihat (bukan kedip)
-      var pair = await Promise.all([
+      // Paralel: ambil config (untuk hash sandi) + cari petugas by email.
+      // Hold minimum 320ms supaya loading state tidak kedip.
+      var triple = await Promise.all([
         fetchConfig(),
+        fetchPetugasByEmail(email),
         new Promise(function (r) { setTimeout(r, 320); })
       ]);
-      var cfg  = pair[0];
-      var hash = (cfg && cfg.kuesioner_pw_hash) || '';
+      var cfg     = triple[0];
+      var petugas = triple[1];
+      var hash    = (cfg && cfg.kuesioner_pw_hash) || '';
       if (!hash) throw new Error('Konfigurasi kata sandi tidak tersedia.');
-      var ok = await PM.verifyPassword(pw, hash);
-      if (!ok) {
+      // Verifikasi sandi
+      var okPw = await PM.verifyPassword(pw, hash);
+      if (!okPw) {
         hideGlobalLoading();
-        showLoginError('Kata sandi salah');
+        showLoginError('Kombinasi email/sandi salah');
         return;
       }
+      // Verifikasi email terdaftar
+      if (!petugas) {
+        hideGlobalLoading();
+        showLoginError('Email tidak terdaftar sebagai PPL/PML di basis data BPS');
+        return;
+      }
+      // Simpan sesi
+      var active = {
+        nama:      petugas.nama || '',
+        email:     petugas.email || email,
+        peran:     petugas.peran === 'PML' ? 'PML' : 'PPL',
+        pml_email: petugas.pml_email || ''
+      };
       sessionStorage.setItem(SK_AUTH, '1');
       sessionStorage.setItem(SK_CONFIG, JSON.stringify(cfg));
+      sessionStorage.setItem(SK_ACTIVE, JSON.stringify(active));
       $('loginPw').value = '';
-      goPick();
+      goDash();
     } catch (err) {
       hideGlobalLoading();
       showLoginError('Gagal terhubung ke server: ' + (err.message || err));
@@ -688,130 +660,47 @@
     return json.data || {};
   }
 
-  function goLogin() {
-    show('loginScreen'); hide('pickScreen'); hide('dashScreen');
-    setTimeout(function () { $('loginPw').focus(); }, 50);
-  }
-
-  // ===== STEP 2 — Pick petugas =====
-  var _pplList = [];
-  var _pmlList = [];
-
-  function bindPick() {
-    $('searchInput').addEventListener('input', renderPetugasList);
-    $('btnLogout').addEventListener('click', doLogout);
-  }
-
-  async function goPick() {
-    hide('loginScreen'); show('pickScreen'); hide('dashScreen');
-    sessionStorage.removeItem(SK_ACTIVE);
-    $('searchInput').value = '';
-    $('searchInput').disabled = true;
-    hide('petugasError');
-    hide('petugasList');
-    $('petugasList').innerHTML = '';
-    show('petugasHint');
-    $('petugasCount').textContent = '';
-    showGlobalLoading('Memuat daftar petugas', 'Mengambil data PPL & PML dari server…');
-    try {
-      var data = await fetchPetugas();
-      _pplList = data.ppl || [];
-      _pmlList = data.pml || [];
-      var total = _pplList.length + _pmlList.length;
-      $('petugasCount').textContent = total + ' petugas tersedia · ' +
-        _pplList.length + ' PPL · ' + _pmlList.length + ' PML';
-      $('searchInput').disabled = false;
-      setTimeout(function () { $('searchInput').focus(); }, 50);
-    } catch (err) {
-      var el = $('petugasError');
-      el.textContent = 'Gagal memuat daftar petugas: ' + (err.message || err);
-      el.classList.remove('hidden');
-      hide('petugasHint');
-    } finally {
-      hideGlobalLoading();
-    }
-  }
-
-  async function fetchPetugas() {
-    var cached = sessionStorage.getItem(SK_LIST);
-    if (cached) {
-      try { return JSON.parse(cached); } catch(e) {}
-    }
-    var url = getScriptUrl() + (getScriptUrl().indexOf('?') > -1 ? '&' : '?') + 'action=getPetugas';
+  async function fetchPetugasByEmail(email) {
+    var url = getScriptUrl() + (getScriptUrl().indexOf('?') > -1 ? '&' : '?') +
+      'action=getPetugasByEmail&email=' + encodeURIComponent(email);
     var res = await fetch(url, { method: 'GET' });
     var json = await res.json();
-    if (json.status !== 'ok') throw new Error(json.message || 'getPetugas gagal');
-    sessionStorage.setItem(SK_LIST, JSON.stringify(json.data));
-    return json.data;
+    if (json.status !== 'ok') throw new Error(json.message || 'getPetugasByEmail gagal');
+    return json.data || null;
   }
 
-  function renderPetugasList() {
-    var q = ($('searchInput').value || '').trim();
-    var box = $('petugasList');
-    // Tampilkan hint default saat query kosong — JANGAN auto-tampilkan semua
-    if (!q) {
-      box.classList.add('hidden');
-      box.innerHTML = '';
-      show('petugasHint');
-      return;
+  // Lazy-load daftar PPL bawahan untuk PML (dipakai canView + filter).
+  // Hasil disimpan di module-level _pplList + sessionStorage agar
+  // tidak fetch ulang saat ganti halaman dalam sesi yang sama.
+  async function ensurePplListForPml(pmlEmail) {
+    if (_pplList && _pplList.length) return _pplList;
+    var cached = sessionStorage.getItem(SK_LIST);
+    if (cached) {
+      try {
+        var arr = JSON.parse(cached);
+        if (Array.isArray(arr)) { _pplList = arr; return _pplList; }
+      } catch(e) {}
     }
-    hide('petugasHint');
-    var list = PM.searchPetugas(q, _pplList, _pmlList);
-    if (!list.length) {
-      box.innerHTML = '<div class="empty" style="grid-column:1/-1">' +
-        'Tidak ada petugas yang cocok dengan <b>' + esc(q) + '</b>.</div>';
-    } else {
-      box.innerHTML = list.map(function (p) {
-        var badge = p.peran === 'PPL'
-          ? '<span class="badge badge-ppl">PPL</span>'
-          : '<span class="badge badge-pml">PML</span>';
-        var pmlInfo = '';
-        if (p.peran === 'PPL' && p.pml_email) {
-          var nm = PM.resolvePmlNama(p.pml_email, _pmlList);
-          pmlInfo = '<div class="petugas-meta">Di bawah PML: ' + esc(nm || p.pml_email) + '</div>';
-        }
-        return '<div class="petugas-card" data-email="' + esc(p.email) + '" data-peran="' + esc(p.peran) + '">' +
-          '<div class="petugas-name">' + esc(p.nama) + ' ' + badge + '</div>' +
-          '<div class="petugas-email">' + esc(p.email) + '</div>' +
-          pmlInfo +
-        '</div>';
-      }).join('');
-      Array.prototype.forEach.call(box.querySelectorAll('.petugas-card'), function (card) {
-        card.addEventListener('click', function () {
-          var email = card.getAttribute('data-email');
-          var peran = card.getAttribute('data-peran');
-          selectPetugas(email, peran);
-        });
-      });
-    }
-    box.classList.remove('hidden');
+    var url = getScriptUrl() + (getScriptUrl().indexOf('?') > -1 ? '&' : '?') +
+      'action=getPplUnderPml&pml_email=' + encodeURIComponent(pmlEmail);
+    var res = await fetch(url, { method: 'GET' });
+    var json = await res.json();
+    if (json.status !== 'ok') throw new Error(json.message || 'getPplUnderPml gagal');
+    _pplList = json.data || [];
+    sessionStorage.setItem(SK_LIST, JSON.stringify(_pplList));
+    return _pplList;
   }
 
-  function selectPetugas(email, peran) {
-    var src = peran === 'PML' ? _pmlList : _pplList;
-    var rec = null;
-    for (var i = 0; i < src.length; i++) {
-      if ((src[i].email || '').toLowerCase() === (email || '').toLowerCase()) {
-        rec = src[i]; break;
-      }
-    }
-    if (!rec) return;
-    var active = {
-      nama:      rec.nama || '',
-      email:     rec.email || '',
-      peran:     peran === 'PML' ? 'PML' : 'PPL',
-      pml_email: rec.pml_email || ''
-    };
-    sessionStorage.setItem(SK_ACTIVE, JSON.stringify(active));
-    goDash();
+  function goLogin() {
+    show('loginScreen'); hide('dashScreen');
+    setTimeout(function () {
+      var emailEl = $('loginEmail');
+      if (emailEl.value) $('loginPw').focus(); else emailEl.focus();
+    }, 50);
   }
 
-  // ===== STEP 3 — Dashboard =====
+  // ===== STEP 2 — Dashboard =====
   function bindDash() {
-    $('btnGantiPetugas').addEventListener('click', function () {
-      sessionStorage.removeItem(SK_ACTIVE);
-      goPick();
-    });
     $('btnLogout2').addEventListener('click', doLogout);
     $('btnAddAssignment').addEventListener('click', openModal);
     $('btnResetFilter').addEventListener('click', resetFilters);
@@ -820,26 +709,27 @@
     });
   }
 
-  function goDash() {
-    hide('loginScreen'); hide('pickScreen'); show('dashScreen');
-
-    // Pastikan _pplList/_pmlList ada (untuk canViewAssignment + filter)
-    var listCached = sessionStorage.getItem(SK_LIST);
-    if (listCached) {
-      try {
-        var d = JSON.parse(listCached);
-        _pplList = d.ppl || [];
-        _pmlList = d.pml || [];
-      } catch(e) {}
-    }
+  async function goDash() {
+    hide('loginScreen'); show('dashScreen');
 
     var a = readActivePetugas();
-    if (!a) { goPick(); return; }
+    if (!a) { goLogin(); return; }
     $('activeNama').textContent  = a.nama;
     $('activeEmail').textContent = a.email;
     $('activeBadge').innerHTML = a.peran === 'PML'
       ? '<span class="badge badge-pml">PML</span>'
       : '<span class="badge badge-ppl">PPL</span>';
+
+    // PPL hanya melihat assignment miliknya sendiri (cuma butuh own email,
+    // tidak perlu daftar PPL lain). PML butuh daftar PPL bawahan untuk
+    // canView + filter — lazy-load di sini.
+    if (a.peran === 'PML') {
+      try { await ensurePplListForPml(a.email); }
+      catch (err) { console.warn('Gagal memuat daftar PPL bawahan:', err); }
+    } else {
+      _pplList = [];
+    }
+
     populateFilters();
     renderAssignList();
   }
