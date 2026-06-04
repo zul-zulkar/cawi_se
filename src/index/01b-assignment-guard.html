@@ -53,12 +53,16 @@
   if (!found) return backToPortal();
 
   // 4) Set mode form sebelum mode-gate logic jalan
+  // Unified (SE2026-P): ?mode=P / UNIFIED → Blok P + L/L.UB satu halaman.
+  // Mode dasar (l/lub) tetap di-set untuk reuse logika collect/validation existing.
+  var isUnified = (modeRaw === 'P' || modeRaw === 'p' || modeRaw === 'UNIFIED' || modeRaw === 'unified');
   var mode = (modeRaw === 'L' || modeRaw === 'l') ? 'l' : 'lub';
   localStorage.setItem(FORM_MODE_KEY, mode);
 
   // Expose ke window untuk dipakai listener lain (submit.js hook)
   window.__cawiActiveAssignment = found;
   window.__cawiActiveDraftKey   = draftKey;
+  window.__cawiUnified          = isUnified;
 
   // ============================================================
   // 5) STORAGE PROXY: setiap write ke GLOBAL_DRAFT_KEY otomatis

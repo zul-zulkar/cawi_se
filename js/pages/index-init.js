@@ -10,6 +10,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Apply current mode early (so form-l/form-lub visibility is correct)
   if (typeof applyFormMode === 'function') applyFormMode(getFormMode());
 
+  // Unified mode (SE2026-P): Blok P sebagai entri (di-set oleh guard via ?mode=P|UNIFIED)
+  if (window.__cawiUnified && typeof setUnifiedMode === 'function') setUnifiedMode(true);
+
   // Init searchable selects BEFORE any data load
   makeSearchable('q1_provinsi', 'provinsi');
   makeSearchable('q2_kabupaten', 'kabupaten/kota');
@@ -162,6 +165,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // Helper ini explicit menjamin cascade jalan urut.
   if (window.__cawiActiveAssignment && !_isEditMode && !_draftContinueId) {
     setTimeout(() => applyAssignmentPrefill(window.__cawiActiveAssignment), 100);
+  }
+
+  // Unified mode: hitung stage awal dari Blok P (setelah restore + prefill)
+  if (window.__cawiUnified && typeof initFormP === 'function') {
+    setTimeout(() => { try { initFormP(); } catch (e) {} }, 150);
   }
 
   // Auto-save on any input change (debounced 60s) + mark form dirty

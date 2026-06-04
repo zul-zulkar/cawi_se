@@ -1,7 +1,17 @@
-/* ====== FORM MODE (L.UB vs L) ====== */
+/* ====== FORM MODE (L.UB vs L; + Unified P) ====== */
 const LS_MODE   = 'cawi_form_mode';
 const MODE_LUB  = 'lub';
 const MODE_L    = 'l';
+const MODE_UNIFIED = 'unified'; // SE2026-P: Blok P + L/L.UB dalam satu halaman
+
+// Aktifkan unified mode (Blok P sebagai entri). Stage (l/lub) ditentukan
+// runtime oleh PMT_GATE_RULES; lihat js/form-p/form-p.js.
+function setUnifiedMode(on) {
+  document.body.classList.toggle('mode-unified', on !== false);
+}
+function isUnifiedActive() {
+  return !!(document.body && document.body.classList.contains('mode-unified'));
+}
 
 function getFormMode() {
   const m = localStorage.getItem(LS_MODE);
