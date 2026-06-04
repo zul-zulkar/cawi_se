@@ -242,6 +242,9 @@ function doPost(e) {
       sheet.setFrozenRows(1);
       sheet.setColumnWidth(1, 160);
     }
+    // Auto-migrasi: pastikan kolom "CAWI ID" ada (untuk sheet yang dibuat
+    // sebelum kolom ini diperkenalkan)
+    ensureCawiIdColumn(sheet);
 
     if (d._edit_id && parseInt(d._edit_id) > 0) {
       return updateRecord(sheet, d, parseInt(d._edit_id));
@@ -264,19 +267,41 @@ function doPost(e) {
   }
 }
 
+// Auto-migration: pastikan kolom "CAWI ID" ada di sheet.
+// Sheet existing yang dibuat sebelum kolom ini diperkenalkan akan otomatis
+// di-extend. Return indeks kolom (1-based) "CAWI ID" di sheet.
+function ensureCawiIdColumn(sheet) {
+  if (!sheet) return -1;
+  var lastCol = sheet.getLastColumn();
+  if (lastCol >= 1) {
+    var headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
+    for (var i = 0; i < headers.length; i++) {
+      if (String(headers[i]).trim().toUpperCase() === 'CAWI ID') return i + 1;
+    }
+  }
+  // Belum ada → append sebagai kolom baru
+  var newCol = lastCol + 1;
+  var cell = sheet.getRange(1, newCol);
+  cell.setValue('CAWI ID');
+  cell.setFontWeight('bold');
+  // Ikuti warna header sheet (orange untuk L.UB / biru untuk L) jika sudah ada styling
+  try {
+    var refBg = sheet.getRange(1, 1).getBackground();
+    var refFg = sheet.getRange(1, 1).getFontColor();
+    if (refBg) cell.setBackground(refBg);
+    if (refFg) cell.setFontColor(refFg);
+  } catch (e) {}
+  return newCol;
+}
+
 // Cari row (1-based sheet row) dengan kolom "CAWI ID" yang cocok dengan cawi_id.
-// Return -1 jika sheet/kolom/value tidak ditemukan.
+// Return -1 jika value tidak ditemukan. Auto-migrasi kolom kalau belum ada.
 function findRowByCawiId(sheet, cawi_id) {
   if (!sheet || !cawi_id) return -1;
-  var lastRow = sheet.getLastRow();
-  var lastCol = sheet.getLastColumn();
-  if (lastRow < 2 || lastCol < 1) return -1;
-  var headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
-  var colIdx = -1;
-  for (var i = 0; i < headers.length; i++) {
-    if (String(headers[i]).trim().toUpperCase() === 'CAWI ID') { colIdx = i + 1; break; }
-  }
+  var colIdx = ensureCawiIdColumn(sheet);
   if (colIdx < 1) return -1;
+  var lastRow = sheet.getLastRow();
+  if (lastRow < 2) return -1;
   var col = sheet.getRange(2, colIdx, lastRow - 1, 1).getValues();
   var target = String(cawi_id).trim();
   for (var j = 0; j < col.length; j++) {
@@ -886,6 +911,7 @@ function saveTandaTanganL(d) {
 function insertLRecord(d) {
   var ss = SpreadsheetApp.openById(SHEET_ID);
   var sheet = getOrInitLSheet(ss);
+  ensureCawiIdColumn(sheet);
   sheet.appendRow(buildRowL(d));
   var newId = sheet.getLastRow() - 1;
   applyTextFormatL(sheet, sheet.getLastRow(), d); // jaga angka nol di depan (HP, NIK, dll)
@@ -900,6 +926,7 @@ function insertLRecord(d) {
 function updateLRecord(d, editId) {
   var ss = SpreadsheetApp.openById(SHEET_ID);
   var sheet = getOrInitLSheet(ss);
+  ensureCawiIdColumn(sheet);
   var targetRow = editId + 1;
   if (targetRow < 2 || targetRow > sheet.getLastRow()) {
     return jsonResponse({ status: "error", message: "Rekaman L tidak ditemukan (id=" + editId + ")" });

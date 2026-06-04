@@ -268,7 +268,7 @@ function _showDraftToast(nama) {
     document.body.appendChild(t);
   }
   const safeName = nama.length > 25 ? nama.slice(0, 25) + '…' : nama;
-  t.textContent = '✓ Draft "' + safeName + '" tersimpan ke Daftar';
+  t.textContent = '✓ Draft "' + safeName + '" tersimpan';
   t.style.opacity = '1';
   clearTimeout(t._tmr);
   t._tmr = setTimeout(() => { t.style.opacity = '0'; }, 3500);
