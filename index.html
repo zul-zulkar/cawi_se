@@ -178,6 +178,31 @@
   .assign-card-meta { font-size: 11px; color: var(--muted); display: flex; justify-content: space-between; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
   .assign-card-actions { display: flex; gap: 6px; margin-top: 8px; }
   .assign-card-actions .btn { padding: 7px 10px; font-size: 12px; flex: 1; }
+  /* Progress mini-bar (draft) */
+  .assign-prog { margin-top: 2px; }
+  .assign-prog-bar { height: 6px; background: #eef2f7; border-radius: 4px; overflow: hidden; }
+  .assign-prog-bar > span { display: block; height: 100%; background: var(--bps-blue); border-radius: 4px; transition: width .3s; }
+  .assign-prog-txt { font-size: 11px; color: var(--muted); margin-top: 3px; }
+  .assign-prog-muted { font-style: italic; }
+  /* Expandable detail */
+  .assign-card-toggle {
+    background: none; border: none; padding: 4px 0; margin: 0;
+    font-size: 12px; color: var(--bps-blue); cursor: pointer; text-align: left;
+    font-weight: 600; display: flex; align-items: center; gap: 4px;
+  }
+  .assign-card-caret { transition: transform .2s; display: inline-block; }
+  .assign-card.expanded .assign-card-caret { transform: rotate(180deg); }
+  .assign-card-detail {
+    display: flex; flex-direction: column; gap: 4px; padding: 8px; margin-top: 2px;
+    background: #f8fafc; border: 1px solid var(--border); border-radius: 8px;
+  }
+  .assign-detail-row { display: flex; gap: 8px; font-size: 12px; line-height: 1.4; }
+  .assign-detail-lbl { color: var(--muted); min-width: 92px; flex-shrink: 0; }
+  .assign-detail-val { color: #1e293b; word-break: break-word; }
+  .assign-code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 11px; color: #334155; word-break: break-all;
+  }
 
   .empty {
     text-align: center; padding: 28px 14px; color: var(--muted);
@@ -558,6 +583,66 @@
     } catch(e) { return ''; }
   }
 
+  // Baca draft per-assignment (localStorage[draft_key]) → ringkasan untuk kartu.
+  // Draft = map field-id→value + _formMode/_ts/_progress (lihat js/shared/draft.js).
+  // Return null bila assignment belum pernah dibuka (draft belum ada).
+  function getDraftMeta(draftKey) {
+    if (!draftKey) return null;
+    var raw;
+    try { raw = localStorage.getItem(draftKey); } catch (e) { return null; }
+    if (!raw) return null;
+    var v;
+    try { v = JSON.parse(raw); } catch (e) { return null; }
+    if (!v || typeof v !== 'object') return null;
+    var mode = (v._formMode === 'l') ? 'l' : 'lub';
+    var nama, namaSub, alamat;
+    if (mode === 'l') {
+      nama    = v['l1_nama_kk'] || '';
+      namaSub = v['l2_nama_usaha'] || '';
+      alamat  = [v['l1_nama_jalan'], v['l1_no_rumah'], v['l1_alamat_detail']]
+                  .filter(function (x) { return x && String(x).trim(); }).join(' ');
+    } else {
+      nama    = v['q5a_nama_perusahaan'] || '';
+      namaSub = v['q5b_nama_komersial'] || '';
+      var rtrw = (v['q5c_rt'] || v['q5c_rw'])
+        ? (' RT ' + (v['q5c_rt'] || '-') + '/RW ' + (v['q5c_rw'] || '-')) : '';
+      alamat  = String((v['q5c_alamat'] || '') + rtrw).trim();
+    }
+    var prog = (v._progress != null && v._progress !== '') ? parseInt(v._progress, 10) : null;
+    return {
+      mode:     mode,
+      ts:       v._ts || '',
+      progress: (prog != null && !isNaN(prog)) ? prog : null,
+      filled:   (v._pfilled != null && v._pfilled !== '') ? parseInt(v._pfilled, 10) : null,
+      total:    (v._ptotal  != null && v._ptotal  !== '') ? parseInt(v._ptotal, 10)  : null,
+      nama:     nama, namaSub: namaSub, alamat: alamat
+    };
+  }
+
+  // Susun baris kode wilayah BPS + SLS lengkap (monospace) untuk panel detail.
+  function fmtKodeWilayah(it) {
+    var rows = [];
+    var w = [];
+    if (it.provinsi_kd)  w.push('Prov ' + esc(it.provinsi_kd));
+    if (it.kabupaten_kd) w.push('Kab ' + esc(it.kabupaten_kd));
+    if (it.kecamatan_kd) w.push('Kec ' + esc(it.kecamatan_kd));
+    if (it.desa_kd)      w.push('Desa ' + esc(it.desa_kd));
+    if (w.length) rows.push('<div class="assign-code">' + w.join(' · ') + '</div>');
+    if (it.sls_kd || it.sls_full_kd) {
+      var s = 'SLS ' + esc(it.sls_kd || '-');
+      if (it.sls_full_kd) s += ' · lengkap ' + esc(it.sls_full_kd);
+      if (it.subsls_kd && it.subsls_kd !== '00') s += '-' + esc(it.subsls_kd);
+      rows.push('<div class="assign-code">' + s + '</div>');
+    }
+    return rows.join('');
+  }
+
+  // Satu baris label/value untuk panel detail kartu.
+  function dRow(lbl, valHtml) {
+    return '<div class="assign-detail-row"><span class="assign-detail-lbl">' + lbl +
+      '</span><span class="assign-detail-val">' + (valHtml || '—') + '</span></div>';
+  }
+
   // ===== Initial routing =====
   function init() {
     bindLogin();
@@ -794,25 +879,66 @@
         ? '<span class="badge badge-done">Selesai</span>'
         : '<span class="badge badge-draft">Draft</span>';
       var showPetugas = (a.peran === 'PML' && (it.petugas_email || '').toLowerCase() !== (a.email || '').toLowerCase());
+      var dm = getDraftMeta(it.draft_key);
+
+      // Baris wilayah (kini termasuk provinsi)
+      var wilayah = [it.desa, it.kecamatan, it.kabupaten, it.provinsi]
+        .filter(Boolean).map(esc).join(', ');
+
       var slsLine = '';
       if (it.sls_nama) {
         var subTxt = (it.subsls_kd && it.subsls_kd !== '00') ? (' · SubSLS ' + esc(it.subsls_kd)) : '';
         slsLine = '<div class="assign-card-wilayah">SLS: <b>' + esc(it.sls_nama) + '</b>' + subTxt + '</div>';
       }
+
+      // Progress (hanya draft): bar % bila tersnapshot, else status ringkas
+      var progHtml = '';
+      if (it.status !== 'submitted') {
+        if (dm && dm.progress != null) {
+          var ftxt = (dm.filled != null && dm.total != null) ? (dm.filled + '/' + dm.total + ' field') : 'isian';
+          progHtml = '<div class="assign-prog"><div class="assign-prog-bar"><span style="width:' +
+            dm.progress + '%"></span></div><div class="assign-prog-txt">' + dm.progress + '% · ' + ftxt + '</div></div>';
+        } else if (dm) {
+          progHtml = '<div class="assign-prog-txt assign-prog-muted">Sedang dikerjakan</div>';
+        } else {
+          progHtml = '<div class="assign-prog-txt assign-prog-muted">Belum dibuka</div>';
+        }
+      }
+
+      // Label waktu: dikirim (submitted) / diubah (draft tersimpan) / dibuat
+      var timeLabel;
+      if (it.status === 'submitted') timeLabel = 'Dikirim ' + (fmtDateTime(it.updated_at) || fmtDateTime(it.created_at));
+      else if (dm && dm.ts)          timeLabel = 'Diubah ' + fmtDateTime(dm.ts);
+      else                           timeLabel = 'Dibuat ' + fmtDateTime(it.created_at);
+
+      // Panel detail (expandable): nama KK/usaha/bangunan, alamat, kode wilayah & SLS
+      var detail = [];
+      if (dm) {
+        detail.push(dRow(dm.mode === 'l' ? 'Kepala Keluarga' : 'Perusahaan', esc(dm.nama) || '—'));
+        if (dm.namaSub) detail.push(dRow(dm.mode === 'l' ? 'Usaha' : 'Nama komersial', esc(dm.namaSub)));
+        if (dm.alamat)  detail.push(dRow('Alamat', esc(dm.alamat)));
+      }
+      detail.push(dRow('Kode wilayah', fmtKodeWilayah(it) || '—'));
+      detail.push(dRow('Petugas', esc(it.petugas_nama) || '—'));
+      detail.push(dRow('Dibuat', esc(fmtDateTime(it.created_at)) || '—'));
+
       return '<div class="assign-card" data-id="' + esc(it.id) + '">' +
         '<div class="assign-card-head">' +
           '<div class="assign-card-title">' + esc(it.nama_responden) + '</div>' +
           '<div>' + jenisBadge + '</div>' +
         '</div>' +
-        '<div class="assign-card-wilayah">' +
-          esc(it.desa) + ', ' + esc(it.kecamatan) + ', ' + esc(it.kabupaten) +
-        '</div>' +
+        '<div class="assign-card-wilayah">' + wilayah + '</div>' +
         slsLine +
         (showPetugas ? '<div class="assign-card-wilayah">Petugas: <b>' + esc(it.petugas_nama) + '</b></div>' : '') +
+        progHtml +
         '<div class="assign-card-meta">' +
           '<span>' + statusBadge + '</span>' +
-          '<span>' + esc(fmtDateTime(it.created_at)) + '</span>' +
+          '<span>' + esc(timeLabel) + '</span>' +
         '</div>' +
+        '<button type="button" class="assign-card-toggle" data-act="toggle" aria-expanded="false">' +
+          'Detail wilayah &amp; isian <span class="assign-card-caret">▾</span>' +
+        '</button>' +
+        '<div class="assign-card-detail hidden">' + detail.join('') + '</div>' +
         '<div class="assign-card-actions">' +
           '<button class="btn btn-primary" data-act="open">Buka Kuesioner</button>' +
           '<button class="btn btn-danger"  data-act="del">Hapus</button>' +
@@ -823,6 +949,14 @@
       var id = card.getAttribute('data-id');
       card.querySelector('[data-act="open"]').addEventListener('click', function () { openKuesioner(id); });
       card.querySelector('[data-act="del"]').addEventListener('click',  function () { deleteAssignment(id); });
+      var tg = card.querySelector('[data-act="toggle"]');
+      if (tg) tg.addEventListener('click', function () {
+        var det = card.querySelector('.assign-card-detail');
+        var open = tg.getAttribute('aria-expanded') === 'true';
+        tg.setAttribute('aria-expanded', open ? 'false' : 'true');
+        if (det) det.classList.toggle('hidden');
+        card.classList.toggle('expanded');
+      });
     });
   }
 

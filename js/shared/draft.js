@@ -26,6 +26,15 @@ function saveDraft() {
     }
     vals['_formMode'] = (typeof getFormMode === 'function') ? getFormMode() : 'lub';
     vals['_ts'] = new Date().toISOString();
+    // Snapshot progress agar portal (index.html) bisa tampilkan % tanpa load form
+    try {
+      if (typeof calcProgress === 'function') {
+        var _pp = calcProgress();
+        vals['_progress'] = _pp.pct;
+        vals['_pfilled']  = _pp.filled;
+        vals['_ptotal']   = _pp.total;
+      }
+    } catch (e) {}
     localStorage.setItem(LS_KEY, JSON.stringify(vals));
     // Update status indicator
     const dot = document.getElementById('autosaveDot');
@@ -196,6 +205,15 @@ function saveAsDraft() {
     const mode = (typeof getFormMode === 'function') ? getFormMode() : 'lub';
     raw['_formMode'] = mode;
     raw['_ts'] = new Date().toISOString();
+    // Snapshot progress agar portal (index.html) bisa tampilkan % tanpa load form
+    try {
+      if (typeof calcProgress === 'function') {
+        const _pp = calcProgress();
+        raw['_progress'] = _pp.pct;
+        raw['_pfilled']  = _pp.filled;
+        raw['_ptotal']   = _pp.total;
+      }
+    } catch (e) {}
 
     const id = _currentDraftId || ('draft_' + Date.now());
     let draft;
