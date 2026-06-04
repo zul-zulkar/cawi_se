@@ -21,6 +21,11 @@ const CONFIG_SHEET_NAME = "CAWI_Config";
 const L_SHEET_NAME       = "SE2026_L_Responses";
 const L_ANGGOTA_SHEET    = "SE2026_L_Anggota";
 
+// P MODE (Pemutakhiran / listing SE2026-P) — sheet baru, dibuat otomatis bila belum ada
+const P_SHEET_NAME       = "SE2026_P_Responses";
+// Sheet sumber prelist (DTSEN/SBR) — dikelola manual di Sheets; getPrelist baca by SLS
+const PRELIST_SHEET_NAME = "SE2026_Prelist";
+
 // Portal Petugas — sheet daftar PPL & PML (dikelola manual di Sheets)
 const PPL_SHEET_NAME = "PPL";
 const PML_SHEET_NAME = "PML";
@@ -195,6 +200,29 @@ function doPost(e) {
     if (d.action === "getPetugas") return getPetugasResponse();
     if (d.action === "getPetugasByEmail") return getPetugasByEmailResponse(d.email);
     if (d.action === "getPplUnderPml")    return getPplUnderPmlResponse(d.pml_email);
+    if (d.action === "getPrelist")  return getPrelistResponse(d.sls_kd || d.kode_sls || d.sls || '');
+    if (d.action === "getPRecords") return getPRecordsResponse();
+
+    // === P MODE (Pemutakhiran / listing) → sheet SE2026_P_Responses ===
+    // Self-contained: resolusi cawi_id, insert/update/delete sendiri (1 baris per entitas).
+    if (d.formMode === 'p') {
+      if (d.action === "deleteRecord" && d._delete_id && parseInt(d._delete_id) > 0) {
+        return deletePRecord(parseInt(d._delete_id));
+      }
+      // Edit-in-place via cawi_id (1 assignment = 1 baris P)
+      if (d.cawi_id && !d._edit_id) {
+        try {
+          var _pss = SpreadsheetApp.openById(SHEET_ID);
+          var _psheet = _pss.getSheetByName(P_SHEET_NAME);
+          if (_psheet) {
+            var _prow = findRowByCawiId(_psheet, d.cawi_id);
+            if (_prow > 0) d._edit_id = _prow - 1;
+          }
+        } catch (_pErr) { Logger.log("findRowByCawiId P gagal: " + _pErr.message); }
+      }
+      if (d._edit_id && parseInt(d._edit_id) > 0) return updatePRecord(d, parseInt(d._edit_id));
+      return insertPRecord(d);
+    }
 
     // === MODE DISPATCHER: L mode pakai sheet terpisah ===
     const mode = (d.formMode === 'l') ? 'l' : 'lub';
@@ -622,6 +650,10 @@ function doGet(e) {
     if (action === "getPplUnderPml") {
       return getPplUnderPmlResponse(e.parameter.pml_email);
     }
+    if (action === "getPrelist") {
+      return getPrelistResponse(e.parameter.sls_kd || e.parameter.kode_sls || e.parameter.sls || '');
+    }
+    if (action === "getPRecords") return getPRecordsResponse();
     return getRecordsResponse();
   } catch(err) {
     return jsonResponse({ status: "error", message: err.message });
@@ -975,4 +1007,235 @@ function readLRecords() {
     obj._ts = obj.timestamp;
     return obj;
   });
+}
+
+// ============================================================
+// P MODE (SE2026-P Pemutakhiran / Listing) — header, builder, helpers
+// ============================================================
+// Satu baris per entitas (keluarga/bangunan/usaha) yang dimutakhirkan.
+// Blok P selalu di-submit (formMode 'p'); kuesioner lanjutan (L/L.UB/L.KP)
+// disimpan terpisah di sheet masing-masing, ditautkan via "jenis_lanjutan" +
+// "record_id_lanjutan". Field memakai prefix pmt_ (lihat docs/desain-unified-kuesioner-P.md §C).
+
+const P_HEADERS = [
+  "Timestamp",
+  "CAWI ID",
+  // Identitas pendata (login)
+  "Petugas Email (login)", "Petugas Peran (login)", "Petugas Nama",
+  // No urut
+  "No Urut Keluarga", "No Urut Bangunan",
+  // Identitas entitas
+  "Nama KK/Bangunan",
+  "Alamat Jalan", "Alamat Blok/No",
+  // Wilayah
+  "Provinsi", "Kode Provinsi",
+  "Kabupaten/Kota", "Kode Kabupaten",
+  "Kecamatan", "Kode Kecamatan",
+  "Kelurahan/Desa", "Kode Kelurahan",
+  "Kode SLS", "Nama SLS",
+  "Perubahan SLS", "Nama SLS Baru",
+  // Pemutakhiran
+  "Keberadaan", "Sesuai KK",
+  "Kode Penggunaan Bangunan", "Skala Usaha",
+  "Jumlah Usaha", "IDSBR",
+  "Jumlah Anggota (KK)", "Jumlah Anggota Menetap",
+  // Geotag (pindahan dari L.UB)
+  "Latitude", "Longitude", "Akurasi (m)",
+  // Tautan ke kuesioner lanjutan
+  "Jenis Lanjutan", "Record ID Lanjutan"
+];
+
+// Urutan HARUS sama persis dengan P_HEADERS
+const P_FIELD_NAMES = [
+  "timestamp",
+  "cawi_id",
+  "petugas_email_login", "petugas_peran_login", "petugas_nama",
+  "pmt_no_kel", "pmt_no_bgn",
+  "pmt_nama",
+  "pmt_jalan", "pmt_blok",
+  "provinsi", "provinsi_kd",
+  "kabupaten", "kabupaten_kd",
+  "kecamatan", "kecamatan_kd",
+  "kelurahan", "kelurahan_kd",
+  "kode_sls", "nama_sls",
+  "pmt_sls_berubah", "pmt_sls_nama",
+  "pmt_keberadaan", "pmt_sesuai_kk",
+  "pmt_kode_bangunan", "pmt_skala",
+  "pmt_jml_usaha", "pmt_idsbr",
+  "pmt_jml_kk", "pmt_jml_menetap",
+  "pmt_lat", "pmt_lng", "pmt_akurasi",
+  "jenis_lanjutan", "record_id_lanjutan"
+];
+
+function buildRowP(d) {
+  // Build row dari P_FIELD_NAMES — urutan dijamin match P_HEADERS
+  return P_FIELD_NAMES.map(function(key) {
+    if (key === "timestamp") return d.timestamp || new Date().toLocaleString("id-ID");
+    var v = d[key];
+    return (v === null || v === undefined) ? "" : v;
+  });
+}
+
+// Init sheet P (header hijau-teal, beda dari L.UB orange & L biru)
+function getOrInitPSheet(ss) {
+  var sheet = ss.getSheetByName(P_SHEET_NAME);
+  if (!sheet) {
+    sheet = ss.insertSheet(P_SHEET_NAME);
+  }
+  if (sheet.getLastRow() === 0) {
+    sheet.appendRow(P_HEADERS);
+    sheet.getRange(1, 1, 1, P_HEADERS.length)
+      .setFontWeight("bold")
+      .setBackground("#0f766e")
+      .setFontColor("#ffffff");
+    sheet.setFrozenRows(1);
+    sheet.setColumnWidth(1, 160);
+  }
+  return sheet;
+}
+
+// Jaga field teks (cegah hilang angka nol depan / notasi ilmiah) untuk IDSBR
+function applyTextFormatP(sheet, rowNum, d) {
+  var idsbrCol = P_FIELD_NAMES.indexOf('pmt_idsbr') + 1;
+  if (idsbrCol > 0 && d.pmt_idsbr !== null && d.pmt_idsbr !== undefined && d.pmt_idsbr !== '') {
+    var cell = sheet.getRange(rowNum, idsbrCol);
+    cell.setNumberFormat('@');
+    cell.setValue(String(d.pmt_idsbr));
+  }
+}
+
+// Insert P record
+function insertPRecord(d) {
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  var sheet = getOrInitPSheet(ss);
+  ensureCawiIdColumn(sheet);
+  sheet.appendRow(buildRowP(d));
+  var newId = sheet.getLastRow() - 1;
+  applyTextFormatP(sheet, sheet.getLastRow(), d);
+  return jsonResponse({ status: "ok", message: "Data P berhasil disimpan", mode: "p", record_id: newId });
+}
+
+// Update P record by _id
+function updatePRecord(d, editId) {
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  var sheet = getOrInitPSheet(ss);
+  ensureCawiIdColumn(sheet);
+  var targetRow = editId + 1;
+  if (targetRow < 2 || targetRow > sheet.getLastRow()) {
+    return jsonResponse({ status: "error", message: "Rekaman P tidak ditemukan (id=" + editId + ")" });
+  }
+  sheet.getRange(targetRow, 1, 1, P_HEADERS.length).setValues([buildRowP(d)]);
+  applyTextFormatP(sheet, targetRow, d);
+  return jsonResponse({ status: "ok", message: "Data P berhasil diperbarui", mode: "p", record_id: editId });
+}
+
+// Delete P record by _id
+function deletePRecord(deleteId) {
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  var sheet = ss.getSheetByName(P_SHEET_NAME);
+  if (!sheet) return jsonResponse({ status: "error", message: "Sheet P tidak ditemukan" });
+  var targetRow = deleteId + 1;
+  if (targetRow < 2 || targetRow > sheet.getLastRow()) {
+    return jsonResponse({ status: "error", message: "Rekaman P tidak ditemukan (id=" + deleteId + ")" });
+  }
+  sheet.deleteRow(targetRow);
+  return jsonResponse({ status: "ok", message: "Rekaman P berhasil dihapus", mode: "p" });
+}
+
+// Baca semua P records — _formMode='p' untuk badge di daftar.html
+function readPRecords() {
+  var ss = SpreadsheetApp.openById(SHEET_ID);
+  var sheet = ss.getSheetByName(P_SHEET_NAME);
+  if (!sheet || sheet.getLastRow() <= 1) return [];
+  var values = sheet.getDataRange().getValues();
+  return values.slice(1).map(function(row, idx) {
+    var obj = { _id: idx + 1, _formMode: 'p' };
+    P_FIELD_NAMES.forEach(function(key, i) { obj[key] = cellStr(row[i]); });
+    obj._ts = obj.timestamp;
+    return obj;
+  });
+}
+
+function getPRecordsResponse() {
+  try { return jsonResponse({ status: "ok", data: readPRecords() }); }
+  catch (err) { return jsonResponse({ status: "error", message: err.message }); }
+}
+
+// ============================================================
+// PRELIST (DTSEN/SBR) — endpoint getPrelist
+// ============================================================
+// Baca sheet PRELIST_SHEET_NAME, filter by Kode SLS, kembalikan entri minimal
+// (G-3): domisili wilayah + nama + skala usaha. Pemetaan kolom dilakukan via
+// nama header (case-insensitive) supaya tahan terhadap layout sheet yang belum
+// pasti. Bila sheet belum ada → kembalikan list kosong (bukan error).
+function getPrelistResponse(slsKd) {
+  try {
+    var ss = SpreadsheetApp.openById(SHEET_ID);
+    var sheet = ss.getSheetByName(PRELIST_SHEET_NAME);
+    if (!sheet || sheet.getLastRow() < 2) return jsonResponse({ status: "ok", data: [] });
+    var values = sheet.getDataRange().getValues();
+    var headers = values[0].map(function(h) { return String(h).trim().toLowerCase(); });
+    var idx = _mapPrelistHeaders(headers);
+    var target = String(slsKd || '').trim();
+    var pick = function(row, i) { return (i >= 0 && i < row.length) ? cellStr(row[i]).trim() : ''; };
+    var out = [];
+    for (var r = 1; r < values.length; r++) {
+      var row = values[r];
+      var slsVal = pick(row, idx.kode_sls);
+      // Filter SLS bila parameter diberikan & kolom SLS terdeteksi
+      if (target && idx.kode_sls >= 0 && slsVal !== target) continue;
+      var nama = pick(row, idx.nama);
+      if (!nama && !slsVal) continue; // baris kosong
+      out.push({
+        nama:         nama,
+        skala:        pick(row, idx.skala),
+        idsbr:        pick(row, idx.idsbr),
+        alamat:       pick(row, idx.alamat),
+        no_urut:      pick(row, idx.no_urut),
+        kode_sls:     slsVal,
+        nama_sls:     pick(row, idx.nama_sls),
+        provinsi:     pick(row, idx.provinsi),
+        provinsi_kd:  pick(row, idx.provinsi_kd),
+        kabupaten:    pick(row, idx.kabupaten),
+        kabupaten_kd: pick(row, idx.kabupaten_kd),
+        kecamatan:    pick(row, idx.kecamatan),
+        kecamatan_kd: pick(row, idx.kecamatan_kd),
+        kelurahan:    pick(row, idx.kelurahan),
+        kelurahan_kd: pick(row, idx.kelurahan_kd)
+      });
+    }
+    return jsonResponse({ status: "ok", data: out });
+  } catch (err) {
+    return jsonResponse({ status: "error", message: err.message });
+  }
+}
+
+// Petakan indeks kolom prelist berdasarkan kata kunci di header (lowercase).
+// Return objek { field: indexKolom (-1 jika tidak ada) }.
+function _mapPrelistHeaders(h) {
+  function find(fn) { for (var i = 0; i < h.length; i++) { if (fn(h[i])) return i; } return -1; }
+  var has    = function(s, kw) { return s.indexOf(kw) >= 0; };
+  var isKode = function(s) {
+    return has(s, 'kode') || /(^|[^a-z])kd([^a-z]|$)/.test(s) || /_kd$/.test(s);
+  };
+  return {
+    kode_sls:     find(function(s) { return has(s, 'sls') && isKode(s); }),
+    nama_sls:     find(function(s) { return has(s, 'sls') && has(s, 'nama'); }),
+    nama:         find(function(s) {
+      return has(s, 'nama') && !has(s, 'sls') && !has(s, 'prov') && !has(s, 'kab') &&
+             !has(s, 'kec') && !has(s, 'desa') && !has(s, 'kelurahan') && !has(s, 'petugas');
+    }),
+    skala:        find(function(s) { return has(s, 'skala'); }),
+    idsbr:        find(function(s) { return has(s, 'idsbr') || has(s, 'id sbr'); }),
+    alamat:       find(function(s) { return has(s, 'alamat'); }),
+    no_urut:      find(function(s) { return has(s, 'urut'); }),
+    provinsi_kd:  find(function(s) { return has(s, 'prov') && isKode(s); }),
+    provinsi:     find(function(s) { return has(s, 'prov') && !isKode(s); }),
+    kabupaten_kd: find(function(s) { return has(s, 'kab') && isKode(s); }),
+    kabupaten:    find(function(s) { return has(s, 'kab') && !isKode(s); }),
+    kecamatan_kd: find(function(s) { return has(s, 'kec') && isKode(s); }),
+    kecamatan:    find(function(s) { return has(s, 'kec') && !isKode(s); }),
+    kelurahan_kd: find(function(s) { return (has(s, 'desa') || has(s, 'kelurahan')) && isKode(s); }),
+    kelurahan:    find(function(s) { return (has(s, 'desa') || has(s, 'kelurahan')) && !isKode(s); })
+  };
 }
