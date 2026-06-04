@@ -611,19 +611,10 @@
       var petugas = triple[1];
       var hash    = (cfg && cfg.kuesioner_pw_hash) || '';
       if (!hash) throw new Error('Konfigurasi kata sandi tidak tersedia.');
-      // Verifikasi sandi
+      // Verifikasi sandi DAN email — dua-duanya wajib cocok
       var okPw = await PM.verifyPassword(pw, hash);
-      if (!okPw) {
-        hideGlobalLoading();
-        showLoginError('Kombinasi email/sandi salah');
-        return;
-      }
-      // Verifikasi email terdaftar
-      if (!petugas) {
-        hideGlobalLoading();
-        showLoginError('Email tidak terdaftar sebagai PPL/PML di basis data BPS');
-        return;
-      }
+      if (!okPw)    { showLoginError('Kombinasi email/sandi salah'); return; }
+      if (!petugas) { showLoginError('Email tidak terdaftar sebagai PPL/PML di basis data BPS'); return; }
       // Simpan sesi
       var active = {
         nama:      petugas.nama || '',
@@ -637,9 +628,11 @@
       $('loginPw').value = '';
       goDash();
     } catch (err) {
-      hideGlobalLoading();
       showLoginError('Gagal terhubung ke server: ' + (err.message || err));
     } finally {
+      // Selalu lepas loading + tombol — apa pun outcome-nya (sukses, gagal,
+      // exception). Fix bug "overlay nempel" saat sukses path.
+      hideGlobalLoading();
       btn.disabled = false; btn.textContent = 'Masuk';
     }
   }
@@ -709,7 +702,11 @@
     });
   }
 
-  async function goDash() {
+  function goDash() {
+    // Selalu tutup overlay loading saat masuk dashboard — apa pun jalur
+    // yang membawa kita ke sini (login sukses, init dengan sesi tersimpan,
+    // ganti petugas, dst). Idempoten kalau overlay memang sudah ter-hide.
+    hideGlobalLoading();
     hide('loginScreen'); show('dashScreen');
 
     var a = readActivePetugas();
@@ -720,18 +717,26 @@
       ? '<span class="badge badge-pml">PML</span>'
       : '<span class="badge badge-ppl">PPL</span>';
 
-    // PPL hanya melihat assignment miliknya sendiri (cuma butuh own email,
-    // tidak perlu daftar PPL lain). PML butuh daftar PPL bawahan untuk
-    // canView + filter — lazy-load di sini.
-    if (a.peran === 'PML') {
-      try { await ensurePplListForPml(a.email); }
-      catch (err) { console.warn('Gagal memuat daftar PPL bawahan:', err); }
-    } else {
+    // PPL hanya melihat assignment miliknya sendiri — tidak butuh daftar
+    // PPL lain. Render langsung tanpa fetch tambahan.
+    if (a.peran !== 'PML') {
       _pplList = [];
+      populateFilters();
+      renderAssignList();
+      return;
     }
 
+    // PML butuh daftar PPL bawahan untuk canView + filter dropdown petugas.
+    // Render dulu dengan cache (kalau ada), lalu refresh di background tanpa
+    // menahan UI. Ini menghindari overlay loading nempel saat jaringan lambat.
     populateFilters();
     renderAssignList();
+    ensurePplListForPml(a.email).then(function () {
+      populateFilters();
+      renderAssignList();
+    }).catch(function (err) {
+      console.warn('Gagal memuat daftar PPL bawahan:', err);
+    });
   }
 
   function populateFilters() {
