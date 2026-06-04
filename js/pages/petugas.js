@@ -89,10 +89,21 @@
       petugas_email: petugasAktif.email,
       petugas_peran: petugasAktif.peran === 'PML' ? 'PML' : 'PPL',
       jenis: jenis,
+      // Nama tampilan wilayah (yang dipakai filter & kartu)
       provinsi:       String(data.provinsi).trim(),
       kabupaten:      String(data.kabupaten).trim(),
       kecamatan:      String(data.kecamatan).trim(),
       desa:           String(data.desa).trim(),
+      // Kode BPS — dipakai guard untuk pre-fill dropdown cascade di kuesioner
+      provinsi_kd:    String(data.provinsi_kd  || '').trim(),
+      kabupaten_kd:   String(data.kabupaten_kd || '').trim(),
+      kecamatan_kd:   String(data.kecamatan_kd || '').trim(),
+      desa_kd:        String(data.desa_kd      || '').trim(),
+      // SLS (banjar/dusun/lingkungan) — pembagian wilayah lebih detail
+      sls_nama:       String(data.sls_nama     || '').trim(),
+      sls_kd:         String(data.sls_kd       || '').trim(),       // 4-digit relatif desa
+      sls_full_kd:    String(data.sls_full_kd  || '').trim(),       // 14-digit (desa + sls)
+      subsls_kd:      String(data.subsls_kd    || '00').trim(),     // 2-digit; "00" = tanpa sub
       nama_responden: String(data.nama_responden).trim(),
       draft_key: draftKey,
       status: 'draft',

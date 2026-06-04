@@ -243,13 +243,91 @@
   /* Hidden helper */
   .hidden { display: none !important; }
 
+  /* ============================================================
+     Global loading overlay — dipakai saat verifikasi password,
+     fetch petugas, atau aksi async lain yang perlu blok UI.
+     ============================================================ */
+  .global-loading {
+    position: fixed; inset: 0; z-index: 9999;
+    background: rgba(248, 250, 252, 0.92);
+    backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+    display: none; align-items: center; justify-content: center;
+    animation: fadein 0.18s ease;
+  }
+  .global-loading.open { display: flex; }
+  @keyframes fadein { from { opacity: 0; } to { opacity: 1; } }
+  .gl-card {
+    background: #fff; border-radius: 14px;
+    padding: 28px 32px 26px; min-width: 280px; max-width: 360px;
+    box-shadow: 0 24px 64px rgba(0, 53, 128, 0.18);
+    border-top: 4px solid var(--bps-blue);
+    text-align: center;
+  }
+  .gl-dots {
+    display: inline-flex; gap: 6px; margin-bottom: 14px;
+    height: 14px; align-items: center;
+  }
+  .gl-dots span {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--bps-blue); display: inline-block;
+    animation: gl-bounce 1.4s ease-in-out infinite both;
+  }
+  .gl-dots span:nth-child(1) { animation-delay: -0.32s; }
+  .gl-dots span:nth-child(2) { animation-delay: -0.16s; }
+  @keyframes gl-bounce {
+    0%, 80%, 100% { transform: scale(0.5); opacity: 0.6; }
+    40%           { transform: scale(1);   opacity: 1; }
+  }
+  .gl-title {
+    font-size: 14px; font-weight: 700; color: var(--text);
+    margin: 2px 0 4px; letter-spacing: 0.2px;
+  }
+  .gl-sub {
+    font-size: 12px; color: var(--muted); line-height: 1.5;
+  }
+
+  /* Skeleton/empty hint untuk pencarian petugas */
+  .search-hint {
+    text-align: center; padding: 36px 18px;
+    color: var(--muted); font-size: 13px;
+    background: linear-gradient(180deg, #f8fafc, #ffffff);
+    border: 1px dashed var(--border); border-radius: 10px;
+  }
+  .search-hint-icon {
+    font-size: 28px; line-height: 1; margin-bottom: 8px; opacity: 0.6;
+  }
+  .search-hint-title {
+    font-weight: 700; color: var(--text); margin-bottom: 4px; font-size: 14px;
+  }
+
+  /* Selectable list dalam modal (kecamatan/desa) */
+  .modal-input-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+  }
+  .modal-input-grid > div { margin-bottom: 0; }
+  .form-input[disabled] {
+    background: #f1f5f9; color: var(--muted); cursor: not-allowed;
+  }
+
   @media (max-width: 640px) {
     .topbar-brand small { display: none; }
     .filter-actions .btn { font-size: 11px; }
+    .modal-input-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
 <body>
+
+<!-- ============================================================
+     Global loading overlay (dipanggil oleh JS via showGlobalLoading)
+     ============================================================ -->
+<div id="globalLoading" class="global-loading" role="status" aria-live="polite">
+  <div class="gl-card">
+    <div class="gl-dots"><span></span><span></span><span></span></div>
+    <div class="gl-title" id="glTitle">Memuat…</div>
+    <div class="gl-sub" id="glSub">Mohon tunggu sebentar.</div>
+  </div>
+</div>
 
 <!-- ============================================================
      STEP 1 — Password Gate
@@ -286,10 +364,15 @@
       <h2 class="section-title">Cari & Pilih Petugas</h2>
       <div class="search-bar">
         <input type="text" id="searchInput" class="form-input"
-               placeholder="Cari nama atau email petugas..." autocomplete="off"/>
+               placeholder="Cari nama atau email petugas..." autocomplete="off" disabled/>
       </div>
-      <div id="petugasLoading" class="spinner-wrap"><span class="spinner"></span>Memuat daftar petugas...</div>
       <div id="petugasError" class="alert alert-error hidden"></div>
+      <div id="petugasHint" class="search-hint">
+        <div class="search-hint-icon">&#128269;</div>
+        <div class="search-hint-title">Ketik untuk mencari petugas</div>
+        <div>Masukkan sebagian nama atau email PPL / PML, lalu pilih kartu yang muncul.</div>
+        <div id="petugasCount" style="margin-top:10px;font-size:11px;letter-spacing:0.3px;opacity:0.75"></div>
+      </div>
       <div id="petugasList" class="petugas-list hidden"></div>
     </div>
   </div>
@@ -360,25 +443,53 @@
         </div>
       </div>
       <div class="form-row">
-        <label class="form-label" for="addNamaResp">Nama Responden / Kepala Keluarga</label>
-        <input type="text" id="addNamaResp" class="form-input"/>
+        <label class="form-label" for="addNamaResp">
+          <span id="addNamaRespLabel">Nama Kepala Keluarga</span>
+        </label>
+        <input type="text" id="addNamaResp" class="form-input" placeholder="Nama lengkap…"/>
       </div>
-      <div class="form-row">
-        <label class="form-label" for="addProvinsi">Provinsi</label>
-        <input type="text" id="addProvinsi" class="form-input" value="Bali"/>
+      <div class="modal-input-grid">
+        <div class="form-row">
+          <label class="form-label" for="addProvinsi">Provinsi</label>
+          <select id="addProvinsi" class="form-input"></select>
+        </div>
+        <div class="form-row">
+          <label class="form-label" for="addKabupaten">Kabupaten/Kota</label>
+          <select id="addKabupaten" class="form-input"></select>
+        </div>
       </div>
-      <div class="form-row">
-        <label class="form-label" for="addKabupaten">Kabupaten</label>
-        <input type="text" id="addKabupaten" class="form-input" value="Buleleng"/>
+      <div class="modal-input-grid">
+        <div class="form-row">
+          <label class="form-label" for="addKecamatan">Kecamatan</label>
+          <select id="addKecamatan" class="form-input" disabled>
+            <option value="">— pilih kabupaten dulu —</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label class="form-label" for="addDesa">Desa/Kelurahan</label>
+          <select id="addDesa" class="form-input" disabled>
+            <option value="">— pilih kecamatan dulu —</option>
+          </select>
+        </div>
       </div>
-      <div class="form-row">
-        <label class="form-label" for="addKecamatan">Kecamatan</label>
-        <input type="text" id="addKecamatan" class="form-input"/>
+      <div class="modal-input-grid">
+        <div class="form-row">
+          <label class="form-label" for="addSls">SLS (Banjar/Dusun/Lingkungan)</label>
+          <select id="addSls" class="form-input" disabled>
+            <option value="">— pilih desa dulu —</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label class="form-label" for="addSubSls">SubSLS</label>
+          <select id="addSubSls" class="form-input" disabled>
+            <option value="">— pilih SLS dulu —</option>
+          </select>
+        </div>
       </div>
-      <div class="form-row">
-        <label class="form-label" for="addDesa">Desa</label>
-        <input type="text" id="addDesa" class="form-input"/>
-      </div>
+      <p style="font-size:11px;color:var(--muted);margin:-4px 0 0;line-height:1.5">
+        SubSLS <b>00</b> berarti SLS tidak terbagi; kode lain (01, 02, …) menandai bagian SubSLS.
+        Pembagian per SubSLS dipakai untuk distribusi tugas yang lebih seimbang.
+      </p>
     </div>
     <div class="modal-footer">
       <button id="modalCancelBtn" class="btn btn-ghost" type="button">Batal</button>
@@ -388,6 +499,7 @@
 </div>
 
 <script src="js/config.js"></script>
+<script src="js/data/regional.js"></script>
 <script src="js/pages/petugas.js"></script>
 <script>
 (function () {
@@ -412,6 +524,74 @@
   }
   function show(id) { $(id).classList.remove('hidden'); }
   function hide(id) { $(id).classList.add('hidden'); }
+
+  // Global loading overlay
+  function showGlobalLoading(title, sub) {
+    $('glTitle').textContent = title || 'Memuat…';
+    $('glSub').textContent   = sub   || 'Mohon tunggu sebentar.';
+    $('globalLoading').classList.add('open');
+  }
+  function hideGlobalLoading() { $('globalLoading').classList.remove('open'); }
+
+  // Sort helper (label A-Z, locale id)
+  function sortByNama(a, b) { return String(a.nama).localeCompare(String(b.nama), 'id'); }
+
+  // Lookup helper untuk reverse-map kode→nama (saat render assignment)
+  function findKabNama(kdprov, kdkab) {
+    var list = (typeof STATIC_KABUPATEN !== 'undefined' && STATIC_KABUPATEN[kdprov]) || [];
+    for (var i = 0; i < list.length; i++) if (list[i].kode === kdkab) return list[i].nama;
+    return '';
+  }
+
+  // ============================================================
+  // Lazy-load kamus wilayah Bali (regional-bali.json, ~313 KB).
+  // Tidak dimuat saat landing — baru di-fetch saat modal Tambah
+  // Assignment dibuka pertama kali. Hasil di-cache di session.
+  // ============================================================
+  var _baliLoaded  = false;
+  var _baliLoading = null; // Promise saat fetch in-flight
+  function loadBaliRegional() {
+    if (_baliLoaded) return Promise.resolve();
+    if (_baliLoading) return _baliLoading;
+    _baliLoading = fetch('js/data/regional-bali.json', { cache: 'force-cache' })
+      .then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+      })
+      .then(function (data) {
+        // data.kab    = { "51": [[kode, nama], ...] }
+        // data.kec    = { kdkab: [[kode, nama], ...] }
+        // data.desa   = { kdkec: [[kode, nama], ...] }
+        // data.sls    = { kddesa: [[kode4digit, nama], ...] }
+        // data.subsls = { kdsls14digit: ["00","01",...] }
+        function mergeKn(target, src) {
+          for (var k in src) {
+            target[k] = src[k].map(function (pair) {
+              return { kode: pair[0], nama: pair[1] };
+            });
+          }
+        }
+        mergeKn(STATIC_KABUPATEN, data.kab);
+        mergeKn(STATIC_KECAMATAN, data.kec);
+        mergeKn(STATIC_KELURAHAN, data.desa);
+        // SLS dan SUBSLS belum ada di regional.js, deklarasikan di window
+        if (typeof window.STATIC_SLS === 'undefined') window.STATIC_SLS = {};
+        if (typeof window.STATIC_SUBSLS === 'undefined') window.STATIC_SUBSLS = {};
+        mergeKn(window.STATIC_SLS, data.sls);
+        for (var kdsls in data.subsls) {
+          window.STATIC_SUBSLS[kdsls] = data.subsls[kdsls].map(function (k) {
+            return { kode: k, nama: k };
+          });
+        }
+        _baliLoaded  = true;
+        _baliLoading = null;
+      })
+      .catch(function (err) {
+        _baliLoading = null;
+        throw err;
+      });
+    return _baliLoading;
+  }
 
   function getAssignments() {
     try { return JSON.parse(localStorage.getItem(LK_ASSIGN) || '[]'); }
@@ -463,18 +643,29 @@
     hide('loginError');
     if (!pw) { showLoginError('Masukkan kata sandi'); return; }
     var btn = $('loginBtn');
-    btn.disabled = true; btn.textContent = 'Memverifikasi...';
+    btn.disabled = true; btn.textContent = 'Memverifikasi…';
+    showGlobalLoading('Memverifikasi kata sandi', 'Menghubungi server BPS untuk validasi…');
     try {
-      var cfg = await fetchConfig();
+      // Tahan minimal 320ms supaya loading terlihat (bukan kedip)
+      var pair = await Promise.all([
+        fetchConfig(),
+        new Promise(function (r) { setTimeout(r, 320); })
+      ]);
+      var cfg  = pair[0];
       var hash = (cfg && cfg.kuesioner_pw_hash) || '';
       if (!hash) throw new Error('Konfigurasi kata sandi tidak tersedia.');
       var ok = await PM.verifyPassword(pw, hash);
-      if (!ok) { showLoginError('Kata sandi salah'); return; }
+      if (!ok) {
+        hideGlobalLoading();
+        showLoginError('Kata sandi salah');
+        return;
+      }
       sessionStorage.setItem(SK_AUTH, '1');
       sessionStorage.setItem(SK_CONFIG, JSON.stringify(cfg));
       $('loginPw').value = '';
       goPick();
     } catch (err) {
+      hideGlobalLoading();
       showLoginError('Gagal terhubung ke server: ' + (err.message || err));
     } finally {
       btn.disabled = false; btn.textContent = 'Masuk';
@@ -515,20 +706,29 @@
     hide('loginScreen'); show('pickScreen'); hide('dashScreen');
     sessionStorage.removeItem(SK_ACTIVE);
     $('searchInput').value = '';
+    $('searchInput').disabled = true;
     hide('petugasError');
     hide('petugasList');
-    show('petugasLoading');
+    $('petugasList').innerHTML = '';
+    show('petugasHint');
+    $('petugasCount').textContent = '';
+    showGlobalLoading('Memuat daftar petugas', 'Mengambil data PPL & PML dari server…');
     try {
       var data = await fetchPetugas();
       _pplList = data.ppl || [];
       _pmlList = data.pml || [];
-      renderPetugasList();
+      var total = _pplList.length + _pmlList.length;
+      $('petugasCount').textContent = total + ' petugas tersedia · ' +
+        _pplList.length + ' PPL · ' + _pmlList.length + ' PML';
+      $('searchInput').disabled = false;
+      setTimeout(function () { $('searchInput').focus(); }, 50);
     } catch (err) {
       var el = $('petugasError');
       el.textContent = 'Gagal memuat daftar petugas: ' + (err.message || err);
       el.classList.remove('hidden');
+      hide('petugasHint');
     } finally {
-      hide('petugasLoading');
+      hideGlobalLoading();
     }
   }
 
@@ -546,11 +746,20 @@
   }
 
   function renderPetugasList() {
-    var q = $('searchInput').value || '';
-    var list = PM.searchPetugas(q, _pplList, _pmlList);
+    var q = ($('searchInput').value || '').trim();
     var box = $('petugasList');
+    // Tampilkan hint default saat query kosong — JANGAN auto-tampilkan semua
+    if (!q) {
+      box.classList.add('hidden');
+      box.innerHTML = '';
+      show('petugasHint');
+      return;
+    }
+    hide('petugasHint');
+    var list = PM.searchPetugas(q, _pplList, _pmlList);
     if (!list.length) {
-      box.innerHTML = '<div class="empty" style="grid-column:1/-1">Tidak ada petugas yang cocok.</div>';
+      box.innerHTML = '<div class="empty" style="grid-column:1/-1">' +
+        'Tidak ada petugas yang cocok dengan <b>' + esc(q) + '</b>.</div>';
     } else {
       box.innerHTML = list.map(function (p) {
         var badge = p.peran === 'PPL'
@@ -690,6 +899,11 @@
         ? '<span class="badge badge-done">Selesai</span>'
         : '<span class="badge badge-draft">Draft</span>';
       var showPetugas = (a.peran === 'PML' && (it.petugas_email || '').toLowerCase() !== (a.email || '').toLowerCase());
+      var slsLine = '';
+      if (it.sls_nama) {
+        var subTxt = (it.subsls_kd && it.subsls_kd !== '00') ? (' · SubSLS ' + esc(it.subsls_kd)) : '';
+        slsLine = '<div class="assign-card-wilayah">SLS: <b>' + esc(it.sls_nama) + '</b>' + subTxt + '</div>';
+      }
       return '<div class="assign-card" data-id="' + esc(it.id) + '">' +
         '<div class="assign-card-head">' +
           '<div class="assign-card-title">' + esc(it.nama_responden) + '</div>' +
@@ -698,6 +912,7 @@
         '<div class="assign-card-wilayah">' +
           esc(it.desa) + ', ' + esc(it.kecamatan) + ', ' + esc(it.kabupaten) +
         '</div>' +
+        slsLine +
         (showPetugas ? '<div class="assign-card-wilayah">Petugas: <b>' + esc(it.petugas_nama) + '</b></div>' : '') +
         '<div class="assign-card-meta">' +
           '<span>' + statusBadge + '</span>' +
@@ -738,7 +953,7 @@
     renderAssignList();
   }
 
-  // ===== Modal Tambah =====
+  // ===== Modal Tambah Assignment =====
   function bindModal() {
     $('modalCloseBtn').addEventListener('click', closeModal);
     $('modalCancelBtn').addEventListener('click', closeModal);
@@ -746,31 +961,221 @@
     $('modalAdd').addEventListener('click', function (e) {
       if (e.target.id === 'modalAdd') closeModal();
     });
+    // Cascade wilayah
+    $('addProvinsi').addEventListener('change',  onProvChange);
+    $('addKabupaten').addEventListener('change', onKabChange);
+    $('addKecamatan').addEventListener('change', onKecChange);
+    $('addDesa').addEventListener('change',      onDesaChange);
+    $('addSls').addEventListener('change',       onSlsChange);
+    // Jenis kuesioner mengubah label "Nama Kepala Keluarga" vs "Nama Usaha"
+    Array.prototype.forEach.call(document.getElementsByName('addJenis'), function (r) {
+      r.addEventListener('change', applyJenisLabel);
+    });
   }
+
+  function applyJenisLabel() {
+    var jenis = 'L';
+    var radios = document.getElementsByName('addJenis');
+    for (var i = 0; i < radios.length; i++) if (radios[i].checked) jenis = radios[i].value;
+    $('addNamaRespLabel').textContent = jenis === 'L'
+      ? 'Nama Kepala Keluarga'
+      : 'Nama Usaha / Perusahaan';
+    $('addNamaResp').placeholder = jenis === 'L'
+      ? 'Nama lengkap kepala keluarga…'
+      : 'Nama usaha atau perusahaan…';
+  }
+
+  function populateProvinsi() {
+    var sel = $('addProvinsi');
+    sel.innerHTML = '';
+    var list = (typeof STATIC_PROVINSI !== 'undefined') ? STATIC_PROVINSI.slice() : [];
+    list.sort(sortByNama).forEach(function (p) {
+      var o = document.createElement('option');
+      o.value = p.kode; o.textContent = p.nama;
+      sel.appendChild(o);
+    });
+    // Default Bali (51) sesuai konteks BPS Buleleng
+    sel.value = '51';
+    onProvChange();
+  }
+
+  function resetSelect(id, placeholder) {
+    var sel = $(id);
+    sel.innerHTML = '<option value="">' + placeholder + '</option>';
+    sel.disabled = true;
+  }
+
+  function onProvChange() {
+    var kdprov = $('addProvinsi').value;
+    var selKab = $('addKabupaten');
+    selKab.innerHTML = '<option value="">— pilih kabupaten —</option>';
+    var list = (typeof STATIC_KABUPATEN !== 'undefined' && STATIC_KABUPATEN[kdprov]) || [];
+    list.slice().sort(sortByNama).forEach(function (k) {
+      var o = document.createElement('option');
+      o.value = k.kode; o.textContent = k.nama;
+      selKab.appendChild(o);
+    });
+    // Default Buleleng (5108) saat provinsi Bali
+    if (kdprov === '51') selKab.value = '5108';
+    // Reset cascade ke bawah
+    resetSelect('addKecamatan', '— pilih kabupaten dulu —');
+    resetSelect('addDesa',      '— pilih kecamatan dulu —');
+    resetSelect('addSls',       '— pilih desa dulu —');
+    resetSelect('addSubSls',    '— pilih SLS dulu —');
+    if (selKab.value) onKabChange();
+  }
+
+  function onKabChange() {
+    var kdkab = $('addKabupaten').value;
+    var selKec = $('addKecamatan');
+    selKec.innerHTML = '<option value="">— pilih kecamatan —</option>';
+    var list = (typeof STATIC_KECAMATAN !== 'undefined' && STATIC_KECAMATAN[kdkab]) || [];
+    if (!list.length) {
+      selKec.innerHTML = '<option value="">(data kecamatan belum tersedia untuk kabupaten ini)</option>';
+      selKec.disabled = true;
+    } else {
+      list.slice().sort(sortByNama).forEach(function (kc) {
+        var o = document.createElement('option');
+        o.value = kc.kode; o.textContent = kc.nama;
+        selKec.appendChild(o);
+      });
+      selKec.disabled = false;
+    }
+    resetSelect('addDesa',   '— pilih kecamatan dulu —');
+    resetSelect('addSls',    '— pilih desa dulu —');
+    resetSelect('addSubSls', '— pilih SLS dulu —');
+  }
+
+  function onKecChange() {
+    var kdkec = $('addKecamatan').value;
+    var selDesa = $('addDesa');
+    selDesa.innerHTML = '<option value="">— pilih desa —</option>';
+    var list = (typeof STATIC_KELURAHAN !== 'undefined' && STATIC_KELURAHAN[kdkec]) || [];
+    if (!list.length) {
+      selDesa.innerHTML = '<option value="">(data desa belum tersedia untuk kecamatan ini)</option>';
+      selDesa.disabled = true;
+    } else {
+      list.slice().sort(sortByNama).forEach(function (d) {
+        var o = document.createElement('option');
+        o.value = d.kode; o.textContent = d.nama;
+        selDesa.appendChild(o);
+      });
+      selDesa.disabled = false;
+    }
+    resetSelect('addSls',    '— pilih desa dulu —');
+    resetSelect('addSubSls', '— pilih SLS dulu —');
+  }
+
+  function onDesaChange() {
+    var kddesa = $('addDesa').value;
+    var selSls = $('addSls');
+    selSls.innerHTML = '<option value="">— pilih SLS —</option>';
+    var list = (typeof STATIC_SLS !== 'undefined' && STATIC_SLS[kddesa]) || [];
+    if (!list.length) {
+      selSls.innerHTML = '<option value="">(belum ada data SLS untuk desa ini)</option>';
+      selSls.disabled = true;
+    } else {
+      list.slice().sort(sortByNama).forEach(function (s) {
+        var o = document.createElement('option');
+        o.value = s.kode;     // 4-digit kode SLS (mis. "0001")
+        o.textContent = s.nama; // mis. "LINGKUNGAN PENGINUMAN"
+        // Simpan fullKode (14-digit gabungan desa+sls) untuk lookup subsls
+        o.dataset.fullkode = kddesa + s.kode;
+        selSls.appendChild(o);
+      });
+      selSls.disabled = false;
+    }
+    resetSelect('addSubSls', '— pilih SLS dulu —');
+  }
+
+  function onSlsChange() {
+    var sel = $('addSls');
+    var fullKode = sel.options[sel.selectedIndex] && sel.options[sel.selectedIndex].dataset.fullkode;
+    var selSub = $('addSubSls');
+    selSub.innerHTML = '';
+    var list = (typeof STATIC_SUBSLS !== 'undefined' && fullKode && STATIC_SUBSLS[fullKode]) || [];
+    if (!list.length) {
+      // SLS tunggal — buat opsi default "00 (tanpa sub)"
+      var o = document.createElement('option');
+      o.value = '00'; o.textContent = '00 — tanpa sub';
+      selSub.appendChild(o);
+      selSub.disabled = false;
+      return;
+    }
+    selSub.appendChild((function () {
+      var o = document.createElement('option');
+      o.value = ''; o.textContent = '— pilih SubSLS —';
+      return o;
+    })());
+    list.slice().sort(function (a, b) { return a.kode.localeCompare(b.kode); }).forEach(function (s) {
+      var o = document.createElement('option');
+      o.value = s.kode;
+      o.textContent = s.kode === '00' ? '00 — tanpa sub' : s.kode;
+      selSub.appendChild(o);
+    });
+    selSub.disabled = false;
+    // Auto-pilih kalau cuma 1 opsi (selain placeholder)
+    if (list.length === 1) selSub.value = list[0].kode;
+  }
+
   function openModal() {
     hide('modalError'); $('modalError').textContent = '';
     $('addNamaResp').value = '';
-    $('addKecamatan').value = '';
-    $('addDesa').value = '';
-    // Provinsi & Kabupaten default sudah terisi
     var radios = document.getElementsByName('addJenis');
     for (var i = 0; i < radios.length; i++) radios[i].checked = (radios[i].value === 'L');
-    $('modalAdd').classList.add('open');
-    setTimeout(function () { $('addNamaResp').focus(); }, 50);
+    applyJenisLabel();
+
+    if (_baliLoaded) {
+      // Sudah ter-cache di sesi ini — buka langsung
+      populateProvinsi();
+      $('modalAdd').classList.add('open');
+      setTimeout(function () { $('addNamaResp').focus(); }, 50);
+      return;
+    }
+    // Pertama kali → tampilkan loading dulu sambil fetch wilayah Bali (~313 KB)
+    showGlobalLoading('Memuat data wilayah', 'Mengunduh kamus wilayah Bali (sekali per sesi)…');
+    loadBaliRegional().then(function () {
+      hideGlobalLoading();
+      populateProvinsi();
+      $('modalAdd').classList.add('open');
+      setTimeout(function () { $('addNamaResp').focus(); }, 50);
+    }).catch(function (err) {
+      hideGlobalLoading();
+      window.alert('Gagal memuat data wilayah: ' + (err.message || err) +
+        '\nPastikan koneksi internet aktif lalu coba lagi.');
+    });
   }
   function closeModal() { $('modalAdd').classList.remove('open'); }
+
+  function selectedText(selectId) {
+    var sel = $(selectId);
+    if (!sel || sel.selectedIndex < 0) return '';
+    var opt = sel.options[sel.selectedIndex];
+    return (opt && opt.value) ? opt.text : '';
+  }
 
   function saveAssignment() {
     var jenis = 'L';
     var radios = document.getElementsByName('addJenis');
     for (var i = 0; i < radios.length; i++) if (radios[i].checked) jenis = radios[i].value;
+    var slsSel  = $('addSls');
+    var slsOpt  = slsSel.options[slsSel.selectedIndex];
+    var slsFull = (slsOpt && slsOpt.dataset && slsOpt.dataset.fullkode) || '';
     var data = {
       jenis: jenis,
       nama_responden: $('addNamaResp').value,
-      provinsi:       $('addProvinsi').value,
-      kabupaten:      $('addKabupaten').value,
-      kecamatan:      $('addKecamatan').value,
-      desa:           $('addDesa').value
+      provinsi:      selectedText('addProvinsi'),
+      kabupaten:     selectedText('addKabupaten'),
+      kecamatan:     selectedText('addKecamatan'),
+      desa:          selectedText('addDesa'),
+      provinsi_kd:   $('addProvinsi').value,
+      kabupaten_kd:  $('addKabupaten').value,
+      kecamatan_kd:  $('addKecamatan').value,
+      desa_kd:       $('addDesa').value,
+      sls_nama:      selectedText('addSls'),
+      sls_kd:        $('addSls').value,        // 4-digit relatif terhadap desa
+      sls_full_kd:   slsFull,                  // 14-digit gabungan
+      subsls_kd:     $('addSubSls').value || '00'
     };
     try {
       var active = readActivePetugas();

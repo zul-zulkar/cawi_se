@@ -102,7 +102,8 @@ const HEADERS = [
   "Tanda Tangan (base64)",
   // Tambahan Q19c + L.KP
   "Transaksi Beli Jasa Non-Penduduk",
-  "Data Cabang (JSON)"
+  "Data Cabang (JSON)",
+  "CAWI ID"
 ];
 
 function buildRow(d) {
@@ -175,7 +176,8 @@ function buildRow(d) {
       ? d.tanda_tangan : (d.tanda_tangan ? "[ada]" : "[kosong]"),
     // Q19c + L.KP
     d.transaksi_beli_jasa_nonpenduduk,
-    d.lkp_data || ''
+    d.lkp_data || '',
+    d.cawi_id || ''
   ];
 }
 
@@ -190,6 +192,22 @@ function doPost(e) {
 
     // === MODE DISPATCHER: L mode pakai sheet terpisah ===
     const mode = (d.formMode === 'l') ? 'l' : 'lub';
+
+    // === CAWI_ID DISPATCHER (Portal Petugas Assignment) ===
+    // Kalau client mengirim cawi_id (UUID assignment) dan tidak ada _edit_id,
+    // cari row dengan cawi_id yang sama di sheet target → set _edit_id supaya
+    // submit berikutnya menimpa baris itu, bukan create record baru.
+    if (d.cawi_id && !d._edit_id && d.action !== "deleteRecord") {
+      try {
+        var _ss = SpreadsheetApp.openById(SHEET_ID);
+        var _sheetName = (mode === 'l') ? L_SHEET_NAME : SHEET_NAME;
+        var _sheet = _ss.getSheetByName(_sheetName);
+        if (_sheet) {
+          var _row = findRowByCawiId(_sheet, d.cawi_id);
+          if (_row > 0) d._edit_id = _row - 1;
+        }
+      } catch (_cawiErr) { Logger.log("findRowByCawiId gagal: " + _cawiErr.message); }
+    }
 
     // Delete: cari di kedua sheet (frontend tidak kirim formMode di delete)
     if (d.action === "deleteRecord" && d._delete_id && parseInt(d._delete_id) > 0) {
@@ -238,12 +256,33 @@ function doPost(e) {
       try { saveTandaTangan(d); } catch(sigErr) { Logger.log("Gagal simpan TTD: " + sigErr.message); }
     }
 
-    return jsonResponse({ status: "ok", message: "Data berhasil disimpan", mode: "lub" });
+    return jsonResponse({ status: "ok", message: "Data berhasil disimpan", mode: "lub", record_id: newId });
 
   } catch (err) {
     Logger.log("doPost error: " + err.message);
     return jsonResponse({ status: "error", message: err.message });
   }
+}
+
+// Cari row (1-based sheet row) dengan kolom "CAWI ID" yang cocok dengan cawi_id.
+// Return -1 jika sheet/kolom/value tidak ditemukan.
+function findRowByCawiId(sheet, cawi_id) {
+  if (!sheet || !cawi_id) return -1;
+  var lastRow = sheet.getLastRow();
+  var lastCol = sheet.getLastColumn();
+  if (lastRow < 2 || lastCol < 1) return -1;
+  var headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
+  var colIdx = -1;
+  for (var i = 0; i < headers.length; i++) {
+    if (String(headers[i]).trim().toUpperCase() === 'CAWI ID') { colIdx = i + 1; break; }
+  }
+  if (colIdx < 1) return -1;
+  var col = sheet.getRange(2, colIdx, lastRow - 1, 1).getValues();
+  var target = String(cawi_id).trim();
+  for (var j = 0; j < col.length; j++) {
+    if (String(col[j][0]).trim() === target) return j + 2;
+  }
+  return -1;
 }
 
 // Cek mode record by _id (dipakai untuk deleteRecord ketika frontend tidak kirim formMode)
@@ -362,7 +401,7 @@ function updateRecord(sheet, d, editId) {
   if (d.tanda_tangan && d.tanda_tangan.length > 100) {
     try { saveTandaTangan(d); } catch(sigErr) { Logger.log("Gagal simpan TTD: " + sigErr.message); }
   }
-  return jsonResponse({ status: "ok", message: "Data berhasil diperbarui" });
+  return jsonResponse({ status: "ok", message: "Data berhasil diperbarui", record_id: editId });
 }
 
 // Hapus rekaman berdasarkan _id
@@ -492,7 +531,8 @@ const FIELD_NAMES = [
   "tanggal_pelaksanaan",
   "tanda_tangan",
   "transaksi_beli_jasa_nonpenduduk",
-  "lkp_data"
+  "lkp_data",
+  "cawi_id"
 ];
 
 // Kembalikan semua config dari sheet CAWI_Config sebagai objek key-value
@@ -661,7 +701,8 @@ const L_HEADERS = [
   "Petugas Nama", "Petugas NIP", "Petugas HP",
   "Responden Nama", "Responden HP", "Responden Email",
   "Tanggal Pelaksanaan",
-  "Tanda Tangan (base64)"
+  "Tanda Tangan (base64)",
+  "CAWI ID"
 ];
 
 // Urutan HARUS sama persis dengan L_HEADERS — dipakai untuk parse balik di getRecordsResponse
@@ -734,7 +775,8 @@ const L_FIELD_NAMES = [
   "petugas_nama", "petugas_nip", "petugas_hp",
   "responden_nama", "responden_hp", "responden_email",
   "tanggal_pelaksanaan",
-  "tanda_tangan"
+  "tanda_tangan",
+  "cawi_id"
 ];
 
 function buildRowL(d) {
@@ -851,7 +893,7 @@ function insertLRecord(d) {
   if (d.tanda_tangan && d.tanda_tangan.length > 100) {
     try { saveTandaTanganL(d); } catch(e) { Logger.log("Gagal simpan TTD L: " + e.message); }
   }
-  return jsonResponse({ status: "ok", message: "Data L berhasil disimpan", mode: "l" });
+  return jsonResponse({ status: "ok", message: "Data L berhasil disimpan", mode: "l", record_id: newId });
 }
 
 // Update L record by _id
@@ -869,7 +911,7 @@ function updateLRecord(d, editId) {
   if (d.tanda_tangan && d.tanda_tangan.length > 100) {
     try { saveTandaTanganL(d); } catch(e) { Logger.log("Gagal simpan TTD L: " + e.message); }
   }
-  return jsonResponse({ status: "ok", message: "Data L berhasil diperbarui", mode: "l" });
+  return jsonResponse({ status: "ok", message: "Data L berhasil diperbarui", mode: "l", record_id: editId });
 }
 
 // Delete L record

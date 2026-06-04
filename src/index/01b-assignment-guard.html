@@ -3,6 +3,15 @@
      Kuesioner HANYA bisa dibuka via ?draft=cawi_..._<uuid>&mode=L|LUB
      yang cocok dengan entry di localStorage `cawi_assignments`.
      Tanpa itu → redirect ke index.html (portal).
+
+     Selain guard, partial ini juga:
+     - Mirror LS_KEY (cawi_se2026_draft_v1) ke draft_key per-assignment
+       SECARA REAL-TIME via Storage proxy. Ini fix masalah draft hilang
+       saat refresh / pindah halaman karena race condition timing.
+     - Pre-fill draft dari data assignment (nama responden + kode wilayah)
+       saat assignment baru pertama kali dibuka.
+     - Sinkronkan status assignment → "submitted" saat submit sukses,
+       lalu redirect kembali ke portal.
      ============================================================ -->
 <script>
 (function () {
@@ -43,41 +52,96 @@
   }
   if (!found) return backToPortal();
 
-  // 4) Set mode form sebelum mode-gate logic jalan, agar kuesioner langsung dibuka
+  // 4) Set mode form sebelum mode-gate logic jalan
   var mode = (modeRaw === 'L' || modeRaw === 'l') ? 'l' : 'lub';
   localStorage.setItem(FORM_MODE_KEY, mode);
 
-  // Simpan referensi ke window untuk dipakai listener lain (mis. submit hook)
+  // Expose ke window untuk dipakai listener lain (submit.js hook)
   window.__cawiActiveAssignment = found;
   window.__cawiActiveDraftKey   = draftKey;
 
-  // 5) DRAFT BINDING: muat draft per-assignment ke global key sebelum form load.
-  //    Ini memastikan kuesioner unik per assignment — autosave global dari sesi
-  //    sebelumnya tidak bocor ke assignment lain.
+  // ============================================================
+  // 5) STORAGE PROXY: setiap write ke GLOBAL_DRAFT_KEY otomatis
+  //    di-mirror ke draftKey per-assignment. Ini menjamin draft
+  //    tetap tersinkron tanpa bergantung pada interval/beforeunload
+  //    (yang punya race condition saat user refresh cepat).
+  // ============================================================
+  var origSetItem    = Storage.prototype.setItem;
+  var origRemoveItem = Storage.prototype.removeItem;
+  Storage.prototype.setItem = function (key, value) {
+    origSetItem.call(this, key, value);
+    if (this === window.localStorage && key === GLOBAL_DRAFT_KEY) {
+      try { origSetItem.call(this, draftKey, value); } catch (e) {}
+    }
+  };
+  Storage.prototype.removeItem = function (key) {
+    origRemoveItem.call(this, key);
+    // Jangan auto-hapus draftKey saat global draft di-clear (clearDraft
+    // dipanggil oleh submit-success hook secara terkontrol)
+  };
+
+  // ============================================================
+  // 6) MUAT draft per-assignment ke global key SEBELUM form load.
+  //    Kalau belum ada draft tersimpan, pre-fill dari assignment.
+  // ============================================================
+  function buildPrefillVals(assignment) {
+    var vals = {};
+    vals._formMode = mode;
+    vals._ts       = new Date().toISOString();
+    if (mode === 'l') {
+      // L mode (Rumah Tangga): nama_kk + wilayah keluarga + SLS
+      if (assignment.nama_responden) vals['l1_nama_kk'] = assignment.nama_responden;
+      if (assignment.provinsi_kd)    vals['l1_alamat_provinsi'] = assignment.provinsi_kd;
+      if (assignment.kabupaten_kd)   vals['l1_alamat_kab']      = assignment.kabupaten_kd;
+      if (assignment.kecamatan_kd)   vals['l1_alamat_kec']      = assignment.kecamatan_kd;
+      if (assignment.desa_kd)        vals['l1_alamat_kel']      = assignment.desa_kd;
+      // SLS (banjar/dusun/lingkungan). Kalau ada subsls != 00, embed di nama
+      // supaya petugas tahu pembagian wilayahnya.
+      if (assignment.sls_full_kd) {
+        var sub = assignment.subsls_kd && assignment.subsls_kd !== '00'
+          ? assignment.sls_full_kd + assignment.subsls_kd
+          : assignment.sls_full_kd;
+        vals['l1_kode_sls'] = sub;
+      }
+      if (assignment.sls_nama) {
+        var subTag = assignment.subsls_kd && assignment.subsls_kd !== '00'
+          ? ' (SubSLS ' + assignment.subsls_kd + ')'
+          : '';
+        vals['l1_nama_sls'] = assignment.sls_nama + subTag;
+      }
+    } else {
+      // L.UB mode (Usaha Besar): nama perusahaan + wilayah Blok I
+      if (assignment.nama_responden) vals['q5a_nama_perusahaan'] = assignment.nama_responden;
+      if (assignment.provinsi_kd)    vals['q1_provinsi']  = assignment.provinsi_kd;
+      if (assignment.kabupaten_kd)   vals['q2_kabupaten'] = assignment.kabupaten_kd;
+      if (assignment.kecamatan_kd)   vals['q3_kecamatan'] = assignment.kecamatan_kd;
+      if (assignment.desa_kd)        vals['q4_kelurahan'] = assignment.desa_kd;
+    }
+    return vals;
+  }
+
   try {
     var perAssign = localStorage.getItem(draftKey);
     if (perAssign) {
-      localStorage.setItem(GLOBAL_DRAFT_KEY, perAssign);
+      // Draft tersimpan untuk assignment ini → restore ke global key
+      origSetItem.call(localStorage, GLOBAL_DRAFT_KEY, perAssign);
     } else {
-      // Belum pernah diisi → kosongkan global key supaya tidak mewarisi data lain
-      localStorage.removeItem(GLOBAL_DRAFT_KEY);
+      // Pertama kali dibuka → pre-fill dari data assignment
+      var prefill = buildPrefillVals(found);
+      var serialized = JSON.stringify(prefill);
+      origSetItem.call(localStorage, GLOBAL_DRAFT_KEY, serialized);
+      origSetItem.call(localStorage, draftKey, serialized);
     }
   } catch (e) {}
 
-  // 6) DRAFT SYNC-BACK: salin global draft ke per-assignment key secara berkala
-  //    dan saat unload, agar progres tersimpan ke assignment yang benar.
-  function syncDraftBack() {
-    try {
-      var v = localStorage.getItem(GLOBAL_DRAFT_KEY);
-      if (v) localStorage.setItem(draftKey, v);
-    } catch (e) {}
-  }
-  setInterval(syncDraftBack, 30000);
-  window.addEventListener('beforeunload', syncDraftBack);
-
-  // 7) POST-SUBMIT HOOK: dispatch dari submit.js. Update status assignment
-  //    jadi `submitted`, hapus draft per-assignment, redirect ke portal.
-  window.addEventListener('cawi:submit-success', function () {
+  // ============================================================
+  // 7) POST-SUBMIT HOOK
+  //    - Set status assignment → submitted, simpan record_id (untuk
+  //      edit by cawi_id berikutnya) jika backend mengembalikannya.
+  //    - Hapus draft per-assignment.
+  //    - Redirect ke portal.
+  // ============================================================
+  window.addEventListener('cawi:submit-success', function (ev) {
     try {
       var list = JSON.parse(localStorage.getItem(ASSIGNMENT_KEY) || '[]');
       var nowIso = new Date().toISOString();
@@ -85,14 +149,17 @@
         if (list[j] && list[j].draft_key === draftKey) {
           list[j].status     = 'submitted';
           list[j].updated_at = nowIso;
+          if (ev && ev.detail && ev.detail.record_id) {
+            list[j].record_id = ev.detail.record_id;
+          }
           break;
         }
       }
-      localStorage.setItem(ASSIGNMENT_KEY, JSON.stringify(list));
-      localStorage.removeItem(draftKey);
-      localStorage.removeItem(GLOBAL_DRAFT_KEY);
+      // Gunakan origSetItem agar TIDAK kena proxy mirror
+      origSetItem.call(localStorage, ASSIGNMENT_KEY, JSON.stringify(list));
+      origRemoveItem.call(localStorage, draftKey);
+      origRemoveItem.call(localStorage, GLOBAL_DRAFT_KEY);
     } catch (e) {}
-    // Beri waktu user lihat pesan sukses sebentar, lalu kembali ke portal
     setTimeout(backToPortal, 1500);
   });
 })();

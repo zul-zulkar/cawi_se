@@ -239,6 +239,48 @@ describe('createAssignment', () => {
     const a = PM.createAssignment(validData(), activePML)
     expect(a.petugas_peran).toBe('PML')
   })
+
+  it('menyimpan kode wilayah BPS (provinsi_kd, kabupaten_kd, kecamatan_kd, desa_kd)', () => {
+    const a = PM.createAssignment(validData({
+      provinsi_kd: '51',
+      kabupaten_kd: '5108',
+      kecamatan_kd: '5108050',
+      desa_kd: '5108050001'
+    }), activePPL)
+    expect(a.provinsi_kd).toBe('51')
+    expect(a.kabupaten_kd).toBe('5108')
+    expect(a.kecamatan_kd).toBe('5108050')
+    expect(a.desa_kd).toBe('5108050001')
+  })
+
+  it('kode wilayah opsional (backward compat) — kosong jika tidak diberi', () => {
+    const a = PM.createAssignment(validData(), activePPL)
+    expect(a.provinsi_kd).toBe('')
+    expect(a.kabupaten_kd).toBe('')
+    expect(a.kecamatan_kd).toBe('')
+    expect(a.desa_kd).toBe('')
+  })
+
+  it('menyimpan SLS/SubSLS untuk pembagian wilayah lebih detail', () => {
+    const a = PM.createAssignment(validData({
+      sls_nama:    'BANJAR PENGINUMAN',
+      sls_kd:      '0001',
+      sls_full_kd: '51010100010001',
+      subsls_kd:   '02'
+    }), activePPL)
+    expect(a.sls_nama).toBe('BANJAR PENGINUMAN')
+    expect(a.sls_kd).toBe('0001')
+    expect(a.sls_full_kd).toBe('51010100010001')
+    expect(a.subsls_kd).toBe('02')
+  })
+
+  it('SubSLS default "00" jika tidak diberi (SLS tunggal tanpa pembagian)', () => {
+    const a = PM.createAssignment(validData(), activePPL)
+    expect(a.subsls_kd).toBe('00')
+    expect(a.sls_nama).toBe('')
+    expect(a.sls_kd).toBe('')
+    expect(a.sls_full_kd).toBe('')
+  })
 })
 
 // ============================================================

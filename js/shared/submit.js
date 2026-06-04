@@ -616,6 +616,15 @@ async function submitForm() {
 
   try {
     const data = collectData();
+    // Jika kuesioner dibuka dari assignment (Portal Petugas), sertakan
+    // cawi_id supaya backend bisa overwrite row yang sama saat re-submit.
+    if (window.__cawiActiveAssignment && window.__cawiActiveAssignment.id) {
+      data.cawi_id = window.__cawiActiveAssignment.id;
+      // Kalau assignment sudah pernah disubmit, pakai record_id untuk edit by row
+      if (window.__cawiActiveAssignment.record_id && !data._edit_id) {
+        data._edit_id = window.__cawiActiveAssignment.record_id;
+      }
+    }
     const isEdit = !!(data._edit_id);
     console.log('[SUBMIT] mode:', isEdit ? 'EDIT id=' + data._edit_id : 'BARU');
     // Content-Type: text/plain → tidak perlu no-cors, bisa baca response
@@ -625,10 +634,12 @@ async function submitForm() {
       body: JSON.stringify(data)
     });
     let gasOk = true;
+    let _recordIdFromServer = null;
     try {
       const json = await res.json();
       console.log('[SUBMIT] GAS response:', json);
       if (json.status !== 'ok') throw new Error(json.message || 'GAS error');
+      if (json.record_id || json.recordId) _recordIdFromServer = json.record_id || json.recordId;
     } catch(parseErr) {
       // Jika response bukan JSON (mis. redirect GAS), abaikan
       if (parseErr.message && parseErr.message !== 'GAS error') {
@@ -651,7 +662,12 @@ async function submitForm() {
     // Beritahu listener (mis. assignment guard) bahwa submit sukses
     try {
       window.dispatchEvent(new CustomEvent('cawi:submit-success', {
-        detail: { formMode: data.formMode, wasEdit: wasEdit }
+        detail: {
+          formMode: data.formMode,
+          wasEdit:  wasEdit,
+          record_id: _recordIdFromServer,
+          cawi_id:  data.cawi_id || null
+        }
       }));
     } catch(_e) {}
     // Simpan ringkasan ke daftar lokal
