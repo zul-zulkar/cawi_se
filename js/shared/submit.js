@@ -302,6 +302,9 @@ function collectDataLUB() {
     petugas_nama: getVal('p_nama'),
     petugas_nip: getVal('p_nip'),
     petugas_hp: getVal('p_hp'),
+    // Identitas pendata dari sesi login (hidden, auto-inject)
+    petugas_email_login: getVal('petugas_email_login'),
+    petugas_peran_login: getVal('petugas_peran_login'),
     // Blok III — Responden
     responden_nama: getVal('r_nama'),
     responden_hp: getVal('r_hp'),
@@ -462,6 +465,9 @@ function collectDataL() {
     petugas_nama:      getVal('l5_petugas_nama'),
     petugas_nip:       getVal('l5_petugas_nip'),
     petugas_hp:        getVal('l5_petugas_hp'),
+    // Identitas pendata dari sesi login (hidden, auto-inject)
+    petugas_email_login: getVal('petugas_email_login'),
+    petugas_peran_login: getVal('petugas_peran_login'),
     responden_nama:    getVal('l5_responden_nama'),
     responden_hp:      getVal('l5_responden_hp'),
     responden_email:   getVal('l5_responden_email'),
@@ -889,14 +895,17 @@ function loadEditMode() {
     if (typeof calcPendapatan      === 'function') calcPendapatan();
     if (typeof calcAset            === 'function') calcAset();
     if (typeof calcModal           === 'function') calcModal();
-    // Restore L.KP branches
-    if (r.lkp_data && typeof handleJumlahCabang === 'function') {
+    // Restore L.KP branches (roster model: kartu cabang hidup di #lkp-pool)
+    if (r.lkp_data) {
       setTimeout(() => {
-        handleJumlahCabang();
         try {
-          const branches = JSON.parse(r.lkp_data);
+          const branches = JSON.parse(r.lkp_data || '[]');
+          // Set jumlah cabang (q10b_jumlah readonly, auto)
+          const q10bEl = document.getElementById('q10b_jumlah');
+          if (q10bEl) q10bEl.value = branches.length > 0 ? branches.length : '';
           branches.forEach(b => {
             const i = b.no;
+            if (typeof _ensureLkpCard === 'function') _ensureLkpCard(i);
             const s = (id, val) => { const el = document.getElementById(id); if (el && val != null) el.value = val; };
             s('lkp_'+i+'_nama', b.nama);
             s('lkp_'+i+'_jenis', b.jenis);
@@ -907,9 +916,12 @@ function loadEditMode() {
             if (b.aset) { const el = document.getElementById('lkp_'+i+'_aset'); if (el) { el.value = Number(b.aset).toLocaleString('id-ID'); } }
             if (b.provinsi) {
               const prSel = document.getElementById('lkp_'+i+'_provinsi');
-              if (prSel) { prSel.value = b.provinsi; loadKabupatenLKP(b.provinsi, i).then(() => { const kSel = document.getElementById('lkp_'+i+'_kabupaten'); if (kSel && b.kabupaten) kSel.value = b.kabupaten; }); }
+              if (prSel) { prSel.value = b.provinsi; Promise.resolve(loadKabupatenLKP(b.provinsi, i)).then(() => { const kSel = document.getElementById('lkp_'+i+'_kabupaten'); if (kSel && b.kabupaten) kSel.value = b.kabupaten; }); }
             }
           });
+          // Tampilkan section L.KP bila Kantor pusat + render roster
+          if (getRadio('q10a') === '2') { const lkp = document.getElementById('lkp_section'); if (lkp) lkp.classList.remove('hidden'); }
+          if (typeof renderLkpRoster === 'function') renderLkpRoster();
         } catch(_e) {}
         if (typeof updateProgress === 'function') updateProgress();
       }, 500);

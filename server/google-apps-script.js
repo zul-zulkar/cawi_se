@@ -103,7 +103,9 @@ const HEADERS = [
   // Tambahan Q19c + L.KP
   "Transaksi Beli Jasa Non-Penduduk",
   "Data Cabang (JSON)",
-  "CAWI ID"
+  "CAWI ID",
+  // Identitas pendata (login) — auto-inject dari sesi petugas, append di akhir
+  "Petugas Email (login)", "Petugas Peran (login)"
 ];
 
 function buildRow(d) {
@@ -177,7 +179,9 @@ function buildRow(d) {
     // Q19c + L.KP
     d.transaksi_beli_jasa_nonpenduduk,
     d.lkp_data || '',
-    d.cawi_id || ''
+    d.cawi_id || '',
+    // Identitas pendata (login)
+    d.petugas_email_login || '', d.petugas_peran_login || ''
   ];
 }
 
@@ -559,7 +563,8 @@ const FIELD_NAMES = [
   "tanda_tangan",
   "transaksi_beli_jasa_nonpenduduk",
   "lkp_data",
-  "cawi_id"
+  "cawi_id",
+  "petugas_email_login", "petugas_peran_login"
 ];
 
 // Kembalikan semua config dari sheet CAWI_Config sebagai objek key-value
@@ -757,7 +762,8 @@ const L_HEADERS = [
   "Responden Nama", "Responden HP", "Responden Email",
   "Tanggal Pelaksanaan",
   "Tanda Tangan (base64)",
-  "CAWI ID"
+  "CAWI ID",
+  "Petugas Email (login)", "Petugas Peran (login)"
 ];
 
 // Urutan HARUS sama persis dengan L_HEADERS — dipakai untuk parse balik di getRecordsResponse
@@ -802,7 +808,8 @@ const L_FIELD_NAMES = [
   "responden_nama", "responden_hp", "responden_email",
   "tanggal_pelaksanaan",
   "tanda_tangan",
-  "cawi_id"
+  "cawi_id",
+  "petugas_email_login", "petugas_peran_login"
 ];
 
 function buildRowL(d) {

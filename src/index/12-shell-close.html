@@ -12,6 +12,16 @@
   <div class="screen-body" id="screen-ang-body"></div>
 </div>
 
+<!-- ====== L.KP CABANG DETAIL SCREEN ====== -->
+<div id="screen-lkp" class="form-screen">
+  <div class="screen-nav">
+    <button class="btn-back" onclick="exitLkpDetail()">&#8592; Kembali</button>
+    <span class="screen-title" id="screen-lkp-title">Cabang/Unit ke-1</span>
+    <button class="btn-done" onclick="exitLkpDetail()">&#10003; Selesai</button>
+  </div>
+  <div class="screen-body" id="screen-lkp-body"></div>
+</div>
+
 <!-- ====== USAHA DETAIL SCREEN ====== -->
 <div id="screen-usaha" class="form-screen">
   <div class="screen-nav">
@@ -34,8 +44,15 @@
   </div>
 </footer>
 
+<!-- IDENTITAS PENDATA (login) — hidden, auto-inject ke submission semua mode -->
+<div id="petugas-login-identity" style="display:none">
+  <input type="hidden" id="petugas_email_login" value=""/>
+  <input type="hidden" id="petugas_peran_login" value=""/>
+</div>
+
 <!-- HIDDEN POOLS -->
 <div id="anggota-pool" aria-hidden="true" style="display:none"></div>
+<div id="lkp-pool" aria-hidden="true" style="display:none"></div>
 <div id="usaha-storage" style="display:none">
   <input type="hidden" id="l_usaha_all_data" value="[]"/>
   <input type="hidden" id="l_usaha_count" value="0"/>

@@ -4,6 +4,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Pindahkan Blok II section-cards ke screen-usaha-body (sebelum applyFormMode)
   _initUsahaDetailScreen();
 
+  // Inject identitas pendata (login) ke field hidden + auto-fill nama petugas
+  injectPetugasIdentity();
+
   // Apply current mode early (so form-l/form-lub visibility is correct)
   if (typeof applyFormMode === 'function') applyFormMode(getFormMode());
 
@@ -191,6 +194,40 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
+/* ====== IDENTITAS PENDATA (login) ======
+ * Baca petugas aktif dari sessionStorage['cawi_petugas_aktif'] (di-set portal).
+ * Bila tidak terbawa (mis. tab baru) → fallback ke window.__cawiActiveAssignment
+ * yang di-set oleh assignment guard. Isi field hidden petugas_email_login /
+ * petugas_peran_login (di-submit di semua mode), dan auto-fill nama petugas
+ * ke field form (tanpa menimpa isian manual yang sudah ada).
+ */
+function injectPetugasIdentity() {
+  let email = '', peran = '', nama = '';
+  try {
+    const active = JSON.parse(sessionStorage.getItem('cawi_petugas_aktif') || 'null');
+    if (active) { email = active.email || ''; peran = active.peran || ''; nama = active.nama || ''; }
+  } catch (e) {}
+  // Fallback: assignment (G-4) — sessionStorage tidak terbawa antar-tab
+  const a = window.__cawiActiveAssignment;
+  if (a) {
+    if (!email) email = a.petugas_email || '';
+    if (!peran) peran = a.petugas_peran || '';
+    if (!nama)  nama  = a.petugas_nama  || '';
+  }
+  const eEl = document.getElementById('petugas_email_login');
+  if (eEl) eEl.value = email;
+  const pEl = document.getElementById('petugas_peran_login');
+  if (pEl) pEl.value = peran;
+  // Auto-fill nama petugas ke field form L.UB (p_nama) & L (l5_petugas_nama),
+  // hanya bila kosong (jangan timpa isian manual / hasil restore draft).
+  if (nama) {
+    ['p_nama', 'l5_petugas_nama'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el && !el.value) el.value = nama;
+    });
+  }
+}
+
 /* ====== GUARDED NAVIGATION ======
  * Selalu konfirmasi sebelum keluar dari kuesioner. Konfirmasi tampil
  * baik form sudah diubah maupun belum, karena assignment-driven workflow
@@ -302,21 +339,53 @@ function exitUsahaDetail() {
   showMainScreen();
 }
 
+function showLkpDetailScreen(idx) {
+  _activeScreenIdx = idx;
+  const titleEl = document.getElementById('screen-lkp-title');
+  if (titleEl) titleEl.textContent = 'Cabang/Unit ke-' + idx;
+  // Pindahkan card cabang dari pool ke screen-lkp-body
+  const pool = document.getElementById('lkp-pool');
+  const body = document.getElementById('screen-lkp-body');
+  if (pool && body) {
+    const card = document.getElementById('lkp_card_' + idx);
+    if (card) body.appendChild(card);
+  }
+  _showScreen('lkp');
+  history.pushState({ screen: 'lkp', idx }, '', '#lkp-' + idx);
+}
+
+function exitLkpDetail() {
+  if (_activeScreenIdx != null) {
+    // Kembalikan card ke pool
+    const card = document.getElementById('lkp_card_' + _activeScreenIdx);
+    const pool = document.getElementById('lkp-pool');
+    if (card && pool) pool.appendChild(card);
+    if (typeof renderLkpRosterRow === 'function') renderLkpRosterRow(_activeScreenIdx);
+    if (typeof updateProgress === 'function') updateProgress();
+  }
+  showMainScreen();
+}
+
 // Hash router — handle popstate (browser/iOS back button)
 function _handleHashNav() {
   const hash = location.hash;
   const angM = hash.match(/^#ang-(\d+)$/);
   const usahaM = hash.match(/^#usaha-(\d+)$/);
+  const lkpM = hash.match(/^#lkp-(\d+)$/);
   if (angM) {
     const idx = parseInt(angM[1]);
     if (_activeScreen !== 'ang' || _activeScreenIdx !== idx) showAngDetailScreen(idx);
   } else if (usahaM) {
     const idx = parseInt(usahaM[1]);
     if (_activeScreen !== 'usaha' || _activeScreenIdx !== idx) showUsahaDetailScreen(idx);
+  } else if (lkpM) {
+    const idx = parseInt(lkpM[1]);
+    if (_activeScreen !== 'lkp' || _activeScreenIdx !== idx) showLkpDetailScreen(idx);
   } else {
     // Navigasi ke hash kosong = kembali ke main
     if (_activeScreen === 'ang')   exitAnggotaDetail();
     else if (_activeScreen === 'usaha') exitUsahaDetail();
+    else if (_activeScreen === 'lkp')   exitLkpDetail();
   }
 }
 window.addEventListener('popstate', _handleHashNav);

@@ -55,6 +55,11 @@ function restoreDraft() {
       const inp = document.getElementById('l1_jml_kk_anggota');
       if (inp) { inp.value = vals['l1_jml_kk_anggota']; renderAnggotaCards(); }
     }
+    // L.UB mode: pastikan kartu cabang L.KP ada di pool sebelum isi field lkp_*
+    if (vals['_formMode'] !== 'l' && vals['q10b_jumlah'] && typeof _ensureLkpCard === 'function') {
+      const nCab = Math.min(parseInt(vals['q10b_jumlah']) || 0, 50);
+      for (let i = 1; i <= nCab; i++) _ensureLkpCard(i);
+    }
     // Restore inputs / selects / textareas
     Object.keys(vals).forEach(key => {
       if (key.startsWith('_r_')) {
@@ -137,6 +142,11 @@ function restoreDraft() {
     // L mode: rebuild usaha roster dari hidden input #l_usaha_all_data (restored above)
     if (typeof syncUsahaStoreFromDom === 'function') syncUsahaStoreFromDom();
     if (typeof renderUsahaRoster   === 'function') renderUsahaRoster();
+    // L.UB mode: tampilkan section L.KP (bila Kantor pusat) + render roster cabang
+    if (typeof renderLkpRoster === 'function') {
+      if (getRadio('q10a') === '2') { const lkp = document.getElementById('lkp_section'); if (lkp) lkp.classList.remove('hidden'); }
+      renderLkpRoster();
+    }
     updateProgress();
     const txt = document.getElementById('autosaveText');
     if (txt) txt.textContent = 'Draft dimuat';

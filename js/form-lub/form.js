@@ -55,11 +55,12 @@ function handleJaringan() {
   const v = getRadio('q10a');
   document.getElementById('q10b_wrap').classList.toggle('hidden', v !== '2');
   document.getElementById('q11_wrap').classList.toggle('hidden', !['3','4','5','6'].includes(v));
-  // L.KP section only for kantor pusat
+  // L.KP section hanya untuk Kantor pusat (q10a=2)
   const lkp = document.getElementById('lkp_section');
   if (lkp) {
     if (v === '2') {
-      handleJumlahCabang();
+      lkp.classList.remove('hidden');
+      renderLkpRoster();
     } else {
       lkp.classList.add('hidden');
       updateSidebarLKP(0);
@@ -67,37 +68,37 @@ function handleJaringan() {
   }
 }
 
-function handleJumlahCabang() {
-  const lkp = document.getElementById('lkp_section');
-  const wrap = document.getElementById('lkp_branches_wrap');
-  if (!lkp || !wrap) return;
-  if (getRadio('q10a') !== '2') { lkp.classList.add('hidden'); return; }
-  const n = parseInt(document.getElementById('q10b_jumlah').value) || 0;
-  if (n <= 0) { lkp.classList.add('hidden'); updateSidebarLKP(0); return; }
-  lkp.classList.remove('hidden');
-  const capped = Math.min(n, 50);
-  // Only re-render if count changed
-  if (wrap.dataset.count === String(capped)) return;
-  wrap.dataset.count = capped;
-  updateSidebarLKP(capped);
-  wrap.innerHTML = '';
+/* ====== L.KP CABANG ROSTER (pola anggota: pool + move + layar detail) ======
+ * Kartu cabang `lkp_card_${i}` hidup di #lkp-pool (selalu di DOM → tetap terbaca
+ * collectData/validation/progress). Roster untuk navigasi; edit → kartu dipindah
+ * ke #screen-lkp-body; kembali → balik ke pool. Jumlah cabang = #q10b_jumlah
+ * (readonly, auto dari roster). Nested di dalam assignment, di bawah bisnis yang
+ * berbentuk Kantor pusat. */
+
+function _getCabangCount() {
+  const el = document.getElementById('q10b_jumlah');
+  return el ? (parseInt(el.value) || 0) : 0;
+}
+function _setCabangCount(n) {
+  const el = document.getElementById('q10b_jumlah');
+  if (el) el.value = n > 0 ? n : '';
+}
+
+function _lkpCardHTML(i) {
   const provOpts = (typeof STATIC_PROVINSI !== 'undefined' ? STATIC_PROVINSI : [])
     .map(p => `<option value="${p.kode}">${p.nama}</option>`).join('');
-  for (let i = 1; i <= capped; i++) {
-    wrap.insertAdjacentHTML('beforeend', `
-<div class="section-card" id="lkp_card_${i}" style="margin-top:12px;border-left:3px solid #fc6c00">
-  <div class="section-header" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center" onclick="toggleLKPCard(${i})">
-    <span>Cabang/Unit #${i}</span><span id="lkp_toggle_${i}">&#9660;</span>
-  </div>
+  return `
+<div class="section-card" id="lkp_card_${i}" style="border-left:3px solid #fc6c00">
+  <div class="section-header"><span>Cabang/Unit #${i}</span></div>
   <div id="lkp_body_${i}" class="section-body">
     <div class="inline-fields">
       <div class="form-group" style="flex:2">
         <label class="field-label">Nama Kantor/Unit <span class="req">*</span></label>
-        <input type="text" id="lkp_${i}_nama" placeholder="Nama kantor/unit"/>
+        <input type="text" id="lkp_${i}_nama" placeholder="Nama kantor/unit" oninput="if(typeof renderLkpRosterRow==='function')renderLkpRosterRow(${i})"/>
       </div>
       <div class="form-group" style="flex:1">
         <label class="field-label">Jenis Unit <span class="req">*</span></label>
-        <select id="lkp_${i}_jenis">
+        <select id="lkp_${i}_jenis" onchange="if(typeof renderLkpRosterRow==='function')renderLkpRosterRow(${i})">
           <option value="">-- Pilih --</option>
           <option value="1">1. Kantor Cabang</option>
           <option value="2">2. Kantor Perwakilan</option>
@@ -109,7 +110,7 @@ function handleJumlahCabang() {
     <div class="inline-fields">
       <div class="form-group">
         <label class="field-label">Provinsi <span class="req">*</span></label>
-        <select id="lkp_${i}_provinsi" onchange="loadKabupatenLKP(this.value,${i})">
+        <select id="lkp_${i}_provinsi" onchange="loadKabupatenLKP(this.value,${i});if(typeof renderLkpRosterRow==='function')renderLkpRosterRow(${i})">
           <option value="">-- Pilih Provinsi --</option>
           ${provOpts}
         </select>
@@ -128,7 +129,7 @@ function handleJumlahCabang() {
     <div class="inline-fields">
       <div class="form-group">
         <label class="field-label">Jumlah Pekerja (per 31 Des 2025) <span class="req">*</span></label>
-        <input type="number" id="lkp_${i}_pekerja" min="0" placeholder="0"/>
+        <input type="number" id="lkp_${i}_pekerja" min="0" placeholder="0" oninput="if(typeof renderLkpRosterRow==='function')renderLkpRosterRow(${i})"/>
       </div>
       <div class="form-group">
         <label class="field-label">Nilai Pengeluaran 2025 (Rp)</label>
@@ -152,18 +153,130 @@ function handleJumlahCabang() {
       </div>
     </div>
   </div>
-</div>`);
+</div>`;
+}
+
+function _ensureLkpCard(i) {
+  if (document.getElementById('lkp_card_' + i)) return;
+  const pool = document.getElementById('lkp-pool');
+  if (!pool) return;
+  pool.insertAdjacentHTML('beforeend', _lkpCardHTML(i));
+}
+
+function addCabang() {
+  const cur = _getCabangCount();
+  if (cur >= 50) { alert('Maksimal 50 cabang/unit.'); return; }
+  const idx = cur + 1;
+  _setCabangCount(idx);
+  _ensureLkpCard(idx);
+  renderLkpRoster();
+  if (typeof showLkpDetailScreen === 'function') showLkpDetailScreen(idx);
+  if (typeof updateProgress === 'function') updateProgress();
+}
+
+function deleteCabang(i) {
+  const total = _getCabangCount();
+  if (!confirm('Hapus cabang/unit ke-' + i + '? Data yang sudah diisi akan hilang.')) return;
+  for (let j = i; j < total; j++) _shiftLkpFields(j + 1, j);
+  const last = document.getElementById('lkp_card_' + total);
+  if (last) last.remove();
+  _setCabangCount(total - 1);
+  renderLkpRoster();
+  if (typeof updateProgress === 'function') updateProgress();
+}
+
+// Geser semua field cabang src → dst (dipakai saat delete agar indeks rapat)
+function _shiftLkpFields(src, dst) {
+  _ensureLkpCard(dst);
+  ['nama','jenis','kbli','pekerja','pengeluaran','pendapatan','aset'].forEach(f => {
+    const s = document.getElementById('lkp_' + src + '_' + f);
+    const d = document.getElementById('lkp_' + dst + '_' + f);
+    if (s && d) { d.value = s.value; s.value = ''; }
+  });
+  // Provinsi + kabupaten (cascade async)
+  const sProv = document.getElementById('lkp_' + src + '_provinsi');
+  const dProv = document.getElementById('lkp_' + dst + '_provinsi');
+  const sKab  = document.getElementById('lkp_' + src + '_kabupaten');
+  if (sProv && dProv) {
+    const provVal = sProv.value;
+    const kabVal  = sKab ? sKab.value : '';
+    dProv.value = provVal; sProv.value = '';
+    if (provVal && typeof loadKabupatenLKP === 'function') {
+      Promise.resolve(loadKabupatenLKP(provVal, dst)).then(() => {
+        const dKab = document.getElementById('lkp_' + dst + '_kabupaten');
+        if (dKab) dKab.value = kabVal;
+      });
+    }
+    if (sKab) sKab.value = '';
   }
 }
 
-function toggleLKPCard(i) {
-  const body = document.getElementById('lkp_body_' + i);
-  const icon = document.getElementById('lkp_toggle_' + i);
-  if (!body) return;
-  const hidden = body.style.display === 'none';
-  body.style.display = hidden ? '' : 'none';
-  if (icon) icon.innerHTML = hidden ? '&#9660;' : '&#9658;';
+function renderLkpRoster() {
+  const list = document.getElementById('lkp_roster_list');
+  const empty = document.getElementById('lkp_roster_empty');
+  const countEl = document.getElementById('lkp_roster_count');
+  if (!list) return;
+  const n = _getCabangCount();
+  list.innerHTML = '';
+  for (let i = 1; i <= n; i++) {
+    _ensureLkpCard(i);
+    list.insertAdjacentHTML('beforeend', _lkpRosterRowHTML(i));
+  }
+  if (empty)   empty.style.display   = n > 0 ? 'none' : '';
+  if (countEl) countEl.textContent = n + ' cabang/unit';
+  updateSidebarLKP(n);
 }
+
+function renderLkpRosterRow(i) {
+  const list = document.getElementById('lkp_roster_list');
+  if (!list) return;
+  const existing = document.getElementById('lkp_row_' + i);
+  const html = _lkpRosterRowHTML(i);
+  if (existing) existing.outerHTML = html;
+  else list.insertAdjacentHTML('beforeend', html);
+}
+
+function _lkpRosterRowHTML(i) {
+  const nama = (document.getElementById('lkp_' + i + '_nama') || {}).value || '';
+  const jenisSel = document.getElementById('lkp_' + i + '_jenis');
+  const jenisTxt = jenisSel && jenisSel.selectedIndex > 0 ? jenisSel.options[jenisSel.selectedIndex].text : '';
+  const pekerja = (document.getElementById('lkp_' + i + '_pekerja') || {}).value || '';
+  const prov = document.getElementById('lkp_' + i + '_provinsi');
+  const provTxt = prov && prov.selectedIndex > 0 ? prov.options[prov.selectedIndex].text : '';
+  const hasProv = !!(prov && prov.value);
+  let statusCls, statusTxt;
+  if (!nama && !jenisTxt) { statusCls = 'chip-empty'; statusTxt = 'Belum diisi'; }
+  else if (!nama || !jenisTxt || !hasProv || pekerja === '') { statusCls = 'chip-partial'; statusTxt = 'Belum lengkap'; }
+  else { statusCls = 'chip-done'; statusTxt = 'Terisi'; }
+  const displayName = nama || ('Cabang/Unit ke-' + i);
+  const meta = [jenisTxt, provTxt].filter(Boolean).join(' · ');
+  return `<div class="roster-row" id="lkp_row_${i}">
+    <div class="roster-no">${i}</div>
+    <div class="roster-info">
+      <div class="roster-name">${displayName}</div>
+      <div class="roster-meta">${meta || 'Belum ada data'}</div>
+    </div>
+    <span class="status-chip ${statusCls}">${statusTxt}</span>
+    <div class="roster-actions">
+      <button class="btn-roster-edit" type="button" onclick="if(typeof showLkpDetailScreen==='function')showLkpDetailScreen(${i})">Edit</button>
+      <button class="btn-roster-del"  type="button" onclick="deleteCabang(${i})">Hapus</button>
+    </div>
+  </div>`;
+}
+
+// Dipertahankan untuk kompatibilitas (restore draft & pemanggil lama): pastikan
+// kartu ada di pool lalu render roster.
+function handleJumlahCabang() {
+  const lkp = document.getElementById('lkp_section');
+  if (getRadio('q10a') !== '2') { if (lkp) lkp.classList.add('hidden'); return; }
+  if (lkp) lkp.classList.remove('hidden');
+  const n = Math.min(_getCabangCount(), 50);
+  for (let i = 1; i <= n; i++) _ensureLkpCard(i);
+  renderLkpRoster();
+}
+
+// Tidak lagi dipakai dengan roster (kartu tampil penuh di layar detail) — no-op
+function toggleLKPCard(i) {}
 
 async function loadKabupatenLKP(kdprov, idx) {
   const sel = document.getElementById('lkp_' + idx + '_kabupaten');
@@ -419,7 +532,7 @@ function updateSidebarLKP(count) {
   for (let i = 1; i <= count; i++) {
     const div = document.createElement('div');
     div.className = 'sidebar-q-item sidebar-q-sub';
-    div.setAttribute('onclick', `goBlokAndScrollId(1,'lkp_card_${i}')`);
+    div.setAttribute('onclick', `if(typeof showLkpDetailScreen==='function')showLkpDetailScreen(${i})`);
     div.textContent = '↳ Cabang/Unit #' + i;
     items.appendChild(div);
   }

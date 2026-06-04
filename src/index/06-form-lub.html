@@ -510,8 +510,9 @@
       </div>
       <div class="form-group hidden" id="q10b_wrap">
         <div class="subsection-label">b. Jumlah seluruh kantor cabang dan unit usaha</div>
-        <label class="field-label">Jumlah <span class="req">*</span></label>
-        <input type="number" id="q10b_jumlah" min="0" placeholder="0" oninput="handleJumlahCabang()"/>
+        <label class="field-label">Jumlah</label>
+        <input type="number" id="q10b_jumlah" class="input-muted" readonly placeholder="0"/>
+        <div class="hint">Terhitung otomatis dari jumlah cabang/unit pada daftar di bawah</div>
       </div>
     </div>
   </div>
@@ -520,8 +521,15 @@
   <div class="section-card hidden" id="lkp_section">
     <div class="section-header" id="sec-lkp">L.KP — Keterangan Kantor Cabang/Unit di Bawah Kantor Pusat</div>
     <div class="section-body">
-      <div class="hint" style="margin-bottom:16px">Lengkapi informasi setiap kantor cabang/unit yang berada di bawah kendali kantor pusat ini (SE2026-L.KP). Jumlah isian sesuai dengan jawaban rincian 10b.</div>
-      <div id="lkp_branches_wrap"></div>
+      <div class="hint" style="margin-bottom:16px">Lengkapi informasi setiap kantor cabang/unit yang berada di bawah kendali kantor pusat ini (SE2026-L.KP). Tambahkan tiap cabang/unit, lalu isi detailnya di halaman tersendiri.</div>
+      <div class="roster-container">
+        <div class="roster-toolbar">
+          <span class="roster-count" id="lkp_roster_count">0 cabang/unit</span>
+          <button class="btn-roster-add" type="button" onclick="addCabang()">&#43; Tambah Cabang/Unit</button>
+        </div>
+        <div class="roster-list" id="lkp_roster_list"></div>
+        <div id="lkp_roster_empty" class="roster-empty">Belum ada cabang/unit. Klik &ldquo;+ Tambah Cabang/Unit&rdquo; untuk menambahkan.</div>
+      </div>
     </div>
   </div>
 
