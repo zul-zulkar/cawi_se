@@ -39,3 +39,188 @@ body.mode-l .sidebar-blok-group.sb-l{display:block}
 }
 /* Header & ctx-bar tidak perlu double-display nama */
 .anggota-header .field-label::after,.anggota-ctx-bar .field-label::after{content:none}
+
+/* ====== FORM SCREENS (roster navigation) ====== */
+.form-screen { display: none; }
+.form-screen.active { display: block; }
+
+/* Screen nav header — back button + title + action */
+.screen-nav {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: #fff;
+  border-bottom: 1.5px solid #e8e3de;
+  box-shadow: 0 2px 6px rgba(0,0,0,.06);
+}
+.screen-nav .btn-back {
+  flex-shrink: 0;
+  background: none;
+  border: 1.5px solid #c8c0b5;
+  color: #4a5568;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 7px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.screen-nav .btn-back:hover { background: #f7f4f0; border-color: #a09585; }
+.screen-nav .screen-title {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 700;
+  color: #1a2332;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.screen-nav .btn-done {
+  flex-shrink: 0;
+  background: #2b6cb0;
+  color: #fff;
+  border: none;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 7px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.screen-nav .btn-done:hover { background: #2c5282; }
+.screen-body { padding: 0 0 40px; }
+
+/* ====== ROSTER TABLE ====== */
+.roster-container { margin-top: 8px; }
+.roster-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0 10px;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.roster-count {
+  font-size: 13px;
+  color: #666;
+  font-weight: 600;
+}
+.btn-roster-add {
+  background: #2b6cb0;
+  color: #fff;
+  border: none;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 9px 18px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.btn-roster-add:hover { background: #2c5282; }
+.roster-list { display: flex; flex-direction: column; gap: 8px; }
+.roster-empty {
+  text-align: center;
+  color: #999;
+  font-size: 13px;
+  padding: 28px 16px;
+  background: #fafaf9;
+  border: 1.5px dashed #d4cdc5;
+  border-radius: 8px;
+  font-style: italic;
+}
+.roster-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: #fff;
+  border: 1.5px solid #e8e3de;
+  border-radius: 8px;
+  transition: border-color .15s;
+}
+.roster-row:hover { border-color: #b8b0a5; }
+.roster-no {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #e6f0ff;
+  color: #2b6cb0;
+  font-size: 12px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.roster-info { flex: 1; min-width: 0; }
+.roster-name {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #1a2332;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.roster-meta {
+  font-size: 11.5px;
+  color: #888;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.roster-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.btn-roster-edit {
+  background: #ebf4ff;
+  color: #2b6cb0;
+  border: 1.5px solid #bee3f8;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.btn-roster-edit:hover { background: #bee3f8; }
+.btn-roster-del {
+  background: #fff5f5;
+  color: #c53030;
+  border: 1.5px solid #fed7d7;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.btn-roster-del:hover { background: #fed7d7; }
+
+/* ====== STATUS CHIPS ====== */
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 20px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.status-chip.chip-empty   { background: #fff5f5; color: #c53030; border: 1px solid #fed7d7; }
+.status-chip.chip-partial { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+.status-chip.chip-done    { background: #f0fff4; color: #276749; border: 1px solid #9ae6b4; }
+.status-chip.chip-stop    { background: #fff5f5; color: #c53030; border: 1px solid #fed7d7; letter-spacing: .5px; }

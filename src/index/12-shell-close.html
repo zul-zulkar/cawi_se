@@ -1,5 +1,29 @@
 
 </div><!-- end form-container -->
+</div><!-- end screen-main -->
+
+<!-- ====== ANGGOTA DETAIL SCREEN ====== -->
+<div id="screen-ang" class="form-screen">
+  <div class="screen-nav">
+    <button class="btn-back" onclick="exitAnggotaDetail()">&#8592; Kembali</button>
+    <span class="screen-title" id="screen-ang-title">Anggota ke-1</span>
+    <button class="btn-done" onclick="exitAnggotaDetail()">&#10003; Selesai</button>
+  </div>
+  <div class="screen-body" id="screen-ang-body"></div>
+</div>
+
+<!-- ====== USAHA DETAIL SCREEN ====== -->
+<div id="screen-usaha" class="form-screen">
+  <div class="screen-nav">
+    <button class="btn-back" onclick="exitUsahaDetail()">&#8592; Kembali</button>
+    <span class="screen-title" id="screen-usaha-title">Usaha ke-1</span>
+    <button class="btn-done" onclick="exitUsahaDetail()">&#10003; Selesai</button>
+  </div>
+  <div class="screen-body" id="screen-usaha-body">
+    <!-- Blok II section-cards dipindahkan ke sini oleh JS saat init -->
+  </div>
+  <div style="height:40px"></div>
+</div>
 
 <!-- ====== FOOTER ====== -->
 <footer class="form-footer">
@@ -9,6 +33,13 @@
     <span class="footer-note">Data yang dikumpulkan bersifat <strong>RAHASIA</strong> dan dilindungi oleh Undang-Undang No. 16 Tahun 1997 tentang Statistik</span>
   </div>
 </footer>
+
+<!-- HIDDEN POOLS -->
+<div id="anggota-pool" aria-hidden="true" style="display:none"></div>
+<div id="usaha-storage" style="display:none">
+  <input type="hidden" id="l_usaha_all_data" value="[]"/>
+  <input type="hidden" id="l_usaha_count" value="0"/>
+</div>
 
 </div><!-- end main-content -->
 </div><!-- end app-layout -->

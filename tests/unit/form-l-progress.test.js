@@ -16,7 +16,18 @@ function mockEl(value = '', { hidden = false, kbliHidden = false } = {}) {
   }
 }
 
-function makeCalc({ fields = {}, radios = {}, elements = {}, l5HasSig = false } = {}) {
+// Bangun _usahaDataStore dari fields/radios yang memiliki prefix l2_
+// agar tests Blok II lama tetap bekerja tanpa perubahan.
+// Selalu mengembalikan minimal 1 entry (kosong jika tidak ada l2_* values)
+// agar progress slots Blok II ikut dihitung (sama seperti sebelum refactor).
+function buildUsahaStore(fields, radios) {
+  const obj = {}
+  Object.keys(fields).forEach(k  => { if (k.startsWith('l2_'))  obj[k]           = fields[k];  })
+  Object.keys(radios).forEach(k  => { if (k.startsWith('l2_'))  obj['_r_' + k]   = radios[k];  })
+  return [obj]  // always 1 entry
+}
+
+function makeCalc({ fields = {}, radios = {}, elements = {}, l5HasSig = false, usahaStore = null } = {}) {
   const noop = () => {}
   const dom  = { ...elements }
   const mockDoc = {
@@ -25,11 +36,14 @@ function makeCalc({ fields = {}, radios = {}, elements = {}, l5HasSig = false } 
     addEventListener: noop,
     createElement:    ()  => ({}),
   }
+  // Inject _usahaDataStore — either explicit or auto-built from l2_* fields/radios
+  const store = usahaStore !== null ? usahaStore : buildUsahaStore(fields, radios)
   const fn = new Function(
     'document', 'window',
     'getVal', 'getRadio',
     'isValidHP', 'isValidEmail',
     'l5HasSig',
+    '_usahaDataStore', '_activeUsahaIdx', '_collectL2Fields',
     `${SOURCE}\nreturn { calcProgressL };`
   )
   return fn(
@@ -38,7 +52,8 @@ function makeCalc({ fields = {}, radios = {}, elements = {}, l5HasSig = false } 
     name  => String(radios[name] ?? ''),
     hp    => /^(\+62|62|0)[0-9]{8,13}$/.test(hp.replace(/[\s-]/g, '')),
     email => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email),
-    l5HasSig
+    l5HasSig,
+    store, null, null
   ).calcProgressL
 }
 
@@ -504,28 +519,23 @@ describe('calcProgressL() — Blok II Usaha', () => {
 
   it('y29 sum = 100 counts an extra checkmark', () => {
     const fields = {
+      l2_tahun_operasi: '2020',  // tahunan section (yr < 2026)
       l2_y29a: '50', l2_y29b: '20', l2_y29c: '10',
       l2_y29d: '10', l2_y29e: '5',  l2_y29f: '5',
     }
-    const r = calc({
-      fields,
-      elements: { l2_tahunan_wrap: mockEl('', { hidden: false }), l2_bulanan_wrap: mockEl('', { hidden: true }) },
-    })
+    const r = calc({ fields })
     expect(r.filled).toBeGreaterThanOrEqual(7)
   })
 
   it('y29 sum != 100 does not get the sum-check bonus', () => {
     const fields = {
+      l2_tahun_operasi: '2020',
       l2_y29a: '50', l2_y29b: '20', l2_y29c: '10',
       l2_y29d: '10', l2_y29e: '5',  l2_y29f: '4',  // total 99
     }
-    const r = calc({
-      fields,
-      elements: { l2_tahunan_wrap: mockEl('', { hidden: false }), l2_bulanan_wrap: mockEl('', { hidden: true }) },
-    })
+    const r = calc({ fields })
     const allRight = calc({
       fields: { ...fields, l2_y29f: '5' },
-      elements: { l2_tahunan_wrap: mockEl('', { hidden: false }), l2_bulanan_wrap: mockEl('', { hidden: true }) },
     })
     expect(allRight.filled).toBe(r.filled + 1)
   })

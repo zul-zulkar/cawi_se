@@ -1,6 +1,9 @@
 let _formDirty = false;
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Pindahkan Blok II section-cards ke screen-usaha-body (sebelum applyFormMode)
+  _initUsahaDetailScreen();
+
   // Apply current mode early (so form-l/form-lub visibility is correct)
   if (typeof applyFormMode === 'function') applyFormMode(getFormMode());
 
@@ -173,6 +176,19 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('beforeunload', e => {
     if (_formDirty) { e.preventDefault(); return (e.returnValue = ''); }
   });
+
+  // iOS Safari: back/forward gesture doesn't fire beforeunload.
+  // Auto-save on pagehide so no data is lost when user navigates away.
+  window.addEventListener('pagehide', () => {
+    try { saveAsDraft(); } catch(e) {}
+  });
+
+  // If page is restored from bfcache (iOS swipe-back), the guard state
+  // may be stale. Redirect to portal so session is re-validated cleanly.
+  // Data was already saved by pagehide + storage proxy.
+  window.addEventListener('pageshow', e => {
+    if (e.persisted) { window.location.replace('index.html'); }
+  });
 });
 
 /* ====== GUARDED NAVIGATION ======
@@ -208,6 +224,119 @@ function leaveGuardCancel() { _closeLeaveGuard(); _leaveAction = null; }
 function _closeLeaveGuard() {
   document.getElementById('leaveGuardOverlay').classList.remove('open');
   document.getElementById('leaveGuardModal').classList.remove('open');
+}
+
+/* ============================================================
+   SCREEN MANAGER + HASH ROUTER
+   Mengelola navigasi antara main screen, anggota detail, dan
+   usaha detail screen. iOS back button pada hash navigation
+   otomatis ditangani oleh popstate (tidak perlu beforeunload).
+   ============================================================ */
+
+let _activeScreen = 'main'; // 'main' | 'ang' | 'usaha'
+let _activeScreenIdx = null; // anggota ke-N atau usaha ke-N
+
+function _showScreen(type) {
+  document.querySelectorAll('.form-screen').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById('screen-' + type);
+  if (el) el.classList.add('active');
+  _activeScreen = type;
+  // Scroll ke atas saat pindah screen
+  window.scrollTo(0, 0);
+}
+
+function showMainScreen() {
+  _showScreen('main');
+  _activeScreenIdx = null;
+  // Hapus hash agar clean
+  if (location.hash) history.pushState(null, '', location.pathname + location.search);
+}
+
+function showAngDetailScreen(idx) {
+  _activeScreenIdx = idx;
+  const titleEl = document.getElementById('screen-ang-title');
+  if (titleEl) titleEl.textContent = 'Anggota ke-' + idx;
+  // Pindahkan card dari pool ke screen-ang-body
+  const pool = document.getElementById('anggota-pool');
+  const body = document.getElementById('screen-ang-body');
+  if (pool && body) {
+    const card = document.getElementById('l_ang_card_' + idx);
+    if (card) body.appendChild(card);
+  }
+  _showScreen('ang');
+  history.pushState({ screen: 'ang', idx }, '', '#ang-' + idx);
+}
+
+function showUsahaDetailScreen(idx) {
+  _activeScreenIdx = idx;
+  const titleEl = document.getElementById('screen-usaha-title');
+  if (titleEl) titleEl.textContent = 'Usaha ke-' + idx;
+  // Load data usaha N ke form l2_*
+  if (typeof loadUsahaIntoForm === 'function') loadUsahaIntoForm(idx);
+  _showScreen('usaha');
+  history.pushState({ screen: 'usaha', idx }, '', '#usaha-' + idx);
+}
+
+function exitAnggotaDetail() {
+  if (_activeScreenIdx != null) {
+    // Kembalikan card ke pool
+    const card = document.getElementById('l_ang_card_' + _activeScreenIdx);
+    const pool = document.getElementById('anggota-pool');
+    if (card && pool) pool.appendChild(card);
+    // Update baris roster
+    if (typeof renderAnggotaRosterRow === 'function') renderAnggotaRosterRow(_activeScreenIdx);
+    if (typeof updateJmlPendataan === 'function') updateJmlPendataan();
+    if (typeof updateProgress === 'function') updateProgress();
+  }
+  showMainScreen();
+}
+
+function exitUsahaDetail() {
+  if (_activeScreenIdx != null) {
+    // Simpan form l2_* ke store
+    if (typeof serializeCurrentUsahaForm === 'function') serializeCurrentUsahaForm(_activeScreenIdx);
+    // Update roster row
+    if (typeof renderUsahaRosterRow === 'function') renderUsahaRosterRow(_activeScreenIdx);
+    if (typeof updateProgress === 'function') updateProgress();
+  }
+  showMainScreen();
+}
+
+// Hash router — handle popstate (browser/iOS back button)
+function _handleHashNav() {
+  const hash = location.hash;
+  const angM = hash.match(/^#ang-(\d+)$/);
+  const usahaM = hash.match(/^#usaha-(\d+)$/);
+  if (angM) {
+    const idx = parseInt(angM[1]);
+    if (_activeScreen !== 'ang' || _activeScreenIdx !== idx) showAngDetailScreen(idx);
+  } else if (usahaM) {
+    const idx = parseInt(usahaM[1]);
+    if (_activeScreen !== 'usaha' || _activeScreenIdx !== idx) showUsahaDetailScreen(idx);
+  } else {
+    // Navigasi ke hash kosong = kembali ke main
+    if (_activeScreen === 'ang')   exitAnggotaDetail();
+    else if (_activeScreen === 'usaha') exitUsahaDetail();
+  }
+}
+window.addEventListener('popstate', _handleHashNav);
+
+/* ============================================================
+   INISIALISASI USAHA DETAIL SCREEN
+   Memindahkan semua .section-card dari #blokL2 ke #screen-usaha-body
+   saat DOM siap. blokL2 kemudian hanya berisi roster.
+   ============================================================ */
+function _initUsahaDetailScreen() {
+  const blokL2  = document.getElementById('blokL2');
+  const usahaBody = document.getElementById('screen-usaha-body');
+  if (!blokL2 || !usahaBody) return;
+  // Pindahkan nav-actions Blok II ke screen usaha juga
+  blokL2.querySelectorAll('.section-card, .notice-box, .nav-actions:last-of-type').forEach(el => {
+    // Kecualikan elemen yang sudah ditandai sebagai roster
+    if (!el.id || !el.id.startsWith('usaha-roster')) {
+      usahaBody.appendChild(el);
+    }
+  });
 }
 
 /* ============================================================

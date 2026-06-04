@@ -27,6 +27,8 @@ const ROOT  = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
 const V_SRC = readFileSync(resolve(ROOT, 'js/form-l/form-l-validation.js'), 'utf8')
 const P_SRC = readFileSync(resolve(ROOT, 'js/form-l/form-l-progress.js'), 'utf8')
 const S_SRC = readFileSync(resolve(ROOT, 'js/shared/submit.js'), 'utf8')
+// form-l.js now owns _collectL2Fields which maps l2_* fields to usaha store keys
+const F_SRC = readFileSync(resolve(ROOT, 'js/form-l/form-l.js'), 'utf8')
 
 // ── DOM / environment helpers ─────────────────────────────────────────────────
 
@@ -41,10 +43,20 @@ function mockDoc(elements = {}) {
   }
 }
 
-function runValidation({ fields = {}, radios = {}, elements = {} } = {}) {
+// Build usaha store from l2_* fields/radios (always 1 entry for backward compat)
+function buildStoreC(fields, radios) {
+  const obj = {}
+  Object.keys(fields).forEach(k => { if (k.startsWith('l2_'))  obj[k]         = fields[k]; })
+  Object.keys(radios).forEach(k => { if (k.startsWith('l2_'))  obj['_r_' + k] = radios[k]; })
+  return [obj]
+}
+
+function runValidation({ fields = {}, radios = {}, elements = {}, usahaStore = null } = {}) {
+  const store = usahaStore !== null ? usahaStore : buildStoreC(fields, radios)
   const fn = new Function(
     'document', 'window', 'getVal', 'getRadio',
     'isValidHP', 'isValidEmail', 'l5HasSig',
+    '_usahaDataStore', '_activeUsahaIdx', '_collectL2Fields',
     `${V_SRC}\nreturn collectAllProblemsL();`
   )
   return fn(
@@ -53,14 +65,17 @@ function runValidation({ fields = {}, radios = {}, elements = {} } = {}) {
     name => String(radios[name] ?? ''),
     hp   => /^(\+62|62|0)[0-9]{8,13}$/.test(hp.replace(/[\s-]/g, '')),
     em   => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em),
-    false
+    false,
+    store, null, null
   )
 }
 
-function runProgress({ fields = {}, radios = {}, elements = {} } = {}) {
+function runProgress({ fields = {}, radios = {}, elements = {}, usahaStore = null } = {}) {
+  const store = usahaStore !== null ? usahaStore : buildStoreC(fields, radios)
   const fn = new Function(
     'document', 'window', 'getVal', 'getRadio',
     'isValidHP', 'isValidEmail', 'l5HasSig',
+    '_usahaDataStore', '_activeUsahaIdx', '_collectL2Fields',
     `${P_SRC}\nreturn calcProgressL();`
   )
   return fn(
@@ -69,7 +84,8 @@ function runProgress({ fields = {}, radios = {}, elements = {} } = {}) {
     name => String(radios[name] ?? ''),
     hp   => /^(\+62|62|0)[0-9]{8,13}$/.test(hp.replace(/[\s-]/g, '')),
     em   => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em),
-    false
+    false,
+    store, null, null
   )
 }
 
@@ -182,37 +198,30 @@ describe('Consistency: internet_b1-b6 (16b) — both pillars agree on conditiona
 
 // ── Pillar 3: collectDataL source includes all required radio fields ───────────
 
-describe('Consistency: Pillar 3 — collectDataL() collects all required radio fields', () => {
+describe('Consistency: Pillar 3 — usaha fields collected via _collectL2Fields in form-l.js', () => {
   /**
-   * Maps HTML field name → key name used in collectDataL() return object.
-   * Both must appear in submit.js source for the answer to reach the server.
+   * With multi-usaha architecture, form-l.js._collectL2Fields() serializes
+   * all l2_* fields into the usaha store. submit.js then passes the store
+   * as usaha_data JSON array. Verify field names appear in the right source.
    */
-  const COLLECT_MAP = [
-    ['l2_internet',    'internet'],
-    ['l2_internet_b1', 'internet_b1'],
-    ['l2_internet_b2', 'internet_b2'],
-    ['l2_internet_b3', 'internet_b3'],
-    ['l2_internet_b4', 'internet_b4'],
-    ['l2_internet_b5', 'internet_b5'],
-    ['l2_internet_b6', 'internet_b6'],
-    ['l2_teknologi',   'teknologi'],
-    ['l2_ramah_a',     'ramah_lingkungan'],
-    ['l2_ramah_b',     'biaya_lingkungan'],
-    ['l2_kreatif',     'produk_kreatif'],
-    ['l2_halal',       'halal'],
-    ['l2_bpom',        'bpom'],
-    ['l2_mitra_kdkmp', 'mitra_kdkmp'],
-    ['l2_mbg',         'program_mbg'],
-    ['l2_nonpend_a',   'transaksi_barang_nonpenduduk'],
-    ['l2_nonpend_b',   'transaksi_jual_jasa_nonpenduduk'],
-    ['l2_nonpend_c',   'transaksi_beli_jasa_nonpenduduk'],
+
+  it('submit.js collects usaha_data (JSON array of all usaha)', () => {
+    expect(S_SRC).toContain('usaha_data')
+    expect(S_SRC).toContain('_usahaDataStore')
+  })
+
+  const L2_FIELD_IDS = [
+    'l2_internet', 'l2_internet_b1', 'l2_internet_b2', 'l2_internet_b3',
+    'l2_internet_b4', 'l2_internet_b5', 'l2_internet_b6',
+    'l2_teknologi', 'l2_ramah_a', 'l2_ramah_b', 'l2_kreatif',
+    'l2_halal', 'l2_bpom', 'l2_mitra_kdkmp', 'l2_mbg',
+    'l2_nonpend_a', 'l2_nonpend_b', 'l2_nonpend_c',
   ]
 
-  for (const [fieldId, collectKey] of COLLECT_MAP) {
-    it(`'${fieldId}' is referenced in collectDataL() as '${collectKey}'`, () => {
-      // Both the HTML field name and the data key must appear in submit.js
-      expect(S_SRC).toContain(fieldId)
-      expect(S_SRC).toContain(collectKey)
+  for (const fieldId of L2_FIELD_IDS) {
+    it(`'${fieldId}' is serialized by _collectL2Fields in form-l.js`, () => {
+      // Field must appear in form-l.js _collectL2Fields (in textIds or radioNames)
+      expect(F_SRC).toContain(fieldId)
     })
   }
 })

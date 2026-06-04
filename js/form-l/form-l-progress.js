@@ -89,122 +89,85 @@ function calcProgressL() {
     }
   }
 
-  /* === BLOK II: Usaha === */
-  c(!!getVal('l2_nama_usaha'));
-  c(!!getVal('l2_alamat'));
-  const hp2 = getVal('l2_hp');
-  if (hp2) c(isValidHP(hp2));
-  const kw = getRadio('l2_kawasan');
-  c(!!kw);
-  if (kw && kw !== '10') c(!!getVal('l2_nama_kawasan'));
-  c(!!getRadio('l2_jenis_usaha'));
-  const nibR = getRadio('l2_punya_nib');
-  c(!!nibR);
-  if (nibR === '1') c(getVal('l2_nib').length === 13);
-  if (nibR === '2') c(!!getRadio('l2_nib_alasan'));
-  if (getRadio('l2_nib_alasan') === '5') c(!!getVal('l2_nib_alasan_lain'));
-  c(!!getRadio('l2_badan_usaha'));
-  c(!!getVal('l2_pengusaha_nama'));
-  c(!!getRadio('l2_pengusaha_jk'));
-  const uP = parseInt(getVal('l2_pengusaha_umur'));
-  c(!!getVal('l2_pengusaha_umur') && uP >= 17 && uP <= 120);
-  c(getVal('l2_pengusaha_nik').length === 16);
-  c(!!getVal('l2_kegiatan_utama'));
-  const lb1 = getRadio('l2_b1'), lb2 = getRadio('l2_b2');
-  c(!!lb1); c(!!lb2);
-  const showLb3 = lb1 === '2' && lb2 === '2';
-  if (showLb3) c(!!getRadio('l2_b3'));
-  const lb3 = showLb3 ? getRadio('l2_b3') : '';
-  const showLb4 = showLb3 && lb3 === '2';
-  if (showLb4) c(!!getRadio('l2_b4'));
-  const showLc = lb2 === '1' || (showLb3 && lb3 === '1');
-  if (showLc) c(!!getRadio('l2_c'));
-  const showLde = lb1 === '1' && lb2 === '2';
-  if (showLde) { c(!!getVal('l2_input')); c(!!getVal('l2_proses')); }
-  c(!!getVal('l2_produk_utama'));
-  c(!!getVal('l2_kbli_kode'));
-  const lHotelW = document.getElementById('l2_hotel_wrap');
-  if (lHotelW && !lHotelW.classList.contains('hidden')) c(!!getRadio('l2_hotel'));
-  const jR = getRadio('l2_jaringan');
-  c(!!jR);
-  if (jR === '2') c(!!getVal('l2_jml_cabang'));
-  /* Rincian 16a: Internet */
-  const intV = getRadio('l2_internet');
-  c(!!intV);
-  /* Rincian 16b: Tujuan penggunaan internet (kondisional: internet=1) */
-  if (intV === '1') {
-    ['l2_internet_b1','l2_internet_b2','l2_internet_b3',
-     'l2_internet_b4','l2_internet_b5','l2_internet_b6'].forEach(n => c(!!getRadio(n)));
-  }
-  /* Rincian 16c: Teknologi digital */
-  c(!!getRadio('l2_teknologi'));
-  /* Rincian 17a: Produk ramah lingkungan */
-  c(!!getRadio('l2_ramah_a'));
-  /* Rincian 17b: Input perlindungan lingkungan */
-  c(!!getRadio('l2_ramah_b'));
-  /* Rincian 18: Produk karya seni/sastra/desain/teknologi/warisan */
-  c(!!getRadio('l2_kreatif'));
-  /* Rincian 19/20: Halal & BPOM — ikuti kbli-hidden sama seperti validation */
-  const _hHalalP = document.getElementById('sec-L2-19');
-  const _cHalalP = _hHalalP && _hHalalP.closest('.section-card');
-  const showL2HalalP = !_cHalalP || !_cHalalP.classList.contains('kbli-hidden');
-  const _hBpomP  = document.getElementById('sec-L2-20');
-  const _cBpomP  = _hBpomP  && _hBpomP.closest('.section-card');
-  const showL2BpomP  = !_cBpomP  || !_cBpomP.classList.contains('kbli-hidden');
-  if (showL2HalalP) {
-    c(!!getRadio('l2_halal'));
-    if (getRadio('l2_halal') === '1') {
-      c(getVal('l2_halal_b') !== '');
-      c(getVal('l2_halal_c') !== '');
+  /* === BLOK II: Usaha (multi-usaha, iterate _usahaDataStore) === */
+  function calcOneUsahaProgress(d) {
+    c(!!d.l2_nama_usaha);
+    c(!!d.l2_alamat);
+    const kw = d['_r_l2_kawasan'] || '';
+    c(!!kw);
+    if (kw && kw !== '10') c(!!d.l2_nama_kawasan);
+    c(!!d['_r_l2_jenis_usaha']);
+    const nibR = d['_r_l2_punya_nib'] || '';
+    c(!!nibR);
+    if (nibR === '1') c((d.l2_nib || '').length === 13);
+    if (nibR === '2') c(!!d['_r_l2_nib_alasan']);
+    if (d['_r_l2_nib_alasan'] === '5') c(!!d.l2_nib_alasan_lain);
+    c(!!d['_r_l2_badan_usaha']);
+    c(!!d.l2_pengusaha_nama);
+    c(!!d['_r_l2_pengusaha_jk']);
+    const uP = parseInt(d.l2_pengusaha_umur || '');
+    c(!!d.l2_pengusaha_umur && uP >= 17 && uP <= 120);
+    c((d.l2_pengusaha_nik || '').length === 16);
+    c(!!d.l2_kegiatan_utama);
+    const lb1 = d['_r_l2_b1'] || '', lb2 = d['_r_l2_b2'] || '';
+    c(!!lb1); c(!!lb2);
+    const showLb3 = lb1 === '2' && lb2 === '2';
+    if (showLb3) c(!!d['_r_l2_b3']);
+    const lb3 = showLb3 ? (d['_r_l2_b3'] || '') : '';
+    if (showLb3 && lb3 === '2') c(!!d['_r_l2_b4']);
+    const showLc = lb2 === '1' || (showLb3 && lb3 === '1');
+    if (showLc) c(!!d['_r_l2_c']);
+    const showLde = lb1 === '1' && lb2 === '2';
+    if (showLde) { c(!!d.l2_input); c(!!d.l2_proses); }
+    c(!!d.l2_produk_utama);
+    c(!!d.l2_kbli_kode);
+    c(!!d['_r_l2_jaringan']);
+    if (d['_r_l2_jaringan'] === '2') c(!!d.l2_jml_cabang);
+    c(!!d['_r_l2_internet']);
+    if (d['_r_l2_internet'] === '1') {
+      ['b1','b2','b3','b4','b5','b6'].forEach(s => c(!!d['_r_l2_internet_' + s]));
+    }
+    c(!!d['_r_l2_teknologi']);
+    c(!!d['_r_l2_ramah_a']);
+    c(!!d['_r_l2_ramah_b']);
+    c(!!d['_r_l2_kreatif']);
+    c(!!d['_r_l2_halal']);
+    if (d['_r_l2_halal'] === '1') {
+      c(d.l2_halal_b !== '' && d.l2_halal_b !== undefined);
+      c(d.l2_halal_c !== '' && d.l2_halal_c !== undefined);
+    }
+    c(!!d['_r_l2_bpom']);
+    if (d['_r_l2_bpom'] === '1') {
+      c(d.l2_bpom_b !== '' && d.l2_bpom_b !== undefined);
+      c(d.l2_bpom_c !== '' && d.l2_bpom_c !== undefined);
+    }
+    c(!!d['_r_l2_mitra_kdkmp']);
+    c(!!d['_r_l2_mbg']);
+    c(!!d['_r_l2_nonpend_a']);
+    c(!!d['_r_l2_nonpend_b']);
+    c(!!d['_r_l2_nonpend_c']);
+    c(d.l2_pekerja_l !== '' && d.l2_pekerja_l !== undefined);
+    c(d.l2_pekerja_p !== '' && d.l2_pekerja_p !== undefined);
+    const yrU = parseInt(d.l2_tahun_operasi || '');
+    c(!!d.l2_tahun_operasi && yrU >= 1900 && yrU <= 2026);
+    // y29 sum (tahunan, tahun < 2026) — only count when all y29 fields are present
+    if (yrU >= 1900 && yrU < 2026) {
+      const y29ids = ['l2_y29a','l2_y29b','l2_y29c','l2_y29d','l2_y29e','l2_y29f'];
+      if (y29ids.every(id => d[id] !== undefined && d[id] !== '')) {
+        y29ids.forEach(id => c(true));
+        const tot = y29ids.map(id => parseFloat(d[id])||0).reduce((a,b)=>a+b,0);
+        c(Math.abs(tot-100) <= 0.01);
+      }
     }
   }
-  if (showL2BpomP) {
-    c(!!getRadio('l2_bpom'));
-    if (getRadio('l2_bpom') === '1') {
-      c(getVal('l2_bpom_b') !== '');
-      c(getVal('l2_bpom_c') !== '');
-    }
-  }
-  /* Rincian 21: Mitra KDKMP */
-  c(!!getRadio('l2_mitra_kdkmp'));
-  /* Rincian 22: Program MBG */
-  c(!!getRadio('l2_mbg'));
-  /* Rincian 23: Transaksi non-penduduk */
-  c(!!getRadio('l2_nonpend_a'));
-  c(!!getRadio('l2_nonpend_b'));
-  c(!!getRadio('l2_nonpend_c'));
-  /* Pekerja & tahun operasi */
-  c(getVal('l2_pekerja_l') !== '');
-  c(getVal('l2_pekerja_p') !== '');
-  const yr = parseInt(getVal('l2_tahun_operasi'));
-  c(!!getVal('l2_tahun_operasi') && yr >= 1900 && yr <= 2026);
-  /* Tahunan vs Bulanan: hitung sesuai container yang aktif */
-  const lTahunanW = document.getElementById('l2_tahunan_wrap');
-  const lBulananW = document.getElementById('l2_bulanan_wrap');
-  if (lTahunanW && !lTahunanW.classList.contains('hidden')) {
-    ['l2_y26a','l2_y26b','l2_y26c','l2_y26d','l2_y26e'].forEach(id => c(getVal(id) !== ''));
-    ['l2_y27a','l2_y27b'].forEach(id => c(getVal(id) !== ''));
-    c(getVal('l2_y27d') !== '');
-    ['l2_y28a','l2_y28b'].forEach(id => c(getVal(id) !== ''));
-    const m29 = ['l2_y29a','l2_y29b','l2_y29c','l2_y29d','l2_y29e','l2_y29f'];
-    m29.forEach(id => c(getVal(id) !== ''));
-    if (m29.every(id => getVal(id) !== '')) {
-      const tot = m29.map(id => parseFloat(getVal(id)) || 0).reduce((a,b) => a+b, 0);
-      c(Math.abs(tot - 100) < 0.01);
-    }
-  }
-  if (lBulananW && !lBulananW.classList.contains('hidden')) {
-    ['l2_m30a','l2_m30b','l2_m30c','l2_m30d','l2_m30e'].forEach(id => c(getVal(id) !== ''));
-    ['l2_m31a','l2_m31b'].forEach(id => c(getVal(id) !== ''));
-    c(getVal('l2_m31d') !== '');
-    ['l2_m32a','l2_m32b'].forEach(id => c(getVal(id) !== ''));
-    const m33 = ['l2_m33a','l2_m33b','l2_m33c','l2_m33d','l2_m33e','l2_m33f'];
-    m33.forEach(id => c(getVal(id) !== ''));
-    if (m33.every(id => getVal(id) !== '')) {
-      const tot = m33.map(id => parseFloat(getVal(id)) || 0).reduce((a,b) => a+b, 0);
-      c(Math.abs(tot - 100) < 0.01);
-    }
-  }
+
+  const _uList = (typeof _usahaDataStore !== 'undefined') ? _usahaDataStore : [];
+  const activeUsahaIdx = (typeof _activeUsahaIdx !== 'undefined') ? _activeUsahaIdx : null;
+  _uList.forEach((u, i) => {
+    const idx = i + 1;
+    const data = (activeUsahaIdx === idx && typeof _collectL2Fields === 'function') ? _collectL2Fields() : u;
+    calcOneUsahaProgress(data);
+  });
 
   /* === BLOK III: Perumahan & Aset === */
   const jb = getRadio('l3_jenis_bangunan');

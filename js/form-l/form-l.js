@@ -1,30 +1,163 @@
 ﻿/* ====== L FORM HANDLERS ====== */
 
-/* --- L1 Anggota Cards --- */
+/* --- L1 Anggota Roster --- */
+
+// Jumlah anggota saat ini (sinkron dengan #l1_jml_kk_anggota hidden input)
+function _getAnggotaCount() {
+  const el = document.getElementById('l1_jml_kk_anggota');
+  return el ? (parseInt(el.value) || 0) : 0;
+}
+function _setAnggotaCount(n) {
+  const el = document.getElementById('l1_jml_kk_anggota');
+  if (el) el.value = n;
+}
+
+// Pastikan card untuk anggota ke-i ada di pool (buat jika belum ada)
+function _ensureAnggotaCard(i) {
+  if (document.getElementById('l_ang_card_' + i)) return;
+  const pool = document.getElementById('anggota-pool');
+  if (!pool) return;
+  pool.insertAdjacentHTML('beforeend', anggotaCardHTML(i));
+  initAnggotaSearchable(i);
+}
+
+// Tambah anggota baru ke roster
+function addAnggota() {
+  const current = _getAnggotaCount();
+  if (current >= 30) { alert('Maksimal 30 anggota keluarga.'); return; }
+  const newIdx = current + 1;
+  _setAnggotaCount(newIdx);
+  _ensureAnggotaCard(newIdx);
+  renderAnggotaRoster();
+  updateSidebarAnggota(newIdx);
+  updateJmlPendataan();
+  if (typeof updateProgress === 'function') updateProgress();
+  // Langsung buka form detail anggota baru
+  if (typeof showAngDetailScreen === 'function') showAngDetailScreen(newIdx);
+}
+
+// Hapus anggota ke-i dan geser indeks
+function deleteAnggota(i) {
+  const total = _getAnggotaCount();
+  if (!confirm('Hapus anggota ke-' + i + '? Data yang sudah diisi akan hilang.')) return;
+  // Shift data dari i+1..total ke i..total-1
+  for (let j = i; j < total; j++) {
+    _shiftAnggotaFields(j + 1, j);
+  }
+  // Hapus card terakhir dari pool
+  const lastCard = document.getElementById('l_ang_card_' + total);
+  if (lastCard) lastCard.remove();
+  _setAnggotaCount(total - 1);
+  renderAnggotaRoster();
+  updateSidebarAnggota(total - 1);
+  updateJmlPendataan();
+  if (typeof updateProgress === 'function') updateProgress();
+}
+
+// Copy semua field dari anggota `src` ke anggota `dst`
+function _shiftAnggotaFields(src, dst) {
+  _ensureAnggotaCard(dst);
+  const fieldsTxt = ['nama','nik','hubungan','alamat_dom_note','dn_provinsi','dn_kab','ln_negara','tgl_lahir','profesi','kronis_q_lain','18a_nilai','18b_nilai','18c_nilai'];
+  fieldsTxt.forEach(f => {
+    const s = document.getElementById('l_ang_' + src + '_' + f);
+    const d = document.getElementById('l_ang_' + dst + '_' + f);
+    if (s && d) { d.value = s.value; s.value = ''; }
+  });
+  // Selects
+  ['hubungan','dn_provinsi'].forEach(f => {
+    const s = document.getElementById('l_ang_' + src + '_' + f);
+    const d = document.getElementById('l_ang_' + dst + '_' + f);
+    if (s && d) { d.value = s.value; s.value = ''; }
+  });
+  // Radios
+  const radioGroups = ['keberadaan','alamat_dom','kawin','jk','sekolah','ijazah','rekening','kedudukan','18a','18b','18c',
+    'disab_a','disab_b','disab_c','disab_d','disab_e','disab_f',
+    'kronis_a','kronis_b','kronis_c','kronis_d','kronis_e','kronis_f','kronis_g','kronis_h',
+    'kronis_i','kronis_j','kronis_k','kronis_l','kronis_m','kronis_n','kronis_o','kronis_p'];
+  radioGroups.forEach(g => {
+    const srcVal = document.querySelector(`input[name="l_ang_${src}_${g}"]:checked`);
+    const dstRadio = srcVal ? document.querySelector(`input[name="l_ang_${dst}_${g}"][value="${srcVal.value}"]`) : null;
+    // Clear dst
+    document.querySelectorAll(`input[name="l_ang_${dst}_${g}"]`).forEach(r => { r.checked = false; });
+    if (dstRadio) { dstRadio.checked = true; dstRadio.dispatchEvent(new Event('change', {bubbles:true})); }
+    // Clear src
+    if (srcVal) { srcVal.checked = false; srcVal.dispatchEvent(new Event('change', {bubbles:true})); }
+  });
+  // Umur (readonly, dihitung dari tgl_lahir)
+  if (typeof computeUmurAnggota === 'function') { computeUmurAnggota(dst); computeUmurAnggota(src); }
+}
+
+// Render satu baris roster (update jika sudah ada)
+function renderAnggotaRosterRow(i) {
+  const list = document.getElementById('l1_roster_list');
+  if (!list) return;
+  const existing = document.getElementById('l_ang_row_' + i);
+  const html = _anggotaRosterRowHTML(i);
+  if (existing) { existing.outerHTML = html; }
+  else { list.insertAdjacentHTML('beforeend', html); }
+}
+
+// Render seluruh roster table
+function renderAnggotaRoster() {
+  const list = document.getElementById('l1_roster_list');
+  const empty = document.getElementById('l1_roster_empty');
+  const countEl = document.getElementById('l1_roster_count');
+  if (!list) return;
+  const n = _getAnggotaCount();
+  list.innerHTML = '';
+  for (let i = 1; i <= n; i++) {
+    list.insertAdjacentHTML('beforeend', _anggotaRosterRowHTML(i));
+  }
+  if (empty) empty.style.display = n > 0 ? 'none' : '';
+  if (countEl) countEl.textContent = n + ' anggota';
+}
+
+function _anggotaRosterRowHTML(i) {
+  const nama  = (document.getElementById('l_ang_' + i + '_nama') || {}).value || '';
+  const hub   = (document.getElementById('l_ang_' + i + '_hubungan') || {});
+  const hubTxt = hub.selectedIndex > 0 ? hub.options[hub.selectedIndex].text : '';
+  const keb   = document.querySelector(`input[name="l_ang_${i}_keberadaan"]:checked`);
+  const kebV  = keb ? keb.value : '';
+  const STOP  = (kebV === '2' || kebV === '6' || kebV === '7');
+
+  let statusCls, statusTxt;
+  if (!nama && !kebV) { statusCls = 'chip-empty'; statusTxt = 'Belum diisi'; }
+  else if (STOP)      { statusCls = 'chip-stop';  statusTxt = 'STOP'; }
+  else if (!nama || !kebV || !document.querySelector(`input[name="l_ang_${i}_jk"]:checked`)) {
+    statusCls = 'chip-partial'; statusTxt = 'Belum lengkap';
+  } else { statusCls = 'chip-done'; statusTxt = 'Terisi'; }
+
+  const displayName = nama || ('Anggota ke-' + i);
+  const meta = [hubTxt, kebV ? 'Keberadaan: ' + kebV : ''].filter(Boolean).join(' · ');
+  return `<div class="roster-row" id="l_ang_row_${i}">
+    <div class="roster-no">${i}</div>
+    <div class="roster-info">
+      <div class="roster-name">${displayName}</div>
+      <div class="roster-meta">${meta || 'Belum ada data'}</div>
+    </div>
+    <span class="status-chip ${statusCls}">${statusTxt}</span>
+    <div class="roster-actions">
+      <button class="btn-roster-edit" type="button" onclick="if(typeof showAngDetailScreen==='function')showAngDetailScreen(${i})">Edit</button>
+      <button class="btn-roster-del"  type="button" onclick="deleteAnggota(${i})">Hapus</button>
+    </div>
+  </div>`;
+}
+
+// renderAnggotaCards dipanggil oleh draft.js — render semua ke pool lalu update roster
 function renderAnggotaCards() {
-  const wrap = document.getElementById('l1_anggota_wrap');
-  const empty = document.getElementById('l1_anggota_empty');
-  if (!wrap) return;
-  const n = parseInt(document.getElementById('l1_jml_kk_anggota').value) || 0;
-  const capped = Math.min(Math.max(n, 0), 30);
-  if (capped <= 0) {
-    wrap.innerHTML = '';
-    if (empty) empty.style.display = '';
+  const n = _getAnggotaCount();
+  if (n <= 0) {
+    renderAnggotaRoster();
     updateSidebarAnggota(0);
     updateJmlPendataan();
     if (typeof updateProgress === 'function') updateProgress();
     return;
   }
-  if (empty) empty.style.display = 'none';
-  // Only re-render if count changed
-  if (wrap.dataset.count === String(capped)) return;
-  wrap.dataset.count = capped;
-  wrap.innerHTML = '';
-  for (let i = 1; i <= capped; i++) {
-    wrap.insertAdjacentHTML('beforeend', anggotaCardHTML(i));
-    initAnggotaSearchable(i);
+  for (let i = 1; i <= n; i++) {
+    _ensureAnggotaCard(i);
   }
-  updateSidebarAnggota(capped);
+  renderAnggotaRoster();
+  updateSidebarAnggota(n);
   updateJmlPendataan();
   if (typeof updateProgress === 'function') updateProgress();
 }
@@ -302,28 +435,20 @@ function penyakitKronisRowsHTML(i) {
     </div>`).join('');
 }
 
-function toggleAnggotaCard(i) {
-  const body = document.getElementById('l_ang_body_' + i);
-  const icon = document.getElementById('l_ang_toggle_' + i);
-  if (!body) return;
-  const hidden = body.style.display === 'none';
-  body.style.display = hidden ? '' : 'none';
-  if (icon) icon.innerHTML = hidden ? '&#9660;' : '&#9658;';
-}
+// toggleAnggotaCard — tidak lagi digunakan dengan roster, dipertahankan agar tidak error
+function toggleAnggotaCard(i) {}
 
 function updateAnggotaNamePreview(i) {
   const el = document.getElementById('l_ang_' + i + '_nama');
   const name = el ? el.value.trim() : '';
-  const out = document.getElementById('l_ang_' + i + '_name_preview');
-  if (out) out.textContent = name ? '— ' + name : '';
   const ctx = document.getElementById('l_ang_' + i + '_ctx_nama');
-  if (ctx) ctx.textContent = name ? ' ' + name : ' (nama belum diisi)';
-  // Perbarui data-ang-nama pada card agar tiap pertanyaan menampilkan nama via CSS ::after
+  if (ctx) ctx.textContent = name ? ' ' + name : ' (nama belum diisi)';
   const card = document.getElementById('l_ang_card_' + i);
   if (card) {
     if (name) card.setAttribute('data-ang-nama', name);
     else card.removeAttribute('data-ang-nama');
   }
+  if (document.getElementById('l_ang_row_' + i)) renderAnggotaRosterRow(i);
 }
 
 function updateSidebarAnggota(count) {
@@ -336,22 +461,19 @@ function updateSidebarAnggota(count) {
   for (let i = 1; i <= count; i++) {
     const div = document.createElement('div');
     div.className = 'sidebar-q-item sidebar-q-sub';
-    div.setAttribute('onclick', `goBlokAndScrollId(1,'l_ang_card_${i}')`);
-    div.textContent = '↳ Anggota #' + i;
+    div.setAttribute('onclick', `if(typeof showAngDetailScreen==='function')showAngDetailScreen(${i})`);
+    div.textContent = '↓ Anggota #' + i;
     items.appendChild(div);
   }
 }
 
 function updateJmlPendataan() {
-  const wrap = document.getElementById('l1_anggota_wrap');
-  if (!wrap) return;
-  const cards = wrap.querySelectorAll('.anggota-card');
+  const n = _getAnggotaCount();
   let filled = 0;
-  cards.forEach(card => {
-    const id = card.id.replace('l_ang_card_', '');
-    const nama = document.getElementById('l_ang_' + id + '_nama');
+  for (let i = 1; i <= n; i++) {
+    const nama = document.getElementById('l_ang_' + i + '_nama');
     if (nama && nama.value.trim()) filled++;
-  });
+  }
   const out = document.getElementById('l1_jml_pendataan');
   if (out) out.value = filled || '';
 }
@@ -570,6 +692,275 @@ async function handleDnProvinsiAnggota(i) {
     sel.innerHTML = '<option value="">-- Gagal memuat --</option>';
     sel.disabled = false;
   }
+}
+
+/* ====== L2 USAHA ROSTER (multi-usaha) ======
+ * Data setiap usaha disimpan dalam _usahaDataStore (array JS) dan
+ * di-mirror ke hidden input #l_usaha_all_data agar ikut draft save/restore.
+ * Form l2_* dipakai sebagai "edit form" aktif — hanya satu usaha aktif
+ * dalam DOM sekaligus; data usaha lain tersimpan di store.
+ */
+
+let _usahaDataStore = [];   // array of objects, index 0 = usaha ke-1
+let _activeUsahaIdx = null; // 1-based, usaha yang sedang diedit di form
+
+/* ---- Store persistence ---- */
+
+function _saveUsahaStoreToDom() {
+  const el = document.getElementById('l_usaha_all_data');
+  if (el) el.value = JSON.stringify(_usahaDataStore);
+  const cntEl = document.getElementById('l_usaha_count');
+  if (cntEl) cntEl.value = _usahaDataStore.length;
+}
+
+function syncUsahaStoreFromDom() {
+  const el = document.getElementById('l_usaha_all_data');
+  try { _usahaDataStore = JSON.parse((el && el.value) || '[]'); }
+  catch(e) { _usahaDataStore = []; }
+}
+
+/* ---- Serialize / Deserialize form l2_* ↔ store ---- */
+
+function serializeCurrentUsahaForm(idx) {
+  if (!idx || idx < 1) return;
+  const obj = _collectL2Fields();
+  _usahaDataStore[idx - 1] = obj;
+  _saveUsahaStoreToDom();
+}
+
+function loadUsahaIntoForm(idx) {
+  if (!idx || idx < 1) return;
+  _activeUsahaIdx = idx;
+  const obj = _usahaDataStore[idx - 1] || {};
+  _applyL2Fields(obj);
+  rehydrateUsahaConditionals();
+}
+
+function _collectL2Fields() {
+  const obj = {};
+  // text / number / select / textarea
+  const textIds = [
+    'l2_nama_usaha','l2_nama_komersial','l2_alamat','l2_rt','l2_rw','l2_kodepos',
+    'l2_email','l2_website','l2_hp','l2_nama_kawasan','l2_lokasi_alamat',
+    'l2_lokasi_provinsi','l2_lokasi_kab','l2_nib','l2_nib_alasan_lain',
+    'l2_pengusaha_nama','l2_pengusaha_umur','l2_pengusaha_nik','l2_kegiatan_utama',
+    'l2_input','l2_proses','l2_produk_utama','l2_kbli_kode','l2_kbli_search',
+    'l2_kbli_kategori','l2_kbli_kategori_display','l2_jml_cabang',
+    'l2_kp_nama','l2_kp_negara','l2_kp_alamat','l2_kp_email','l2_kp_provinsi','l2_kp_kab',
+    'l2_halal_b','l2_halal_c','l2_bpom_b','l2_bpom_c',
+    'l2_pekerja_l','l2_pekerja_p','l2_pekerja_dibayar','l2_pekerja_tidak_dibayar','l2_tahun_operasi',
+    'l2_y26a','l2_y26b','l2_y26c','l2_y26d','l2_y26e','l2_y26f',
+    'l2_y27a','l2_y27b','l2_y27c','l2_y27d',
+    'l2_y28a','l2_y28b','l2_y28c','l2_y28c1','l2_y28d',
+    'l2_y29a','l2_y29b','l2_y29c','l2_y29d','l2_y29e','l2_y29f','l2_y29g',
+    'l2_m30a','l2_m30b','l2_m30c','l2_m30d','l2_m30e','l2_m30f',
+    'l2_m31a','l2_m31b','l2_m31c','l2_m31d',
+    'l2_m32a','l2_m32b','l2_m32c','l2_m32c1','l2_m32d',
+    'l2_m33a','l2_m33b','l2_m33c','l2_m33d','l2_m33e','l2_m33f','l2_m33g',
+  ];
+  textIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) obj[id] = el.value;
+  });
+  // radio groups
+  const radioNames = [
+    'l2_kawasan','l2_jenis_usaha','l2_punya_nib','l2_nib_alasan','l2_badan_usaha',
+    'l2_kdkmp','l2_koperasi_jenis','l2_lap_keuangan','l2_pengusaha_jk',
+    'l2_b1','l2_b2','l2_b3','l2_b4','l2_c','l2_hotel','l2_jaringan',
+    'l2_internet','l2_internet_b1','l2_internet_b2','l2_internet_b3',
+    'l2_internet_b4','l2_internet_b5','l2_internet_b6',
+    'l2_teknologi','l2_ramah_a','l2_ramah_b','l2_kreatif',
+    'l2_halal','l2_bpom','l2_mitra_kdkmp','l2_mbg',
+    'l2_nonpend_a','l2_nonpend_b','l2_nonpend_c',
+  ];
+  radioNames.forEach(name => {
+    const checked = document.querySelector(`input[name="${name}"]:checked`);
+    obj['_r_' + name] = checked ? checked.value : '';
+  });
+  // checkboxes (bulan beroperasi 2026)
+  for (let i = 1; i <= 8; i++) {
+    const cb = document.getElementById('l2_m31e_' + i);
+    obj['_c_l2_m31e_' + i] = cb && cb.checked ? '1' : '0';
+  }
+  // KBLI chip visibility
+  const chip = document.getElementById('l2_kbli_chip');
+  obj['_kbli_chip_visible'] = chip && chip.style.display !== 'none' ? '1' : '0';
+  return obj;
+}
+
+function _applyL2Fields(obj) {
+  if (!obj) return;
+  // Clear all first
+  _clearL2Fields();
+  // text / number / select / textarea
+  Object.keys(obj).forEach(key => {
+    if (key.startsWith('_')) return;
+    const el = document.getElementById(key);
+    if (el && !el.readOnly && !el.disabled) {
+      el.value = obj[key] || '';
+    }
+  });
+  // radio groups
+  Object.keys(obj).forEach(key => {
+    if (!key.startsWith('_r_')) return;
+    const name = key.slice(3);
+    const val = obj[key];
+    document.querySelectorAll(`input[name="${name}"]`).forEach(r => { r.checked = false; });
+    if (val) {
+      const radio = document.querySelector(`input[name="${name}"][value="${val}"]`);
+      if (radio) radio.checked = true;
+    }
+  });
+  // checkboxes
+  for (let i = 1; i <= 8; i++) {
+    const cb = document.getElementById('l2_m31e_' + i);
+    if (cb) cb.checked = (obj['_c_l2_m31e_' + i] === '1');
+  }
+  // KBLI chip
+  const kode = (document.getElementById('l2_kbli_kode') || {}).value;
+  const chip = document.getElementById('l2_kbli_chip');
+  const searchEl = document.getElementById('l2_kbli_search');
+  if (kode && chip) {
+    chip.style.display = '';
+    const chipText = document.getElementById('l2_kbli_chip_text');
+    const chipUraian = document.getElementById('l2_kbli_chip_uraian');
+    if (chipText) chipText.textContent = kode;
+    if (chipUraian) chipUraian.textContent = searchEl ? searchEl.value : '';
+    if (searchEl) searchEl.style.display = 'none';
+    const dropWrap = document.querySelector('.ac-wrap');
+    if (dropWrap) dropWrap.style.display = 'none';
+  } else if (chip) {
+    chip.style.display = 'none';
+    if (searchEl) searchEl.style.display = '';
+    const dropWrap = document.querySelector('.ac-wrap');
+    if (dropWrap) dropWrap.style.display = '';
+  }
+  // Apply kbli filter (Halal/BPOM visibility)
+  if (typeof applyKBLIFilter === 'function') applyKBLIFilter();
+}
+
+function _clearL2Fields() {
+  document.querySelectorAll('[id^="l2_"]').forEach(el => {
+    if (el.readOnly || el.disabled) return;
+    if (el.type === 'radio' || el.type === 'checkbox') { el.checked = false; return; }
+    el.value = '';
+  });
+  // Hide KBLI chip, show search
+  const chip = document.getElementById('l2_kbli_chip');
+  if (chip) chip.style.display = 'none';
+  const dropWrap = document.querySelector('.ac-wrap');
+  if (dropWrap) dropWrap.style.display = '';
+  const searchEl = document.getElementById('l2_kbli_search');
+  if (searchEl) searchEl.style.display = '';
+  // Reset readonly totals
+  ['l2_pekerja_total','l2_pekerja_total2','l2_y26f','l2_y27c','l2_y28c','l2_y29g',
+   'l2_m30f','l2_m31c','l2_m32c','l2_m33g'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  // Hide conditional wraps
+  ['l2_nama_kawasan_wrap','l2_nib_wrap','l2_nib_alasan_wrap','l2_nib_alasan_lain_wrap',
+   'l2_koperasi_wrap','l2_lokasi_utama_wrap','l2_b3_wrap','l2_b4_wrap','l2_c_wrap',
+   'l2_de_wrap','l2_hotel_wrap','l2_jml_cabang_wrap','l2_kp_wrap','l2_unit_pembantu_notice',
+   'l2_internet_b_wrap','l2_halal_b_wrap','l2_bpom_b_wrap',
+   'l2_tahunan_wrap','l2_bulanan_wrap'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.add('hidden');
+  });
+}
+
+// Re-trigger semua conditional show/hide handlers setelah load data
+function rehydrateUsahaConditionals() {
+  if (typeof handleKawasanL       === 'function') handleKawasanL();
+  if (typeof handleJenisUsahaL    === 'function') handleJenisUsahaL();
+  if (typeof handleNIBL           === 'function') handleNIBL();
+  if (typeof handleBadanUsahaL    === 'function') handleBadanUsahaL();
+  if (typeof handleKegiatanL      === 'function') handleKegiatanL();
+  if (typeof handleJaringanL      === 'function') handleJaringanL();
+  if (typeof handleInternetL      === 'function') handleInternetL();
+  if (typeof handleHalalL         === 'function') handleHalalL();
+  if (typeof handleBPOML          === 'function') handleBPOML();
+  if (typeof handleTahunOperasiL  === 'function') handleTahunOperasiL();
+  if (typeof handleNIBAlasanL     === 'function') handleNIBAlasanL();
+}
+
+/* ---- CRUD ---- */
+
+function addUsaha() {
+  const current = _usahaDataStore.length;
+  if (current >= 10) { alert('Maksimal 10 usaha per keluarga.'); return; }
+  _usahaDataStore.push({});
+  _saveUsahaStoreToDom();
+  renderUsahaRoster();
+  if (typeof updateProgress === 'function') updateProgress();
+  // Buka detail usaha baru
+  const newIdx = _usahaDataStore.length;
+  if (typeof showUsahaDetailScreen === 'function') showUsahaDetailScreen(newIdx);
+}
+
+function deleteUsaha(idx) {
+  if (!confirm('Hapus usaha ke-' + idx + '? Data yang sudah diisi akan hilang.')) return;
+  // Jika usaha yang dihapus sedang diedit, tutup dulu
+  if (_activeUsahaIdx === idx && typeof showMainScreen === 'function') {
+    _activeUsahaIdx = null;
+    showMainScreen();
+  }
+  _usahaDataStore.splice(idx - 1, 1);
+  if (_activeUsahaIdx > idx) _activeUsahaIdx--;
+  _saveUsahaStoreToDom();
+  renderUsahaRoster();
+  if (typeof updateProgress === 'function') updateProgress();
+}
+
+/* ---- Roster rendering ---- */
+
+function renderUsahaRosterRow(idx) {
+  const list = document.getElementById('l2_roster_list');
+  if (!list) return;
+  const existing = document.getElementById('l_usaha_row_' + idx);
+  const html = _usahaRosterRowHTML(idx);
+  if (existing) existing.outerHTML = html;
+  else list.insertAdjacentHTML('beforeend', html);
+}
+
+function renderUsahaRoster() {
+  const list = document.getElementById('l2_roster_list');
+  const empty = document.getElementById('l2_roster_empty');
+  const countEl = document.getElementById('l2_roster_count');
+  if (!list) return;
+  list.innerHTML = '';
+  const n = _usahaDataStore.length;
+  for (let i = 1; i <= n; i++) list.insertAdjacentHTML('beforeend', _usahaRosterRowHTML(i));
+  if (empty)   empty.style.display   = n > 0 ? 'none' : '';
+  if (countEl) countEl.textContent = n + ' usaha';
+}
+
+function _usahaRosterRowHTML(idx) {
+  const d = _usahaDataStore[idx - 1] || {};
+  const nama   = d['l2_nama_usaha'] || '';
+  const kbliKd = d['l2_kbli_kode'] || '';
+  const kbliJd = d['l2_kbli_search'] || '';
+  const tahun  = d['l2_tahun_operasi'] || '';
+
+  let statusCls, statusTxt;
+  if (!nama && !kbliKd) { statusCls = 'chip-empty';   statusTxt = 'Belum diisi'; }
+  else if (!nama || !kbliKd) { statusCls = 'chip-partial'; statusTxt = 'Belum lengkap'; }
+  else { statusCls = 'chip-done'; statusTxt = 'Terisi'; }
+
+  const displayName = nama || ('Usaha ke-' + idx);
+  const meta = [kbliKd ? 'KBLI ' + kbliKd : '', tahun ? 'Tahun ' + tahun : ''].filter(Boolean).join(' · ');
+  return `<div class="roster-row" id="l_usaha_row_${idx}">
+    <div class="roster-no">${idx}</div>
+    <div class="roster-info">
+      <div class="roster-name">${displayName}</div>
+      <div class="roster-meta">${meta || (kbliJd ? kbliJd.slice(0,50) : 'Belum ada data')}</div>
+    </div>
+    <span class="status-chip ${statusCls}">${statusTxt}</span>
+    <div class="roster-actions">
+      <button class="btn-roster-edit" type="button" onclick="if(typeof showUsahaDetailScreen==='function')showUsahaDetailScreen(${idx})">Edit</button>
+      <button class="btn-roster-del"  type="button" onclick="deleteUsaha(${idx})">Hapus</button>
+    </div>
+  </div>`;
 }
 
 /* --- L2 conditional handlers --- */

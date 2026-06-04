@@ -134,6 +134,9 @@ function restoreDraft() {
     const hintL = document.getElementById('l5_sig_hint');
     if (hintL && vals['_sig_l']) hintL.textContent = 'Tanda tangan dimuat dari draft';
     dismissRestore();
+    // L mode: rebuild usaha roster dari hidden input #l_usaha_all_data (restored above)
+    if (typeof syncUsahaStoreFromDom === 'function') syncUsahaStoreFromDom();
+    if (typeof renderUsahaRoster   === 'function') renderUsahaRoster();
     updateProgress();
     const txt = document.getElementById('autosaveText');
     if (txt) txt.textContent = 'Draft dimuat';
@@ -159,6 +162,10 @@ function getDraftList() {
 
 function saveAsDraft() {
   try {
+    // Sync usaha yang sedang aktif di form ke store sebelum serialize
+    if (typeof _activeUsahaIdx !== 'undefined' && _activeUsahaIdx != null) {
+      if (typeof serializeCurrentUsahaForm === 'function') serializeCurrentUsahaForm(_activeUsahaIdx);
+    }
     const raw = {};
     document.querySelectorAll('input[id]:not([type=radio]):not([type=checkbox]),textarea[id],select[id]').forEach(el => {
       if (!el.id || el.readOnly) return;

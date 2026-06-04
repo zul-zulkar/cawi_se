@@ -32,21 +32,15 @@
     </div>
   </div>
 
-  <!-- L1.2 Jumlah Anggota -->
+  <!-- L1.2 Jumlah Anggota — hidden, dikelola oleh roster -->
+  <input type="hidden" id="l1_jml_kk_anggota" value="0"/>
   <div class="section-card">
     <div class="section-header" id="sec-L1-2">2. Jumlah Anggota Keluarga</div>
     <div class="section-body">
-      <div class="inline-fields">
-        <div class="form-group">
-          <label class="field-label">a. Sesuai KK <span class="req">*</span></label>
-          <input type="number" id="l1_jml_kk_anggota" min="1" max="30" placeholder="0" oninput="renderAnggotaCards()"/>
-          <div class="hint">Akan men-generate kartu anggota sesuai jumlah ini (max 30)</div>
-        </div>
-        <div class="form-group">
-          <label class="field-label">b. Hasil Pendataan (autofill)</label>
-          <input type="number" id="l1_jml_pendataan" class="input-muted" readonly placeholder="0"/>
-          <div class="hint">Terhitung otomatis dari kartu anggota yang terisi</div>
-        </div>
+      <div class="form-group">
+        <label class="field-label">b. Hasil Pendataan (autofill)</label>
+        <input type="number" id="l1_jml_pendataan" class="input-muted" readonly placeholder="0"/>
+        <div class="hint">Terhitung otomatis dari anggota yang terisi namanya</div>
       </div>
     </div>
   </div>
@@ -135,12 +129,20 @@
     </div>
   </div>
 
-  <!-- ANGGOTA CARDS (dynamic) -->
+  <!-- ROSTER ANGGOTA KELUARGA -->
   <div class="section-card" id="l1_anggota_section">
     <div class="section-header" id="sec-L1-anggota">Daftar Anggota Keluarga</div>
     <div class="section-body">
-      <div id="l1_anggota_empty" class="hint">Isi rincian 2.a di atas untuk menampilkan kartu anggota keluarga. Tiap kartu berisi identitas (r5-r13) dan sosial ekonomi (r14-r21).</div>
-      <div id="l1_anggota_wrap"></div>
+      <div class="roster-container" id="l1_anggota_roster_container">
+        <div class="roster-toolbar">
+          <span class="roster-count" id="l1_roster_count">0 anggota</span>
+          <button class="btn-roster-add" onclick="addAnggota()" id="l1_btn_add_anggota" type="button">
+            &#43; Tambah Anggota
+          </button>
+        </div>
+        <div class="roster-list" id="l1_roster_list"></div>
+        <div id="l1_roster_empty" class="roster-empty">Belum ada anggota. Klik &ldquo;+ Tambah Anggota&rdquo; untuk mulai menambahkan.</div>
+      </div>
     </div>
   </div>
 

@@ -9,7 +9,17 @@ function mockEl(value = '', isHidden = false) {
   return { value, classList: { contains: cls => cls === 'hidden' && isHidden } }
 }
 
-function makeCollect({ fields = {}, radios = {}, elements = {}, l5HasSig = false } = {}) {
+// Build usaha store from l2_* fields/radios (backward compat).
+// Always returns at least 1 entry so per-usaha validation runs,
+// which matches the pre-roster behavior where Blok II was always present.
+function buildUsahaStoreV(fields, radios) {
+  const obj = {}
+  Object.keys(fields).forEach(k => { if (k.startsWith('l2_'))  obj[k]         = fields[k]; })
+  Object.keys(radios).forEach(k => { if (k.startsWith('l2_'))  obj['_r_' + k] = radios[k]; })
+  return [obj]  // always 1 entry; may be empty object
+}
+
+function makeCollect({ fields = {}, radios = {}, elements = {}, l5HasSig = false, usahaStore = null } = {}) {
   const dom = { ...elements }
   const noop = () => {}
   const mockDoc = {
@@ -18,11 +28,13 @@ function makeCollect({ fields = {}, radios = {}, elements = {}, l5HasSig = false
     addEventListener: noop,
     createElement: () => ({}),
   }
+  const store = usahaStore !== null ? usahaStore : buildUsahaStoreV(fields, radios)
   const fn = new Function(
     'document', 'window',
     'getVal', 'getRadio',
     'isValidHP', 'isValidEmail',
     'l5HasSig',
+    '_usahaDataStore', '_activeUsahaIdx', '_collectL2Fields',
     `${SOURCE}\nreturn { collectAllProblemsL };`
   )
   return fn(
@@ -31,7 +43,8 @@ function makeCollect({ fields = {}, radios = {}, elements = {}, l5HasSig = false
     name => String(radios[name] ?? ''),
     hp    => /^(\+62|62|0)[0-9]{8,13}$/.test(hp.replace(/[\s-]/g, '')),
     email => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email),
-    l5HasSig
+    l5HasSig,
+    store, null, null
   ).collectAllProblemsL
 }
 
@@ -350,12 +363,13 @@ describe('collectAllProblemsL — Blok II Usaha', () => {
   })
 
   it('tahunan wrap visible & y29 != 100 → error sum', () => {
+    // tahun < 2026 → tahunan section; y29 sum check applies
     const r = collect({
       fields: {
+        l2_tahun_operasi: '2020',
         l2_y29a: '50', l2_y29b: '20', l2_y29c: '10',
         l2_y29d: '10', l2_y29e: '5', l2_y29f: '4',  // total 99
       },
-      elements: { l2_tahunan_wrap: mockEl('', false), l2_bulanan_wrap: mockEl('', true) },
     })
     expect(errText(r, 'l2_y29a')).toMatch(/100%/)
   })
@@ -363,21 +377,22 @@ describe('collectAllProblemsL — Blok II Usaha', () => {
   it('tahunan wrap visible & y29 = 100 → no error', () => {
     const r = collect({
       fields: {
+        l2_tahun_operasi: '2020',
         l2_y29a: '50', l2_y29b: '20', l2_y29c: '10',
         l2_y29d: '10', l2_y29e: '5', l2_y29f: '5',
       },
-      elements: { l2_tahunan_wrap: mockEl('', false), l2_bulanan_wrap: mockEl('', true) },
     })
     expect(hasErr(r, 'l2_y29a')).toBe(false)
   })
 
   it('bulanan wrap visible & m33 != 100 → error sum', () => {
+    // tahun >= 2026 → bulanan section; m33 sum check applies
     const r = collect({
       fields: {
+        l2_tahun_operasi: '2026',
         l2_m33a: '40', l2_m33b: '20', l2_m33c: '15',
         l2_m33d: '10', l2_m33e: '10', l2_m33f: '4',  // 99
       },
-      elements: { l2_tahunan_wrap: mockEl('', true), l2_bulanan_wrap: mockEl('', false) },
     })
     expect(errText(r, 'l2_m33a')).toMatch(/100%/)
   })

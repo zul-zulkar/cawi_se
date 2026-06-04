@@ -397,116 +397,20 @@ function collectDataL() {
       }
       return JSON.stringify(arr);
     })(),
-    // === BLOK II: Usaha ===
-    nama_usaha:       getVal('l2_nama_usaha'),
-    nama_komersial:   getVal('l2_nama_komersial'),
-    alamat_usaha:     getVal('l2_alamat'),
-    rt:               getVal('l2_rt'),
-    rw:               getVal('l2_rw'),
-    kodepos_usaha:    getVal('l2_kodepos'),
-    email_usaha:      getVal('l2_email'),
-    website_usaha:    getVal('l2_website'),
-    hp_usaha:         getVal('l2_hp'),
-    kawasan:          getRadio('l2_kawasan'),
-    nama_kawasan:     getVal('l2_nama_kawasan'),
-    jenis_usaha:      getRadio('l2_jenis_usaha'),
-    lokasi_alamat:    getVal('l2_lokasi_alamat'),
-    lokasi_provinsi:  getVal('l2_lokasi_provinsi'),
-    lokasi_kab:       getVal('l2_lokasi_kab'),
-    punya_nib:        getRadio('l2_punya_nib'),
-    nib:              getVal('l2_nib'),
-    nib_alasan:       getRadio('l2_nib_alasan'),
-    nib_alasan_lain:  getVal('l2_nib_alasan_lain'),
-    badan_usaha:      getRadio('l2_badan_usaha'),
-    pengusaha_nama:   getVal('l2_pengusaha_nama'),
-    pengusaha_jk:     getRadio('l2_pengusaha_jk'),
-    pengusaha_umur:   getVal('l2_pengusaha_umur'),
-    pengusaha_nik:    getVal('l2_pengusaha_nik'),
-    kegiatan_utama:   getVal('l2_kegiatan_utama'),
-    b1: getRadio('l2_b1'), b2: getRadio('l2_b2'),
-    b3: getRadio('l2_b3'), b4: getRadio('l2_b4'),
-    c:  getRadio('l2_c'),
-    input_bahan:      getVal('l2_input'),
-    proses_produksi:  getVal('l2_proses'),
-    produk_utama:     getVal('l2_produk_utama'),
-    kbli_kode:        getVal('l2_kbli_kode'),
-    kbli_judul:       getVal('l2_kbli_search'),
-    kbli_kategori:    getVal('l2_kbli_kategori'),
-    klasifikasi_hotel: getRadio('l2_hotel'),
-    jaringan:         getRadio('l2_jaringan'),
-    jml_cabang:       getVal('l2_jml_cabang'),
-    kp_nama:          getVal('l2_kp_nama'),
-    kp_negara:        getVal('l2_kp_negara'),
-    kp_alamat:        getVal('l2_kp_alamat'),
-    kp_email:         getVal('l2_kp_email'),
-    kp_provinsi:      getVal('l2_kp_provinsi'),
-    kp_kab:           getVal('l2_kp_kab'),
-    internet:         getRadio('l2_internet'),
-    /* 16b: tujuan internet */
-    internet_b1:      getRadio('l2_internet_b1'),
-    internet_b2:      getRadio('l2_internet_b2'),
-    internet_b3:      getRadio('l2_internet_b3'),
-    internet_b4:      getRadio('l2_internet_b4'),
-    internet_b5:      getRadio('l2_internet_b5'),
-    internet_b6:      getRadio('l2_internet_b6'),
-    /* 16c: teknologi digital */
-    teknologi:        getRadio('l2_teknologi'),
-    /* 17: ramah lingkungan */
-    ramah_lingkungan: getRadio('l2_ramah_a'),
-    biaya_lingkungan: getRadio('l2_ramah_b'),
-    /* 18: produk kreatif */
-    produk_kreatif:   getRadio('l2_kreatif'),
-    halal:            getRadio('l2_halal'),
-    halal_b:          getVal('l2_halal_b'),
-    halal_c:          getVal('l2_halal_c'),
-    bpom:             getRadio('l2_bpom'),
-    bpom_b:           getVal('l2_bpom_b'),
-    bpom_c:           getVal('l2_bpom_c'),
-    /* 21-22: kemitraan */
-    mitra_kdkmp:      getRadio('l2_mitra_kdkmp'),
-    program_mbg:      getRadio('l2_mbg'),
-    /* 23: transaksi non-penduduk */
-    transaksi_barang_nonpenduduk:    getRadio('l2_nonpend_a'),
-    transaksi_jual_jasa_nonpenduduk: getRadio('l2_nonpend_b'),
-    transaksi_beli_jasa_nonpenduduk: getRadio('l2_nonpend_c'),
-    pekerja_l:        getVal('l2_pekerja_l'),
-    pekerja_p:        getVal('l2_pekerja_p'),
-    pekerja_dibayar:  getVal('l2_pekerja_dibayar'),
-    pekerja_tidak_dibayar: getVal('l2_pekerja_tidak_dibayar'),
-    tahun_operasi:    getVal('l2_tahun_operasi'),
-    // Yearly (l2_y26-y29)
-    y26a: parseCurrency(getVal('l2_y26a')), y26b: parseCurrency(getVal('l2_y26b')),
-    y26c: parseCurrency(getVal('l2_y26c')), y26d: parseCurrency(getVal('l2_y26d')),
-    y26e: parseCurrency(getVal('l2_y26e')), y26f: parseCurrency(getVal('l2_y26f')),
-    y27a: parseCurrency(getVal('l2_y27a')), y27b: parseCurrency(getVal('l2_y27b')),
-    y27c: parseCurrency(getVal('l2_y27c')), y27d: getVal('l2_y27d'),
-    y28a: parseCurrency(getVal('l2_y28a')), y28b: parseCurrency(getVal('l2_y28b')),
-    y28c: parseCurrency(getVal('l2_y28c')), y28c1: getVal('l2_y28c1'),
-    y28d: getVal('l2_y28d'),
-    y29a: getVal('l2_y29a'), y29b: getVal('l2_y29b'), y29c: getVal('l2_y29c'),
-    y29d: getVal('l2_y29d'), y29e: getVal('l2_y29e'), y29f: getVal('l2_y29f'),
-    y29g: getVal('l2_y29g'),
-    // Monthly (l2_m30-m33)
-    m30a: parseCurrency(getVal('l2_m30a')), m30b: parseCurrency(getVal('l2_m30b')),
-    m30c: parseCurrency(getVal('l2_m30c')), m30d: parseCurrency(getVal('l2_m30d')),
-    m30e: parseCurrency(getVal('l2_m30e')), m30f: parseCurrency(getVal('l2_m30f')),
-    m31a: parseCurrency(getVal('l2_m31a')), m31b: parseCurrency(getVal('l2_m31b')),
-    m31c: parseCurrency(getVal('l2_m31c')), m31d: getVal('l2_m31d'),
-    m31e: (function() {
-      const arr = [];
-      for (let i = 1; i <= 8; i++) {
-        const cb = document.getElementById('l2_m31e_' + i);
-        if (cb && cb.checked) arr.push(i);
+    // === BLOK II: Usaha (multi-usaha JSON array) ===
+    // Jika ada usaha yang sedang diedit (aktif di form), serialize dulu ke store
+    usaha_data: (function() {
+      if (typeof _usahaDataStore === 'undefined') return '[]';
+      // Sync usaha yang sedang aktif di form (kalau ada)
+      if (typeof _activeUsahaIdx !== 'undefined' && _activeUsahaIdx != null) {
+        if (typeof _collectL2Fields === 'function') {
+          const activeData = _collectL2Fields();
+          _usahaDataStore[_activeUsahaIdx - 1] = activeData;
+        }
       }
-      return arr.join(',');
+      return JSON.stringify(_usahaDataStore);
     })(),
-    m32a: parseCurrency(getVal('l2_m32a')), m32b: parseCurrency(getVal('l2_m32b')),
-    m32c: parseCurrency(getVal('l2_m32c')), m32c1: getVal('l2_m32c1'),
-    m32d: getVal('l2_m32d'),
-    m33a: getVal('l2_m33a'), m33b: getVal('l2_m33b'), m33c: getVal('l2_m33c'),
-    m33d: getVal('l2_m33d'), m33e: getVal('l2_m33e'), m33f: getVal('l2_m33f'),
-    m33g: getVal('l2_m33g'),
-    // === BLOK III: Perumahan & Aset ===
+        // === BLOK III: Perumahan & Aset ===
     jenis_bangunan:    getRadio('l3_jenis_bangunan'),
     lantai_apt:        getVal('l3_lantai_apt'),
     bangunan_lain:     getVal('l3_bangunan_lain'),
