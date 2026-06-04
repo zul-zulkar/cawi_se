@@ -140,8 +140,8 @@ body.mode-l .sidebar-blok-group.sb-l{display:block}
 }
 .roster-row {
   display: flex;
-  align-items: center;
-  gap: 10px;
+  flex-direction: column;
+  gap: 8px;
   padding: 12px 14px;
   background: #fff;
   border: 1.5px solid #e8e3de;
@@ -149,6 +149,12 @@ body.mode-l .sidebar-blok-group.sb-l{display:block}
   transition: border-color .15s;
 }
 .roster-row:hover { border-color: #b8b0a5; }
+/* Baris atas: no + nama/meta + status + hapus (nama tidak lagi tertutup tombol) */
+.roster-row-top {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 .roster-no {
   flex-shrink: 0;
   width: 26px;
@@ -179,35 +185,49 @@ body.mode-l .sidebar-blok-group.sb-l{display:block}
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.roster-actions {
-  display: flex;
-  gap: 6px;
-  flex-shrink: 0;
-}
-.btn-roster-edit {
-  background: #ebf4ff;
-  color: #2b6cb0;
-  border: 1.5px solid #bee3f8;
-  font-size: 12px;
-  font-weight: 700;
-  padding: 5px 12px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-family: inherit;
-}
-.btn-roster-edit:hover { background: #bee3f8; }
+/* Hapus — minimalis (ikon ✕), tidak menutupi nama */
 .btn-roster-del {
-  background: #fff5f5;
-  color: #c53030;
-  border: 1.5px solid #fed7d7;
-  font-size: 12px;
-  font-weight: 700;
-  padding: 5px 12px;
-  border-radius: 5px;
+  flex-shrink: 0;
+  background: transparent;
+  border: none;
+  color: #b0a8a0;
+  font-size: 17px;
+  line-height: 1;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-roster-del:hover { background: #fff5f5; color: #c53030; }
+/* Penanda Kepala Keluarga (anggota #1, tidak bisa dihapus) */
+.roster-kk-lock {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  color: #b0a8a0;
+}
+/* Baris bawah: tombol buka detail (minimalis, lebar penuh) */
+.btn-roster-open {
+  width: 100%;
+  background: #f7fafc;
+  border: 1px solid #e8e3de;
+  color: #2b6cb0;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 7px 10px;
+  border-radius: 6px;
   cursor: pointer;
   font-family: inherit;
 }
-.btn-roster-del:hover { background: #fed7d7; }
+.btn-roster-open:hover { background: #ebf4ff; border-color: #bee3f8; }
 
 /* ====== STATUS CHIPS ====== */
 .status-chip {

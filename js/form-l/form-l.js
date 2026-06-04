@@ -127,19 +127,23 @@ function _anggotaRosterRowHTML(i) {
     statusCls = 'chip-partial'; statusTxt = 'Belum lengkap';
   } else { statusCls = 'chip-done'; statusTxt = 'Terisi'; }
 
-  const displayName = nama || ('Anggota ke-' + i);
+  const isKK = (i === 1); // anggota #1 = Kepala Keluarga (otomatis, tidak dapat dihapus)
+  const displayName = nama || (isKK ? 'Kepala Keluarga' : 'Anggota ke-' + i);
   const meta = [hubTxt, kebV ? 'Keberadaan: ' + kebV : ''].filter(Boolean).join(' · ');
+  const delCtrl = isKK
+    ? `<span class="roster-kk-lock" title="Kepala Keluarga — terisi otomatis">🔒</span>`
+    : `<button class="btn-roster-del" type="button" title="Hapus anggota" aria-label="Hapus anggota ke-${i}" onclick="deleteAnggota(${i})">✕</button>`;
   return `<div class="roster-row" id="l_ang_row_${i}">
-    <div class="roster-no">${i}</div>
-    <div class="roster-info">
-      <div class="roster-name">${displayName}</div>
-      <div class="roster-meta">${meta || 'Belum ada data'}</div>
+    <div class="roster-row-top">
+      <div class="roster-no">${i}</div>
+      <div class="roster-info">
+        <div class="roster-name">${displayName}</div>
+        <div class="roster-meta">${meta || 'Belum ada data'}</div>
+      </div>
+      <span class="status-chip ${statusCls}">${statusTxt}</span>
+      ${delCtrl}
     </div>
-    <span class="status-chip ${statusCls}">${statusTxt}</span>
-    <div class="roster-actions">
-      <button class="btn-roster-edit" type="button" onclick="if(typeof showAngDetailScreen==='function')showAngDetailScreen(${i})">Edit</button>
-      <button class="btn-roster-del"  type="button" onclick="deleteAnggota(${i})">Hapus</button>
-    </div>
+    <button class="btn-roster-open" type="button" onclick="if(typeof showAngDetailScreen==='function')showAngDetailScreen(${i})">Buka detail anggota</button>
   </div>`;
 }
 
@@ -160,6 +164,43 @@ function renderAnggotaCards() {
   updateSidebarAnggota(n);
   updateJmlPendataan();
   if (typeof updateProgress === 'function') updateProgress();
+}
+
+// Anggota #1 = Kepala Keluarga: otomatis dibuat saat roster masih kosong,
+// hubungan dikunci ke "1" (Kepala Keluarga), namanya disinkron dari l1_nama_kk.
+// Idempotent — aman dipanggil dari prefill, restore draft, maupun init.
+function ensureKepalaKeluarga() {
+  if (typeof getFormMode === 'function' && getFormMode() !== 'l') return;
+  if (_getAnggotaCount() > 0) return; // sudah ada anggota (mis. dari draft)
+  _setAnggotaCount(1);
+  _ensureAnggotaCard(1);
+  const hub = document.getElementById('l_ang_1_hubungan');
+  if (hub) {
+    hub.value = '1'; // 1 = Kepala Keluarga
+    const inp = document.getElementById('l_ang_1_hubungan_inp');
+    if (inp) {
+      const opt = Array.prototype.find.call(hub.options, o => o.value === '1');
+      if (opt) { inp.value = opt.text; inp.classList.add('has-value'); }
+    }
+    hub.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+  syncKepalaKeluargaNama();
+  renderAnggotaRoster();
+  if (typeof updateSidebarAnggota === 'function') updateSidebarAnggota(1);
+  if (typeof updateJmlPendataan === 'function') updateJmlPendataan();
+  if (typeof updateProgress === 'function') updateProgress();
+}
+
+// Sinkron nama anggota #1 dengan Nama Kepala Keluarga (Blok I) selama
+// hubungan anggota #1 masih "Kepala Keluarga". Dipanggil saat l1_nama_kk berubah.
+function syncKepalaKeluargaNama() {
+  const kk  = document.getElementById('l1_nama_kk');
+  const ang = document.getElementById('l_ang_1_nama');
+  const hub = document.getElementById('l_ang_1_hubungan');
+  if (!kk || !ang) return;
+  if (hub && hub.value && hub.value !== '1') return; // anggota #1 bukan KK → jangan timpa
+  ang.value = kk.value;
+  if (document.getElementById('l_ang_row_1')) renderAnggotaRosterRow(1);
 }
 
 function initAnggotaSearchable(i) {
@@ -950,16 +991,16 @@ function _usahaRosterRowHTML(idx) {
   const displayName = nama || ('Usaha ke-' + idx);
   const meta = [kbliKd ? 'KBLI ' + kbliKd : '', tahun ? 'Tahun ' + tahun : ''].filter(Boolean).join(' · ');
   return `<div class="roster-row" id="l_usaha_row_${idx}">
-    <div class="roster-no">${idx}</div>
-    <div class="roster-info">
-      <div class="roster-name">${displayName}</div>
-      <div class="roster-meta">${meta || (kbliJd ? kbliJd.slice(0,50) : 'Belum ada data')}</div>
+    <div class="roster-row-top">
+      <div class="roster-no">${idx}</div>
+      <div class="roster-info">
+        <div class="roster-name">${displayName}</div>
+        <div class="roster-meta">${meta || (kbliJd ? kbliJd.slice(0,50) : 'Belum ada data')}</div>
+      </div>
+      <span class="status-chip ${statusCls}">${statusTxt}</span>
+      <button class="btn-roster-del" type="button" title="Hapus usaha" aria-label="Hapus usaha ke-${idx}" onclick="deleteUsaha(${idx})">✕</button>
     </div>
-    <span class="status-chip ${statusCls}">${statusTxt}</span>
-    <div class="roster-actions">
-      <button class="btn-roster-edit" type="button" onclick="if(typeof showUsahaDetailScreen==='function')showUsahaDetailScreen(${idx})">Edit</button>
-      <button class="btn-roster-del"  type="button" onclick="deleteUsaha(${idx})">Hapus</button>
-    </div>
+    <button class="btn-roster-open" type="button" onclick="if(typeof showUsahaDetailScreen==='function')showUsahaDetailScreen(${idx})">Buka detail usaha</button>
   </div>`;
 }
 

@@ -151,6 +151,8 @@ function restoreDraft() {
     // L mode: rebuild usaha roster dari hidden input #l_usaha_all_data (restored above)
     if (typeof syncUsahaStoreFromDom === 'function') syncUsahaStoreFromDom();
     if (typeof renderUsahaRoster   === 'function') renderUsahaRoster();
+    // L mode: pastikan anggota #1 = Kepala Keluarga (skip bila draft sudah punya anggota)
+    if (vals['_formMode'] === 'l' && typeof ensureKepalaKeluarga === 'function') ensureKepalaKeluarga();
     // L.UB mode: tampilkan section L.KP (bila Kantor pusat) + render roster cabang
     if (typeof renderLkpRoster === 'function') {
       if (getRadio('q10a') === '2') { const lkp = document.getElementById('lkp_section'); if (lkp) lkp.classList.remove('hidden'); }

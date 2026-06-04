@@ -199,10 +199,6 @@
   .assign-detail-row { display: flex; gap: 8px; font-size: 12px; line-height: 1.4; }
   .assign-detail-lbl { color: var(--muted); min-width: 92px; flex-shrink: 0; }
   .assign-detail-val { color: #1e293b; word-break: break-word; }
-  .assign-code {
-    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-    font-size: 11px; color: #334155; word-break: break-all;
-  }
 
   .empty {
     text-align: center; padding: 28px 14px; color: var(--muted);
@@ -619,22 +615,28 @@
     };
   }
 
-  // Susun baris kode wilayah BPS + SLS lengkap (monospace) untuk panel detail.
-  function fmtKodeWilayah(it) {
-    var rows = [];
-    var w = [];
-    if (it.provinsi_kd)  w.push('Prov ' + esc(it.provinsi_kd));
-    if (it.kabupaten_kd) w.push('Kab ' + esc(it.kabupaten_kd));
-    if (it.kecamatan_kd) w.push('Kec ' + esc(it.kecamatan_kd));
-    if (it.desa_kd)      w.push('Desa ' + esc(it.desa_kd));
-    if (w.length) rows.push('<div class="assign-code">' + w.join(' · ') + '</div>');
-    if (it.sls_kd || it.sls_full_kd) {
-      var s = 'SLS ' + esc(it.sls_kd || '-');
-      if (it.sls_full_kd) s += ' · lengkap ' + esc(it.sls_full_kd);
-      if (it.subsls_kd && it.subsls_kd !== '00') s += '-' + esc(it.subsls_kd);
-      rows.push('<div class="assign-code">' + s + '</div>');
+  // Ambil KODE wilayah pendek (spesifik per level) dari kode penuh/gabungan.
+  // Struktur BPS: prov(2) · kab(+2=4) · kec(+3=7) · desa(+3=10).
+  // SLS/SubSLS sudah pendek (relatif) → dikembalikan apa adanya.
+  function shortKode(level, full) {
+    var k = String(full == null ? '' : full).trim();
+    if (!k) return '';
+    switch (level) {
+      case 'prov': return k.slice(0, 2);
+      case 'kab':  return k.length > 2 ? k.slice(2, 4) : k;
+      case 'kec':  return k.length > 4 ? k.slice(4, 7) : k;
+      case 'desa': return k.length > 7 ? k.slice(7, 10) : k;
+      default:     return k; // sls, subsls — sudah pendek
     }
-    return rows.join('');
+  }
+
+  // Label tampilan wilayah: "[kode] nama" memakai kode PENDEK per-level.
+  // Fallback ke nama saja bila kode kosong (mis. assignment lama).
+  function wilayahLabel(level, full, nama) {
+    var k = shortKode(level, full);
+    var n = String(nama == null ? '' : nama).trim();
+    if (!n) return k ? ('[' + k + ']') : '';
+    return k ? ('[' + k + '] ' + n) : n;
   }
 
   // Satu baris label/value untuk panel detail kartu.
@@ -827,18 +829,34 @@
   function populateFilters() {
     var a = readActivePetugas();
     var visible = PM.filterAssignments(getAssignments(), {}, a, _pplList);
-    fillSelect('fltDesa',      'Semua Desa',      PM.getDistinctValues(visible, 'desa'));
-    fillSelect('fltKecamatan', 'Semua Kecamatan', PM.getDistinctValues(visible, 'kecamatan'));
-    fillSelect('fltKabupaten', 'Semua Kabupaten', PM.getDistinctValues(visible, 'kabupaten'));
+    // Peta nama→kode (penuh) per level agar opsi filter bisa tampil "[kode] nama"
+    // sambil value tetap = nama (filterAssignments mencocokkan berdasar nama).
+    var mapDesa = buildKodeMap(visible, 'desa',      'desa_kd');
+    var mapKec  = buildKodeMap(visible, 'kecamatan', 'kecamatan_kd');
+    var mapKab  = buildKodeMap(visible, 'kabupaten', 'kabupaten_kd');
+    fillSelect('fltDesa',      'Semua Desa',      PM.getDistinctValues(visible, 'desa'),         mapDesa, 'desa');
+    fillSelect('fltKecamatan', 'Semua Kecamatan', PM.getDistinctValues(visible, 'kecamatan'),    mapKec,  'kec');
+    fillSelect('fltKabupaten', 'Semua Kabupaten', PM.getDistinctValues(visible, 'kabupaten'),    mapKab,  'kab');
     fillSelect('fltPetugas',   'Semua Petugas',   PM.getDistinctValues(visible, 'petugas_nama'));
   }
 
-  function fillSelect(id, allLabel, values) {
+  // Bangun peta { nama: kode_penuh } dari daftar assignment (kode pertama yang ketemu).
+  function buildKodeMap(list, nameField, kdField) {
+    var m = {};
+    (list || []).forEach(function (a) {
+      var n = a && a[nameField];
+      if (n && a[kdField] && !m[n]) m[n] = a[kdField];
+    });
+    return m;
+  }
+
+  function fillSelect(id, allLabel, values, kodeMap, level) {
     var sel = $(id);
     var cur = sel.value;
     sel.innerHTML = '<option value="">' + allLabel + '</option>' +
       values.map(function (v) {
-        return '<option value="' + esc(v) + '"' + (v === cur ? ' selected' : '') + '>' + esc(v) + '</option>';
+        var label = (kodeMap && level) ? wilayahLabel(level, kodeMap[v], v) : v;
+        return '<option value="' + esc(v) + '"' + (v === cur ? ' selected' : '') + '>' + esc(label) + '</option>';
       }).join('');
   }
 
@@ -881,14 +899,18 @@
       var showPetugas = (a.peran === 'PML' && (it.petugas_email || '').toLowerCase() !== (a.email || '').toLowerCase());
       var dm = getDraftMeta(it.draft_key);
 
-      // Baris wilayah (kini termasuk provinsi)
-      var wilayah = [it.desa, it.kecamatan, it.kabupaten, it.provinsi]
-        .filter(Boolean).map(esc).join(', ');
+      // Baris wilayah — format [kode] nama per level (kini termasuk provinsi)
+      var wilayah = [
+        wilayahLabel('desa', it.desa_kd,      it.desa),
+        wilayahLabel('kec',  it.kecamatan_kd, it.kecamatan),
+        wilayahLabel('kab',  it.kabupaten_kd, it.kabupaten),
+        wilayahLabel('prov', it.provinsi_kd,  it.provinsi)
+      ].filter(Boolean).map(esc).join(', ');
 
       var slsLine = '';
-      if (it.sls_nama) {
+      if (it.sls_nama || it.sls_kd) {
         var subTxt = (it.subsls_kd && it.subsls_kd !== '00') ? (' · SubSLS ' + esc(it.subsls_kd)) : '';
-        slsLine = '<div class="assign-card-wilayah">SLS: <b>' + esc(it.sls_nama) + '</b>' + subTxt + '</div>';
+        slsLine = '<div class="assign-card-wilayah">SLS: <b>' + esc(wilayahLabel('sls', it.sls_kd, it.sls_nama)) + '</b>' + subTxt + '</div>';
       }
 
       // Progress (hanya draft): bar % bila tersnapshot, else status ringkas
@@ -911,16 +933,25 @@
       else if (dm && dm.ts)          timeLabel = 'Diubah ' + fmtDateTime(dm.ts);
       else                           timeLabel = 'Dibuat ' + fmtDateTime(it.created_at);
 
-      // Panel detail (expandable): nama KK/usaha/bangunan, alamat, kode wilayah & SLS
+      // Panel detail (expandable): nama KK/usaha/bangunan, alamat, lalu
+      // wilayah satu baris per level (vertikal) format [kode] nama.
       var detail = [];
       if (dm) {
-        detail.push(dRow(dm.mode === 'l' ? 'Kepala Keluarga' : 'Perusahaan', esc(dm.nama) || '—'));
+        detail.push(dRow(dm.mode === 'l' ? 'Kepala Keluarga' : 'Perusahaan', esc(dm.nama)));
         if (dm.namaSub) detail.push(dRow(dm.mode === 'l' ? 'Usaha' : 'Nama komersial', esc(dm.namaSub)));
         if (dm.alamat)  detail.push(dRow('Alamat', esc(dm.alamat)));
       }
-      detail.push(dRow('Kode wilayah', fmtKodeWilayah(it) || '—'));
-      detail.push(dRow('Petugas', esc(it.petugas_nama) || '—'));
-      detail.push(dRow('Dibuat', esc(fmtDateTime(it.created_at)) || '—'));
+      detail.push(dRow('Provinsi',  esc(wilayahLabel('prov', it.provinsi_kd,  it.provinsi))));
+      detail.push(dRow('Kabupaten', esc(wilayahLabel('kab',  it.kabupaten_kd, it.kabupaten))));
+      detail.push(dRow('Kecamatan', esc(wilayahLabel('kec',  it.kecamatan_kd, it.kecamatan))));
+      detail.push(dRow('Desa/Kel.', esc(wilayahLabel('desa', it.desa_kd,      it.desa))));
+      if (it.sls_nama || it.sls_kd) {
+        var slsDet = wilayahLabel('sls', it.sls_kd, it.sls_nama);
+        if (it.subsls_kd && it.subsls_kd !== '00') slsDet += ' · SubSLS ' + it.subsls_kd;
+        detail.push(dRow('SLS', esc(slsDet)));
+      }
+      detail.push(dRow('Petugas', esc(it.petugas_nama)));
+      detail.push(dRow('Dibuat', esc(fmtDateTime(it.created_at))));
 
       return '<div class="assign-card" data-id="' + esc(it.id) + '">' +
         '<div class="assign-card-head">' +
@@ -1020,7 +1051,7 @@
     var list = (typeof STATIC_PROVINSI !== 'undefined') ? STATIC_PROVINSI.slice() : [];
     list.sort(sortByNama).forEach(function (p) {
       var o = document.createElement('option');
-      o.value = p.kode; o.textContent = p.nama;
+      o.value = p.kode; o.textContent = wilayahLabel('prov', p.kode, p.nama);
       sel.appendChild(o);
     });
     // Default Bali (51) sesuai konteks BPS Buleleng
@@ -1041,7 +1072,7 @@
     var list = (typeof STATIC_KABUPATEN !== 'undefined' && STATIC_KABUPATEN[kdprov]) || [];
     list.slice().sort(sortByNama).forEach(function (k) {
       var o = document.createElement('option');
-      o.value = k.kode; o.textContent = k.nama;
+      o.value = k.kode; o.textContent = wilayahLabel('kab', k.kode, k.nama);
       selKab.appendChild(o);
     });
     // Default Buleleng (5108) saat provinsi Bali
@@ -1065,7 +1096,7 @@
     } else {
       list.slice().sort(sortByNama).forEach(function (kc) {
         var o = document.createElement('option');
-        o.value = kc.kode; o.textContent = kc.nama;
+        o.value = kc.kode; o.textContent = wilayahLabel('kec', kc.kode, kc.nama);
         selKec.appendChild(o);
       });
       selKec.disabled = false;
@@ -1086,7 +1117,7 @@
     } else {
       list.slice().sort(sortByNama).forEach(function (d) {
         var o = document.createElement('option');
-        o.value = d.kode; o.textContent = d.nama;
+        o.value = d.kode; o.textContent = wilayahLabel('desa', d.kode, d.nama);
         selDesa.appendChild(o);
       });
       selDesa.disabled = false;
@@ -1107,7 +1138,7 @@
       list.slice().sort(sortByNama).forEach(function (s) {
         var o = document.createElement('option');
         o.value = s.kode;     // 4-digit kode SLS (mis. "0001")
-        o.textContent = s.nama; // mis. "LINGKUNGAN PENGINUMAN"
+        o.textContent = wilayahLabel('sls', s.kode, s.nama); // mis. "[0001] LINGKUNGAN PENGINUMAN"
         // Simpan fullKode (14-digit gabungan desa+sls) untuk lookup subsls
         o.dataset.fullkode = kddesa + s.kode;
         selSls.appendChild(o);

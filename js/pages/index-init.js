@@ -491,6 +491,8 @@ async function applyAssignmentPrefill(a) {
       const el = document.getElementById('l1_nama_kk');
       if (el && !el.value) { el.value = a.nama_responden; el.dispatchEvent(new Event('input', {bubbles:true})); }
     }
+    // Anggota #1 = Kepala Keluarga otomatis (idempotent; skip bila draft sudah punya anggota)
+    if (typeof ensureKepalaKeluarga === 'function') ensureKepalaKeluarga();
     // Cascade wilayah keluarga (l1_alamat_*)
     if (a.provinsi_kd) {
       const selProv = document.getElementById('l1_alamat_provinsi');

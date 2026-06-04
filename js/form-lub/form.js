@@ -251,16 +251,16 @@ function _lkpRosterRowHTML(i) {
   const displayName = nama || ('Cabang/Unit ke-' + i);
   const meta = [jenisTxt, provTxt].filter(Boolean).join(' · ');
   return `<div class="roster-row" id="lkp_row_${i}">
-    <div class="roster-no">${i}</div>
-    <div class="roster-info">
-      <div class="roster-name">${displayName}</div>
-      <div class="roster-meta">${meta || 'Belum ada data'}</div>
+    <div class="roster-row-top">
+      <div class="roster-no">${i}</div>
+      <div class="roster-info">
+        <div class="roster-name">${displayName}</div>
+        <div class="roster-meta">${meta || 'Belum ada data'}</div>
+      </div>
+      <span class="status-chip ${statusCls}">${statusTxt}</span>
+      <button class="btn-roster-del" type="button" title="Hapus cabang/unit" aria-label="Hapus cabang ke-${i}" onclick="deleteCabang(${i})">✕</button>
     </div>
-    <span class="status-chip ${statusCls}">${statusTxt}</span>
-    <div class="roster-actions">
-      <button class="btn-roster-edit" type="button" onclick="if(typeof showLkpDetailScreen==='function')showLkpDetailScreen(${i})">Edit</button>
-      <button class="btn-roster-del"  type="button" onclick="deleteCabang(${i})">Hapus</button>
-    </div>
+    <button class="btn-roster-open" type="button" onclick="if(typeof showLkpDetailScreen==='function')showLkpDetailScreen(${i})">Buka detail cabang/unit</button>
   </div>`;
 }
 
