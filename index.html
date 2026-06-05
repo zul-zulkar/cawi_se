@@ -131,6 +131,7 @@
   .badge-l      { background: #e0e7ff; color: #3730a3; }
   .badge-lub    { background: #fce7f3; color: #9d174d; }
   .badge-p      { background: #ccfbf1; color: #0f766e; }
+  .modal-note   { background: #f0fdfa; border: 1px solid #99f6e4; color: #0f766e; font-size: 12.5px; line-height: 1.5; padding: 9px 12px; border-radius: 8px; }
   .badge-draft  { background: #fef3c7; color: var(--amber); }
   .badge-done   { background: #dcfce7; color: var(--green); }
 
@@ -404,13 +405,11 @@
     </div>
     <div class="modal-body">
       <div id="modalError" class="alert alert-error hidden"></div>
+      <!-- Semua assignment = Pemutakhiran (P). Jenis kuesioner lanjutan (keluarga/usaha)
+           ditentukan DI DALAM Blok P via Kode Penggunaan Bangunan. -->
+      <input type="hidden" name="addJenis" value="UNIFIED"/>
       <div class="form-row">
-        <label class="form-label">Jenis Kuesioner</label>
-        <div class="radio-group">
-          <label><input type="radio" name="addJenis" value="UNIFIED" checked/> P — Pemutakhiran (keluarga/usaha/bangunan)</label>
-          <label><input type="radio" name="addJenis" value="L"/> L (Rumah Tangga)</label>
-          <label><input type="radio" name="addJenis" value="LUB"/> L.UB (Usaha Besar)</label>
-        </div>
+        <div class="modal-note">Semua assignment dibuka sebagai <b>Pemutakhiran (P)</b>. Identifikasi keluarga / bangunan lainnya dilakukan di dalam Blok P.</div>
       </div>
       <div class="form-row">
         <label class="form-label" for="addNamaResp">
@@ -1174,9 +1173,7 @@
   function openModal() {
     hide('modalError'); $('modalError').textContent = '';
     $('addNamaResp').value = '';
-    var radios = document.getElementsByName('addJenis');
-    for (var i = 0; i < radios.length; i++) radios[i].checked = (radios[i].value === 'L');
-    applyJenisLabel();
+    applyJenisLabel(); // selalu UNIFIED → label "Nama Keluarga / Usaha / Bangunan"
 
     if (_baliLoaded) {
       // Sudah ter-cache di sesi ini — buka langsung
@@ -1208,9 +1205,8 @@
   }
 
   function saveAssignment() {
-    var jenis = 'L';
-    var radios = document.getElementsByName('addJenis');
-    for (var i = 0; i < radios.length; i++) if (radios[i].checked) jenis = radios[i].value;
+    // Semua assignment = Pemutakhiran (P). Jenis lanjutan ditentukan di Blok P.
+    var jenis = 'UNIFIED';
     var slsSel  = $('addSls');
     var slsOpt  = slsSel.options[slsSel.selectedIndex];
     var slsFull = (slsOpt && slsOpt.dataset && slsOpt.dataset.fullkode) || '';

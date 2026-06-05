@@ -461,10 +461,11 @@ function collectDataL() {
     aset_rumah_nilai:  parseCurrency(getVal('l3_aset_rumah_nilai')),
     // === BLOK IV: Catatan ===
     catatan_pendata:   getVal('l4_catatan'),
-    // === BLOK V: Petugas & Responden ===
-    petugas_nama:      getVal('l5_petugas_nama'),
-    petugas_nip:       getVal('l5_petugas_nip'),
-    petugas_hp:        getVal('l5_petugas_hp'),
+    // === BLOK V: Responden ===
+    // Identitas petugas TIDAK lagi diisi manual — otomatis dari assignment/login.
+    petugas_nama:      ((typeof window !== 'undefined' && window.__cawiActiveAssignment) || {}).petugas_nama || '',
+    petugas_nip:       ((typeof window !== 'undefined' && window.__cawiActiveAssignment) || {}).petugas_nip || '',
+    petugas_hp:        ((typeof window !== 'undefined' && window.__cawiActiveAssignment) || {}).petugas_hp || '',
     // Identitas pendata dari sesi login (hidden, auto-inject)
     petugas_email_login: getVal('petugas_email_login'),
     petugas_peran_login: getVal('petugas_peran_login'),
@@ -565,22 +566,20 @@ async function submitUnified() {
     }
   }
   const stage = (typeof computeStageFromP === 'function') ? computeStageFromP() : 'none';
-  // 2) Validasi stage lanjutan (reuse validasi existing)
-  if (stage === 'l') {
+  const isLStage = (stage === 'keluarga' || stage === 'usaha');
+  // 2) Validasi stage lanjutan (kuesioner L; usaha-saja → field keluarga di-skip
+  //    otomatis oleh collectAllProblemsL via window.__cawiLScope).
+  if (isLStage) {
+    window.__cawiLScope = (stage === 'usaha') ? 'usaha' : 'full';
     if (typeof collectAllProblemsL === 'function') {
       const probs = collectAllProblemsL();
       if (probs.errors.length) {
         const first = probs.errors[0];
-        if (typeof goBlok === 'function') goBlok(first.blok || 1);
+        if (typeof goBlok === 'function') goBlok(first.blok || 2);
         setTimeout(() => showAlert('l5_submitAlert', first.label + ' — ' + first.text), 300);
         return;
       }
     }
-  } else if (stage === 'lub') {
-    const e1 = (typeof validateBlok1 === 'function') ? validateBlok1() : '';
-    if (e1) { if (typeof goBlok === 'function') goBlok(1); setTimeout(() => showAlert('alertBox', 'Blok I — ' + e1), 300); return; }
-    const e3 = (typeof validateBlok3 === 'function') ? validateBlok3() : '';
-    if (e3) { showAlert('submitAlert', e3); return; }
   }
 
   if (typeof window.showLoadingOverlay === 'function') {
@@ -588,10 +587,11 @@ async function submitUnified() {
   }
   try {
     const cawiId = (window.__cawiActiveAssignment && window.__cawiActiveAssignment.id) || null;
-    // 3) Submit stage dulu (untuk dapat record_id tautan)
+    // 3) Submit stage dulu (untuk dapat record_id tautan). keluarga & usaha sama-sama
+    //    formMode 'l' (L.UB dilebur). usaha-saja: field keluarga kosong → tetap valid.
     let stageRecordId = null;
-    if (stage === 'l' || stage === 'lub') {
-      const sd = collectData(); // dispatch by getFormMode (sudah diselaraskan ke stage)
+    if (isLStage) {
+      const sd = collectData(); // dispatch by getFormMode (sudah diselaraskan ke 'l')
       if (cawiId) sd.cawi_id = cawiId;
       stageRecordId = await _postData(sd);
     }

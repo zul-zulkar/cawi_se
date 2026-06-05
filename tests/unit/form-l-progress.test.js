@@ -683,11 +683,11 @@ describe('calcProgressL() — Blok III Perumahan', () => {
 
 // ─── BLOK V: Petugas/Responden ──────────────────────────────────────────────
 
-describe('calcProgressL() — Blok V Petugas/Responden', () => {
-  it('petugas_nama counts', () => {
+describe('calcProgressL() — Blok V Responden', () => {
+  it('identitas petugas tidak dihitung progress (otomatis dari login)', () => {
     const base = calc()
     const r = calc({ fields: { l5_petugas_nama: 'Andi' } })
-    expect(r.filled).toBe(base.filled + 1)
+    expect(r.filled).toBe(base.filled)
   })
 
   it('responden_hp requires valid format and counts', () => {

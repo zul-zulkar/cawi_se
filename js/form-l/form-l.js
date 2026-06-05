@@ -500,12 +500,43 @@ function updateSidebarAnggota(count) {
   group.classList.remove('hidden');
   items.innerHTML = '';
   for (let i = 1; i <= count; i++) {
+    const nmEl = document.getElementById('l_ang_' + i + '_nama');
+    const nm = (nmEl && nmEl.value ? String(nmEl.value) : '').trim();
     const div = document.createElement('div');
-    div.className = 'sidebar-q-item sidebar-q-sub';
+    div.className = 'sidebar-q-item sidebar-q-sub sidebar-roster-item';
     div.setAttribute('onclick', `if(typeof showAngDetailScreen==='function')showAngDetailScreen(${i})`);
-    div.textContent = '↓ Anggota #' + i;
+    div.innerHTML = '<span class="sb-roster-no">#' + i + '</span><span class="sb-roster-nm'
+      + (nm ? '' : ' is-empty') + '">' + (nm ? _sbEsc(nm) : 'belum diisi') + '</span>';
     items.appendChild(div);
   }
+}
+
+/* Generate item roster USAHA di sidebar (Blok II L) — nama dari _usahaDataStore. */
+function updateSidebarUsaha(count) {
+  const group = document.getElementById('sidebarUsahaGroup');
+  const items = document.getElementById('sidebarUsahaItems');
+  if (!group || !items) return;
+  const n = (typeof count === 'number') ? count
+          : (typeof _usahaDataStore !== 'undefined' ? _usahaDataStore.length : 0);
+  if (n <= 0) { group.classList.add('hidden'); items.innerHTML = ''; return; }
+  group.classList.remove('hidden');
+  items.innerHTML = '';
+  for (let i = 1; i <= n; i++) {
+    const d = (typeof _usahaDataStore !== 'undefined' && _usahaDataStore[i - 1]) || {};
+    const nm = String(d['l2_nama_usaha'] || '').trim();
+    const div = document.createElement('div');
+    div.className = 'sidebar-q-item sidebar-q-sub sidebar-roster-item';
+    div.setAttribute('onclick', `if(typeof showUsahaDetailScreen==='function')showUsahaDetailScreen(${i})`);
+    div.innerHTML = '<span class="sb-roster-no">#' + i + '</span><span class="sb-roster-nm'
+      + (nm ? '' : ' is-empty') + '">' + (nm ? _sbEsc(nm) : 'belum diisi') + '</span>';
+    items.appendChild(div);
+  }
+}
+
+function _sbEsc(s) {
+  return String(s).replace(/[&<>"']/g, function (c) {
+    return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c];
+  });
 }
 
 function updateJmlPendataan() {
@@ -848,6 +879,8 @@ function _collectL2Fields() {
   // KBLI chip visibility
   const chip = document.getElementById('l2_kbli_chip');
   obj['_kbli_chip_visible'] = chip && chip.style.display !== 'none' ? '1' : '0';
+  // L.KP — cabang per-usaha (ikut tersimpan di objek usaha → usaha_data ke GAS)
+  obj._cabang = (typeof _collectL2Cabang === 'function') ? _collectL2Cabang() : [];
   return obj;
 }
 
@@ -900,6 +933,8 @@ function _applyL2Fields(obj) {
   }
   // Apply kbli filter (Halal/BPOM visibility)
   if (typeof applyKBLIFilter === 'function') applyKBLIFilter();
+  // L.KP — bangun ulang kartu cabang dari objek usaha
+  if (typeof _applyL2Cabang === 'function') _applyL2Cabang(obj._cabang || []);
 }
 
 function _clearL2Fields() {
@@ -930,6 +965,10 @@ function _clearL2Fields() {
     const el = document.getElementById(id);
     if (el) el.classList.add('hidden');
   });
+  // L.KP — kosongkan daftar cabang
+  const cabList = document.getElementById('l2_cabang_list');
+  if (cabList) cabList.innerHTML = '';
+  if (typeof _syncL2JmlCabang === 'function') _syncL2JmlCabang();
 }
 
 // Re-trigger semua conditional show/hide handlers setelah load data
@@ -996,6 +1035,7 @@ function renderUsahaRoster() {
   for (let i = 1; i <= n; i++) list.insertAdjacentHTML('beforeend', _usahaRosterRowHTML(i));
   if (empty)   empty.style.display   = n > 0 ? 'none' : '';
   if (countEl) countEl.textContent = n + ' usaha';
+  if (typeof updateSidebarUsaha === 'function') updateSidebarUsaha(n);
 }
 
 function _usahaRosterRowHTML(idx) {
@@ -1024,6 +1064,100 @@ function _usahaRosterRowHTML(idx) {
     </div>
     <button class="btn-roster-open" type="button" onclick="if(typeof showUsahaDetailScreen==='function')showUsahaDetailScreen(${idx})">Buka detail usaha</button>
   </div>`;
+}
+
+/* ====== L.KP CABANG per-usaha (inline cards) ======
+ * Cabang dari usaha "Kantor pusat" (l2_jaringan=2). Disimpan per-usaha di
+ * _usahaDataStore[i]._cabang (lewat _collectL2Fields/_applyL2Fields) → otomatis
+ * ikut usaha_data JSON ke GAS, tanpa perubahan backend/submit. Kartu inline
+ * (id l2cab_<n>_*), dibangun ulang tiap usaha dimuat. */
+function _l2CabangCount() {
+  const list = document.getElementById('l2_cabang_list');
+  return list ? list.querySelectorAll('.l2cab-card').length : 0;
+}
+function _syncL2JmlCabang() {
+  const n = _l2CabangCount();
+  const cntEl = document.getElementById('l2_cabang_count');
+  if (cntEl) cntEl.textContent = n + ' cabang/unit';
+  const empty = document.getElementById('l2_cabang_empty');
+  if (empty) empty.style.display = n > 0 ? 'none' : '';
+  const jml = document.getElementById('l2_jml_cabang');
+  if (jml) jml.value = n > 0 ? n : '';
+}
+function _l2CabangCardHTML(i, d) {
+  d = d || {};
+  const v = (k) => (d[k] != null ? String(d[k]) : '');
+  const sel = (val) => v('jenis') === val ? ' selected' : '';
+  const esc = (typeof _sbEsc === 'function') ? _sbEsc : ((s) => String(s == null ? '' : s));
+  return `<div class="l2cab-card" data-cab="${i}">
+    <div class="l2cab-head">
+      <span class="l2cab-no">#${i}</span>
+      <span class="l2cab-title">Cabang / Unit</span>
+      <button type="button" class="btn-roster-del" title="Hapus cabang/unit" aria-label="Hapus cabang ${i}" onclick="deleteCabangL2(${i})">&#10005;</button>
+    </div>
+    <div class="form-group">
+      <label class="field-label">Nama Kantor/Unit <span class="req">*</span></label>
+      <input type="text" id="l2cab_${i}_nama" value="${esc(v('nama'))}" placeholder="Nama kantor/unit"/>
+    </div>
+    <div class="inline-fields">
+      <div class="form-group">
+        <label class="field-label">Jenis Unit</label>
+        <select id="l2cab_${i}_jenis">
+          <option value="">-- Pilih --</option>
+          <option value="1"${sel('1')}>1. Kantor Cabang</option>
+          <option value="2"${sel('2')}>2. Kantor Perwakilan</option>
+          <option value="3"${sel('3')}>3. Pabrik</option>
+          <option value="4"${sel('4')}>4. Unit Pembantu/Penunjang</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="field-label">KBLI (5 digit)</label>
+        <input type="text" id="l2cab_${i}_kbli" maxlength="5" value="${esc(v('kbli'))}" placeholder="00000"/>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="field-label">Alamat</label>
+      <input type="text" id="l2cab_${i}_alamat" value="${esc(v('alamat'))}" placeholder="Alamat cabang/unit"/>
+    </div>
+    <div class="form-group">
+      <label class="field-label">Jumlah Pekerja</label>
+      <input type="number" id="l2cab_${i}_pekerja" min="0" value="${esc(v('pekerja'))}" placeholder="0"/>
+    </div>
+  </div>`;
+}
+function addCabangL2() {
+  const list = document.getElementById('l2_cabang_list');
+  if (!list) return;
+  const n = _l2CabangCount();
+  if (n >= 50) { alert('Maksimal 50 cabang/unit.'); return; }
+  list.insertAdjacentHTML('beforeend', _l2CabangCardHTML(n + 1, {}));
+  _syncL2JmlCabang();
+  if (typeof updateProgress === 'function') updateProgress();
+}
+function deleteCabangL2(i) {
+  if (!confirm('Hapus cabang/unit ke-' + i + '? Data yang sudah diisi akan hilang.')) return;
+  const arr = _collectL2Cabang();
+  arr.splice(i - 1, 1);
+  _applyL2Cabang(arr);
+  if (typeof updateProgress === 'function') updateProgress();
+}
+function _collectL2Cabang() {
+  const list = document.getElementById('l2_cabang_list');
+  if (!list) return [];
+  const out = [];
+  list.querySelectorAll('.l2cab-card').forEach((card) => {
+    const i = card.getAttribute('data-cab');
+    const g = (f) => { const el = document.getElementById('l2cab_' + i + '_' + f); return el ? el.value : ''; };
+    out.push({ nama: g('nama'), jenis: g('jenis'), kbli: g('kbli'), alamat: g('alamat'), pekerja: g('pekerja') });
+  });
+  return out;
+}
+function _applyL2Cabang(arr) {
+  const list = document.getElementById('l2_cabang_list');
+  if (!list) return;
+  list.innerHTML = '';
+  (arr || []).forEach((d, idx) => list.insertAdjacentHTML('beforeend', _l2CabangCardHTML(idx + 1, d)));
+  _syncL2JmlCabang();
 }
 
 /* --- L2 conditional handlers --- */

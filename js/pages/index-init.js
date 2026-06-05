@@ -303,8 +303,6 @@ function showMainScreen() {
 
 function showAngDetailScreen(idx) {
   _activeScreenIdx = idx;
-  const titleEl = document.getElementById('screen-ang-title');
-  if (titleEl) titleEl.textContent = 'Anggota ke-' + idx;
   // Pindahkan card dari pool ke screen-ang-body
   const pool = document.getElementById('anggota-pool');
   const body = document.getElementById('screen-ang-body');
@@ -312,6 +310,7 @@ function showAngDetailScreen(idx) {
     const card = document.getElementById('l_ang_card_' + idx);
     if (card) body.appendChild(card);
   }
+  _setRosterOwnerTitle('ang', idx);
   _showScreen('ang');
   _updateRosterNav();
   history.pushState({ screen: 'ang', idx }, '', '#ang-' + idx);
@@ -319,14 +318,48 @@ function showAngDetailScreen(idx) {
 
 function showUsahaDetailScreen(idx) {
   _activeScreenIdx = idx;
-  const titleEl = document.getElementById('screen-usaha-title');
-  if (titleEl) titleEl.textContent = 'Usaha ke-' + idx;
-  // Load data usaha N ke form l2_*
+  // Load data usaha N ke form l2_* dulu, baru set judul (baca l2_nama_usaha terbaru)
   if (typeof loadUsahaIntoForm === 'function') loadUsahaIntoForm(idx);
+  _setRosterOwnerTitle('usaha', idx);
   _showScreen('usaha');
   _updateRosterNav();
   history.pushState({ screen: 'usaha', idx }, '', '#usaha-' + idx);
 }
+
+/* Header sticky layar detail roster menampilkan nama pemilik entri (anggota/usaha/
+ * cabang) agar petugas tak salah mengisi. Dipanggil saat buka layar & saat nama
+ * diketik (lewat listener input global di bawah). */
+function _setRosterOwnerTitle(type, idx) {
+  const titleId = type === 'ang' ? 'screen-ang-title'
+                : type === 'usaha' ? 'screen-usaha-title'
+                : 'screen-lkp-title';
+  const el = document.getElementById(titleId);
+  if (!el) return;
+  const label = type === 'ang' ? ('Anggota #' + idx)
+              : type === 'usaha' ? ('Usaha #' + idx)
+              : ('Cabang/Unit #' + idx);
+  const nameId = type === 'ang' ? ('l_ang_' + idx + '_nama')
+               : type === 'usaha' ? 'l2_nama_usaha'
+               : ('lkp_' + idx + '_nama');
+  const nmEl = document.getElementById(nameId);
+  let nm = (nmEl && nmEl.value ? String(nmEl.value) : '').trim();
+  const esc = (s) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  el.innerHTML = '<span class="screen-title-num">' + label + '</span>'
+    + '<span class="screen-title-name' + (nm ? '' : ' is-empty') + '">'
+    + (nm ? esc(nm) : 'nama belum diisi') + '</span>';
+}
+
+// Update judul sticky saat nama entri aktif diketik (delegasi input global).
+document.addEventListener('input', function (ev) {
+  if (typeof _activeScreen === 'undefined' || _activeScreen == null) return;
+  const t = ev.target;
+  if (!t || !t.id) return;
+  const want = _activeScreen === 'ang' ? ('l_ang_' + _activeScreenIdx + '_nama')
+             : _activeScreen === 'usaha' ? 'l2_nama_usaha'
+             : _activeScreen === 'lkp' ? ('lkp_' + _activeScreenIdx + '_nama')
+             : null;
+  if (want && t.id === want) _setRosterOwnerTitle(_activeScreen, _activeScreenIdx);
+});
 
 // Simpan & kembalikan detail roster yang sedang aktif ke pool/store
 // (tanpa pindah ke layar utama). Dipakai oleh exit* dan navRosterDetail.
@@ -338,9 +371,11 @@ function _stashActiveDetail() {
     if (card && pool) pool.appendChild(card);
     if (typeof renderAnggotaRosterRow === 'function') renderAnggotaRosterRow(_activeScreenIdx);
     if (typeof updateJmlPendataan === 'function') updateJmlPendataan();
+    if (typeof updateSidebarAnggota === 'function' && typeof _getAnggotaCount === 'function') updateSidebarAnggota(_getAnggotaCount());
   } else if (_activeScreen === 'usaha') {
     if (typeof serializeCurrentUsahaForm === 'function') serializeCurrentUsahaForm(_activeScreenIdx);
     if (typeof renderUsahaRosterRow === 'function') renderUsahaRosterRow(_activeScreenIdx);
+    if (typeof updateSidebarUsaha === 'function') updateSidebarUsaha();
   } else if (_activeScreen === 'lkp') {
     const card = document.getElementById('lkp_card_' + _activeScreenIdx);
     const pool = document.getElementById('lkp-pool');
@@ -365,8 +400,6 @@ function exitUsahaDetail() {
 
 function showLkpDetailScreen(idx) {
   _activeScreenIdx = idx;
-  const titleEl = document.getElementById('screen-lkp-title');
-  if (titleEl) titleEl.textContent = 'Cabang/Unit ke-' + idx;
   // Pindahkan card cabang dari pool ke screen-lkp-body
   const pool = document.getElementById('lkp-pool');
   const body = document.getElementById('screen-lkp-body');
@@ -374,6 +407,7 @@ function showLkpDetailScreen(idx) {
     const card = document.getElementById('lkp_card_' + idx);
     if (card) body.appendChild(card);
   }
+  _setRosterOwnerTitle('lkp', idx);
   _showScreen('lkp');
   _updateRosterNav();
   history.pushState({ screen: 'lkp', idx }, '', '#lkp-' + idx);

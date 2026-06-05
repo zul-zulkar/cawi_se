@@ -270,10 +270,7 @@ function collectAllProblemsL() {
   /* === BLOK IV: Catatan (opsional) === */
   if (!getVal('l4_catatan')) k('Blok IV: Catatan Pendata', 'Tidak diisi (opsional)', 4, 'l4_catatan');
 
-  /* === BLOK V: Petugas & Responden === */
-  if (!getVal('l5_petugas_nama')) e('Petugas: Nama', 'Harus diisi', 5, 'l5_petugas_nama');
-  if (!getVal('l5_petugas_hp')) k('Petugas: Nomor HP', 'Tidak diisi (opsional)', 5, 'l5_petugas_hp');
-  else if (!isValidHP(getVal('l5_petugas_hp'))) e('Petugas: Nomor HP', 'Format tidak valid', 5, 'l5_petugas_hp');
+  /* === BLOK V: Responden === (Identitas petugas otomatis dari login — tak divalidasi) */
   if (!getVal('l5_responden_nama')) e('Responden: Nama', 'Harus diisi', 5, 'l5_responden_nama');
   if (!getVal('l5_responden_hp')) e('Responden: Nomor HP', 'Harus diisi', 5, 'l5_responden_hp');
   else if (!isValidHP(getVal('l5_responden_hp'))) e('Responden: Nomor HP', 'Format tidak valid', 5, 'l5_responden_hp');
@@ -281,6 +278,13 @@ function collectAllProblemsL() {
   if (l5Email && !isValidEmail(l5Email)) e('Responden: Email', 'Format email tidak valid', 5, 'l5_responden_email');
   if (!getVal('l5_tanggal')) e('Responden: Tanggal Pelaksanaan', 'Harus diisi', 5, 'l5_tanggal');
   if (typeof l5HasSig === 'undefined' || l5HasSig !== true) e('Tanda Tangan', 'Harus diisi — gambar di kotak tanda tangan', 5, 'l5_sigCanvas');
+
+  // Unified stage "usaha-saja" (bangunan lainnya): hanya data usaha yang diwajibkan.
+  // Buang temuan blok keluarga — Blok I (keluarga&anggota) & Blok III (perumahan&aset).
+  if (typeof window !== 'undefined' && window.__cawiLScope === 'usaha') {
+    const keepUsaha = (arr) => arr.filter((x) => x.blok !== 1 && x.blok !== 3);
+    return { errors: keepUsaha(errors), warnings: keepUsaha(warnings), kosong: keepUsaha(kosong) };
+  }
 
   return {errors, warnings, kosong};
 }

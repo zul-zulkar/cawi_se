@@ -112,6 +112,12 @@ function _ssHighlight(text, q) {
 }
 
 // ---- Searchable Select Component ----
+/* Searchable select — versi minimalis:
+ *  - Trigger READ-ONLY (#<id>_inp) menampilkan nilai terpilih (bersih, seperti select).
+ *    Tetap kompatibel: kode prefill/draft cukup set inp.value + class has-value.
+ *  - Tombol clear (×) muncul saat ada nilai.
+ *  - Kotak pencarian berada DI DALAM dropdown (#<id>_search), bukan di field.
+ */
 function makeSearchable(selectId, label) {
   const select = document.getElementById(selectId);
   if (!select || select.dataset.ssInit) return;
@@ -123,18 +129,45 @@ function makeSearchable(selectId, label) {
   select.parentNode.insertBefore(wrap, select);
   wrap.appendChild(select);
 
+  // Trigger read-only (menampilkan pilihan). Pencarian dilakukan di dalam dropdown.
   const inp = document.createElement('input');
   inp.type = 'text';
   inp.className = 'ss-input';
   inp.id = selectId + '_inp';
+  inp.readOnly = true;
   inp.autocomplete = 'off';
   inp.disabled = select.disabled;
-  inp.placeholder = select.disabled ? 'Memuat...' : `🔍 Cari ${label}…`;
+  inp.placeholder = select.disabled ? 'Memuat…' : `Pilih ${label}…`;
+  inp.dataset.ssLabel = label;
   wrap.insertBefore(inp, select);
 
+  // Tombol clear (×)
+  const clearBtn = document.createElement('button');
+  clearBtn.type = 'button';
+  clearBtn.className = 'ss-clear';
+  clearBtn.id = selectId + '_clear';
+  clearBtn.setAttribute('aria-label', `Hapus pilihan ${label}`);
+  clearBtn.innerHTML = '&times;';
+  wrap.insertBefore(clearBtn, select);
+
+  // Dropdown: kotak cari + daftar opsi.
   const dd = document.createElement('div');
   dd.className = 'ss-dropdown';
   dd.id = selectId + '_dd';
+  const searchRow = document.createElement('div');
+  searchRow.className = 'ss-search-row';
+  const search = document.createElement('input');
+  search.type = 'text';
+  search.className = 'ss-search';
+  search.id = selectId + '_search';
+  search.autocomplete = 'off';
+  search.placeholder = `🔍 Cari ${label}…`;
+  searchRow.appendChild(search);
+  dd.appendChild(searchRow);
+  const listEl = document.createElement('div');
+  listEl.className = 'ss-list';
+  listEl.id = selectId + '_list';
+  dd.appendChild(listEl);
   wrap.appendChild(dd);
 
   let focusIdx = -1;
@@ -142,7 +175,6 @@ function makeSearchable(selectId, label) {
   function getOpts() {
     return Array.from(select.options).filter(o => o.value !== '').map(o => ({value: o.value, label: o.text}));
   }
-
   function scoreFilter(opts, q) {
     const ql = (q || '').trim();
     if (!ql) return opts;
@@ -151,46 +183,51 @@ function makeSearchable(selectId, label) {
       .filter(o => o._score > 0)
       .sort((a, b) => b._score - a._score || a.label.localeCompare(b.label, 'id'));
   }
-
-  function renderDd(opts, q) {
+  function renderList(opts, q) {
     focusIdx = -1;
-    dd.innerHTML = '';
+    listEl.innerHTML = '';
     const visible = opts.slice(0, 150);
     if (!visible.length) {
       const empty = document.createElement('div');
       empty.className = 'ss-item ss-empty';
       empty.textContent = 'Tidak ditemukan';
-      dd.appendChild(empty);
-    } else {
-      visible.forEach(o => {
-        const el = document.createElement('div');
-        el.className = 'ss-item';
-        if (o.value === select.value) el.classList.add('active');
-        el.innerHTML = _ssHighlight(o.label, q || '');
-        el._ssOpt = o;
-        el.addEventListener('mousedown', e => {
-          e.preventDefault();
-          selectOpt(o);
-        });
-        dd.appendChild(el);
-      });
+      listEl.appendChild(empty);
+      return;
     }
-    dd.classList.add('open');
+    visible.forEach(o => {
+      const el = document.createElement('div');
+      el.className = 'ss-item';
+      if (o.value === select.value) el.classList.add('active');
+      el.innerHTML = _ssHighlight(o.label, q || '');
+      el._ssOpt = o;
+      el.addEventListener('mousedown', e => { e.preventDefault(); selectOpt(o); });
+      listEl.appendChild(el);
+    });
   }
-
+  function openDd() {
+    if (inp.disabled) return;
+    dd.classList.add('open');
+    search.value = '';
+    renderList(getOpts(), '');
+    setTimeout(() => search.focus(), 0);
+  }
+  function closeDd() { dd.classList.remove('open'); focusIdx = -1; }
   function selectOpt(o) {
     inp.value = o.label;
     inp.classList.add('has-value');
     select.value = o.value;
     select.dispatchEvent(new Event('change', {bubbles: true}));
-    dd.classList.remove('open');
-    focusIdx = -1;
+    closeDd();
   }
-
-  function getItems() {
-    return Array.from(dd.querySelectorAll('.ss-item:not(.ss-empty)'));
+  function clearSel(e) {
+    if (e) { e.stopPropagation(); e.preventDefault(); }
+    inp.value = '';
+    inp.classList.remove('has-value');
+    select.value = '';
+    select.dispatchEvent(new Event('change', {bubbles: true}));
+    closeDd();
   }
-
+  function getItems() { return Array.from(listEl.querySelectorAll('.ss-item:not(.ss-empty)')); }
   function setFocus(idx) {
     const items = getItems();
     items.forEach(el => el.classList.remove('keyboard-focus'));
@@ -201,62 +238,31 @@ function makeSearchable(selectId, label) {
     }
   }
 
-  inp.addEventListener('focus', () => {
-    if (inp.disabled) return;
-    inp.select();
-    const q = inp.value;
-    renderDd(scoreFilter(getOpts(), q), q);
-  });
-
-  inp.addEventListener('input', () => {
-    const q = inp.value;
-    renderDd(scoreFilter(getOpts(), q), q);
-    if (!q) { inp.classList.remove('has-value'); select.value = ''; }
-  });
-
+  inp.addEventListener('click', () => { dd.classList.contains('open') ? closeDd() : openDd(); });
   inp.addEventListener('keydown', e => {
+    if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDd(); }
+  });
+  clearBtn.addEventListener('click', clearSel);
+  search.addEventListener('input', () => renderList(scoreFilter(getOpts(), search.value), search.value));
+  search.addEventListener('keydown', e => {
     const items = getItems();
-    if (e.key === 'ArrowDown') {
+    if (e.key === 'ArrowDown') { e.preventDefault(); setFocus(focusIdx + 1); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); setFocus(focusIdx - 1); }
+    else if (e.key === 'Enter') {
       e.preventDefault();
-      if (!dd.classList.contains('open')) {
-        const q = inp.value;
-        renderDd(scoreFilter(getOpts(), q), q);
-      } else {
-        setFocus(focusIdx + 1);
-      }
-    } else if (e.key === 'ArrowUp') {
-      e.preventDefault();
-      setFocus(focusIdx - 1);
-    } else if (e.key === 'Enter') {
-      e.preventDefault();
-      if (focusIdx >= 0 && items[focusIdx] && items[focusIdx]._ssOpt) {
-        selectOpt(items[focusIdx]._ssOpt);
-      } else if (items.length === 1 && items[0]._ssOpt) {
-        selectOpt(items[0]._ssOpt);
-      }
-    } else if (e.key === 'Escape') {
-      dd.classList.remove('open');
-      focusIdx = -1;
-    }
+      if (focusIdx >= 0 && items[focusIdx] && items[focusIdx]._ssOpt) selectOpt(items[focusIdx]._ssOpt);
+      else if (items.length === 1 && items[0]._ssOpt) selectOpt(items[0]._ssOpt);
+    } else if (e.key === 'Escape') { closeDd(); inp.focus(); }
   });
-
-  inp.addEventListener('blur', () => {
-    setTimeout(() => {
-      dd.classList.remove('open');
-      focusIdx = -1;
-      if (inp.value && !getOpts().find(o => o.label === inp.value)) {
-        const cur = select.value ? (getOpts().find(o => o.value === select.value) || null) : null;
-        inp.value = cur ? cur.label : '';
-        if (!cur) inp.classList.remove('has-value');
-      }
-    }, 180);
-  });
+  // Tutup dropdown saat klik di luar
+  document.addEventListener('mousedown', ev => { if (!wrap.contains(ev.target)) closeDd(); });
 }
 
 function syncSearchable(selectId, label) {
   const inp = document.getElementById(selectId + '_inp');
   const select = document.getElementById(selectId);
   if (!inp || !select) return;
+  const search = document.getElementById(selectId + '_search');
   inp.disabled = select.disabled;
   if (select.disabled) {
     inp.placeholder = 'Memuat…';
@@ -264,7 +270,8 @@ function syncSearchable(selectId, label) {
     inp.classList.remove('has-value');
   } else {
     const count = Array.from(select.options).filter(o => o.value).length;
-    inp.placeholder = count > 0 ? `🔍 Cari ${label}… (${count} pilihan)` : `🔍 Cari ${label}…`;
+    inp.placeholder = `Pilih ${label}…`;
+    if (search) search.placeholder = count > 0 ? `🔍 Cari ${label}… (${count})` : `🔍 Cari ${label}…`;
     inp.value = '';
     inp.classList.remove('has-value');
   }

@@ -377,7 +377,7 @@
 
   <!-- ===== L SIDEBAR GROUPS (5 Blok) ===== -->
   <!-- BLOK I L: Keluarga & Anggota -->
-  <div class="sidebar-blok-group sb-l">
+  <div class="sidebar-blok-group sb-l" data-lblok="1">
     <div class="sidebar-item" id="sidebarTabL1">
       <div class="sidebar-item-main" onclick="goBlok(1)">
         <div class="sidebar-item-num">I</div>
@@ -401,7 +401,7 @@
   </div>
 
   <!-- BLOK II L: Usaha/Perusahaan -->
-  <div class="sidebar-blok-group sb-l">
+  <div class="sidebar-blok-group sb-l" data-lblok="2">
     <div class="sidebar-item" id="sidebarTabL2">
       <div class="sidebar-item-main" onclick="goBlok(2)">
         <div class="sidebar-item-num">II</div>
@@ -432,11 +432,15 @@
       <div class="sidebar-q-item" onclick="goBlokAndScroll(2,'L2-25')">25 · Tahun Beroperasi</div>
       <div class="sidebar-q-item" onclick="goBlokAndScroll(2,'L2-26')">26-29 · Keuangan Tahunan</div>
       <div class="sidebar-q-item" onclick="goBlokAndScroll(2,'L2-30')">30-33 · Keuangan Bulanan</div>
+      <div id="sidebarUsahaGroup" class="hidden">
+        <div class="sidebar-q-item sidebar-roster-head" onclick="goBlokAndScroll(2,'L2-roster')">Daftar Usaha</div>
+        <div id="sidebarUsahaItems"></div>
+      </div>
     </div>
   </div>
 
   <!-- BLOK III L: Perumahan & Aset -->
-  <div class="sidebar-blok-group sb-l">
+  <div class="sidebar-blok-group sb-l" data-lblok="3">
     <div class="sidebar-item" id="sidebarTabL3">
       <div class="sidebar-item-main" onclick="goBlok(3)">
         <div class="sidebar-item-num">III</div>
@@ -462,7 +466,7 @@
   </div>
 
   <!-- BLOK IV L: Catatan -->
-  <div class="sidebar-blok-group sb-l">
+  <div class="sidebar-blok-group sb-l" data-lblok="4">
     <div class="sidebar-item" id="sidebarTabL4">
       <div class="sidebar-item-main" onclick="goBlok(4)">
         <div class="sidebar-item-num">IV</div>
@@ -475,7 +479,7 @@
   </div>
 
   <!-- BLOK V L: Petugas & Responden -->
-  <div class="sidebar-blok-group sb-l">
+  <div class="sidebar-blok-group sb-l" data-lblok="5">
     <div class="sidebar-item" id="sidebarTabL5">
       <div class="sidebar-item-main" onclick="goBlok(5)">
         <div class="sidebar-item-num">V</div>
@@ -487,7 +491,6 @@
       <button class="sidebar-expand-btn" id="sidebarExpandBtnL5" onclick="toggleSidebarBlok(5)" title="Tampilkan pertanyaan">&#9660;</button>
     </div>
     <div class="sidebar-q-list hidden" id="sidebarQListL5">
-      <div class="sidebar-q-item" onclick="goBlokAndScroll(5,'L5-petugas')">Identitas Petugas</div>
       <div class="sidebar-q-item" onclick="goBlokAndScroll(5,'L5-responden')">Data Responden</div>
     </div>
   </div>
@@ -2050,7 +2053,7 @@
           <option value="2">2. Campuran (tempat tinggal + usaha)</option>
           <option value="3">3. Tempat Tinggal</option>
           <option value="4">4. Tempat Ibadah / Organisasi</option>
-          <option value="5">5. Pemerintah / Sekolah</option>
+          <option value="5">5. Kantor Pemerintah &amp; Konsulat</option>
           <option value="6">6. Tidak Dicakup</option>
           <option value="7">7. Kantor Virtual (Virtual Office)</option>
           <option value="8">8. Panti / Lapas / Asrama</option>
@@ -2580,9 +2583,20 @@
           <label class="radio-item"><input type="radio" name="l2_jaringan" value="6" onchange="handleJaringanL()"/> <span>6. Unit pembantu/penunjang</span></label>
         </div>
       </div>
+      <!-- b. L.KP — Daftar cabang/unit (muncul saat jaringan = Kantor pusat).
+           Disimpan per-usaha di _usahaDataStore[i]._cabang (ikut usaha_data ke GAS). -->
       <div class="form-group hidden" id="l2_jml_cabang_wrap">
-        <label class="field-label">b. Jumlah seluruh kantor cabang dan unit usaha di bawah kantor pusat <span class="req">*</span></label>
-        <input type="number" id="l2_jml_cabang" min="0" placeholder="0"/>
+        <div class="subsection-label">b. L.KP — Daftar Kantor Cabang/Unit di Bawah Kantor Pusat <span class="req">*</span></div>
+        <div class="hint">Lengkapi tiap kantor cabang/unit yang berada di bawah kendali usaha ini.</div>
+        <div class="roster-container">
+          <div class="roster-toolbar">
+            <span class="roster-count" id="l2_cabang_count">0 cabang/unit</span>
+            <button class="btn-roster-add" type="button" onclick="addCabangL2()">&#43; Tambah Cabang/Unit</button>
+          </div>
+          <div class="roster-list" id="l2_cabang_list"></div>
+          <div id="l2_cabang_empty" class="roster-empty">Belum ada cabang/unit. Klik &ldquo;+ Tambah Cabang/Unit&rdquo; untuk menambahkan.</div>
+        </div>
+        <input type="hidden" id="l2_jml_cabang"/>
       </div>
       <div class="notice-box hidden" id="l2_unit_pembantu_notice">
         Usaha ini merupakan unit pembantu/penunjang. Setelah mengisi Informasi Kantor Pusat (Rincian 15), pendataan usaha ini <strong>SELESAI</strong>.
@@ -3375,28 +3389,8 @@
     </div>
   </div>
 
-  <div class="section-card">
-    <div class="section-header" id="sec-L5-petugas">Identitas Petugas Pendata</div>
-    <div class="section-body">
-      <div class="form-group">
-        <label class="field-label">Nama Petugas <span class="req">*</span></label>
-        <div class="ac-wrap">
-          <input type="text" id="l5_petugas_nama" placeholder="Ketik nama petugas untuk mencari..."
-                 oninput="filterPetugasL()" onblur="hidePetugasDropL()" autocomplete="off"/>
-          <div id="l5_petugasDrop" class="ac-drop"></div>
-        </div>
-      </div>
-      <div class="inline-fields">
-        <div class="form-group">
-          <label class="field-label">NIP / ID Petugas</label>
-          <input type="text" id="l5_petugas_nip" class="input-muted" placeholder="Terisi otomatis saat nama dipilih" readonly/>
-        </div>
-        <div class="form-group">
-          <label class="field-label">No. HP Petugas</label>
-          <input type="text" id="l5_petugas_hp" placeholder="08xxxxxxxxxx"/>
-        </div>
-      </div>
-    </div>
+  <div class="notice-box" style="margin-bottom:14px">
+    Identitas petugas pendata terisi <strong>otomatis</strong> dari akun yang sedang login saat data dikirim — tidak perlu diisi manual.
   </div>
 
   <div class="section-card">

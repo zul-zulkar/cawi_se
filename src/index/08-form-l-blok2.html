@@ -330,9 +330,20 @@
           <label class="radio-item"><input type="radio" name="l2_jaringan" value="6" onchange="handleJaringanL()"/> <span>6. Unit pembantu/penunjang</span></label>
         </div>
       </div>
+      <!-- b. L.KP — Daftar cabang/unit (muncul saat jaringan = Kantor pusat).
+           Disimpan per-usaha di _usahaDataStore[i]._cabang (ikut usaha_data ke GAS). -->
       <div class="form-group hidden" id="l2_jml_cabang_wrap">
-        <label class="field-label">b. Jumlah seluruh kantor cabang dan unit usaha di bawah kantor pusat <span class="req">*</span></label>
-        <input type="number" id="l2_jml_cabang" min="0" placeholder="0"/>
+        <div class="subsection-label">b. L.KP — Daftar Kantor Cabang/Unit di Bawah Kantor Pusat <span class="req">*</span></div>
+        <div class="hint">Lengkapi tiap kantor cabang/unit yang berada di bawah kendali usaha ini.</div>
+        <div class="roster-container">
+          <div class="roster-toolbar">
+            <span class="roster-count" id="l2_cabang_count">0 cabang/unit</span>
+            <button class="btn-roster-add" type="button" onclick="addCabangL2()">&#43; Tambah Cabang/Unit</button>
+          </div>
+          <div class="roster-list" id="l2_cabang_list"></div>
+          <div id="l2_cabang_empty" class="roster-empty">Belum ada cabang/unit. Klik &ldquo;+ Tambah Cabang/Unit&rdquo; untuk menambahkan.</div>
+        </div>
+        <input type="hidden" id="l2_jml_cabang"/>
       </div>
       <div class="notice-box hidden" id="l2_unit_pembantu_notice">
         Usaha ini merupakan unit pembantu/penunjang. Setelah mengisi Informasi Kantor Pusat (Rincian 15), pendataan usaha ini <strong>SELESAI</strong>.

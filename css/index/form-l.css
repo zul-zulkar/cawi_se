@@ -11,18 +11,27 @@ body.mode-l .sidebar-blok-group.sb-l{display:block}
 .sidebar-blok-group.sb-p{display:none}
 body.mode-unified #form-p{display:block}
 body.mode-unified .sidebar-blok-group.sb-p{display:block}
-/* Default unified: sembunyikan kedua kuesioner lanjutan sampai gate me-reveal */
+/* Default unified: kuesioner lanjutan tersembunyi sampai gate me-reveal.
+   L.UB dilebur ke Blok II usaha (form L) → #form-lub & sb-lub selalu disembunyikan. */
 body.mode-unified #form-lub{display:none}
 body.mode-unified #form-l{display:none}
 body.mode-unified .sidebar-blok-group.sb-lub{display:none}
 body.mode-unified .sidebar-blok-group.sb-l{display:none}
-/* stage L → reveal kuesioner L */
-body.mode-unified.stage-l #form-l{display:block}
-body.mode-unified.stage-l .sidebar-blok-group.sb-l{display:block}
-/* stage L.UB → reveal kuesioner L.UB */
-body.mode-unified.stage-lub #form-lub{display:block}
-body.mode-unified.stage-lub .sidebar-blok-group.sb-lub{display:block}
-/* stage none → keduanya tetap tersembunyi (cukup Blok P) */
+/* Sembunyikan tombol ganti kuesioner manual di unified (gate yang menentukan) */
+body.mode-unified .sidebar-mode-row,
+body.mode-unified .sidebar-switch-row{display:none}
+/* stage keluarga & usaha → reveal kuesioner L */
+body.mode-unified.stage-keluarga #form-l,
+body.mode-unified.stage-usaha #form-l{display:block}
+body.mode-unified.stage-keluarga .sidebar-blok-group.sb-l,
+body.mode-unified.stage-usaha .sidebar-blok-group.sb-l{display:block}
+/* stage USAHA-SAJA (bangunan lainnya): sembunyikan blok KELUARGA (I: keluarga&anggota,
+   III: perumahan&aset). Sisakan II (usaha), IV (catatan), V (petugas/submit). */
+body.mode-unified.stage-usaha .sidebar-blok-group.sb-l[data-lblok="1"],
+body.mode-unified.stage-usaha .sidebar-blok-group.sb-l[data-lblok="3"]{display:none}
+body.mode-unified.stage-usaha #blokL1,
+body.mode-unified.stage-usaha #blokL3{display:none}
+/* stage none → kuesioner lanjutan tetap tersembunyi (cukup Blok P) */
 
 /* Petunjuk lanjutan di Blok P */
 .pmt-stage-hint{margin-top:10px;padding:10px 12px;border-radius:8px;background:#ebf4ff;border:1px solid #bee3f8;color:#2b6cb0;font-size:12.5px;line-height:1.5}
@@ -124,13 +133,53 @@ body.mode-unified.stage-lub .sidebar-blok-group.sb-lub{display:block}
 .screen-nav .btn-back:hover { background: #f7f4f0; border-color: #a09585; }
 .screen-nav .screen-title {
   flex: 1;
+  min-width: 0;
   font-size: 15px;
   font-weight: 700;
   color: #1a2332;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.25;
+  gap: 1px;
 }
+/* Judul dua baris: nomor entri (kecil) + nama pemilik (menonjol) */
+.screen-title .screen-title-num {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .4px;
+  text-transform: uppercase;
+  color: #9aa3b0;
+}
+.screen-title .screen-title-name {
+  font-size: 14px;
+  font-weight: 800;
+  color: #c05621;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.screen-title .screen-title-name.is-empty { color: #b0a8a0; font-weight: 600; font-style: italic; }
+
+/* ====== ITEM ROSTER DI SIDEBAR (anggota/usaha — nama digenerate) ====== */
+.sidebar-roster-head { font-weight: 700; color: #c05621; }
+.sidebar-roster-item { display: flex; align-items: center; gap: 8px; }
+.sidebar-roster-item .sb-roster-no {
+  flex-shrink: 0; font-size: 10px; font-weight: 800; color: #2b6cb0;
+  background: #e6f0ff; border-radius: 4px; padding: 1px 6px;
+}
+.sidebar-roster-item .sb-roster-nm {
+  flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.sidebar-roster-item .sb-roster-nm.is-empty { color: #9aa3b0; font-style: italic; }
+
+/* ====== L.KP CABANG CARDS (inline di detail usaha) ====== */
+.l2cab-card { margin-top: 10px; border: 1.5px solid #ffd9bf; border-left: 3px solid #fc6c00; border-radius: 8px; padding: 12px 14px; background: #fffaf6; }
+.l2cab-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.l2cab-head .l2cab-no { flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%; background: #fff0e3; color: #c05621; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+.l2cab-head .l2cab-title { flex: 1; font-size: 13px; font-weight: 700; color: #1a2332; }
 .screen-nav .btn-done {
   flex-shrink: 0;
   background: #2b6cb0;

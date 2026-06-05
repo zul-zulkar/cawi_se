@@ -73,13 +73,25 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 
 /* ====== SEARCHABLE SELECT ====== */
 .ss-wrap{position:relative}
-.ss-wrap::after{content:'CARI';position:absolute;top:50%;right:10px;transform:translateY(-50%);font-size:9px;font-weight:800;color:#fc6c00;letter-spacing:1.5px;background:#fff4ec;padding:2px 8px;border-radius:10px;border:1px solid #ffd0b0;pointer-events:none;z-index:2}
-.ss-input{width:100%;border:1.5px solid #ffb38a;border-left:3px solid #fc6c00;border-radius:5px;padding:9px 52px 9px 36px;font-size:13px;font-family:inherit;transition:border-color .2s,box-shadow .2s;background:#fffaf6 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23fc6c00' stroke-width='2.5'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") no-repeat 10px center;cursor:text;color:#2d2d2d;box-shadow:0 1px 5px rgba(252,108,0,.10)}
-.ss-input:focus{outline:none;border-color:#fc6c00;border-left-width:3px;box-shadow:0 0 0 3px rgba(252,108,0,.18)}
+/* caret ▾ pada trigger (disembunyikan saat trigger disabled) */
+.ss-wrap::after{content:'▾';position:absolute;top:50%;right:11px;transform:translateY(-50%);font-size:12px;color:#fc6c00;pointer-events:none;z-index:1}
+/* Trigger read-only — tampilan bersih seperti select biasa */
+.ss-input{width:100%;border:1.5px solid #ffb38a;border-left:3px solid #fc6c00;border-radius:6px;padding:9px 56px 9px 12px;font-size:13px;font-family:inherit;transition:border-color .2s,box-shadow .2s;background:#fffaf6;cursor:pointer;color:#2d2d2d;box-shadow:0 1px 5px rgba(252,108,0,.08);text-overflow:ellipsis;white-space:nowrap;overflow:hidden}
+.ss-input::placeholder{color:#b0a8a0}
+.ss-input:focus{outline:none;border-color:#fc6c00;box-shadow:0 0 0 3px rgba(252,108,0,.18)}
 .ss-input:disabled{background-color:#f7f4f0;color:#aaa;border-color:#e8e3de;border-left-color:#ddd;cursor:default;box-shadow:none}
-.ss-input.has-value{background-color:#fff4ec;border-color:#ffa06e;border-left-color:#fc6c00}
-.ss-dropdown{position:absolute;top:100%;left:0;right:0;background:#fff;border:1.5px solid #ffb38a;border-top:none;border-radius:0 0 6px 6px;max-height:230px;overflow-y:auto;z-index:201;display:none;box-shadow:0 6px 18px rgba(252,108,0,.15)}
+.ss-input.has-value{background-color:#fff4ec;border-color:#ffa06e;border-left-color:#fc6c00;font-weight:600;color:#1a2332}
+/* Tombol clear (×) — hanya saat ada nilai */
+.ss-clear{display:none;position:absolute;top:50%;right:30px;transform:translateY(-50%);width:20px;height:20px;border:none;border-radius:50%;background:#ffe0cc;color:#c05621;font-size:14px;line-height:1;cursor:pointer;align-items:center;justify-content:center;font-family:inherit;padding:0;z-index:2}
+.ss-clear:hover{background:#fc6c00;color:#fff}
+.ss-input.has-value ~ .ss-clear{display:flex}
+/* Dropdown: kotak cari di dalam + daftar opsi */
+.ss-dropdown{position:absolute;top:calc(100% + 3px);left:0;right:0;background:#fff;border:1.5px solid #ffb38a;border-radius:8px;z-index:201;display:none;box-shadow:0 8px 22px rgba(252,108,0,.18);overflow:hidden}
 .ss-dropdown.open{display:block}
+.ss-search-row{padding:8px;border-bottom:1px solid #ffe6d5;background:#fffaf6}
+.ss-search{width:100%;border:1.5px solid #ffd0b0;border-radius:6px;padding:8px 10px 8px 32px;font-size:13px;font-family:inherit;color:#2d2d2d;background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23fc6c00' stroke-width='2.5'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") no-repeat 9px center}
+.ss-search:focus{outline:none;border-color:#fc6c00;box-shadow:0 0 0 3px rgba(252,108,0,.15)}
+.ss-list{max-height:230px;overflow-y:auto}
 .ss-item{padding:9px 12px;cursor:pointer;font-size:13px;border-bottom:1px solid #f5f0eb;line-height:1.4}
 .ss-item:hover,.ss-item.active{background:#fff5ee}
 .ss-item.keyboard-focus{background:#fff0e0;outline:2px solid rgba(252,108,0,.35);outline-offset:-2px}

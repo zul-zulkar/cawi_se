@@ -120,7 +120,7 @@
 
   <!-- ===== L SIDEBAR GROUPS (5 Blok) ===== -->
   <!-- BLOK I L: Keluarga & Anggota -->
-  <div class="sidebar-blok-group sb-l">
+  <div class="sidebar-blok-group sb-l" data-lblok="1">
     <div class="sidebar-item" id="sidebarTabL1">
       <div class="sidebar-item-main" onclick="goBlok(1)">
         <div class="sidebar-item-num">I</div>
@@ -144,7 +144,7 @@
   </div>
 
   <!-- BLOK II L: Usaha/Perusahaan -->
-  <div class="sidebar-blok-group sb-l">
+  <div class="sidebar-blok-group sb-l" data-lblok="2">
     <div class="sidebar-item" id="sidebarTabL2">
       <div class="sidebar-item-main" onclick="goBlok(2)">
         <div class="sidebar-item-num">II</div>
@@ -175,11 +175,15 @@
       <div class="sidebar-q-item" onclick="goBlokAndScroll(2,'L2-25')">25 · Tahun Beroperasi</div>
       <div class="sidebar-q-item" onclick="goBlokAndScroll(2,'L2-26')">26-29 · Keuangan Tahunan</div>
       <div class="sidebar-q-item" onclick="goBlokAndScroll(2,'L2-30')">30-33 · Keuangan Bulanan</div>
+      <div id="sidebarUsahaGroup" class="hidden">
+        <div class="sidebar-q-item sidebar-roster-head" onclick="goBlokAndScroll(2,'L2-roster')">Daftar Usaha</div>
+        <div id="sidebarUsahaItems"></div>
+      </div>
     </div>
   </div>
 
   <!-- BLOK III L: Perumahan & Aset -->
-  <div class="sidebar-blok-group sb-l">
+  <div class="sidebar-blok-group sb-l" data-lblok="3">
     <div class="sidebar-item" id="sidebarTabL3">
       <div class="sidebar-item-main" onclick="goBlok(3)">
         <div class="sidebar-item-num">III</div>
@@ -205,7 +209,7 @@
   </div>
 
   <!-- BLOK IV L: Catatan -->
-  <div class="sidebar-blok-group sb-l">
+  <div class="sidebar-blok-group sb-l" data-lblok="4">
     <div class="sidebar-item" id="sidebarTabL4">
       <div class="sidebar-item-main" onclick="goBlok(4)">
         <div class="sidebar-item-num">IV</div>
@@ -218,7 +222,7 @@
   </div>
 
   <!-- BLOK V L: Petugas & Responden -->
-  <div class="sidebar-blok-group sb-l">
+  <div class="sidebar-blok-group sb-l" data-lblok="5">
     <div class="sidebar-item" id="sidebarTabL5">
       <div class="sidebar-item-main" onclick="goBlok(5)">
         <div class="sidebar-item-num">V</div>
@@ -230,7 +234,6 @@
       <button class="sidebar-expand-btn" id="sidebarExpandBtnL5" onclick="toggleSidebarBlok(5)" title="Tampilkan pertanyaan">&#9660;</button>
     </div>
     <div class="sidebar-q-list hidden" id="sidebarQListL5">
-      <div class="sidebar-q-item" onclick="goBlokAndScroll(5,'L5-petugas')">Identitas Petugas</div>
       <div class="sidebar-q-item" onclick="goBlokAndScroll(5,'L5-responden')">Data Responden</div>
     </div>
   </div>

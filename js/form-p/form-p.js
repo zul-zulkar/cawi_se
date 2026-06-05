@@ -12,23 +12,25 @@
  * ============================================================ */
 
 /* ---- Gate: Kode Penggunaan Bangunan → stage lanjutan ----
- * kode 1–8 (panduan SE2026-P):
- *   1 Khusus Usaha · 2 Campuran · 3 Tempat Tinggal · 4 Ibadah/Organisasi
- *   5 Pemerintah/Sekolah · 6 Tidak dicakup · 7 Virtual Office · 8 Panti/Lapas
- * skala: 'ub'|'besar' → L.UB ; selain itu (UMKM/kosong) → L.
- * Return: 'none' | 'l' | 'lub'  (pure function — diuji unit).
+ * Model leburan (L & L.UB jadi satu form L; usaha besar pun masuk L usaha):
+ *   kode 1–8 (panduan SE2026-P):
+ *     1 Khusus Usaha · 2 Campuran · 3 Tempat Tinggal · 4 Ibadah/Organisasi
+ *     5 Kantor Pemerintah & Konsulat · 6 Tidak dicakup · 7 Virtual Office · 8 Panti/Lapas
+ *   - 2 (campuran) / 3 (tempat tinggal) = KELUARGA → kuesioner L keluarga + usaha
+ *   - 1 (khusus usaha) / 7 (virtual office) = USAHA → kuesioner L usaha saja
+ *   - 4 / 5 / 6 / 8 = tidak ada kuesioner lanjutan (cukup listing Blok P)
+ * skala (UMKM/UB) tidak lagi menentukan stage — usaha besar tetap ke L usaha.
+ * Return: 'none' | 'keluarga' | 'usaha'  (pure function — diuji unit).
  */
 function PMT_GATE_RULES(kode, jmlUsaha, skala) {
   var k = String(kode == null ? '' : kode).trim();
-  var s = String(skala == null ? '' : skala).trim().toLowerCase();
-  var isUB = (s === 'ub' || s === 'besar');
   switch (k) {
-    case '3':                 // Tempat tinggal → keluarga (+usaha RT) = L
-      return 'l';
-    case '2':                 // Campuran → UB? L.UB : L
-    case '1':                 // Khusus usaha
-    case '7':                 // Virtual office
-      return isUB ? 'lub' : 'l';
+    case '2':                 // Campuran (tempat tinggal + usaha)
+    case '3':                 // Tempat tinggal
+      return 'keluarga';
+    case '1':                 // Khusus tempat usaha
+    case '7':                 // Kantor virtual (virtual office)
+      return 'usaha';
     case '4': case '5': case '6': case '8':
       return 'none';          // hanya listing P (tidak ada kuesioner lanjutan)
     default:
@@ -64,22 +66,28 @@ function refreshDynamicSidebar() {
   if (!isUnifiedMode()) return computeStageFromP();
   var stage = computeStageFromP();
   var body = document.body;
-  body.classList.toggle('stage-l',    stage === 'l');
-  body.classList.toggle('stage-lub',  stage === 'lub');
-  body.classList.toggle('stage-none', stage === 'none');
+  var isL = (stage === 'keluarga' || stage === 'usaha');
+  body.classList.toggle('stage-keluarga', stage === 'keluarga');
+  body.classList.toggle('stage-usaha',    stage === 'usaha');
+  body.classList.toggle('stage-none',     stage === 'none');
   window.__cawiStage = stage;
+  // Cakupan kuesioner L: 'usaha' = hanya Blok II (usaha), 'full' = keluarga+usaha.
+  // Dibaca oleh validasi/progres L agar field keluarga tak diwajibkan saat usaha-saja.
+  window.__cawiLScope = (stage === 'usaha') ? 'usaha' : 'full';
 
-  // Selaraskan mode untuk reuse logika existing (tanpa reset navigasi P).
-  if (stage === 'l' && typeof setFormMode === 'function' && (typeof getFormMode !== 'function' || getFormMode() !== 'l')) {
+  // Keluarga & usaha sama-sama pakai form L (L.UB sudah dilebur ke Blok II usaha).
+  if (isL && typeof setFormMode === 'function' && (typeof getFormMode !== 'function' || getFormMode() !== 'l')) {
     setFormMode('l');
-  } else if (stage === 'lub' && typeof setFormMode === 'function' && (typeof getFormMode !== 'function' || getFormMode() !== 'lub')) {
-    setFormMode('lub');
   }
   // Pastikan class unified tidak ikut hilang saat applyFormMode jalan.
   body.classList.add('mode-unified');
 
-  // L.KP nested (q10a=2) hanya relevan saat stage lub — biarkan
-  // updateSidebarLKP existing yang mengatur #sidebarLKPGroup.
+  // Stage usaha-saja: paksa navigasi ke Blok II (usaha) bila sedang di blok keluarga.
+  if (stage === 'usaha' && typeof goBlok === 'function') {
+    var activePanel = document.querySelector('.blok-panel.active');
+    if (activePanel && /^blokL[1345]$/.test(activePanel.id)) goBlok(2);
+  }
+
   if (typeof updateProgress === 'function') updateProgress();
   _renderStageHint(stage);
   return stage;
@@ -90,9 +98,9 @@ function _renderStageHint(stage) {
   var el = document.getElementById('pmt_stage_hint');
   if (!el) return;
   var msg;
-  if (stage === 'l')        msg = 'Lanjutkan ke kuesioner <b>SE2026-L</b> (keluarga &amp; usaha rumah tangga).';
-  else if (stage === 'lub') msg = 'Lanjutkan ke kuesioner <b>SE2026-L.UB</b> (usaha/perusahaan besar).';
-  else                      msg = 'Bangunan ini cukup dilisting pada Blok P (tidak ada kuesioner lanjutan).';
+  if (stage === 'keluarga')   msg = 'Lanjutkan ke kuesioner <b>L — Keluarga &amp; Usaha</b> (anggota keluarga + usaha rumah tangga).';
+  else if (stage === 'usaha') msg = 'Lanjutkan ke kuesioner <b>L — Usaha saja</b> (bangunan bukan tempat tinggal; cukup data usaha).';
+  else                        msg = 'Bangunan ini cukup dilisting pada Blok P (tidak ada kuesioner lanjutan).';
   el.innerHTML = msg;
   el.classList.toggle('stage-hint-none', stage === 'none');
 }

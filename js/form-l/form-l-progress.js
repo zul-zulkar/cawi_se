@@ -209,8 +209,7 @@ function calcProgressL() {
   ['l3_aset_gas3','l3_aset_gas5','l3_aset_kulkas','l3_aset_ac','l3_aset_emas','l3_aset_komputer',
    'l3_aset_motor','l3_aset_mobil','l3_aset_tanah','l3_aset_rumah'].forEach(id => c(getVal(id) !== ''));
 
-  /* === BLOK V: Petugas & Responden === */
-  c(!!getVal('l5_petugas_nama'));
+  /* === BLOK V: Responden === (identitas petugas otomatis dari login) */
   c(!!getVal('l5_responden_nama'));
   const hpR = getVal('l5_responden_hp');
   c(!!hpR && isValidHP(hpR));

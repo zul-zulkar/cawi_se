@@ -85,8 +85,8 @@ describe('collectAllProblemsL — empty form', () => {
     expect(hasErr(result, 'l1_kodepos')).toBe(true)
   })
 
-  it('flags petugas + responden + tgl + signature', () => {
-    expect(hasErr(result, 'l5_petugas_nama')).toBe(true)
+  it('flags responden + tgl + signature (identitas petugas otomatis dari login)', () => {
+    expect(hasErr(result, 'l5_petugas_nama')).toBe(false) // tidak lagi diisi/divalidasi manual
     expect(hasErr(result, 'l5_responden_nama')).toBe(true)
     expect(hasErr(result, 'l5_responden_hp')).toBe(true)
     expect(hasErr(result, 'l5_responden_email')).toBe(false) // email is now optional
@@ -470,20 +470,11 @@ describe('collectAllProblemsL — Blok V', () => {
     expect(errText(r, 'l5_responden_hp')).toMatch(/[Ff]ormat/)
   })
 
-  it('petugas_hp kosong → kosong list (opsional)', () => {
-    const r = collect()
-    expect(r.kosong.some(k => k.field === 'l5_petugas_hp')).toBe(true)
-  })
-
-  it('petugas_nip not tracked (not required, not in kosong — field exists in DOM only)', () => {
-    // l5_petugas_nip is filled by autocomplete; validation doesn't track it
-    const r = collect()
-    expect(r.errors.some(e => e.field === 'l5_petugas_nip')).toBe(false)
-  })
-
-  it('petugas_hp invalid → error', () => {
+  it('identitas petugas tidak lagi divalidasi (otomatis dari akun login)', () => {
     const r = collect({ fields: { l5_petugas_hp: 'abc' } })
-    expect(errText(r, 'l5_petugas_hp')).toMatch(/[Ff]ormat/)
+    expect(r.errors.some(e => e.field === 'l5_petugas_nama')).toBe(false)
+    expect(r.errors.some(e => e.field === 'l5_petugas_hp')).toBe(false)
+    expect(r.kosong.some(k => k.field === 'l5_petugas_hp')).toBe(false)
   })
 
   it('l5HasSig=true → no signature error', () => {
@@ -518,7 +509,7 @@ describe('collectAllProblemsL — blok routing', () => {
 
   it('Blok V errors carry blok=5', () => {
     const r = collect()
-    const e = r.errors.find(x => x.field === 'l5_petugas_nama')
+    const e = r.errors.find(x => x.field === 'l5_responden_nama')
     expect(e?.blok).toBe(5)
   })
 })
