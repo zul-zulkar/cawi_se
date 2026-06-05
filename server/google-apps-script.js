@@ -1157,7 +1157,7 @@ function readPRecords() {
 }
 
 function getPRecordsResponse() {
-  try { return jsonResponse({ status: "ok", data: readPRecords() }); }
+  try { return jsonResponse({ status: "ok", kind: "precords", data: readPRecords() }); }
   catch (err) { return jsonResponse({ status: "error", message: err.message }); }
 }
 
@@ -1172,7 +1172,7 @@ function getPrelistResponse(slsKd) {
   try {
     var ss = SpreadsheetApp.openById(SHEET_ID);
     var sheet = ss.getSheetByName(PRELIST_SHEET_NAME);
-    if (!sheet || sheet.getLastRow() < 2) return jsonResponse({ status: "ok", data: [] });
+    if (!sheet || sheet.getLastRow() < 2) return jsonResponse({ status: "ok", kind: "prelist", data: [] });
     var values = sheet.getDataRange().getValues();
     var headers = values[0].map(function(h) { return String(h).trim().toLowerCase(); });
     var idx = _mapPrelistHeaders(headers);
@@ -1204,7 +1204,7 @@ function getPrelistResponse(slsKd) {
         kelurahan_kd: pick(row, idx.kelurahan_kd)
       });
     }
-    return jsonResponse({ status: "ok", data: out });
+    return jsonResponse({ status: "ok", kind: "prelist", data: out });
   } catch (err) {
     return jsonResponse({ status: "error", message: err.message });
   }

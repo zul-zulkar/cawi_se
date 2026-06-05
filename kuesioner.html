@@ -121,6 +121,11 @@
     var vals = {};
     vals._formMode = mode;
     vals._ts       = new Date().toISOString();
+    // Unified (SE2026-P): prefill Blok P (nama entitas). Wilayah ikut ke stage L/L.UB
+    // di bawah; field wilayah Blok P diambil dari assignment saat collectDataP().
+    if (isUnified && assignment.nama_responden) {
+      vals['pmt_nama'] = assignment.nama_responden;
+    }
     if (mode === 'l') {
       // L mode (Rumah Tangga): nama_kk + wilayah keluarga + SLS
       if (assignment.nama_responden) vals['l1_nama_kk'] = assignment.nama_responden;
@@ -2782,6 +2787,11 @@
     <button class="btn-done" onclick="exitAnggotaDetail()">&#10003; Selesai</button>
   </div>
   <div class="screen-body" id="screen-ang-body"></div>
+  <div class="nav-actions roster-nav">
+    <button type="button" class="btn btn-secondary roster-nav-prev" onclick="navRosterDetail(-1)">&lsaquo; Sebelumnya</button>
+    <span class="roster-nav-pos"></span>
+    <button type="button" class="btn btn-secondary roster-nav-next" onclick="navRosterDetail(1)">Berikutnya &rsaquo;</button>
+  </div>
 </div>
 
 <!-- ====== L.KP CABANG DETAIL SCREEN ====== -->
@@ -2792,6 +2802,11 @@
     <button class="btn-done" onclick="exitLkpDetail()">&#10003; Selesai</button>
   </div>
   <div class="screen-body" id="screen-lkp-body"></div>
+  <div class="nav-actions roster-nav">
+    <button type="button" class="btn btn-secondary roster-nav-prev" onclick="navRosterDetail(-1)">&lsaquo; Sebelumnya</button>
+    <span class="roster-nav-pos"></span>
+    <button type="button" class="btn btn-secondary roster-nav-next" onclick="navRosterDetail(1)">Berikutnya &rsaquo;</button>
+  </div>
 </div>
 
 <!-- ====== USAHA DETAIL SCREEN ====== -->
@@ -2803,6 +2818,11 @@
   </div>
   <div class="screen-body" id="screen-usaha-body">
     <!-- Blok II section-cards dipindahkan ke sini oleh JS saat init -->
+  </div>
+  <div class="nav-actions roster-nav">
+    <button type="button" class="btn btn-secondary roster-nav-prev" onclick="navRosterDetail(-1)">&lsaquo; Sebelumnya</button>
+    <span class="roster-nav-pos"></span>
+    <button type="button" class="btn btn-secondary roster-nav-next" onclick="navRosterDetail(1)">Berikutnya &rsaquo;</button>
   </div>
   <div style="height:40px"></div>
 </div>
@@ -3102,6 +3122,8 @@
 <script src="js/form-l/form-l-validation.js"></script>
 <!-- Form P (Pemutakhiran / unified) -->
 <script src="js/form-p/form-p.js"></script>
+<script src="js/form-p/form-p-validation.js"></script>
+<script src="js/form-p/form-p-progress.js"></script>
 <!-- Draft, submit, init -->
 <script src="js/shared/draft.js"></script>
 <script src="js/shared/submit.js"></script>

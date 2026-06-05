@@ -167,9 +167,13 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => applyAssignmentPrefill(window.__cawiActiveAssignment), 100);
   }
 
-  // Unified mode: hitung stage awal dari Blok P (setelah restore + prefill)
-  if (window.__cawiUnified && typeof initFormP === 'function') {
-    setTimeout(() => { try { initFormP(); } catch (e) {} }, 150);
+  // Unified mode: hitung stage awal dari Blok P (setelah restore + prefill),
+  // lalu best-effort seed prelist (getPrelist) dari GAS.
+  if (window.__cawiUnified) {
+    setTimeout(() => {
+      try { if (typeof initFormP === 'function') initFormP(); } catch (e) {}
+      try { _seedPrelistForUnified(window.__cawiActiveAssignment); } catch (e) {}
+    }, 150);
   }
 
   // Auto-save on any input change (debounced 60s) + mark form dirty
@@ -309,6 +313,7 @@ function showAngDetailScreen(idx) {
     if (card) body.appendChild(card);
   }
   _showScreen('ang');
+  _updateRosterNav();
   history.pushState({ screen: 'ang', idx }, '', '#ang-' + idx);
 }
 
@@ -319,31 +324,42 @@ function showUsahaDetailScreen(idx) {
   // Load data usaha N ke form l2_*
   if (typeof loadUsahaIntoForm === 'function') loadUsahaIntoForm(idx);
   _showScreen('usaha');
+  _updateRosterNav();
   history.pushState({ screen: 'usaha', idx }, '', '#usaha-' + idx);
 }
 
-function exitAnggotaDetail() {
-  if (_activeScreenIdx != null) {
-    // Kembalikan card ke pool
+// Simpan & kembalikan detail roster yang sedang aktif ke pool/store
+// (tanpa pindah ke layar utama). Dipakai oleh exit* dan navRosterDetail.
+function _stashActiveDetail() {
+  if (_activeScreenIdx == null) return;
+  if (_activeScreen === 'ang') {
     const card = document.getElementById('l_ang_card_' + _activeScreenIdx);
     const pool = document.getElementById('anggota-pool');
     if (card && pool) pool.appendChild(card);
-    // Update baris roster
     if (typeof renderAnggotaRosterRow === 'function') renderAnggotaRosterRow(_activeScreenIdx);
     if (typeof updateJmlPendataan === 'function') updateJmlPendataan();
-    if (typeof updateProgress === 'function') updateProgress();
+  } else if (_activeScreen === 'usaha') {
+    if (typeof serializeCurrentUsahaForm === 'function') serializeCurrentUsahaForm(_activeScreenIdx);
+    if (typeof renderUsahaRosterRow === 'function') renderUsahaRosterRow(_activeScreenIdx);
+  } else if (_activeScreen === 'lkp') {
+    const card = document.getElementById('lkp_card_' + _activeScreenIdx);
+    const pool = document.getElementById('lkp-pool');
+    if (card && pool) pool.appendChild(card);
+    if (typeof renderLkpRosterRow === 'function') renderLkpRosterRow(_activeScreenIdx);
   }
+}
+
+function exitAnggotaDetail() {
+  _stashActiveDetail();
+  if (typeof updateProgress === 'function') updateProgress();
+  _saveDraftSilent();
   showMainScreen();
 }
 
 function exitUsahaDetail() {
-  if (_activeScreenIdx != null) {
-    // Simpan form l2_* ke store
-    if (typeof serializeCurrentUsahaForm === 'function') serializeCurrentUsahaForm(_activeScreenIdx);
-    // Update roster row
-    if (typeof renderUsahaRosterRow === 'function') renderUsahaRosterRow(_activeScreenIdx);
-    if (typeof updateProgress === 'function') updateProgress();
-  }
+  _stashActiveDetail();
+  if (typeof updateProgress === 'function') updateProgress();
+  _saveDraftSilent();
   showMainScreen();
 }
 
@@ -359,19 +375,84 @@ function showLkpDetailScreen(idx) {
     if (card) body.appendChild(card);
   }
   _showScreen('lkp');
+  _updateRosterNav();
   history.pushState({ screen: 'lkp', idx }, '', '#lkp-' + idx);
 }
 
 function exitLkpDetail() {
-  if (_activeScreenIdx != null) {
-    // Kembalikan card ke pool
-    const card = document.getElementById('lkp_card_' + _activeScreenIdx);
-    const pool = document.getElementById('lkp-pool');
-    if (card && pool) pool.appendChild(card);
-    if (typeof renderLkpRosterRow === 'function') renderLkpRosterRow(_activeScreenIdx);
-    if (typeof updateProgress === 'function') updateProgress();
-  }
+  _stashActiveDetail();
+  if (typeof updateProgress === 'function') updateProgress();
+  _saveDraftSilent();
   showMainScreen();
+}
+
+// Jumlah entri roster per tipe layar (ang/usaha/lkp).
+function _rosterCount(type) {
+  if (type === 'ang')   return (typeof _getAnggotaCount === 'function') ? _getAnggotaCount() : 0;
+  if (type === 'lkp')   return (typeof _getCabangCount === 'function') ? _getCabangCount() : 0;
+  if (type === 'usaha') { const el = document.getElementById('l_usaha_count'); return el ? (parseInt(el.value) || 0) : 0; }
+  return 0;
+}
+
+// Maju/mundur antar entri roster (delta ±1) tanpa kembali ke daftar.
+// Menyimpan entri aktif dulu (stash + draft) lalu membuka entri tujuan.
+function navRosterDetail(delta) {
+  if (_activeScreenIdx == null) return;
+  const type = _activeScreen;
+  if (type !== 'ang' && type !== 'usaha' && type !== 'lkp') return;
+  const n = _rosterCount(type);
+  const target = _activeScreenIdx + delta;
+  if (target < 1 || target > n) return;
+  _stashActiveDetail();
+  if (type === 'ang')        showAngDetailScreen(target);
+  else if (type === 'usaha') showUsahaDetailScreen(target);
+  else if (type === 'lkp')   showLkpDetailScreen(target);
+  _saveDraftSilent();
+}
+
+// Update tombol prev/next + indikator posisi (mis. "2 / 5") di layar detail aktif.
+function _updateRosterNav() {
+  const n = _rosterCount(_activeScreen);
+  const idx = _activeScreenIdx || 0;
+  document.querySelectorAll('.roster-nav-prev').forEach(b => { b.disabled = idx <= 1; });
+  document.querySelectorAll('.roster-nav-next').forEach(b => { b.disabled = idx >= n; });
+  document.querySelectorAll('.roster-nav-pos').forEach(el => { el.textContent = n ? (idx + ' / ' + n) : ''; });
+}
+
+// Simpan draft senyap (persist ke assignment via LS_KEY→draft_key mirror) tanpa toast.
+function _saveDraftSilent() {
+  try { if (typeof saveDraft === 'function') saveDraft(); } catch (e) {}
+}
+
+// Best-effort: ambil prelist (GAS getPrelist) by SLS lalu seed field Blok P.
+// AMAN terhadap GAS lama: hanya seed bila response punya kind==='prelist'
+// (GAS lama yang belum punya endpoint ini akan fallback ke getRecords →
+// tanpa kind → di-skip). seedPrelistP hanya mengisi field yang masih kosong.
+function _seedPrelistForUnified(a) {
+  if (!a || typeof getScriptUrl !== 'function' || typeof fetch !== 'function') return;
+  var sls = a.sls_full_kd || a.sls_kd || '';
+  var url = getScriptUrl() + '?action=getPrelist&sls_kd=' + encodeURIComponent(sls);
+  fetch(url)
+    .then(function (r) { return r.json(); })
+    .then(function (json) {
+      if (!json || json.status !== 'ok' || json.kind !== 'prelist' || !Array.isArray(json.data)) return;
+      var entries = json.data;
+      if (!entries.length) return;
+      // Cocokkan entri dgn nama_responden assignment; bila tunggal, ambil saja.
+      var target = null;
+      var nm = String(a.nama_responden || '').trim().toLowerCase();
+      if (nm) {
+        for (var i = 0; i < entries.length; i++) {
+          if (String(entries[i].nama || '').trim().toLowerCase() === nm) { target = entries[i]; break; }
+        }
+      }
+      if (!target && entries.length === 1) target = entries[0];
+      if (target && typeof seedPrelistP === 'function') {
+        seedPrelistP(target);
+        if (typeof saveDraft === 'function') { try { saveDraft(); } catch (e) {} }
+      }
+    })
+    .catch(function () { /* offline / GAS lama / sheet belum ada → abaikan */ });
 }
 
 // Hash router — handle popstate (browser/iOS back button)

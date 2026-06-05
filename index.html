@@ -130,6 +130,7 @@
   .badge-pml    { background: #ccfbf1; color: #0f766e; }
   .badge-l      { background: #e0e7ff; color: #3730a3; }
   .badge-lub    { background: #fce7f3; color: #9d174d; }
+  .badge-p      { background: #ccfbf1; color: #0f766e; }
   .badge-draft  { background: #fef3c7; color: var(--amber); }
   .badge-done   { background: #dcfce7; color: var(--green); }
 
@@ -373,6 +374,7 @@
       <select id="fltPetugas"><option value="">Semua Petugas</option></select>
       <select id="fltJenis">
         <option value="">Semua Jenis</option>
+        <option value="UNIFIED">P (Pemutakhiran)</option>
         <option value="L">L</option>
         <option value="LUB">L.UB</option>
       </select>
@@ -405,7 +407,8 @@
       <div class="form-row">
         <label class="form-label">Jenis Kuesioner</label>
         <div class="radio-group">
-          <label><input type="radio" name="addJenis" value="L" checked/> L (Rumah Tangga)</label>
+          <label><input type="radio" name="addJenis" value="UNIFIED" checked/> P — Pemutakhiran (keluarga/usaha/bangunan)</label>
+          <label><input type="radio" name="addJenis" value="L"/> L (Rumah Tangga)</label>
           <label><input type="radio" name="addJenis" value="LUB"/> L.UB (Usaha Besar)</label>
         </div>
       </div>
@@ -892,6 +895,8 @@
     box.innerHTML = list.map(function (it) {
       var jenisBadge = it.jenis === 'L'
         ? '<span class="badge badge-l">L</span>'
+        : it.jenis === 'UNIFIED'
+        ? '<span class="badge badge-p">P</span>'
         : '<span class="badge badge-lub">L.UB</span>';
       var statusBadge = it.status === 'submitted'
         ? '<span class="badge badge-done">Selesai</span>'
@@ -899,19 +904,7 @@
       var showPetugas = (a.peran === 'PML' && (it.petugas_email || '').toLowerCase() !== (a.email || '').toLowerCase());
       var dm = getDraftMeta(it.draft_key);
 
-      // Baris wilayah — format [kode] nama per level (kini termasuk provinsi)
-      var wilayah = [
-        wilayahLabel('desa', it.desa_kd,      it.desa),
-        wilayahLabel('kec',  it.kecamatan_kd, it.kecamatan),
-        wilayahLabel('kab',  it.kabupaten_kd, it.kabupaten),
-        wilayahLabel('prov', it.provinsi_kd,  it.provinsi)
-      ].filter(Boolean).map(esc).join(', ');
-
-      var slsLine = '';
-      if (it.sls_nama || it.sls_kd) {
-        var subTxt = (it.subsls_kd && it.subsls_kd !== '00') ? (' · SubSLS ' + esc(it.subsls_kd)) : '';
-        slsLine = '<div class="assign-card-wilayah">SLS: <b>' + esc(wilayahLabel('sls', it.sls_kd, it.sls_nama)) + '</b>' + subTxt + '</div>';
-      }
+      // Domisili wilayah TIDAK ditampilkan di baris kartu — sudah ada di panel detail (expand).
 
       // Progress (hanya draft): bar % bila tersnapshot, else status ringkas
       var progHtml = '';
@@ -958,8 +951,6 @@
           '<div class="assign-card-title">' + esc(it.nama_responden) + '</div>' +
           '<div>' + jenisBadge + '</div>' +
         '</div>' +
-        '<div class="assign-card-wilayah">' + wilayah + '</div>' +
-        slsLine +
         (showPetugas ? '<div class="assign-card-wilayah">Petugas: <b>' + esc(it.petugas_nama) + '</b></div>' : '') +
         progHtml +
         '<div class="assign-card-meta">' +
@@ -999,6 +990,8 @@
     var url;
     if (it.jenis === 'L') {
       url = 'kuesioner.html?mode=L&draft=' + encodeURIComponent(it.draft_key);
+    } else if (it.jenis === 'UNIFIED') {
+      url = 'kuesioner.html?mode=P&draft=' + encodeURIComponent(it.draft_key);
     } else {
       url = 'kuesioner.html?mode=LUB&draft=' + encodeURIComponent(it.draft_key);
     }
@@ -1034,15 +1027,15 @@
   }
 
   function applyJenisLabel() {
-    var jenis = 'L';
+    var jenis = 'UNIFIED';
     var radios = document.getElementsByName('addJenis');
     for (var i = 0; i < radios.length; i++) if (radios[i].checked) jenis = radios[i].value;
-    $('addNamaRespLabel').textContent = jenis === 'L'
-      ? 'Nama Kepala Keluarga'
-      : 'Nama Usaha / Perusahaan';
-    $('addNamaResp').placeholder = jenis === 'L'
-      ? 'Nama lengkap kepala keluarga…'
-      : 'Nama usaha atau perusahaan…';
+    var label, ph;
+    if (jenis === 'L')        { label = 'Nama Kepala Keluarga';            ph = 'Nama lengkap kepala keluarga…'; }
+    else if (jenis === 'LUB') { label = 'Nama Usaha / Perusahaan';         ph = 'Nama usaha atau perusahaan…'; }
+    else                      { label = 'Nama Keluarga / Usaha / Bangunan'; ph = 'Nama keluarga, usaha, atau bangunan…'; }
+    $('addNamaRespLabel').textContent = label;
+    $('addNamaResp').placeholder = ph;
   }
 
   function populateProvinsi() {

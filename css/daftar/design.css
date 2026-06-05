@@ -191,6 +191,7 @@ tr:hover td{ background: var(--orange-faint); }
 }
 .mode-badge-lub{ background: var(--orange-soft); color: #9a3412; }
 .mode-badge-l  { background: var(--blue-soft);   color: #1d4ed8; }
+.mode-badge-p  { background: #ccfbf1;            color: #0f766e; }
 .badge-draft{
   background: var(--amber); color: #fff;
   border-radius: var(--r-xs); padding: 2px 7px;

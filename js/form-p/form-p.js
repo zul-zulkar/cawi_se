@@ -154,6 +154,8 @@ function seedPrelistP(entry) {
 
 /* Navigasi ke Blok P (panel #blokP1). Dipakai sidebar grup .sb-p. */
 function goBlokP() {
+  // Simpan dulu isian blok saat ini (persist ke draft assignment).
+  try { if (typeof saveDraft === 'function') saveDraft(); } catch (e) {}
   var panels = document.querySelectorAll('.blok-panel');
   for (var i = 0; i < panels.length; i++) panels[i].classList.remove('active');
   var tabs = document.querySelectorAll('.sidebar-item');

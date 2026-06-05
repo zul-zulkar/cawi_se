@@ -223,6 +223,28 @@ describe('createAssignment', () => {
     expect(a.jenis).toBe('LUB')
   })
 
+  it('jenis UNIFIED → jenis "UNIFIED" + draft_key cawi_u_draft_<id>', () => {
+    const a = PM.createAssignment(validData({ jenis: 'UNIFIED' }), activePPL)
+    expect(a.jenis).toBe('UNIFIED')
+    expect(a.draft_key).toBe('cawi_u_draft_' + a.id)
+  })
+
+  it('jenis "P" dinormalisasi menjadi "UNIFIED"', () => {
+    const a = PM.createAssignment(validData({ jenis: 'P' }), activePPL)
+    expect(a.jenis).toBe('UNIFIED')
+  })
+
+  it('UNIFIED menyertakan p_status "open" + p_jenis_bangunan null', () => {
+    const a = PM.createAssignment(validData({ jenis: 'UNIFIED' }), activePPL)
+    expect(a.p_status).toBe('open')
+    expect(a.p_jenis_bangunan).toBeNull()
+  })
+
+  it('jenis tak dikenal → default LUB (backward-compat)', () => {
+    const a = PM.createAssignment(validData({ jenis: 'XYZ' }), activePPL)
+    expect(a.jenis).toBe('LUB')
+  })
+
   it('throw error saat field wajib kosong', () => {
     expect(() => PM.createAssignment(validData({ desa: '' }), activePPL)).toThrow()
     expect(() => PM.createAssignment(validData({ nama_responden: '   ' }), activePPL)).toThrow()
@@ -391,6 +413,16 @@ describe('filterAssignments', () => {
     const out = PM.filterAssignments(list, { jenis: 'LUB' }, activePML1, PPL_FIXTURES)
     expect(out.length).toBe(1)
     expect(out[0].id).toBe('2')
+  })
+
+  it('filter by jenis UNIFIED (SE2026-P)', () => {
+    const uList = [
+      { id: 'u1', petugas_email: 'pml1@gmail.com', jenis: 'UNIFIED', desa: 'Pedawa' },
+      { id: 'u2', petugas_email: 'pml1@gmail.com', jenis: 'L',       desa: 'Pedawa' },
+    ]
+    const out = PM.filterAssignments(uList, { jenis: 'UNIFIED' }, activePML1, PPL_FIXTURES)
+    expect(out.length).toBe(1)
+    expect(out[0].id).toBe('u1')
   })
 
   it('filter by kecamatan', () => {

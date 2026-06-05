@@ -43,8 +43,20 @@ async function fetchRecords() {
     const json = await resp.json();
     if (json.status === 'ok') {
       const serverRecs = (json.data || []).map(r => ({ ...r, _isDraft: false }));
+      // Record P (SE2026-P) — sheet terpisah; gabung bila endpoint tersedia.
+      // Guard kind==='precords' supaya GAS lama (fallback getRecords) tidak ikut.
+      let pRecs = [];
+      try {
+        const pResp = await fetch(getScriptUrl(), {
+          method: 'POST', body: JSON.stringify({ action: 'getPRecords' })
+        });
+        const pJson = await pResp.json();
+        if (pJson && pJson.status === 'ok' && pJson.kind === 'precords' && Array.isArray(pJson.data)) {
+          pRecs = pJson.data.map(r => ({ ...r, _isDraft: false }));
+        }
+      } catch (e) { /* GAS lama / offline → abaikan record P */ }
       const draftRecs  = getLocalDrafts();
-      records = [...draftRecs, ...serverRecs];
+      records = [...draftRecs, ...serverRecs, ...pRecs];
       buildPetugasFilter();
       updateStats();
       renderTable();
@@ -88,9 +100,9 @@ function getRecordMode(r) {
 }
 
 function getRecordName(r) {
-  if (getRecordMode(r) === 'l') {
-    return r.nama_kk || r.nama_usaha || r.nama_perusahaan || '';
-  }
+  const m = getRecordMode(r);
+  if (m === 'p') return r.pmt_nama || '';
+  if (m === 'l') return r.nama_kk || r.nama_usaha || r.nama_perusahaan || '';
   return r.nama_perusahaan || '';
 }
 
@@ -192,9 +204,11 @@ function renderTable() {
     const mode = getRecordMode(r);
     const badge = (mode === 'l')
       ? `<span class="mode-badge mode-badge-l" title="Usaha Rumah Tangga">L</span>`
+      : (mode === 'p')
+      ? `<span class="mode-badge mode-badge-p" title="Pemutakhiran SE2026-P">P</span>`
       : `<span class="mode-badge mode-badge-lub" title="Usaha/Perusahaan Besar">L.UB</span>`;
     const nameMain = getRecordName(r);
-    const nameSub  = (mode === 'l') ? r.nama_usaha : r.nama_komersial;
+    const nameSub  = (mode === 'l') ? r.nama_usaha : (mode === 'p') ? r.nama_sls : r.nama_komersial;
     const co       = esc(nameMain) || '<em style="color:#bbb">Tanpa nama</em>';
     const koml     = nameSub ? `<small>${esc(nameSub)}</small>` : '';
 
@@ -215,6 +229,14 @@ function renderTable() {
         </div></td>
       </tr>`;
     } else {
+      // P = listing pemutakhiran → hanya Lihat + Hapus (edit/duplikat via unified form, belum).
+      const actionsHtml = (mode === 'p')
+        ? `<button class="btn btn-sm btn-info" title="Lihat" onclick="viewRecord(${r._id},'p')">&#128065;</button>
+           <button class="btn btn-sm" style="background:#e53e3e;color:#fff" title="Hapus" onclick="deleteRecord(${r._id},'p')">&#128465;</button>`
+        : `<button class="btn btn-sm btn-info" title="Lihat" onclick="viewRecord(${r._id},'${mode}')">&#128065;</button>
+           <button class="btn btn-sm" style="background:#38a169;color:#fff" title="Edit" onclick="editRecord(${r._id},'${mode}')">&#9998;</button>
+           <button class="btn btn-sm" style="background:#805ad5;color:#fff" title="Duplikat" onclick="duplicateRecord(${r._id},'${mode}')">&#9986;</button>
+           <button class="btn btn-sm" style="background:#e53e3e;color:#fff" title="Hapus" onclick="deleteRecord(${r._id},'${mode}')">&#128465;</button>`;
       html += `<tr>
         <td data-label="No" style="color:#aaa;font-size:12px;text-align:center">${idx+1}</td>
         <td data-label="Jenis" class="cell-jenis">${badge}</td>
@@ -225,12 +247,7 @@ function renderTable() {
           ${r.petugas_nip ? `<small>NIP: ${esc(r.petugas_nip)}</small>` : ''}</td>
         <td data-label="Kecamatan" style="font-size:12.5px;color:#555">${esc(r.kecamatan||'—')}</td>
         <td data-label="Waktu" style="font-size:12px;color:#888;white-space:nowrap">${fmtDate(r._ts||r.timestamp)}</td>
-        <td><div class="td-actions">
-          <button class="btn btn-sm btn-info" title="Lihat" onclick="viewRecord(${r._id},'${mode}')">&#128065;</button>
-          <button class="btn btn-sm" style="background:#38a169;color:#fff" title="Edit" onclick="editRecord(${r._id},'${mode}')">&#9998;</button>
-          <button class="btn btn-sm" style="background:#805ad5;color:#fff" title="Duplikat" onclick="duplicateRecord(${r._id},'${mode}')">&#9986;</button>
-          <button class="btn btn-sm" style="background:#e53e3e;color:#fff" title="Hapus" onclick="deleteRecord(${r._id},'${mode}')">&#128465;</button>
-        </div></td>
+        <td><div class="td-actions">${actionsHtml}</div></td>
       </tr>`;
     }
   });
@@ -239,6 +256,50 @@ function renderTable() {
 }
 
 /* ====== VIEW: SECTION BUILDERS ====== */
+function viewSectionsP(r) {
+  return [
+    { title: 'Petugas Pendata', fields: [
+      ['Nama Petugas', r.petugas_nama],
+      ['Email (login)', r.petugas_email_login],
+      ['Peran', r.petugas_peran_login],
+    ]},
+    { title: 'Identitas Keluarga/Bangunan', fields: [
+      ['Nama KK / Usaha / Bangunan', r.pmt_nama],
+      ['No. Urut Keluarga', r.pmt_no_kel],
+      ['No. Urut Bangunan', r.pmt_no_bgn],
+      ['IDSBR', r.pmt_idsbr],
+      ['Alamat (Jalan)', r.pmt_jalan],
+      ['Blok / No.', r.pmt_blok],
+    ]},
+    { title: 'Wilayah & SLS', fields: [
+      ['Provinsi', r.provinsi],
+      ['Kabupaten/Kota', r.kabupaten],
+      ['Kecamatan', r.kecamatan],
+      ['Kelurahan/Desa', r.kelurahan],
+      ['Kode SLS', r.kode_sls],
+      ['Nama SLS', r.nama_sls],
+      ['Perubahan SLS', r.pmt_sls_berubah],
+      ['Nama SLS Baru', r.pmt_sls_nama],
+    ]},
+    { title: 'Pemutakhiran', fields: [
+      ['Keberadaan', r.pmt_keberadaan],
+      ['Sesuai KK', r.pmt_sesuai_kk],
+      ['Kode Penggunaan Bangunan', r.pmt_kode_bangunan],
+      ['Skala Usaha', r.pmt_skala],
+      ['Jumlah Usaha', r.pmt_jml_usaha],
+      ['Jumlah Anggota (KK)', r.pmt_jml_kk],
+      ['Jumlah Anggota Menetap', r.pmt_jml_menetap],
+    ]},
+    { title: 'Geotag & Tautan Lanjutan', fields: [
+      ['Latitude', r.pmt_lat],
+      ['Longitude', r.pmt_lng],
+      ['Akurasi (m)', r.pmt_akurasi],
+      ['Jenis Lanjutan', r.jenis_lanjutan],
+      ['Record ID Lanjutan', r.record_id_lanjutan],
+    ]},
+  ];
+}
+
 function viewSectionsLUB(r) {
   return [
     { title: 'Petugas Pendata', fields: [
@@ -384,10 +445,13 @@ function viewRecord(id, mode) {
   const recMode = getRecordMode(r);
   const titleName = getRecordName(r) || 'Detail Entri';
   document.getElementById('viewTitle').textContent    = titleName;
+  const modeTag = recMode === 'l' ? '[L]' : recMode === 'p' ? '[P]' : '[L.UB]';
   document.getElementById('viewSubtitle').textContent =
-    `${recMode === 'l' ? '[L]' : '[L.UB]'} Submit: ${fmtDate(r._ts||r.timestamp)} | Petugas: ${r.petugas_nama || '—'}`;
+    `${modeTag} Submit: ${fmtDate(r._ts||r.timestamp)} | Petugas: ${r.petugas_nama || '—'}`;
 
-  const sections = (recMode === 'l') ? viewSectionsL(r) : viewSectionsLUB(r);
+  const sections = (recMode === 'p') ? viewSectionsP(r)
+                 : (recMode === 'l') ? viewSectionsL(r)
+                 : viewSectionsLUB(r);
 
   let html = '';
   sections.forEach(sec => {

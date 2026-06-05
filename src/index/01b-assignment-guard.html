@@ -92,6 +92,11 @@
     var vals = {};
     vals._formMode = mode;
     vals._ts       = new Date().toISOString();
+    // Unified (SE2026-P): prefill Blok P (nama entitas). Wilayah ikut ke stage L/L.UB
+    // di bawah; field wilayah Blok P diambil dari assignment saat collectDataP().
+    if (isUnified && assignment.nama_responden) {
+      vals['pmt_nama'] = assignment.nama_responden;
+    }
     if (mode === 'l') {
       // L mode (Rumah Tangga): nama_kk + wilayah keluarga + SLS
       if (assignment.nama_responden) vals['l1_nama_kk'] = assignment.nama_responden;

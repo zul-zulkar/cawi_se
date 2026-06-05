@@ -79,10 +79,18 @@
         throw new Error('Field wajib kosong: ' + required[i]);
       }
     }
-    var jenis = data.jenis === 'L' ? 'L' : 'LUB';
+    // Jenis: L (rumah tangga), LUB (usaha besar), UNIFIED (SE2026-P pemutakhiran).
+    // Selain ketiganya → default 'LUB' (backward-compat).
+    var jenis;
+    if (data.jenis === 'L') jenis = 'L';
+    else if (data.jenis === 'UNIFIED' || data.jenis === 'P') jenis = 'UNIFIED';
+    else jenis = 'LUB';
     var id    = generateId();
     var now   = new Date().toISOString();
-    var draftKey = (jenis === 'L' ? 'cawi_l_draft_' : 'cawi_draft_') + id;
+    var draftPrefix = (jenis === 'L') ? 'cawi_l_draft_'
+                    : (jenis === 'UNIFIED') ? 'cawi_u_draft_'
+                    : 'cawi_draft_';
+    var draftKey = draftPrefix + id;
     return {
       id: id,
       petugas_nama:  petugasAktif.nama  || '',
@@ -107,6 +115,9 @@
       nama_responden: String(data.nama_responden).trim(),
       draft_key: draftKey,
       status: 'draft',
+      // SE2026-P (unified): status pemutakhiran + jenis bangunan (diisi runtime)
+      p_status: 'open',
+      p_jenis_bangunan: null,
       created_at: now,
       updated_at: now
     };
@@ -140,7 +151,7 @@
     if (f.kecamatan)    arr = arr.filter(function (a) { return a.kecamatan    === f.kecamatan; });
     if (f.kabupaten)    arr = arr.filter(function (a) { return a.kabupaten    === f.kabupaten; });
     if (f.petugas_nama) arr = arr.filter(function (a) { return a.petugas_nama === f.petugas_nama; });
-    if (f.jenis && (f.jenis === 'L' || f.jenis === 'LUB')) {
+    if (f.jenis && (f.jenis === 'L' || f.jenis === 'LUB' || f.jenis === 'UNIFIED')) {
       arr = arr.filter(function (a) { return a.jenis === f.jenis; });
     }
     return arr;

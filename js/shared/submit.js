@@ -479,8 +479,152 @@ function collectDataL() {
   return data;
 }
 
+/* ============================================================
+ * collectDataP — payload Blok P (SE2026-P / pemutakhiran)
+ * Urutan/nama field HARUS match P_FIELD_NAMES di server/google-apps-script.js.
+ * Wilayah (prov/kab/kec/desa + SLS) diambil dari assignment (scope SLS);
+ * field pmt_* dari Blok P. jenis_lanjutan + record_id_lanjutan diisi oleh
+ * orchestrator submitUnified() setelah submit stage L/L.UB.
+ * ============================================================ */
+function collectDataP() {
+  const a = (typeof window !== 'undefined' && window.__cawiActiveAssignment) || {};
+  return {
+    timestamp: new Date().toLocaleString('id-ID'),
+    formMode: 'p',
+    // Identitas pendata (login)
+    petugas_email_login: getVal('petugas_email_login'),
+    petugas_peran_login: getVal('petugas_peran_login'),
+    petugas_nama: getVal('p_nama') || getVal('l5_petugas_nama') || (a.petugas_nama || ''),
+    // No urut + identitas entitas
+    pmt_no_kel: getVal('pmt_no_kel'),
+    pmt_no_bgn: getVal('pmt_no_bgn'),
+    pmt_nama: getVal('pmt_nama'),
+    pmt_jalan: getVal('pmt_jalan'),
+    pmt_blok: getVal('pmt_blok'),
+    // Wilayah dari assignment (scope SLS)
+    provinsi: a.provinsi || '', provinsi_kd: a.provinsi_kd || '',
+    kabupaten: a.kabupaten || '', kabupaten_kd: a.kabupaten_kd || '',
+    kecamatan: a.kecamatan || '', kecamatan_kd: a.kecamatan_kd || '',
+    kelurahan: a.desa || '', kelurahan_kd: a.desa_kd || '',
+    kode_sls: a.sls_full_kd || a.sls_kd || '', nama_sls: a.sls_nama || '',
+    // Pemutakhiran
+    pmt_sls_berubah: getVal('pmt_sls_berubah'),
+    pmt_sls_nama: getVal('pmt_sls_nama'),
+    pmt_keberadaan: getVal('pmt_keberadaan'),
+    pmt_sesuai_kk: getVal('pmt_sesuai_kk'),
+    pmt_kode_bangunan: getVal('pmt_kode_bangunan'),
+    pmt_skala: getVal('pmt_skala'),
+    pmt_jml_usaha: getVal('pmt_jml_usaha'),
+    pmt_idsbr: getVal('pmt_idsbr'),
+    pmt_jml_kk: getVal('pmt_jml_kk'),
+    pmt_jml_menetap: getVal('pmt_jml_menetap'),
+    // Geotag
+    pmt_lat: getVal('pmt_lat'),
+    pmt_lng: getVal('pmt_lng'),
+    pmt_akurasi: getVal('pmt_akurasi'),
+    // Tautan ke kuesioner lanjutan (diisi orchestrator)
+    jenis_lanjutan: '',
+    record_id_lanjutan: ''
+  };
+}
+
+/* POST satu payload ke GAS, kembalikan record_id (atau null). Lempar bila GAS error. */
+async function _postData(data) {
+  const res = await fetch(getScriptUrl(), {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain' },
+    body: JSON.stringify(data)
+  });
+  let record_id = null;
+  try {
+    const json = await res.json();
+    if (json.status !== 'ok') throw new Error(json.message || 'GAS error');
+    if (json.record_id || json.recordId) record_id = json.record_id || json.recordId;
+  } catch (parseErr) {
+    if (parseErr.message === 'GAS error') throw parseErr;
+    // Response bukan JSON (mis. redirect GAS) → abaikan
+  }
+  return record_id;
+}
+
+/* ============================================================
+ * submitUnified — orkestrasi multi-submit untuk unified mode (SE2026-P).
+ * Urutan: validasi P → validasi stage → submit stage (L/L.UB) → submit P
+ * (dengan jenis_lanjutan + record_id_lanjutan). Stage 'none' = submit P saja.
+ * Tiap sheet di-overwrite by cawi_id (edit-in-place) saat re-submit.
+ * ============================================================ */
+async function submitUnified() {
+  hideAlert('alertBox');
+  // 1) Validasi Blok P
+  if (typeof collectAllProblemsP === 'function') {
+    const p = collectAllProblemsP();
+    if (p.errors && p.errors.length) {
+      if (typeof goBlokP === 'function') goBlokP();
+      setTimeout(() => showAlert('alertBox', 'Blok P — ' + p.errors[0].text), 300);
+      return;
+    }
+  }
+  const stage = (typeof computeStageFromP === 'function') ? computeStageFromP() : 'none';
+  // 2) Validasi stage lanjutan (reuse validasi existing)
+  if (stage === 'l') {
+    if (typeof collectAllProblemsL === 'function') {
+      const probs = collectAllProblemsL();
+      if (probs.errors.length) {
+        const first = probs.errors[0];
+        if (typeof goBlok === 'function') goBlok(first.blok || 1);
+        setTimeout(() => showAlert('l5_submitAlert', first.label + ' — ' + first.text), 300);
+        return;
+      }
+    }
+  } else if (stage === 'lub') {
+    const e1 = (typeof validateBlok1 === 'function') ? validateBlok1() : '';
+    if (e1) { if (typeof goBlok === 'function') goBlok(1); setTimeout(() => showAlert('alertBox', 'Blok I — ' + e1), 300); return; }
+    const e3 = (typeof validateBlok3 === 'function') ? validateBlok3() : '';
+    if (e3) { showAlert('submitAlert', e3); return; }
+  }
+
+  if (typeof window.showLoadingOverlay === 'function') {
+    window.showLoadingOverlay('Mengirim data…', 'Blok P + kuesioner lanjutan. Jangan tutup halaman.');
+  }
+  try {
+    const cawiId = (window.__cawiActiveAssignment && window.__cawiActiveAssignment.id) || null;
+    // 3) Submit stage dulu (untuk dapat record_id tautan)
+    let stageRecordId = null;
+    if (stage === 'l' || stage === 'lub') {
+      const sd = collectData(); // dispatch by getFormMode (sudah diselaraskan ke stage)
+      if (cawiId) sd.cawi_id = cawiId;
+      stageRecordId = await _postData(sd);
+    }
+    // 4) Submit Blok P (dengan tautan ke stage)
+    const pd = collectDataP();
+    if (cawiId) pd.cawi_id = cawiId;
+    pd.jenis_lanjutan = stage;
+    pd.record_id_lanjutan = (stageRecordId != null) ? String(stageRecordId) : '';
+    const pRecordId = await _postData(pd);
+
+    // Sukses — bersihkan draft & beri tahu guard (status submitted + redirect)
+    clearDraft();
+    if (_currentDraftId) { deleteDraftById(_currentDraftId); }
+    if (typeof _formDirty !== 'undefined') _formDirty = false;
+    try {
+      window.dispatchEvent(new CustomEvent('cawi:submit-success', {
+        detail: { formMode: 'p', stage: stage, wasEdit: false, record_id: pRecordId, cawi_id: cawiId }
+      }));
+    } catch (_e) {}
+    if (typeof window.hideLoadingOverlay === 'function') window.hideLoadingOverlay();
+    if (typeof showToast === 'function') showToast('Data pemutakhiran terkirim ✓', 'ok');
+  } catch (e) {
+    if (typeof window.hideLoadingOverlay === 'function') window.hideLoadingOverlay();
+    showAlert('alertBox', 'Gagal mengirim: ' + e.message + '. Periksa koneksi lalu coba lagi.');
+  }
+}
+
 
 async function submitForm() {
+  // Unified mode (SE2026-P): orkestrasi multi-submit P → L/L.UB.
+  if (typeof isUnifiedMode === 'function' && isUnifiedMode()) {
+    return submitUnified();
+  }
   const mode = (typeof getFormMode === 'function') ? getFormMode() : 'lub';
   const submitAlertId = (mode === 'l') ? 'l5_submitAlert' : 'submitAlert';
   const submitBtnId   = (mode === 'l') ? 'l5_submitBtn'   : 'submitBtn';
