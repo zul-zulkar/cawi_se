@@ -488,9 +488,11 @@ function _initUsahaDetailScreen() {
   const blokL2  = document.getElementById('blokL2');
   const usahaBody = document.getElementById('screen-usaha-body');
   if (!blokL2 || !usahaBody) return;
-  // Pindahkan nav-actions Blok II ke screen usaha juga
-  blokL2.querySelectorAll('.section-card, .notice-box, .nav-actions:last-of-type').forEach(el => {
-    // Kecualikan elemen yang sudah ditandai sebagai roster
+  // Pindahkan SEMUA kartu detail usaha (Rincian 8-33) ke layar detail usaha.
+  // Kartu roster (#usaha-roster-card) & nav-actions tetap di blokL2 (layar roster).
+  // Catatan: hanya .section-card dipindah agar elemen bersarang (notice-box,
+  // wrap tahunan/bulanan) ikut utuh di dalam kartunya — tidak ter-ekstrak.
+  blokL2.querySelectorAll(':scope > .section-card').forEach(el => {
     if (!el.id || !el.id.startsWith('usaha-roster')) {
       usahaBody.appendChild(el);
     }

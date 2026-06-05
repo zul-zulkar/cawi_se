@@ -32,6 +32,28 @@ body.mode-unified.stage-lub .sidebar-blok-group.sb-lub{display:block}
 .roster-nav{align-items:center}
 .roster-nav-pos{font-size:12px;color:#888;font-weight:700;white-space:nowrap}
 .roster-nav-prev:disabled,.roster-nav-next:disabled{opacity:.4;cursor:not-allowed}
+/* Mobile: pos di atas (rentang penuh), 2 tombol selebar layar di bawah */
+@media(max-width:720px){
+  .nav-actions.roster-nav{grid-template-columns:1fr 1fr;gap:8px;padding:14px 2px 12px}
+  .nav-actions.roster-nav .roster-nav-pos{grid-column:1 / -1;order:-1;justify-self:center;text-align:center}
+  .nav-actions.roster-nav .roster-nav-prev,
+  .nav-actions.roster-nav .roster-nav-next{justify-self:stretch;width:100%;text-align:center;padding:12px 10px;font-size:14px;min-height:44px}
+}
+@media(max-width:360px){
+  .nav-actions.roster-nav .roster-nav-prev,
+  .nav-actions.roster-nav .roster-nav-next{padding:11px 6px;font-size:13px}
+}
+
+/* Matriks isian (disabilitas / penyakit kronis) — semua rata kiri, opsi horizontal */
+.qmatrix-row{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:8px 0;border-bottom:1px solid #f5f2ee}
+.qmatrix-row:last-child{border-bottom:0}
+.qmatrix-label{font-size:13px;font-weight:600;color:#3a4150;text-align:left}
+.radio-group.qmatrix-opts,.checkbox-group.qmatrix-opts{flex-direction:row;flex-wrap:wrap;gap:6px;margin:0;justify-content:flex-start}
+.radio-group.qmatrix-opts .radio-item,.checkbox-group.qmatrix-opts .checkbox-item{padding:5px 12px}
+@media(max-width:380px){
+  .radio-group.qmatrix-opts,.checkbox-group.qmatrix-opts{gap:4px}
+  .radio-group.qmatrix-opts .radio-item,.checkbox-group.qmatrix-opts .checkbox-item{padding:5px 10px}
+}
 
 /* ====== MODE BADGE (sidebar header) ====== */
 .mode-badge{display:inline-block;font-size:9.5px;font-weight:800;letter-spacing:1px;padding:2px 7px;border-radius:4px;text-transform:uppercase}

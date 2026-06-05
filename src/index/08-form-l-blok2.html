@@ -25,6 +25,678 @@
     </div>
   </div>
 
+  <!-- ============================================================
+       DETAIL USAHA (Rincian 8-33) — dipindahkan ke #screen-usaha-body
+       oleh _initUsahaDetailScreen() saat init. Satu form aktif dipakai
+       bergantian per entri usaha (loadUsahaIntoForm / serializeCurrentUsahaForm).
+       ============================================================ -->
+
+  <!-- L2.8 Nama & Alamat Usaha -->
+  <div class="section-card">
+    <div class="section-header" id="sec-L2-8">8. Nama dan Alamat Usaha</div>
+    <div class="section-body">
+      <div class="form-group">
+        <label class="field-label">a. Nama Usaha/Perusahaan <span class="req">*</span></label>
+        <input type="text" id="l2_nama_usaha" placeholder="Nama usaha lengkap"/>
+      </div>
+      <div class="form-group">
+        <label class="field-label">b. Nama Komersial</label>
+        <input type="text" id="l2_nama_komersial" placeholder="Nama komersial / merek (kosongkan jika sama dengan nama usaha)"/>
+      </div>
+      <div class="form-group">
+        <label class="field-label">c. Alamat Usaha <span class="req">*</span></label>
+        <input type="text" id="l2_alamat" placeholder="Jalan, nomor, dst."/>
+        <div class="hint">Khusus usaha di dalam tempat tinggal/keliling/dsb., catat alamat tempat tinggal pemilik usaha.</div>
+      </div>
+      <div class="inline-fields">
+        <div class="form-group"><label class="field-label">RT</label><input type="text" id="l2_rt" maxlength="4" placeholder="000"/></div>
+        <div class="form-group"><label class="field-label">RW</label><input type="text" id="l2_rw" maxlength="4" placeholder="000"/></div>
+        <div class="form-group"><label class="field-label">Kode Pos</label><input type="text" id="l2_kodepos" maxlength="5" placeholder="00000"/></div>
+      </div>
+      <div class="inline-fields">
+        <div class="form-group"><label class="field-label">Email</label><input type="email" id="l2_email" placeholder="email@usaha.com"/></div>
+        <div class="form-group"><label class="field-label">Website</label><input type="text" id="l2_website" placeholder="www..."/></div>
+        <div class="form-group"><label class="field-label">No. HP/WhatsApp</label><input type="text" id="l2_hp" placeholder="08xxxxxxxxxx"/></div>
+      </div>
+      <div class="form-group">
+        <div class="subsection-label">d. Jenis Kawasan Beroperasi <span class="req">*</span></div>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l2_kawasan" value="1" onchange="handleKawasanL()"/> <span>1. Kawasan Ekonomi Khusus (KEK)</span></label>
+          <label class="radio-item"><input type="radio" name="l2_kawasan" value="2" onchange="handleKawasanL()"/> <span>2. Kawasan Industri (KI)</span></label>
+          <label class="radio-item"><input type="radio" name="l2_kawasan" value="3" onchange="handleKawasanL()"/> <span>3. Stasiun</span></label>
+          <label class="radio-item"><input type="radio" name="l2_kawasan" value="4" onchange="handleKawasanL()"/> <span>4. Bandara</span></label>
+          <label class="radio-item"><input type="radio" name="l2_kawasan" value="5" onchange="handleKawasanL()"/> <span>5. Pelabuhan</span></label>
+          <label class="radio-item"><input type="radio" name="l2_kawasan" value="6" onchange="handleKawasanL()"/> <span>6. Terminal</span></label>
+          <label class="radio-item"><input type="radio" name="l2_kawasan" value="7" onchange="handleKawasanL()"/> <span>7. Rest area jalan tol</span></label>
+          <label class="radio-item"><input type="radio" name="l2_kawasan" value="8" onchange="handleKawasanL()"/> <span>8. Kawasan sentra ekonomi perdesaan/kelurahan</span></label>
+          <label class="radio-item"><input type="radio" name="l2_kawasan" value="9" onchange="handleKawasanL()"/> <span>9. Kawasan usaha lainnya</span></label>
+          <label class="radio-item"><input type="radio" name="l2_kawasan" value="10" onchange="handleKawasanL()"/> <span>10. Di luar kawasan</span></label>
+        </div>
+      </div>
+      <div class="form-group hidden" id="l2_nama_kawasan_wrap">
+        <label class="field-label">e. Nama Kawasan <span class="req">*</span></label>
+        <input type="text" id="l2_nama_kawasan" placeholder="mis. KEK Mandalika, KI Jababeka, Bandara Ngurah Rai"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- L2.9 Jenis & Lokasi Usaha -->
+  <div class="section-card">
+    <div class="section-header" id="sec-L2-9">9. Jenis Usaha &amp; Lokasi Utama</div>
+    <div class="section-body">
+      <div class="form-group">
+        <div class="subsection-label">a. Jenis usaha/perusahaan <span class="req">*</span></div>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l2_jenis_usaha" value="1" onchange="handleJenisUsahaL()"/> <span>1. Usaha di dalam bangunan tempat tinggal</span></label>
+          <label class="radio-item"><input type="radio" name="l2_jenis_usaha" value="2" onchange="handleJenisUsahaL()"/> <span>2. Usaha keliling</span></label>
+          <label class="radio-item"><input type="radio" name="l2_jenis_usaha" value="3" onchange="handleJenisUsahaL()"/> <span>3. Di luar bangunan tempat tinggal, lokasi tetap, perlengkapan dibongkar pasang</span></label>
+          <label class="radio-item"><input type="radio" name="l2_jenis_usaha" value="4" onchange="handleJenisUsahaL()"/> <span>4. Konstruksi/pertambangan/penggalian perorangan</span></label>
+          <label class="radio-item"><input type="radio" name="l2_jenis_usaha" value="5" onchange="handleJenisUsahaL()"/> <span>5. Persewaan rumah/kamar/kantor</span></label>
+          <label class="radio-item"><input type="radio" name="l2_jenis_usaha" value="6" onchange="handleJenisUsahaL()"/> <span>6. Usaha pertanian</span></label>
+        </div>
+        <div class="hint">Jenis 1 &amp; 2 langsung lanjut ke Rincian 10. Jenis 3–6 isi lokasi utama di bawah.</div>
+      </div>
+      <div class="hidden" id="l2_lokasi_utama_wrap">
+        <div class="form-group">
+          <div class="subsection-label">b. Lokasi Utama Usaha</div>
+          <label class="field-label">b1. Alamat/lokasi utama</label>
+          <input type="text" id="l2_lokasi_alamat" placeholder="Alamat lokasi utama usaha"/>
+        </div>
+        <div class="inline-fields">
+          <div class="form-group"><label class="field-label">b2. Provinsi</label><input type="text" id="l2_lokasi_provinsi" placeholder="Provinsi"/></div>
+          <div class="form-group"><label class="field-label">b3. Kabupaten/Kota</label><input type="text" id="l2_lokasi_kab" placeholder="Kabupaten/Kota"/></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- L2.10 NIB -->
+  <div class="section-card">
+    <div class="section-header" id="sec-L2-10">10. Nomor Induk Berusaha (NIB)</div>
+    <div class="section-body">
+      <div class="form-group">
+        <div class="subsection-label">a. Apakah memiliki NIB? <span class="req">*</span></div>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l2_punya_nib" value="1" onchange="handleNIBL()"/> <span>Ya</span></label>
+          <label class="radio-item"><input type="radio" name="l2_punya_nib" value="2" onchange="handleNIBL()"/> <span>Tidak</span></label>
+        </div>
+      </div>
+      <div class="form-group hidden" id="l2_nib_wrap">
+        <label class="field-label">b. Nomor NIB <span class="req">*</span></label>
+        <input type="text" id="l2_nib" maxlength="13" placeholder="13 digit NIB"/>
+        <div class="hint">NIB terdiri dari 13 digit.</div>
+      </div>
+      <div class="hidden" id="l2_nib_alasan_wrap">
+        <div class="form-group">
+          <div class="subsection-label">c. Alasan utama tidak memiliki NIB <span class="req">*</span></div>
+          <div class="radio-group">
+            <label class="radio-item"><input type="radio" name="l2_nib_alasan" value="1" onchange="handleNIBAlasanL()"/> <span>1. Dalam proses pembuatan NIB</span></label>
+            <label class="radio-item"><input type="radio" name="l2_nib_alasan" value="2" onchange="handleNIBAlasanL()"/> <span>2. Pengurusan NIB rumit</span></label>
+            <label class="radio-item"><input type="radio" name="l2_nib_alasan" value="3" onchange="handleNIBAlasanL()"/> <span>3. Tidak memerlukan NIB</span></label>
+            <label class="radio-item"><input type="radio" name="l2_nib_alasan" value="4" onchange="handleNIBAlasanL()"/> <span>4. Tidak tahu tentang NIB</span></label>
+            <label class="radio-item"><input type="radio" name="l2_nib_alasan" value="5" onchange="handleNIBAlasanL()"/> <span>5. Lainnya</span></label>
+          </div>
+        </div>
+        <div class="form-group hidden" id="l2_nib_alasan_lain_wrap">
+          <label class="field-label">Tuliskan alasan lainnya <span class="req">*</span></label>
+          <input type="text" id="l2_nib_alasan_lain" placeholder="Alasan lainnya"/>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- L2.11 Status Badan Usaha -->
+  <div class="section-card">
+    <div class="section-header" id="sec-L2-11">11. Status Badan Usaha</div>
+    <div class="section-body">
+      <div class="form-group">
+        <div class="subsection-label">a. Status badan usaha <span class="req">*</span></div>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l2_badan_usaha" value="1a" onchange="handleBadanUsahaL()"/> <span>1a. Perseroan (PT/NV, PT Persero, PT Tbk, Perseroan Daerah)</span></label>
+          <label class="radio-item"><input type="radio" name="l2_badan_usaha" value="1b" onchange="handleBadanUsahaL()"/> <span>1b. Perseroan Perorangan</span></label>
+          <label class="radio-item"><input type="radio" name="l2_badan_usaha" value="2" onchange="handleBadanUsahaL()"/> <span>2. Yayasan</span></label>
+          <label class="radio-item"><input type="radio" name="l2_badan_usaha" value="3" onchange="handleBadanUsahaL()"/> <span>3. Koperasi</span></label>
+          <label class="radio-item"><input type="radio" name="l2_badan_usaha" value="4" onchange="handleBadanUsahaL()"/> <span>4. Dana Pensiun</span></label>
+          <label class="radio-item"><input type="radio" name="l2_badan_usaha" value="5" onchange="handleBadanUsahaL()"/> <span>5. Perum/Perumda</span></label>
+          <label class="radio-item"><input type="radio" name="l2_badan_usaha" value="6" onchange="handleBadanUsahaL()"/> <span>6. BUM Desa</span></label>
+          <label class="radio-item"><input type="radio" name="l2_badan_usaha" value="7" onchange="handleBadanUsahaL()"/> <span>7. Persekutuan Komanditer (CV)</span></label>
+          <label class="radio-item"><input type="radio" name="l2_badan_usaha" value="8" onchange="handleBadanUsahaL()"/> <span>8. Persekutuan Firma (Fa)</span></label>
+          <label class="radio-item"><input type="radio" name="l2_badan_usaha" value="9" onchange="handleBadanUsahaL()"/> <span>9. Persekutuan Perdata (Maatschap)</span></label>
+          <label class="radio-item"><input type="radio" name="l2_badan_usaha" value="10" onchange="handleBadanUsahaL()"/> <span>10. Kantor Perwakilan Luar Negeri</span></label>
+          <label class="radio-item"><input type="radio" name="l2_badan_usaha" value="11" onchange="handleBadanUsahaL()"/> <span>11. Badan Usaha Luar Negeri</span></label>
+          <label class="radio-item"><input type="radio" name="l2_badan_usaha" value="12" onchange="handleBadanUsahaL()"/> <span>12. Badan Usaha Lainnya (BLU, PTN-BH)</span></label>
+          <label class="radio-item"><input type="radio" name="l2_badan_usaha" value="13" onchange="handleBadanUsahaL()"/> <span>13. Bukan Badan Usaha</span></label>
+        </div>
+      </div>
+      <div class="hidden" id="l2_koperasi_wrap">
+        <div class="form-group">
+          <div class="subsection-label">b. Koperasi Desa/Kelurahan Merah Putih (KDKMP)?</div>
+          <div class="radio-group">
+            <label class="radio-item"><input type="radio" name="l2_kdkmp" value="1"/> <span>Ya</span></label>
+            <label class="radio-item"><input type="radio" name="l2_kdkmp" value="2"/> <span>Tidak</span></label>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="subsection-label">c. Jenis koperasi berdasarkan layanannya</div>
+          <div class="radio-group">
+            <label class="radio-item"><input type="radio" name="l2_koperasi_jenis" value="1"/> <span>1. Open Loop (dapat melayani nonanggota)</span></label>
+            <label class="radio-item"><input type="radio" name="l2_koperasi_jenis" value="2"/> <span>2. Close Loop (hanya melayani anggota)</span></label>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="subsection-label">d. Mempunyai laporan/catatan keuangan?</div>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l2_lap_keuangan" value="1"/> <span>Ya</span></label>
+          <label class="radio-item"><input type="radio" name="l2_lap_keuangan" value="2"/> <span>Tidak</span></label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- L2.12 Pengusaha -->
+  <div class="section-card">
+    <div class="section-header" id="sec-L2-12">12. Keterangan Pengusaha / Penanggung Jawab</div>
+    <div class="section-body">
+      <div class="form-group"><label class="field-label">a. Nama <span class="req">*</span></label><input type="text" id="l2_pengusaha_nama" placeholder="Nama lengkap"/></div>
+      <div class="form-group">
+        <div class="subsection-label">b. Jenis Kelamin <span class="req">*</span></div>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l2_pengusaha_jk" value="1"/> <span>Laki-laki</span></label>
+          <label class="radio-item"><input type="radio" name="l2_pengusaha_jk" value="2"/> <span>Perempuan</span></label>
+        </div>
+      </div>
+      <div class="inline-fields">
+        <div class="form-group"><label class="field-label">c. Umur <span class="req">*</span></label><input type="number" id="l2_pengusaha_umur" min="17" max="120" placeholder="tahun"/></div>
+        <div class="form-group"><label class="field-label">d. NIK <span class="req">*</span></label><input type="text" id="l2_pengusaha_nik" maxlength="16" placeholder="16 digit NIK"/></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- L2.13 Kegiatan Utama & KBLI -->
+  <div class="section-card">
+    <div class="section-header" id="sec-L2-13">13. Kegiatan Utama &amp; Produk</div>
+    <div class="section-body">
+      <div class="form-group">
+        <div class="subsection-label">a. Kegiatan utama usaha/perusahaan <span class="req">*</span></div>
+        <textarea id="l2_kegiatan_utama" placeholder="Tuliskan kegiatan utama beserta produk dan cara penjualannya..."></textarea>
+      </div>
+      <div class="form-group sub-indent">
+        <label class="field-label">b1. Memproduksi barang di lokasi ini? <span class="req">*</span></label>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l2_b1" value="1" onchange="handleKegiatanL()"/> <span>Ya</span></label>
+          <label class="radio-item"><input type="radio" name="l2_b1" value="2" onchange="handleKegiatanL()"/> <span>Tidak</span></label>
+        </div>
+      </div>
+      <div class="form-group sub-indent">
+        <label class="field-label">b2. Menyediakan layanan makan minum? <span class="req">*</span></label>
+        <div class="hint">Ciri: ada peracikan, pemanasan ulang, atau pembuatan produk berdasarkan pesanan/permintaan pelanggan.</div>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l2_b2" value="1" onchange="handleKegiatanL()"/> <span>Ya</span></label>
+          <label class="radio-item"><input type="radio" name="l2_b2" value="2" onchange="handleKegiatanL()"/> <span>Tidak</span></label>
+        </div>
+      </div>
+      <div class="form-group sub-indent hidden" id="l2_b3_wrap">
+        <label class="field-label">b3. Melakukan penjualan barang? <span class="req">*</span></label>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l2_b3" value="1" onchange="handleKegiatanL()"/> <span>Ya</span></label>
+          <label class="radio-item"><input type="radio" name="l2_b3" value="2" onchange="handleKegiatanL()"/> <span>Tidak</span></label>
+        </div>
+      </div>
+      <div class="form-group sub-indent hidden" id="l2_b4_wrap">
+        <label class="field-label">b4. Pilih salah satu aktivitas yang dilakukan: <span class="req">*</span></label>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l2_b4" value="1" onchange="handleKegiatanL()"/> <span>1. Jasa</span></label>
+          <label class="radio-item"><input type="radio" name="l2_b4" value="2" onchange="handleKegiatanL()"/> <span>2. Pertanian, Kehutanan, dan Perikanan</span></label>
+        </div>
+      </div>
+      <div class="form-group hidden" id="l2_c_wrap">
+        <div class="subsection-label">c. Di mana usaha tersebut biasa dilakukan? <span class="req">*</span></div>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l2_c" value="1"/> <span>1. Apotek</span></label>
+          <label class="radio-item"><input type="radio" name="l2_c" value="2"/> <span>2. Swalayan</span></label>
+          <label class="radio-item"><input type="radio" name="l2_c" value="3"/> <span>3. Los Pasar</span></label>
+          <label class="radio-item"><input type="radio" name="l2_c" value="4"/> <span>4. Toko, ruko, dan sejenisnya</span></label>
+          <label class="radio-item"><input type="radio" name="l2_c" value="5"/> <span>5. Kedai, stan, tenda</span></label>
+          <label class="radio-item"><input type="radio" name="l2_c" value="6"/> <span>6. Bar</span></label>
+          <label class="radio-item"><input type="radio" name="l2_c" value="7"/> <span>7. Kelab malam, diskotek</span></label>
+          <label class="radio-item"><input type="radio" name="l2_c" value="8"/> <span>8. Kafe</span></label>
+          <label class="radio-item"><input type="radio" name="l2_c" value="9"/> <span>9. Restoran, warung makan, dan sejenisnya</span></label>
+          <label class="radio-item"><input type="radio" name="l2_c" value="10"/> <span>10. Keliling</span></label>
+          <label class="radio-item"><input type="radio" name="l2_c" value="11"/> <span>11. Daring (online)</span></label>
+        </div>
+      </div>
+      <div class="hidden" id="l2_de_wrap">
+        <div class="form-group">
+          <div class="subsection-label">d. Apa input yang digunakan? <span class="req">*</span></div>
+          <textarea id="l2_input" placeholder="Bahan baku/input utama yang digunakan..."></textarea>
+        </div>
+        <div class="form-group">
+          <div class="subsection-label">e. Bagaimana proses mengubah input menjadi produk output (beserta alatnya)? <span class="req">*</span></div>
+          <textarea id="l2_proses" placeholder="Alur proses produksi..."></textarea>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="subsection-label">f. Apa produk utama yang dihasilkan? <span class="req">*</span></div>
+        <textarea id="l2_produk_utama" placeholder="Produk barang/jasa utama yang dijual/dihasilkan..."></textarea>
+      </div>
+      <div class="form-group">
+        <div class="subsection-label">g. Kode Kategori dan KBLI 2025 <span class="req">*</span></div>
+        <div class="ac-wrap">
+          <input type="text" id="l2_kbli_search" placeholder="Ketik kata kunci KBLI 2025..." oninput="filterKBLIL()" onblur="hideKBLILDrop()" autocomplete="off"/>
+          <div class="ac-drop" id="kbliLDrop"></div>
+        </div>
+        <input type="hidden" id="l2_kbli_kode"/>
+        <input type="hidden" id="l2_kbli_kategori"/>
+        <div id="l2_kbli_chip" class="kbli-chip" style="display:none">
+          <div>
+            <div class="kbli-chip-label">KBLI Terpilih</div>
+            <div class="kbli-chip-text" id="l2_kbli_chip_text"></div>
+            <div class="kbli-chip-uraian" id="l2_kbli_chip_uraian"></div>
+          </div>
+          <button type="button" class="kbli-chip-btn" onclick="clearKBLIL()">Ganti &#10005;</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="field-label">h. Kategori Lapangan Usaha</label>
+        <input type="text" id="l2_kbli_kategori_display" readonly placeholder="Terisi otomatis setelah KBLI dipilih"/>
+      </div>
+      <div class="form-group hidden" id="l2_hotel_wrap">
+        <div class="subsection-label">i. Klasifikasi Hotel (khusus akomodasi)</div>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l2_hotel" value="1"/> <span>1. Hotel Bintang 1</span></label>
+          <label class="radio-item"><input type="radio" name="l2_hotel" value="2"/> <span>2. Hotel Bintang 2</span></label>
+          <label class="radio-item"><input type="radio" name="l2_hotel" value="3"/> <span>3. Hotel Bintang 3</span></label>
+          <label class="radio-item"><input type="radio" name="l2_hotel" value="4"/> <span>4. Hotel Bintang 4</span></label>
+          <label class="radio-item"><input type="radio" name="l2_hotel" value="5"/> <span>5. Hotel Bintang 5</span></label>
+          <label class="radio-item"><input type="radio" name="l2_hotel" value="6"/> <span>6. Lainnya (nonbintang, vila, dll)</span></label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- L2.14 Jaringan -->
+  <div class="section-card">
+    <div class="section-header" id="sec-L2-14">14. Jaringan / Skala Usaha</div>
+    <div class="section-body">
+      <div class="form-group">
+        <div class="subsection-label">a. Jaringan usaha <span class="req">*</span></div>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l2_jaringan" value="1" onchange="handleJaringanL()"/> <span>1. Tunggal</span></label>
+          <label class="radio-item"><input type="radio" name="l2_jaringan" value="2" onchange="handleJaringanL()"/> <span>2. Kantor pusat</span></label>
+          <label class="radio-item"><input type="radio" name="l2_jaringan" value="3" onchange="handleJaringanL()"/> <span>3. Cabang</span></label>
+          <label class="radio-item"><input type="radio" name="l2_jaringan" value="4" onchange="handleJaringanL()"/> <span>4. Perwakilan</span></label>
+          <label class="radio-item"><input type="radio" name="l2_jaringan" value="5" onchange="handleJaringanL()"/> <span>5. Pabrik</span></label>
+          <label class="radio-item"><input type="radio" name="l2_jaringan" value="6" onchange="handleJaringanL()"/> <span>6. Unit pembantu/penunjang</span></label>
+        </div>
+      </div>
+      <div class="form-group hidden" id="l2_jml_cabang_wrap">
+        <label class="field-label">b. Jumlah seluruh kantor cabang dan unit usaha di bawah kantor pusat <span class="req">*</span></label>
+        <input type="number" id="l2_jml_cabang" min="0" placeholder="0"/>
+      </div>
+      <div class="notice-box hidden" id="l2_unit_pembantu_notice">
+        Usaha ini merupakan unit pembantu/penunjang. Setelah mengisi Informasi Kantor Pusat (Rincian 15), pendataan usaha ini <strong>SELESAI</strong>.
+      </div>
+    </div>
+  </div>
+
+  <!-- L2.15 Informasi Kantor Pusat (kondisional) -->
+  <div class="section-card hidden" id="l2_kp_wrap">
+    <div class="section-header" id="sec-L2-15">15. Informasi Kantor Pusat / Induk</div>
+    <div class="section-body">
+      <div class="form-group"><label class="field-label">a. Nama Kantor Pusat</label><input type="text" id="l2_kp_nama" placeholder="Nama kantor pusat/induk"/></div>
+      <div class="form-group"><label class="field-label">b. Alamat Kantor Pusat</label><input type="text" id="l2_kp_alamat" placeholder="Alamat kantor pusat"/></div>
+      <div class="inline-fields">
+        <div class="form-group"><label class="field-label">c. Email</label><input type="email" id="l2_kp_email" placeholder="email@pusat.com"/></div>
+        <div class="form-group"><label class="field-label">d. Negara</label><input type="text" id="l2_kp_negara" placeholder="Indonesia"/></div>
+      </div>
+      <div class="inline-fields">
+        <div class="form-group"><label class="field-label">e. Provinsi</label><input type="text" id="l2_kp_provinsi" placeholder="Provinsi"/></div>
+        <div class="form-group"><label class="field-label">f. Kabupaten/Kota</label><input type="text" id="l2_kp_kab" placeholder="Kabupaten/Kota"/></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- L2.16 Internet & Teknologi Digital -->
+  <div class="section-card">
+    <div class="section-header" id="sec-L2-16">16. Penggunaan Internet &amp; Teknologi Digital</div>
+    <div class="section-body">
+      <div class="form-group">
+        <div class="subsection-label">a. Menggunakan internet dalam menjalankan usaha? <span class="req">*</span></div>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l2_internet" value="1" onchange="handleInternetL()"/> <span>Ya</span></label>
+          <label class="radio-item"><input type="radio" name="l2_internet" value="2" onchange="handleInternetL()"/> <span>Tidak</span></label>
+        </div>
+      </div>
+      <div class="hidden" id="l2_internet_b_wrap">
+        <div class="subsection-label">b. Tujuan penggunaan internet (Ya/Tidak per item) <span class="req">*</span></div>
+        <div class="qmatrix-row"><div class="qmatrix-label">b1. Menerima pesanan barang/jasa</div>
+          <div class="radio-group qmatrix-opts">
+            <label class="radio-item"><input type="radio" name="l2_internet_b1" value="1"/> <span>Ya</span></label>
+            <label class="radio-item"><input type="radio" name="l2_internet_b1" value="2"/> <span>Tidak</span></label>
+          </div></div>
+        <div class="qmatrix-row"><div class="qmatrix-label">b2. Produksi barang/jasa</div>
+          <div class="radio-group qmatrix-opts">
+            <label class="radio-item"><input type="radio" name="l2_internet_b2" value="1"/> <span>Ya</span></label>
+            <label class="radio-item"><input type="radio" name="l2_internet_b2" value="2"/> <span>Tidak</span></label>
+          </div></div>
+        <div class="qmatrix-row"><div class="qmatrix-label">b3. Distribusi barang/jasa</div>
+          <div class="radio-group qmatrix-opts">
+            <label class="radio-item"><input type="radio" name="l2_internet_b3" value="1"/> <span>Ya</span></label>
+            <label class="radio-item"><input type="radio" name="l2_internet_b3" value="2"/> <span>Tidak</span></label>
+          </div></div>
+        <div class="qmatrix-row"><div class="qmatrix-label">b4. Membeli bahan baku online</div>
+          <div class="radio-group qmatrix-opts">
+            <label class="radio-item"><input type="radio" name="l2_internet_b4" value="1"/> <span>Ya</span></label>
+            <label class="radio-item"><input type="radio" name="l2_internet_b4" value="2"/> <span>Tidak</span></label>
+          </div></div>
+        <div class="qmatrix-row"><div class="qmatrix-label">b5. Promosi</div>
+          <div class="radio-group qmatrix-opts">
+            <label class="radio-item"><input type="radio" name="l2_internet_b5" value="1"/> <span>Ya</span></label>
+            <label class="radio-item"><input type="radio" name="l2_internet_b5" value="2"/> <span>Tidak</span></label>
+          </div></div>
+        <div class="qmatrix-row"><div class="qmatrix-label">b6. Lainnya</div>
+          <div class="radio-group qmatrix-opts">
+            <label class="radio-item"><input type="radio" name="l2_internet_b6" value="1"/> <span>Ya</span></label>
+            <label class="radio-item"><input type="radio" name="l2_internet_b6" value="2"/> <span>Tidak</span></label>
+          </div></div>
+      </div>
+      <div class="form-group">
+        <div class="subsection-label">c. Memanfaatkan teknologi digital (AI, IoT, big data, printer 3D, blockchain, cloud)? <span class="req">*</span></div>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l2_teknologi" value="1"/> <span>Ya</span></label>
+          <label class="radio-item"><input type="radio" name="l2_teknologi" value="2"/> <span>Tidak</span></label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- L2.17 Ramah Lingkungan -->
+  <div class="section-card">
+    <div class="section-header" id="sec-L2-17">17. Produk / Kegiatan Ramah Lingkungan</div>
+    <div class="section-body">
+      <div class="form-group">
+        <div class="subsection-label">a. Memproduksi barang/jasa yang ramah lingkungan? <span class="req">*</span></div>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l2_ramah_a" value="1"/> <span>1. Ya, seluruhnya</span></label>
+          <label class="radio-item"><input type="radio" name="l2_ramah_a" value="2"/> <span>2. Ya, sebagian</span></label>
+          <label class="radio-item"><input type="radio" name="l2_ramah_a" value="3"/> <span>3. Tidak sama sekali</span></label>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="subsection-label">b. Menggunakan input untuk perlindungan lingkungan dan/atau membeli barang/jasa ramah lingkungan? <span class="req">*</span></div>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l2_ramah_b" value="1"/> <span>Ya</span></label>
+          <label class="radio-item"><input type="radio" name="l2_ramah_b" value="2"/> <span>Tidak</span></label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- L2.18 Karya Seni / Kreatif -->
+  <div class="section-card">
+    <div class="section-header" id="sec-L2-18">18. Produk Karya Seni / Sastra / Desain / Teknologi / Warisan Budaya</div>
+    <div class="section-body">
+      <div class="form-group">
+        <div class="subsection-label">Menggunakan produk karya seni, sastra, desain, teknologi, atau warisan budaya (sendiri maupun pihak lain)? <span class="req">*</span></div>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l2_kreatif" value="1"/> <span>Ya</span></label>
+          <label class="radio-item"><input type="radio" name="l2_kreatif" value="2"/> <span>Tidak</span></label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- L2.19 Halal -->
+  <div class="section-card">
+    <div class="section-header" id="sec-L2-19">19. Sertifikasi Halal (BPJPH)</div>
+    <div class="section-body">
+      <div class="form-group">
+        <div class="subsection-label">a. Menghasilkan produk bersertifikat halal? <span class="req">*</span></div>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l2_halal" value="1" onchange="handleHalalL()"/> <span>1. Ya, oleh BPJPH</span></label>
+          <label class="radio-item"><input type="radio" name="l2_halal" value="2" onchange="handleHalalL()"/> <span>2. Ya, bukan oleh BPJPH</span></label>
+          <label class="radio-item"><input type="radio" name="l2_halal" value="3" onchange="handleHalalL()"/> <span>3. Tidak</span></label>
+        </div>
+      </div>
+      <div class="hidden" id="l2_halal_b_wrap">
+        <div class="inline-fields">
+          <div class="form-group"><label class="field-label">b. Jumlah varian sudah bersertifikat halal BPJPH <span class="req">*</span></label><input type="number" id="l2_halal_b" min="0" placeholder="0"/></div>
+          <div class="form-group"><label class="field-label">c. Jumlah varian belum bersertifikat halal BPJPH <span class="req">*</span></label><input type="number" id="l2_halal_c" min="0" placeholder="0"/></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- L2.20 BPOM -->
+  <div class="section-card">
+    <div class="section-header" id="sec-L2-20">20. Izin Edar Produk (BPOM)</div>
+    <div class="section-body">
+      <div class="form-group">
+        <div class="subsection-label">a. Memiliki izin edar? <span class="req">*</span></div>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l2_bpom" value="1" onchange="handleBPOML()"/> <span>1. Ya, oleh BPOM</span></label>
+          <label class="radio-item"><input type="radio" name="l2_bpom" value="2" onchange="handleBPOML()"/> <span>2. Ya, bukan oleh BPOM</span></label>
+          <label class="radio-item"><input type="radio" name="l2_bpom" value="3" onchange="handleBPOML()"/> <span>3. Tidak</span></label>
+        </div>
+      </div>
+      <div class="hidden" id="l2_bpom_b_wrap">
+        <div class="inline-fields">
+          <div class="form-group"><label class="field-label">b. Jumlah varian sudah memiliki izin edar BPOM <span class="req">*</span></label><input type="number" id="l2_bpom_b" min="0" placeholder="0"/></div>
+          <div class="form-group"><label class="field-label">c. Jumlah varian belum memiliki izin edar BPOM <span class="req">*</span></label><input type="number" id="l2_bpom_c" min="0" placeholder="0"/></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- L2.21 Mitra KDKMP -->
+  <div class="section-card">
+    <div class="section-header" id="sec-L2-21">21. Kemitraan dengan KDKMP</div>
+    <div class="section-body">
+      <div class="form-group">
+        <div class="subsection-label">Bermitra dengan Koperasi Desa/Kelurahan Merah Putih (KDKMP)? <span class="req">*</span></div>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l2_mitra_kdkmp" value="1"/> <span>Ya</span></label>
+          <label class="radio-item"><input type="radio" name="l2_mitra_kdkmp" value="2"/> <span>Tidak</span></label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- L2.22 MBG -->
+  <div class="section-card">
+    <div class="section-header" id="sec-L2-22">22. Keterlibatan Program Makan Bergizi Gratis (MBG)</div>
+    <div class="section-body">
+      <div class="form-group">
+        <div class="subsection-label">Terlibat dalam program MBG? <span class="req">*</span></div>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l2_mbg" value="1"/> <span>1. Ya, sebagai Satuan Pelayanan Pemenuhan Gizi (SPPG)</span></label>
+          <label class="radio-item"><input type="radio" name="l2_mbg" value="2"/> <span>2. Ya, sebagai supplier</span></label>
+          <label class="radio-item"><input type="radio" name="l2_mbg" value="3"/> <span>3. Ya, sebagai penerima manfaat (Sekolah, Puskesmas)</span></label>
+          <label class="radio-item"><input type="radio" name="l2_mbg" value="4"/> <span>4. Ya, peran lainnya</span></label>
+          <label class="radio-item"><input type="radio" name="l2_mbg" value="5"/> <span>5. Tidak terlibat MBG</span></label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- L2.23 Transaksi Bukan Penduduk -->
+  <div class="section-card">
+    <div class="section-header" id="sec-L2-23">23. Penjualan/Pembelian kepada Bukan Penduduk Indonesia</div>
+    <div class="section-body">
+      <div class="hint">Periode 1 Mei 2024 s.d. 31 Agustus 2026. Bukan penduduk = orang/badan yang pusat kegiatan ekonominya di luar Indonesia.</div>
+      <div class="form-group">
+        <label class="field-label">a. Penjualan dan/atau pembelian barang <span class="req">*</span></label>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l2_nonpend_a" value="1"/> <span>Ya</span></label>
+          <label class="radio-item"><input type="radio" name="l2_nonpend_a" value="2"/> <span>Tidak</span></label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="field-label">b. Penjualan jasa <span class="req">*</span></label>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l2_nonpend_b" value="1"/> <span>Ya</span></label>
+          <label class="radio-item"><input type="radio" name="l2_nonpend_b" value="2"/> <span>Tidak</span></label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="field-label">c. Pembelian jasa <span class="req">*</span></label>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l2_nonpend_c" value="1"/> <span>Ya</span></label>
+          <label class="radio-item"><input type="radio" name="l2_nonpend_c" value="2"/> <span>Tidak</span></label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- L2.24 Pekerja -->
+  <div class="section-card">
+    <div class="section-header" id="sec-L2-24">24. Pekerja</div>
+    <div class="section-body">
+      <div class="hint">Jika beroperasi 2026: rata-rata pekerja per bulan 2026. Jika sebelum 2026: pekerja per 31 Des 2025 (atau rata-rata per bulan 2025).</div>
+      <div class="inline-fields">
+        <div class="form-group"><label class="field-label">a1. Pekerja laki-laki <span class="req">*</span></label><input type="number" id="l2_pekerja_l" min="0" placeholder="0" oninput="calcPekerjaL()"/></div>
+        <div class="form-group"><label class="field-label">b1. Pekerja perempuan <span class="req">*</span></label><input type="number" id="l2_pekerja_p" min="0" placeholder="0" oninput="calcPekerjaL()"/></div>
+        <div class="form-group"><label class="field-label">c1. Total pekerja (a1+b1)</label><input type="number" id="l2_pekerja_total" readonly class="total-field" placeholder="0"/></div>
+      </div>
+      <div class="inline-fields">
+        <div class="form-group"><label class="field-label">a2. Pekerja dibayar</label><input type="number" id="l2_pekerja_dibayar" min="0" placeholder="0" oninput="calcPekerjaL()"/></div>
+        <div class="form-group"><label class="field-label">b2. Pekerja tidak dibayar</label><input type="number" id="l2_pekerja_tidak_dibayar" min="0" placeholder="0" oninput="calcPekerjaL()"/></div>
+        <div class="form-group"><label class="field-label">c2. Total pekerja (a2+b2)</label><input type="number" id="l2_pekerja_total2" readonly class="total-field" placeholder="0"/></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- L2.25 Tahun Operasi -->
+  <div class="section-card">
+    <div class="section-header" id="sec-L2-25">25. Tahun Mulai Beroperasi Secara Komersial</div>
+    <div class="section-body">
+      <div class="form-group">
+        <label class="field-label">Tahun beroperasi komersial (4 angka) <span class="req">*</span></label>
+        <input type="number" id="l2_tahun_operasi" min="1900" max="2026" placeholder="YYYY" oninput="handleTahunOperasiL()"/>
+        <div class="hint">Beroperasi &lt; 2026 → isi Rincian 26–29. Beroperasi ≥ 2026 → isi Rincian 30–33.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- L2.26-29 TAHUNAN (beroperasi sebelum 2026) -->
+  <div class="section-card hidden" id="l2_tahunan_wrap">
+    <div class="section-header" id="sec-L2-26">26–29. Pengeluaran, Pendapatan &amp; Aset Tahun 2025</div>
+    <div class="section-body">
+      <div class="hint">Diisi jika usaha beroperasi komersial <strong>sebelum tahun 2026</strong>.</div>
+
+      <div class="subsection-label">26. Rincian Pengeluaran Tahun 2025 (Rupiah)</div>
+      <div class="form-group"><label class="field-label">a. Total upah/gaji + jaminan sosial pegawai</label><div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="l2_y26a" class="currency-field" oninput="formatCurrency(this);calcL2Pengeluaran()" placeholder="0"/></div></div>
+      <div class="form-group"><label class="field-label">b. Biaya produksi</label><div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="l2_y26b" class="currency-field" oninput="formatCurrency(this);calcL2Pengeluaran()" placeholder="0"/></div></div>
+      <div class="form-group"><label class="field-label">c. Biaya pembelian barang yang terjual (khusus perdagangan)</label><div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="l2_y26c" class="currency-field" oninput="formatCurrency(this);calcL2Pengeluaran()" placeholder="0"/></div></div>
+      <div class="form-group"><label class="field-label">d. Biaya operasional (air, listrik, gas, internet, pemeliharaan, angkutan, dll)</label><div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="l2_y26d" class="currency-field" oninput="formatCurrency(this);calcL2Pengeluaran()" placeholder="0"/></div></div>
+      <div class="form-group"><label class="field-label">e. Biaya nonoperasional</label><div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="l2_y26e" class="currency-field" oninput="formatCurrency(this);calcL2Pengeluaran()" placeholder="0"/></div></div>
+      <div class="form-group"><label class="field-label">f. Total pengeluaran (a+b+c+d+e)</label><div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="l2_y26f" readonly class="total-field" placeholder="0"/></div></div>
+
+      <div class="subsection-label subsection-label-spaced">27. Nilai Produksi/Penjualan/Pendapatan Tahun 2025 (Rupiah)</div>
+      <div class="form-group"><label class="field-label">a. Nilai produksi/penjualan/pendapatan barang dan jasa</label><div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="l2_y27a" class="currency-field" oninput="formatCurrency(this);calcL2Pendapatan()" placeholder="0"/></div></div>
+      <div class="form-group"><label class="field-label">b. Pendapatan lainnya yang dihasilkan</label><div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="l2_y27b" class="currency-field" oninput="formatCurrency(this);calcL2Pendapatan()" placeholder="0"/></div></div>
+      <div class="form-group"><label class="field-label">c. Total nilai produksi/penjualan/pendapatan (a+b)</label><div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="l2_y27c" readonly class="total-field" placeholder="0"/></div></div>
+      <div class="form-group"><label class="field-label">d. Persentase pendapatan dari usaha online</label><div class="inline-pct-row"><input type="number" id="l2_y27d" class="input-short" min="0" max="100" placeholder="0"/><span class="pct-label">%</span></div></div>
+
+      <div class="subsection-label subsection-label-spaced">28. Nilai Aset per 31 Desember 2025 (Rupiah)</div>
+      <div class="form-group"><label class="field-label">a. Nilai aset tanah dan bangunan</label><div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="l2_y28a" class="currency-field" oninput="formatCurrency(this);calcL2Aset()" placeholder="0"/></div></div>
+      <div class="form-group"><label class="field-label">b. Nilai aset selain tanah dan bangunan</label><div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="l2_y28b" class="currency-field" oninput="formatCurrency(this);calcL2Aset()" placeholder="0"/></div></div>
+      <div class="form-group"><label class="field-label">c. Nilai total aset (a+b)</label><div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="l2_y28c" readonly class="total-field" placeholder="0"/></div></div>
+      <div class="form-group">
+        <label class="field-label field-label-sm">c1. Jika tidak dapat mengisi nominal, pilih rentang nilai total aset</label>
+        <select id="l2_y28c1">
+          <option value="">— pilih rentang (opsional) —</option>
+          <option value="1">1. s.d. Rp 500 juta</option>
+          <option value="2">2. &gt; Rp 500 juta s.d. Rp 1 miliar</option>
+          <option value="3">3. &gt; Rp 1 miliar s.d. Rp 5 miliar</option>
+          <option value="4">4. &gt; Rp 5 miliar s.d. Rp 10 miliar</option>
+          <option value="5">5. &gt; Rp 10 miliar</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="field-label">d. Luas tanah yang dikuasai dan digunakan untuk usaha (m²)</label><input type="number" id="l2_y28d" min="0" placeholder="0"/></div>
+
+      <div class="subsection-label subsection-label-spaced">29. Susunan Kepemilikan Modal per 31 Desember 2025 (%)</div>
+      <div class="inline-fields">
+        <div class="form-group"><label class="field-label">a. Pribadi/Perorangan</label><input type="number" id="l2_y29a" min="0" max="100" placeholder="0" oninput="calcL2Modal()"/></div>
+        <div class="form-group"><label class="field-label">b. LNPRT</label><input type="number" id="l2_y29b" min="0" max="100" placeholder="0" oninput="calcL2Modal()"/></div>
+        <div class="form-group"><label class="field-label">c. Korporasi Publik</label><input type="number" id="l2_y29c" min="0" max="100" placeholder="0" oninput="calcL2Modal()"/></div>
+      </div>
+      <div class="inline-fields">
+        <div class="form-group"><label class="field-label">d. Korporasi Nonpublik</label><input type="number" id="l2_y29d" min="0" max="100" placeholder="0" oninput="calcL2Modal()"/></div>
+        <div class="form-group"><label class="field-label">e. Pemerintah</label><input type="number" id="l2_y29e" min="0" max="100" placeholder="0" oninput="calcL2Modal()"/></div>
+        <div class="form-group"><label class="field-label">f. Asing</label><input type="number" id="l2_y29f" min="0" max="100" placeholder="0" oninput="calcL2Modal()"/></div>
+      </div>
+      <div class="form-group"><label class="field-label">g. Total (a+…+f) — harus = 100%</label><div class="inline-pct-row"><input type="number" id="l2_y29g" readonly class="total-field input-short" placeholder="0"/><span id="l2_y29_indicator">%</span></div></div>
+      <div class="hint">LNPRT = Lembaga Nonprofit yang Melayani Rumah Tangga.</div>
+    </div>
+  </div>
+
+  <!-- L2.30-33 BULANAN (beroperasi tahun 2026) -->
+  <div class="section-card hidden" id="l2_bulanan_wrap">
+    <div class="section-header" id="sec-L2-30">30–33. Pengeluaran, Pendapatan &amp; Aset Bulan Terakhir</div>
+    <div class="section-body">
+      <div class="hint">Diisi jika usaha beroperasi komersial <strong>pada tahun 2026</strong>. Nilai sebulan penuh bulan sebelum pendataan.</div>
+
+      <div class="subsection-label">30. Rincian Pengeluaran Selama Satu Bulan Terakhir (Rupiah)</div>
+      <div class="form-group"><label class="field-label">a. Total upah/gaji + jaminan sosial pegawai</label><div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="l2_m30a" class="currency-field" oninput="formatCurrency(this);calcL2Bulanan()" placeholder="0"/></div></div>
+      <div class="form-group"><label class="field-label">b. Biaya produksi</label><div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="l2_m30b" class="currency-field" oninput="formatCurrency(this);calcL2Bulanan()" placeholder="0"/></div></div>
+      <div class="form-group"><label class="field-label">c. Biaya pembelian barang yang terjual (khusus perdagangan)</label><div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="l2_m30c" class="currency-field" oninput="formatCurrency(this);calcL2Bulanan()" placeholder="0"/></div></div>
+      <div class="form-group"><label class="field-label">d. Biaya operasional (air, listrik, gas, internet, pemeliharaan, angkutan, dll)</label><div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="l2_m30d" class="currency-field" oninput="formatCurrency(this);calcL2Bulanan()" placeholder="0"/></div></div>
+      <div class="form-group"><label class="field-label">e. Biaya nonoperasional</label><div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="l2_m30e" class="currency-field" oninput="formatCurrency(this);calcL2Bulanan()" placeholder="0"/></div></div>
+      <div class="form-group"><label class="field-label">f. Total pengeluaran (a+b+c+d+e)</label><div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="l2_m30f" readonly class="total-field" placeholder="0"/></div></div>
+
+      <div class="subsection-label subsection-label-spaced">31. Nilai Produksi/Penjualan/Pendapatan Satu Bulan Terakhir (Rupiah)</div>
+      <div class="form-group"><label class="field-label">a. Nilai produksi/penjualan/pendapatan barang dan jasa</label><div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="l2_m31a" class="currency-field" oninput="formatCurrency(this);calcL2Bulanan()" placeholder="0"/></div></div>
+      <div class="form-group"><label class="field-label">b. Pendapatan lainnya yang dihasilkan</label><div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="l2_m31b" class="currency-field" oninput="formatCurrency(this);calcL2Bulanan()" placeholder="0"/></div></div>
+      <div class="form-group"><label class="field-label">c. Total nilai produksi/penjualan/pendapatan (a+b)</label><div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="l2_m31c" readonly class="total-field" placeholder="0"/></div></div>
+      <div class="form-group"><label class="field-label">d. Persentase pendapatan dari usaha online</label><div class="inline-pct-row"><input type="number" id="l2_m31d" class="input-short" min="0" max="100" placeholder="0"/><span class="pct-label">%</span></div></div>
+      <div class="form-group">
+        <div class="subsection-label">e. Bulan beroperasi selama tahun 2026</div>
+        <div class="checkbox-group qmatrix-opts">
+          <label class="checkbox-item"><input type="checkbox" id="l2_m31e_1"/> <span>Jan</span></label>
+          <label class="checkbox-item"><input type="checkbox" id="l2_m31e_2"/> <span>Feb</span></label>
+          <label class="checkbox-item"><input type="checkbox" id="l2_m31e_3"/> <span>Mar</span></label>
+          <label class="checkbox-item"><input type="checkbox" id="l2_m31e_4"/> <span>Apr</span></label>
+          <label class="checkbox-item"><input type="checkbox" id="l2_m31e_5"/> <span>Mei</span></label>
+          <label class="checkbox-item"><input type="checkbox" id="l2_m31e_6"/> <span>Juni</span></label>
+          <label class="checkbox-item"><input type="checkbox" id="l2_m31e_7"/> <span>Juli</span></label>
+          <label class="checkbox-item"><input type="checkbox" id="l2_m31e_8"/> <span>Agst</span></label>
+        </div>
+      </div>
+
+      <div class="subsection-label subsection-label-spaced">32. Nilai Aset Akhir Bulan Lalu (Rupiah)</div>
+      <div class="form-group"><label class="field-label">a. Nilai aset tanah dan bangunan</label><div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="l2_m32a" class="currency-field" oninput="formatCurrency(this);calcL2Bulanan()" placeholder="0"/></div></div>
+      <div class="form-group"><label class="field-label">b. Nilai aset selain tanah dan bangunan</label><div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="l2_m32b" class="currency-field" oninput="formatCurrency(this);calcL2Bulanan()" placeholder="0"/></div></div>
+      <div class="form-group"><label class="field-label">c. Nilai total aset (a+b)</label><div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="l2_m32c" readonly class="total-field" placeholder="0"/></div></div>
+      <div class="form-group">
+        <label class="field-label field-label-sm">c1. Jika tidak dapat mengisi nominal, pilih rentang nilai total aset</label>
+        <select id="l2_m32c1">
+          <option value="">— pilih rentang (opsional) —</option>
+          <option value="1">1. s.d. Rp 500 juta</option>
+          <option value="2">2. &gt; Rp 500 juta s.d. Rp 1 miliar</option>
+          <option value="3">3. &gt; Rp 1 miliar s.d. Rp 5 miliar</option>
+          <option value="4">4. &gt; Rp 5 miliar s.d. Rp 10 miliar</option>
+          <option value="5">5. &gt; Rp 10 miliar</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="field-label">d. Luas tanah yang dikuasai dan digunakan untuk usaha (m²)</label><input type="number" id="l2_m32d" min="0" placeholder="0"/></div>
+
+      <div class="subsection-label subsection-label-spaced">33. Susunan Kepemilikan Modal Saat Didirikan (%)</div>
+      <div class="inline-fields">
+        <div class="form-group"><label class="field-label">a. Pribadi/Perorangan</label><input type="number" id="l2_m33a" min="0" max="100" placeholder="0" oninput="calcL2Modal33()"/></div>
+        <div class="form-group"><label class="field-label">b. LNPRT</label><input type="number" id="l2_m33b" min="0" max="100" placeholder="0" oninput="calcL2Modal33()"/></div>
+        <div class="form-group"><label class="field-label">c. Korporasi Publik</label><input type="number" id="l2_m33c" min="0" max="100" placeholder="0" oninput="calcL2Modal33()"/></div>
+      </div>
+      <div class="inline-fields">
+        <div class="form-group"><label class="field-label">d. Korporasi Nonpublik</label><input type="number" id="l2_m33d" min="0" max="100" placeholder="0" oninput="calcL2Modal33()"/></div>
+        <div class="form-group"><label class="field-label">e. Pemerintah</label><input type="number" id="l2_m33e" min="0" max="100" placeholder="0" oninput="calcL2Modal33()"/></div>
+        <div class="form-group"><label class="field-label">f. Asing</label><input type="number" id="l2_m33f" min="0" max="100" placeholder="0" oninput="calcL2Modal33()"/></div>
+      </div>
+      <div class="form-group"><label class="field-label">g. Total (a+…+f) — harus = 100%</label><div class="inline-pct-row"><input type="number" id="l2_m33g" readonly class="total-field input-short" placeholder="0"/><span id="l2_m33_indicator">%</span></div></div>
+    </div>
+  </div>
+
   <div class="nav-actions">
     <button class="btn btn-secondary" onclick="goBlok(1)">&lsaquo; Kembali: BLOK I</button>
     <button type="button" class="btn-nav-draft" onclick="saveAsDraft()">&#128190; Simpan Draft</button>

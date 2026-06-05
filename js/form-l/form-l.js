@@ -448,9 +448,9 @@ function disabilitasRowsHTML(i) {
     ['d', 'Sensorik Netra'], ['e', 'Sensorik Rungu'], ['f', 'Sensorik Wicara'],
   ];
   return labels.map(([k, lbl]) => `
-    <div class="inline-fields" style="align-items:center;border-bottom:1px solid #f5f2ee;padding:6px 0">
-      <div style="flex:1;font-size:13px">${k.toUpperCase()}. ${lbl}</div>
-      <div class="radio-group" style="margin:0">
+    <div class="qmatrix-row">
+      <div class="qmatrix-label">${k.toUpperCase()}. ${lbl}</div>
+      <div class="radio-group qmatrix-opts">
         <label class="radio-item"><input type="radio" name="l_ang_${i}_disab_${k}" value="1"/> <span>Ya</span></label>
         <label class="radio-item"><input type="radio" name="l_ang_${i}_disab_${k}" value="2"/> <span>Tidak</span></label>
         <label class="radio-item"><input type="radio" name="l_ang_${i}_disab_${k}" value="9"/> <span>TT</span></label>
@@ -466,9 +466,9 @@ function penyakitKronisRowsHTML(i) {
     ['m', 'Sirosis Hati'], ['n', 'Talasemia'], ['o', 'Leukemia'], ['p', 'Alzheimer'],
   ];
   return labels.map(([k, lbl]) => `
-    <div class="inline-fields" style="align-items:center;border-bottom:1px solid #f5f2ee;padding:6px 0">
-      <div style="flex:1;font-size:13px">${k.toUpperCase()}. ${lbl}</div>
-      <div class="radio-group" style="margin:0">
+    <div class="qmatrix-row">
+      <div class="qmatrix-label">${k.toUpperCase()}. ${lbl}</div>
+      <div class="radio-group qmatrix-opts">
         <label class="radio-item"><input type="radio" name="l_ang_${i}_kronis_${k}" value="1"/> <span>Ya</span></label>
         <label class="radio-item"><input type="radio" name="l_ang_${i}_kronis_${k}" value="2"/> <span>Tidak</span></label>
         <label class="radio-item"><input type="radio" name="l_ang_${i}_kronis_${k}" value="9"/> <span>TT</span></label>
@@ -604,14 +604,36 @@ function handlePendapatanAnggota(i, key) {
 }
 
 /* --- L1 regional dropdowns --- */
+/* Kode wilayah PENDEK (spesifik per level) dari id gabungan: prov 2, kab 2, kec 3, desa 3 digit. */
+function _wilShortKode(level, full) {
+  const k = String(full == null ? '' : full);
+  switch (level) {
+    case 'prov': return k.slice(0, 2);
+    case 'kab':  return k.slice(2, 4);
+    case 'kec':  return k.slice(4, 7);
+    case 'desa': return k.slice(7, 10);
+    default:     return k;
+  }
+}
+/* Label opsi wilayah: "[kode] NAMA" (kode pendek per level). */
+function _wilLabel(level, full, nama) {
+  const sk = _wilShortKode(level, full);
+  return sk ? '[' + sk + '] ' + (nama || '') : (nama || '');
+}
+/* Urut ascending berdasarkan kode (id gabungan numerik). */
+function _byKode(a, b) {
+  const ka = String(a == null ? '' : a), kb = String(b == null ? '' : b);
+  return ka.localeCompare(kb, undefined, { numeric: true });
+}
+
 function loadProvinsiL() {
   const sel = document.getElementById('l1_alamat_provinsi');
   if (!sel) return;
   sel.innerHTML = '<option value="">-- Pilih Provinsi --</option>';
   const list = (typeof STATIC_PROVINSI !== 'undefined') ? STATIC_PROVINSI : [];
-  list.forEach(d => {
+  [...list].sort((a, b) => _byKode(a.kode, b.kode)).forEach(d => {
     const o = document.createElement('option');
-    o.value = d.kode; o.textContent = d.nama;
+    o.value = d.kode; o.textContent = _wilLabel('prov', d.kode, d.nama);
     sel.appendChild(o);
   });
   if (typeof syncSearchable === 'function') syncSearchable('l1_alamat_provinsi', 'provinsi keluarga');
@@ -635,9 +657,9 @@ async function loadKabupatenL(kdprov) {
   const staticKabs = (typeof STATIC_KABUPATEN !== 'undefined' && STATIC_KABUPATEN[kdprov]) || null;
   if (staticKabs) {
     sel.innerHTML = '<option value="">-- Pilih Kabupaten/Kota --</option>';
-    [...staticKabs].sort((a, b) => a.nama.localeCompare(b.nama)).forEach(k => {
+    [...staticKabs].sort((a, b) => _byKode(a.kode, b.kode)).forEach(k => {
       const o = document.createElement('option');
-      o.value = k.kode; o.textContent = k.nama;
+      o.value = k.kode; o.textContent = _wilLabel('kab', k.kode, k.nama);
       sel.appendChild(o);
     });
     sel.disabled = false;
@@ -649,9 +671,9 @@ async function loadKabupatenL(kdprov) {
       { headers: { 'Accept': 'application/json' } });
     const d = await res.json();
     sel.innerHTML = '<option value="">-- Pilih --</option>';
-    (d.data || []).sort((a, b) => a.namakab.localeCompare(b.namakab)).forEach(k => {
+    (d.data || []).sort((a, b) => _byKode(a.kdprovkab, b.kdprovkab)).forEach(k => {
       const o = document.createElement('option');
-      o.value = k.kdprovkab; o.textContent = k.namakab;
+      o.value = k.kdprovkab; o.textContent = _wilLabel('kab', k.kdprovkab, k.namakab);
       sel.appendChild(o);
     });
     sel.disabled = false;
@@ -671,9 +693,9 @@ function loadKecamatanL(kdprovkab) {
   if (typeof syncSearchable === 'function') syncSearchable('l1_alamat_kel', 'kelurahan/desa keluarga');
   if (!kdprovkab) { sel.disabled = true; if (typeof syncSearchable === 'function') syncSearchable('l1_alamat_kec', 'kecamatan keluarga'); return; }
   const stk = (typeof STATIC_KECAMATAN !== 'undefined' && STATIC_KECAMATAN[kdprovkab]) || [];
-  stk.forEach(k => {
+  [...stk].sort((a, b) => _byKode(a.kode, b.kode)).forEach(k => {
     const o = document.createElement('option');
-    o.value = k.kode; o.textContent = k.nama;
+    o.value = k.kode; o.textContent = _wilLabel('kec', k.kode, k.nama);
     sel.appendChild(o);
   });
   sel.disabled = false;
@@ -686,9 +708,9 @@ function loadKelurahanL(kdprovkabkec) {
   sel.innerHTML = '<option value="">-- Pilih Kelurahan/Desa --</option>';
   if (!kdprovkabkec) { sel.disabled = true; if (typeof syncSearchable === 'function') syncSearchable('l1_alamat_kel', 'kelurahan/desa keluarga'); return; }
   const stk = (typeof STATIC_KELURAHAN !== 'undefined' && STATIC_KELURAHAN[kdprovkabkec]) || [];
-  stk.forEach(k => {
+  [...stk].sort((a, b) => _byKode(a.kode, b.kode)).forEach(k => {
     const o = document.createElement('option');
-    o.value = k.kode; o.textContent = k.nama;
+    o.value = k.kode; o.textContent = _wilLabel('desa', k.kode, k.nama);
     sel.appendChild(o);
   });
   sel.disabled = false;
@@ -1061,8 +1083,9 @@ function handleJaringanL() {
   // Kode 6 = Unit Pembantu/Penunjang → pendataan selesai: hide all sections after L2.14
   const isSelesai = (v === '6');
   document.body.classList.toggle('l2-pendataan-selesai', isSelesai);
-  // Hide every section-card in #blokL2 whose header is sec-L2-16 onwards
-  const blok = document.getElementById('blokL2');
+  // Hide every kartu detail usaha (sec-L2-16 onwards). Setelah init kartu
+  // dipindah ke #screen-usaha-body, jadi cari di sana (fallback #blokL2).
+  const blok = document.getElementById('screen-usaha-body') || document.getElementById('blokL2');
   if (blok) {
     blok.querySelectorAll('.section-card').forEach(card => {
       const hdr = card.querySelector('.section-header');
