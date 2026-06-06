@@ -185,7 +185,8 @@ function getKategoriName(k) {
 // Close autocomplete on outside click
 document.addEventListener('click', e => {
   if (!e.target.closest('.autocomplete-wrap')) {
-    document.getElementById('kbliDropdown').classList.remove('open');
+    const _kd = document.getElementById('kbliDropdown'); // L.UB (di-retire) → guard null
+    if (_kd) _kd.classList.remove('open');
   }
   if (!e.target.closest('.ss-wrap')) {
     document.querySelectorAll('.ss-dropdown.open').forEach(d => d.classList.remove('open'));
