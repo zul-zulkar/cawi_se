@@ -190,6 +190,10 @@ function saveAsDraft() {
     let draft;
     {
       // Ringkasan draft form L (Kepala Keluarga + Nama Usaha). L.UB di-retire.
+      // Unified P: saat masih di Blok P (field L belum diisi), pakai pmt_nama +
+      // wilayah assignment sebagai fallback agar kartu draft tak tampil "Tanpa nama".
+      const a = (typeof window !== 'undefined' && window.__cawiActiveAssignment) || {};
+      const namaP = raw['pmt_nama'] || '';
       const kecInpL = document.getElementById('l1_alamat_kec_inp');
       // Count anggota with filled nama
       let jmlTerdata = 0;
@@ -202,17 +206,18 @@ function saveAsDraft() {
         _ts:             raw['_ts'],
         _isDraft:        true,
         _formMode:       'l',
-        nama_kk:         raw['l1_nama_kk']     || '',
+        nama_kk:         raw['l1_nama_kk']     || namaP || '',
         nama_usaha:      raw['l2_nama_usaha']  || '',
+        pmt_nama:        namaP,
         jumlah_anggota:  nAng,
         jumlah_terdata:  jmlTerdata,
-        kecamatan:       kecInpL ? kecInpL.value.trim() : '',
-        kecamatan_kd:    raw['l1_alamat_kec']  || '',
-        petugas_nama:    raw['l5_petugas_nama']|| '',
+        kecamatan:       (kecInpL ? kecInpL.value.trim() : '') || a.kecamatan || '',
+        kecamatan_kd:    raw['l1_alamat_kec']  || a.kecamatan_kd || '',
+        petugas_nama:    raw['l5_petugas_nama']|| a.petugas_nama || '',
         kbli_kode:       raw['l2_kbli_kode']   || '',
         kbli_judul:      raw['l2_kbli_search'] || '',
         // For backward compat with daftar render
-        nama_perusahaan: raw['l2_nama_usaha']  || '',
+        nama_perusahaan: raw['l2_nama_usaha']  || namaP || '',
         nama_komersial:  raw['l1_nama_kk']     || '',
         _raw:            raw
       };
