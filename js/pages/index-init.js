@@ -13,15 +13,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // Unified mode (SE2026-P): Blok P sebagai entri (di-set oleh guard via ?mode=P|UNIFIED)
   if (window.__cawiUnified && typeof setUnifiedMode === 'function') setUnifiedMode(true);
 
-  // Init searchable selects BEFORE any data load
-  makeSearchable('q1_provinsi', 'provinsi');
-  makeSearchable('q2_kabupaten', 'kabupaten/kota');
-  makeSearchable('q3_kecamatan', 'kecamatan');
-  makeSearchable('q4_kelurahan', 'kelurahan/desa');
-  makeSearchable('q11d_negara', 'negara');
-  makeSearchable('q11e_provinsi', 'provinsi kantor pusat');
-  makeSearchable('q11f_kabupaten', 'kabupaten/kota kantor pusat');
-  // L mode regional dropdowns
+  // Init searchable selects (form L). Dropdown wilayah Blok I & Q11 Kantor Pusat
+  // (q1-q4, q11*) + tanggal r_tanggal adalah milik L.UB → di-retire (elemen sudah
+  // tak ada). Wilayah L diisi dari assignment via applyAssignmentPrefill.
   if (document.getElementById('l1_alamat_provinsi')) {
     makeSearchable('l1_alamat_provinsi', 'provinsi keluarga');
     makeSearchable('l1_alamat_kab', 'kabupaten/kota keluarga');
@@ -33,27 +27,12 @@ document.addEventListener('DOMContentLoaded', () => {
     makeSearchable('l3_air', 'sumber air minum');
   }
 
-  // Auto-select Bali [51] and Buleleng [5108] – fixed domicile
-  const selProv = document.getElementById('q1_provinsi');
-  const selKab  = document.getElementById('q2_kabupaten');
-  selProv.value = '51';
-  selKab.value  = '5108';
-  const inpProv = document.getElementById('q1_provinsi_inp');
-  const inpKab  = document.getElementById('q2_kabupaten_inp');
-  if (inpProv) { inpProv.value = 'BALI'; inpProv.classList.add('has-value'); }
-  if (inpKab)  { inpKab.value  = 'KAB. BULELENG'; inpKab.classList.add('has-value'); }
-
-  // Auto-load kecamatan list for Buleleng on open
-  loadKecamatan('5108');
-
-  // Load provinsi for Kantor Pusat (Q11e)
-  loadProvinsi();
-
   // Preload KBLI data for instant local search
   preloadKBLI();
 
-  // Default today's date for Blok III
-  document.getElementById('r_tanggal').value = new Date().toISOString().split('T')[0];
+  // Default tanggal hari ini untuk Blok V (form L)
+  const _lTgl = document.getElementById('l5_tanggal');
+  if (_lTgl && !_lTgl.value) _lTgl.value = new Date().toISOString().split('T')[0];
 
   // Inject remark button + area into every section-card header
   document.querySelectorAll('.section-card').forEach((card, i) => {
