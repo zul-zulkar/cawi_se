@@ -28,10 +28,8 @@ document.addEventListener('DOMContentLoaded', () => {
     makeSearchable('l1_alamat_kec', 'kecamatan keluarga');
     makeSearchable('l1_alamat_kel', 'kelurahan/desa keluarga');
     loadProvinsiL();
-    // L mode static selects with > 5 options
-    makeSearchable('l3_lantai_bahan', 'bahan lantai');
-    makeSearchable('l3_dinding_bahan', 'bahan dinding');
-    makeSearchable('l3_atap_bahan', 'bahan atap');
+    // bahan lantai/dinding/atap kini radio (<11 opsi). Hanya sumber air (11 opsi)
+    // tetap searchable select.
     makeSearchable('l3_air', 'sumber air minum');
   }
 
@@ -116,16 +114,14 @@ document.addEventListener('DOMContentLoaded', () => {
   // Run once on load to reflect any pre-filled defaults
   updateProgress();
 
-  // === MODE PRE-SELECTOR ===
-  // Show mode gate after auth succeeds if no mode is set yet
-  document.addEventListener('cawi-auth-ok', () => {
-    if (typeof hasFormMode === 'function' && !hasFormMode()) {
-      // No draft-continue in progress means user is starting fresh — ask which kuesioner
-      const continuing = localStorage.getItem('cawi_draft_continue_id');
-      const editing    = localStorage.getItem('cawi_edit_mode');
-      if (!continuing && !editing) showModeGate(false);
-    }
-  });
+  // === FORM MODE (legacy L / L.UB, non-unified) ===
+  // Pre-selector 2-gate (pemilih L vs L.UB) sudah dihapus: assignment baru memakai
+  // unified P; assignment legacy mendapat mode deterministik dari guard
+  // (?mode=L|LUB → FORM_MODE_KEY) lalu di-apply saat restore draft. Sebagai jaring
+  // pengaman, terapkan body-class mode untuk jalur legacy non-unified pada load.
+  if (!window.__cawiUnified && typeof applyFormMode === 'function') {
+    applyFormMode(typeof getFormMode === 'function' ? getFormMode() : 'lub');
+  }
 
   // === EDIT MODE (dari daftar.html) ===
   const _isEditMode = loadEditMode();

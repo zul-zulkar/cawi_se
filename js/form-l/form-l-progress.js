@@ -181,17 +181,17 @@ function calcProgressL() {
   if (sm === '1') c(!!getRadio('l3_bukti'));
   if (sm === '5') c(!!getVal('l3_status_lain'));
   c(getVal('l3_luas_lantai') !== '');
-  c(!!getVal('l3_lantai_bahan'));
+  const lantaiBahan = getRadio('l3_lantai_bahan') || getVal('l3_lantai_bahan');
+  c(!!lantaiBahan);
   // lantai_kondisi: tidak wajib saat bahan tanah/bambu/lainnya (7,8,9)
-  const lantaiBahan = getVal('l3_lantai_bahan');
   if (lantaiBahan && !['7','8','9'].includes(lantaiBahan)) c(!!getRadio('l3_lantai_kondisi'));
-  c(!!getVal('l3_dinding_bahan'));
+  const dindingBahan = getRadio('l3_dinding_bahan') || getVal('l3_dinding_bahan');
+  c(!!dindingBahan);
   // dinding_kondisi: tidak wajib saat bahan bambu/lainnya (6,7)
-  const dindingBahan = getVal('l3_dinding_bahan');
   if (dindingBahan && !['6','7'].includes(dindingBahan)) c(!!getRadio('l3_dinding_kondisi'));
-  c(!!getVal('l3_atap_bahan'));
+  const atapBahan = getRadio('l3_atap_bahan') || getVal('l3_atap_bahan');
+  c(!!atapBahan);
   // atap_kondisi: tidak wajib saat bahan ijuk/rumbia/lainnya (5,7,8)
-  const atapBahan = getVal('l3_atap_bahan');
   if (atapBahan && !['5','7','8'].includes(atapBahan)) c(!!getRadio('l3_atap_kondisi'));
   const bab = getRadio('l3_bab');
   c(!!bab);

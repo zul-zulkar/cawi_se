@@ -12,25 +12,6 @@
   </div>
 </div>
 
-<!-- ====== MODE PRE-SELECTOR GATE ====== -->
-<div id="modeGate">
-  <div class="mode-card">
-    <div class="mode-card-title">Jenis Pendataan</div>
-    <div class="mode-card-sub">Pilih jenis kuesioner yang akan diisi. Pilihan ini menentukan struktur form yang ditampilkan.</div>
-    <div class="mode-card-q">Input Usaha/Perusahaan Besar atau Usaha Rumah Tangga (Sedang, Kecil, atau Mikro)?</div>
-    <div class="mode-btns">
-      <button type="button" class="mode-btn" onclick="chooseMode('lub')">
-        <span class="mode-btn-code mode-btn-code-lub">L.UB</span>
-        <div class="mode-btn-title">Usaha / Perusahaan Besar</div>
-        <div class="mode-btn-desc">Kuesioner SE2026-L.UB. Untuk perusahaan menengah-besar dengan badan usaha formal (PT/CV/Koperasi/Yayasan). Termasuk pendataan kantor cabang via L.KP.</div>
-      </button>
-      <button type="button" class="mode-btn" onclick="chooseMode('l')">
-        <span class="mode-btn-code mode-btn-code-l">L</span>
-        <div class="mode-btn-title">Usaha Rumah Tangga (Sedang/Kecil/Mikro)</div>
-        <div class="mode-btn-desc">Kuesioner SE2026-L. Untuk usaha rumah tangga + pendataan keluarga (DTSEN): perumahan, aset, dan sosial ekonomi tiap anggota keluarga.</div>
-      </button>
-    </div>
-    <button type="button" id="modeCancelBtn" class="mode-card-cancel" onclick="hideModeGate()" style="display:none"><i class="bi bi-x-lg"></i> Batal</button>
-  </div>
-</div>
+<!-- Mode pre-selector 2-gate (L vs L.UB) DIHAPUS: semua assignment kini
+     memakai unified P. Mode legacy ditentukan deterministik dari ?mode= oleh guard. -->
 

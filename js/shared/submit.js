@@ -424,12 +424,12 @@ function collectDataL() {
     status_lain:       getVal('l3_status_lain'),
     sewa:              parseCurrency(getVal('l3_sewa')),
     luas_lantai:       getVal('l3_luas_lantai'),
-    lantai_bahan:      getVal('l3_lantai_bahan'),
-    lantai_kondisi:    getRadio('l3_lantai_kondisi'),    // radio, bukan getVal
-    dinding_bahan:     getVal('l3_dinding_bahan'),
-    dinding_kondisi:   getRadio('l3_dinding_kondisi'),  // radio, bukan getVal
-    atap_bahan:        getVal('l3_atap_bahan'),
-    atap_kondisi:      getRadio('l3_atap_kondisi'),     // radio, bukan getVal
+    lantai_bahan:      getRadio('l3_lantai_bahan') || getVal('l3_lantai_bahan'),
+    lantai_kondisi:    getRadio('l3_lantai_kondisi'),    // radio
+    dinding_bahan:     getRadio('l3_dinding_bahan') || getVal('l3_dinding_bahan'),
+    dinding_kondisi:   getRadio('l3_dinding_kondisi'),  // radio
+    atap_bahan:        getRadio('l3_atap_bahan') || getVal('l3_atap_bahan'),
+    atap_kondisi:      getRadio('l3_atap_kondisi'),     // radio
     bab:               getRadio('l3_bab'),
     kloset:            getRadio('l3_kloset'),
     tinja:             getRadio('l3_tinja'),

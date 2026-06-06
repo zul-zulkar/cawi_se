@@ -216,27 +216,8 @@
   </div>
 </div>
 
-<!-- ====== MODE PRE-SELECTOR GATE ====== -->
-<div id="modeGate">
-  <div class="mode-card">
-    <div class="mode-card-title">Jenis Pendataan</div>
-    <div class="mode-card-sub">Pilih jenis kuesioner yang akan diisi. Pilihan ini menentukan struktur form yang ditampilkan.</div>
-    <div class="mode-card-q">Input Usaha/Perusahaan Besar atau Usaha Rumah Tangga (Sedang, Kecil, atau Mikro)?</div>
-    <div class="mode-btns">
-      <button type="button" class="mode-btn" onclick="chooseMode('lub')">
-        <span class="mode-btn-code mode-btn-code-lub">L.UB</span>
-        <div class="mode-btn-title">Usaha / Perusahaan Besar</div>
-        <div class="mode-btn-desc">Kuesioner SE2026-L.UB. Untuk perusahaan menengah-besar dengan badan usaha formal (PT/CV/Koperasi/Yayasan). Termasuk pendataan kantor cabang via L.KP.</div>
-      </button>
-      <button type="button" class="mode-btn" onclick="chooseMode('l')">
-        <span class="mode-btn-code mode-btn-code-l">L</span>
-        <div class="mode-btn-title">Usaha Rumah Tangga (Sedang/Kecil/Mikro)</div>
-        <div class="mode-btn-desc">Kuesioner SE2026-L. Untuk usaha rumah tangga + pendataan keluarga (DTSEN): perumahan, aset, dan sosial ekonomi tiap anggota keluarga.</div>
-      </button>
-    </div>
-    <button type="button" id="modeCancelBtn" class="mode-card-cancel" onclick="hideModeGate()" style="display:none"><i class="bi bi-x-lg"></i> Batal</button>
-  </div>
-</div>
+<!-- Mode pre-selector 2-gate (L vs L.UB) DIHAPUS: semua assignment kini
+     memakai unified P. Mode legacy ditentukan deterministik dari ?mode= oleh guard. -->
 
 <!-- MOBILE TOPBAR -->
 <div class="mobile-topbar" id="mobileTopbar">
@@ -263,21 +244,6 @@
   </div>
   <div class="sidebar-mode-row">
     <span class="sidebar-nav-label" style="padding:0;margin:0">NAVIGASI BLOK</span>
-    <span style="display:flex;align-items:center;gap:6px">
-      <span id="sidebarModeLabel" class="mode-badge mode-badge-lub">L.UB</span>
-      <button type="button" class="sidebar-mode-switch" onclick="switchFormMode()" title="Ganti jenis kuesioner">Ganti</button>
-    </span>
-  </div>
-
-  <!-- GANTI KUESIONER — tombol prominent -->
-  <div class="sidebar-switch-row">
-    <button type="button" class="sidebar-switch-btn" onclick="switchFormMode()" title="Ganti antara L.UB dan L">
-      <span class="sidebar-switch-icon"><i class="bi bi-arrow-left-right"></i></span>
-      <span class="sidebar-switch-text">
-        <span class="sidebar-switch-label">Ganti Kuesioner</span>
-        <span class="sidebar-switch-sub">L.UB &middot; L (Rumah Tangga)</span>
-      </span>
-    </button>
   </div>
 
   <!-- ===== P SIDEBAR GROUP (unified mode) ===== -->
@@ -2917,14 +2883,13 @@
       <div class="form-group"><label class="field-label">c. Nilai total aset (a+b)</label><div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="l2_y28c" readonly class="total-field" placeholder="0"/></div></div>
       <div class="form-group">
         <label class="field-label field-label-sm">c1. Jika tidak dapat mengisi nominal, pilih rentang nilai total aset</label>
-        <select id="l2_y28c1">
-          <option value="">— pilih rentang (opsional) —</option>
-          <option value="1">1. s.d. Rp 500 juta</option>
-          <option value="2">2. &gt; Rp 500 juta s.d. Rp 1 miliar</option>
-          <option value="3">3. &gt; Rp 1 miliar s.d. Rp 5 miliar</option>
-          <option value="4">4. &gt; Rp 5 miliar s.d. Rp 10 miliar</option>
-          <option value="5">5. &gt; Rp 10 miliar</option>
-        </select>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l2_y28c1" value="1"/> <span>1. s.d. Rp 500 juta</span></label>
+          <label class="radio-item"><input type="radio" name="l2_y28c1" value="2"/> <span>2. &gt; Rp 500 juta s.d. Rp 1 miliar</span></label>
+          <label class="radio-item"><input type="radio" name="l2_y28c1" value="3"/> <span>3. &gt; Rp 1 miliar s.d. Rp 5 miliar</span></label>
+          <label class="radio-item"><input type="radio" name="l2_y28c1" value="4"/> <span>4. &gt; Rp 5 miliar s.d. Rp 10 miliar</span></label>
+          <label class="radio-item"><input type="radio" name="l2_y28c1" value="5"/> <span>5. &gt; Rp 10 miliar</span></label>
+        </div>
       </div>
       <div class="form-group"><label class="field-label">d. Luas tanah yang dikuasai dan digunakan untuk usaha (m²)</label><input type="number" id="l2_y28d" min="0" placeholder="0"/></div>
 
@@ -2983,14 +2948,13 @@
       <div class="form-group"><label class="field-label">c. Nilai total aset (a+b)</label><div class="currency-input-wrap"><span class="currency-prefix">Rp</span><input type="text" id="l2_m32c" readonly class="total-field" placeholder="0"/></div></div>
       <div class="form-group">
         <label class="field-label field-label-sm">c1. Jika tidak dapat mengisi nominal, pilih rentang nilai total aset</label>
-        <select id="l2_m32c1">
-          <option value="">— pilih rentang (opsional) —</option>
-          <option value="1">1. s.d. Rp 500 juta</option>
-          <option value="2">2. &gt; Rp 500 juta s.d. Rp 1 miliar</option>
-          <option value="3">3. &gt; Rp 1 miliar s.d. Rp 5 miliar</option>
-          <option value="4">4. &gt; Rp 5 miliar s.d. Rp 10 miliar</option>
-          <option value="5">5. &gt; Rp 10 miliar</option>
-        </select>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l2_m32c1" value="1"/> <span>1. s.d. Rp 500 juta</span></label>
+          <label class="radio-item"><input type="radio" name="l2_m32c1" value="2"/> <span>2. &gt; Rp 500 juta s.d. Rp 1 miliar</span></label>
+          <label class="radio-item"><input type="radio" name="l2_m32c1" value="3"/> <span>3. &gt; Rp 1 miliar s.d. Rp 5 miliar</span></label>
+          <label class="radio-item"><input type="radio" name="l2_m32c1" value="4"/> <span>4. &gt; Rp 5 miliar s.d. Rp 10 miliar</span></label>
+          <label class="radio-item"><input type="radio" name="l2_m32c1" value="5"/> <span>5. &gt; Rp 10 miliar</span></label>
+        </div>
       </div>
       <div class="form-group"><label class="field-label">d. Luas tanah yang dikuasai dan digunakan untuk usaha (m²)</label><input type="number" id="l2_m32d" min="0" placeholder="0"/></div>
 
@@ -3109,18 +3073,17 @@
       </div>
       <div class="form-group">
         <label class="field-label">6a. Bahan lantai utama</label>
-        <select id="l3_lantai_bahan" onchange="handleLantaiBahanL()">
-          <option value="">-- Pilih --</option>
-          <option value="1">1. Marmer/granit</option>
-          <option value="2">2. Keramik</option>
-          <option value="3">3. Parket/vinil/karpet</option>
-          <option value="4">4. Ubin/tegel/teraso</option>
-          <option value="5">5. Kayu/papan</option>
-          <option value="6">6. Semen/bata merah</option>
-          <option value="7">7. Bambu</option>
-          <option value="8">8. Tanah</option>
-          <option value="9">9. Lainnya</option>
-        </select>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l3_lantai_bahan" value="1" onchange="handleLantaiBahanL()"/> <span>1. Marmer/granit</span></label>
+          <label class="radio-item"><input type="radio" name="l3_lantai_bahan" value="2" onchange="handleLantaiBahanL()"/> <span>2. Keramik</span></label>
+          <label class="radio-item"><input type="radio" name="l3_lantai_bahan" value="3" onchange="handleLantaiBahanL()"/> <span>3. Parket/vinil/karpet</span></label>
+          <label class="radio-item"><input type="radio" name="l3_lantai_bahan" value="4" onchange="handleLantaiBahanL()"/> <span>4. Ubin/tegel/teraso</span></label>
+          <label class="radio-item"><input type="radio" name="l3_lantai_bahan" value="5" onchange="handleLantaiBahanL()"/> <span>5. Kayu/papan</span></label>
+          <label class="radio-item"><input type="radio" name="l3_lantai_bahan" value="6" onchange="handleLantaiBahanL()"/> <span>6. Semen/bata merah</span></label>
+          <label class="radio-item"><input type="radio" name="l3_lantai_bahan" value="7" onchange="handleLantaiBahanL()"/> <span>7. Bambu</span></label>
+          <label class="radio-item"><input type="radio" name="l3_lantai_bahan" value="8" onchange="handleLantaiBahanL()"/> <span>8. Tanah</span></label>
+          <label class="radio-item"><input type="radio" name="l3_lantai_bahan" value="9" onchange="handleLantaiBahanL()"/> <span>9. Lainnya</span></label>
+        </div>
       </div>
       <div id="l3_lantai_kondisi_wrap" class="form-group">
         <label class="field-label">6b. Kondisi lantai</label>
@@ -3133,16 +3096,15 @@
       </div>
       <div class="form-group">
         <label class="field-label">7a. Bahan dinding utama</label>
-        <select id="l3_dinding_bahan" onchange="handleDindingBahanL()">
-          <option value="">-- Pilih --</option>
-          <option value="1">1. Tembok</option>
-          <option value="2">2. Plesteran anyaman bambu/kawat</option>
-          <option value="3">3. Kayu/papan/gipsum/GRC</option>
-          <option value="4">4. Anyaman bambu</option>
-          <option value="5">5. Batang kayu</option>
-          <option value="6">6. Bambu</option>
-          <option value="7">7. Lainnya</option>
-        </select>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l3_dinding_bahan" value="1" onchange="handleDindingBahanL()"/> <span>1. Tembok</span></label>
+          <label class="radio-item"><input type="radio" name="l3_dinding_bahan" value="2" onchange="handleDindingBahanL()"/> <span>2. Plesteran anyaman bambu/kawat</span></label>
+          <label class="radio-item"><input type="radio" name="l3_dinding_bahan" value="3" onchange="handleDindingBahanL()"/> <span>3. Kayu/papan/gipsum/GRC</span></label>
+          <label class="radio-item"><input type="radio" name="l3_dinding_bahan" value="4" onchange="handleDindingBahanL()"/> <span>4. Anyaman bambu</span></label>
+          <label class="radio-item"><input type="radio" name="l3_dinding_bahan" value="5" onchange="handleDindingBahanL()"/> <span>5. Batang kayu</span></label>
+          <label class="radio-item"><input type="radio" name="l3_dinding_bahan" value="6" onchange="handleDindingBahanL()"/> <span>6. Bambu</span></label>
+          <label class="radio-item"><input type="radio" name="l3_dinding_bahan" value="7" onchange="handleDindingBahanL()"/> <span>7. Lainnya</span></label>
+        </div>
       </div>
       <div id="l3_dinding_kondisi_wrap" class="form-group">
         <label class="field-label">7b. Kondisi dinding</label>
@@ -3155,17 +3117,16 @@
       </div>
       <div class="form-group">
         <label class="field-label">8a. Bahan atap utama</label>
-        <select id="l3_atap_bahan" onchange="handleAtapBahanL()">
-          <option value="">-- Pilih --</option>
-          <option value="1">1. Beton</option>
-          <option value="2">2. Genteng</option>
-          <option value="3">3. Seng</option>
-          <option value="4">4. Asbes</option>
-          <option value="5">5. Bambu</option>
-          <option value="6">6. Kayu/sirap</option>
-          <option value="7">7. Jerami/ijuk/daun/rumbia</option>
-          <option value="8">8. Lainnya</option>
-        </select>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l3_atap_bahan" value="1" onchange="handleAtapBahanL()"/> <span>1. Beton</span></label>
+          <label class="radio-item"><input type="radio" name="l3_atap_bahan" value="2" onchange="handleAtapBahanL()"/> <span>2. Genteng</span></label>
+          <label class="radio-item"><input type="radio" name="l3_atap_bahan" value="3" onchange="handleAtapBahanL()"/> <span>3. Seng</span></label>
+          <label class="radio-item"><input type="radio" name="l3_atap_bahan" value="4" onchange="handleAtapBahanL()"/> <span>4. Asbes</span></label>
+          <label class="radio-item"><input type="radio" name="l3_atap_bahan" value="5" onchange="handleAtapBahanL()"/> <span>5. Bambu</span></label>
+          <label class="radio-item"><input type="radio" name="l3_atap_bahan" value="6" onchange="handleAtapBahanL()"/> <span>6. Kayu/sirap</span></label>
+          <label class="radio-item"><input type="radio" name="l3_atap_bahan" value="7" onchange="handleAtapBahanL()"/> <span>7. Jerami/ijuk/daun/rumbia</span></label>
+          <label class="radio-item"><input type="radio" name="l3_atap_bahan" value="8" onchange="handleAtapBahanL()"/> <span>8. Lainnya</span></label>
+        </div>
       </div>
       <div id="l3_atap_kondisi_wrap" class="form-group">
         <label class="field-label">8b. Kondisi atap</label>

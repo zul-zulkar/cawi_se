@@ -845,11 +845,11 @@ function _collectL2Fields() {
     'l2_pekerja_l','l2_pekerja_p','l2_pekerja_dibayar','l2_pekerja_tidak_dibayar','l2_tahun_operasi',
     'l2_y26a','l2_y26b','l2_y26c','l2_y26d','l2_y26e','l2_y26f',
     'l2_y27a','l2_y27b','l2_y27c','l2_y27d',
-    'l2_y28a','l2_y28b','l2_y28c','l2_y28c1','l2_y28d',
+    'l2_y28a','l2_y28b','l2_y28c','l2_y28d',
     'l2_y29a','l2_y29b','l2_y29c','l2_y29d','l2_y29e','l2_y29f','l2_y29g',
     'l2_m30a','l2_m30b','l2_m30c','l2_m30d','l2_m30e','l2_m30f',
     'l2_m31a','l2_m31b','l2_m31c','l2_m31d',
-    'l2_m32a','l2_m32b','l2_m32c','l2_m32c1','l2_m32d',
+    'l2_m32a','l2_m32b','l2_m32c','l2_m32d',
     'l2_m33a','l2_m33b','l2_m33c','l2_m33d','l2_m33e','l2_m33f','l2_m33g',
   ];
   textIds.forEach(id => {
@@ -866,6 +866,7 @@ function _collectL2Fields() {
     'l2_teknologi','l2_ramah_a','l2_ramah_b','l2_kreatif',
     'l2_halal','l2_bpom','l2_mitra_kdkmp','l2_mbg',
     'l2_nonpend_a','l2_nonpend_b','l2_nonpend_c',
+    'l2_y28c1','l2_m32c1',
   ];
   radioNames.forEach(name => {
     const checked = document.querySelector(`input[name="${name}"]:checked`);
@@ -1087,7 +1088,7 @@ function _syncL2JmlCabang() {
 function _l2CabangCardHTML(i, d) {
   d = d || {};
   const v = (k) => (d[k] != null ? String(d[k]) : '');
-  const sel = (val) => v('jenis') === val ? ' selected' : '';
+  const chk = (val) => v('jenis') === val ? ' checked' : '';
   const esc = (typeof _sbEsc === 'function') ? _sbEsc : ((s) => String(s == null ? '' : s));
   return `<div class="l2cab-card" data-cab="${i}">
     <div class="l2cab-head">
@@ -1102,13 +1103,12 @@ function _l2CabangCardHTML(i, d) {
     <div class="inline-fields">
       <div class="form-group">
         <label class="field-label">Jenis Unit</label>
-        <select id="l2cab_${i}_jenis">
-          <option value="">-- Pilih --</option>
-          <option value="1"${sel('1')}>1. Kantor Cabang</option>
-          <option value="2"${sel('2')}>2. Kantor Perwakilan</option>
-          <option value="3"${sel('3')}>3. Pabrik</option>
-          <option value="4"${sel('4')}>4. Unit Pembantu/Penunjang</option>
-        </select>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l2cab_${i}_jenis" value="1"${chk('1')}/> <span>1. Kantor Cabang</span></label>
+          <label class="radio-item"><input type="radio" name="l2cab_${i}_jenis" value="2"${chk('2')}/> <span>2. Kantor Perwakilan</span></label>
+          <label class="radio-item"><input type="radio" name="l2cab_${i}_jenis" value="3"${chk('3')}/> <span>3. Pabrik</span></label>
+          <label class="radio-item"><input type="radio" name="l2cab_${i}_jenis" value="4"${chk('4')}/> <span>4. Unit Pembantu/Penunjang</span></label>
+        </div>
       </div>
       <div class="form-group">
         <label class="field-label">KBLI (5 digit)</label>
@@ -1148,7 +1148,8 @@ function _collectL2Cabang() {
   list.querySelectorAll('.l2cab-card').forEach((card) => {
     const i = card.getAttribute('data-cab');
     const g = (f) => { const el = document.getElementById('l2cab_' + i + '_' + f); return el ? el.value : ''; };
-    out.push({ nama: g('nama'), jenis: g('jenis'), kbli: g('kbli'), alamat: g('alamat'), pekerja: g('pekerja') });
+    const jenis = (typeof getRadio === 'function') ? getRadio('l2cab_' + i + '_jenis') : '';
+    out.push({ nama: g('nama'), jenis: jenis, kbli: g('kbli'), alamat: g('alamat'), pekerja: g('pekerja') });
   });
   return out;
 }
@@ -1394,19 +1395,19 @@ function handleBABL() {
 }
 
 function handleLantaiBahanL() {
-  const v = document.getElementById('l3_lantai_bahan')?.value;
+  const v = getRadio('l3_lantai_bahan');
   const w = document.getElementById('l3_lantai_kondisi_wrap');
   if (w) w.classList.toggle('hidden', ['7','8','9'].includes(v));
 }
 
 function handleDindingBahanL() {
-  const v = document.getElementById('l3_dinding_bahan')?.value;
+  const v = getRadio('l3_dinding_bahan');
   const w = document.getElementById('l3_dinding_kondisi_wrap');
   if (w) w.classList.toggle('hidden', ['6','7'].includes(v));
 }
 
 function handleAtapBahanL() {
-  const v = document.getElementById('l3_atap_bahan')?.value;
+  const v = getRadio('l3_atap_bahan');
   const w = document.getElementById('l3_atap_kondisi_wrap');
   if (w) w.classList.toggle('hidden', ['5','7','8'].includes(v));
 }
@@ -1802,9 +1803,9 @@ function loadEditModeL(r) {
     setVal('l3_status_lain', r.status_lain);
     setCurrency('l3_sewa', r.sewa);
     setVal('l3_luas_lantai', r.luas_lantai);
-    setVal('l3_lantai_bahan', r.lantai_bahan);   setRadio('l3_lantai_kondisi',  r.lantai_kondisi);
-    setVal('l3_dinding_bahan', r.dinding_bahan); setRadio('l3_dinding_kondisi', r.dinding_kondisi);
-    setVal('l3_atap_bahan', r.atap_bahan);       setRadio('l3_atap_kondisi',    r.atap_kondisi);
+    setRadio('l3_lantai_bahan', r.lantai_bahan);   setRadio('l3_lantai_kondisi',  r.lantai_kondisi);
+    setRadio('l3_dinding_bahan', r.dinding_bahan); setRadio('l3_dinding_kondisi', r.dinding_kondisi);
+    setRadio('l3_atap_bahan', r.atap_bahan);       setRadio('l3_atap_kondisi',    r.atap_kondisi);
     setRadio('l3_bab', r.bab);
     setRadio('l3_kloset', r.kloset);
     setRadio('l3_tinja', r.tinja);

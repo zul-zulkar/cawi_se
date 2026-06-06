@@ -48,40 +48,7 @@ function applyFormMode(mode) {
   }
 }
 
-/* Pre-selector modal */
-function showModeGate(forSwitch) {
-  const gate = document.getElementById('modeGate');
-  if (!gate) return;
-  gate.classList.add('open');
-  const cancel = document.getElementById('modeCancelBtn');
-  if (cancel) cancel.style.display = forSwitch ? '' : 'none';
-}
-
-function hideModeGate() {
-  const gate = document.getElementById('modeGate');
-  if (gate) gate.classList.remove('open');
-}
-
-function chooseMode(mode) {
-  const m = setFormMode(mode);
-  hideModeGate();
-  // Reset to BLOK 1 of the chosen mode + refresh sidebar/main UI
-  if (typeof goBlok === 'function') {
-    try { goBlok(1); } catch (e) {}
-  }
-  if (typeof updateProgress === 'function') updateProgress();
-  if (typeof updateDeskTopbar === 'function') updateDeskTopbar(1, m);
-  if (typeof showToast === 'function') {
-    showToast('Kuesioner diganti ke ' + (m === 'l' ? 'L (Rumah Tangga)' : 'L.UB (Usaha Besar)'), 'ok');
-  }
-}
-
-/* Switch via sidebar — warn if there's user data */
-function switchFormMode() {
-  const dirty = (typeof _formDirty !== 'undefined' && _formDirty)
-    || (typeof _currentDraftId !== 'undefined' && _currentDraftId);
-  if (dirty) {
-    if (!confirm('Mengganti jenis kuesioner akan menutup form saat ini. Pastikan draft sudah tersimpan. Lanjutkan?')) return;
-  }
-  showModeGate(true);
-}
+/* Mode pre-selector 2-gate (showModeGate/hideModeGate/chooseMode/switchFormMode)
+   DIHAPUS — semua assignment kini unified P; mode legacy L/L.UB ditentukan
+   deterministik dari ?mode= oleh guard (01b-assignment-guard.html) lalu di-apply
+   saat restore draft. Tidak ada lagi pemilih kuesioner di UI. */

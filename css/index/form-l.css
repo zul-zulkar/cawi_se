@@ -17,9 +17,8 @@ body.mode-unified #form-lub{display:none}
 body.mode-unified #form-l{display:none}
 body.mode-unified .sidebar-blok-group.sb-lub{display:none}
 body.mode-unified .sidebar-blok-group.sb-l{display:none}
-/* Sembunyikan tombol ganti kuesioner manual di unified (gate yang menentukan) */
-body.mode-unified .sidebar-mode-row,
-body.mode-unified .sidebar-switch-row{display:none}
+/* Sembunyikan label "NAVIGASI BLOK" generik di unified (sidebar P/L/L.KP sendiri) */
+body.mode-unified .sidebar-mode-row{display:none}
 /* stage keluarga & usaha → reveal kuesioner L */
 body.mode-unified.stage-keluarga #form-l,
 body.mode-unified.stage-usaha #form-l{display:block}
@@ -95,8 +94,6 @@ body.pmt-bangunan .pmt-keluarga-only{display:none!important}
 .mode-badge-lub{background:#fff5eb;color:#dd6b20}
 .mode-badge-l{background:#e6f0ff;color:#2b6cb0}
 .sidebar-mode-row{padding:8px 16px 0;display:flex;align-items:center;justify-content:space-between;gap:8px}
-.sidebar-mode-switch{background:none;border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.7);padding:3px 9px;font-size:10px;border-radius:4px;cursor:pointer;font-family:inherit;font-weight:600;letter-spacing:.3px}
-.sidebar-mode-switch:hover{background:rgba(255,255,255,.08);color:#fff}
 
 /* ====== ANGGOTA CARD (L mode) ====== */
 .anggota-card{margin-top:12px;border-left:3px solid #2b6cb0;background:#fff;border:1.5px solid #e8e3de;border-left-width:3px;border-left-color:#2b6cb0;border-radius:8px;overflow:hidden}

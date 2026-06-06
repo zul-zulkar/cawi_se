@@ -33,8 +33,7 @@ function makeMode({ stored = null } = {}) {
   const noop = () => {}
   const fn = new Function(
     'document', 'window', 'localStorage', 'confirm',
-    `${SOURCE}\nreturn { getFormMode, setFormMode, hasFormMode, clearFormMode, applyFormMode,
-      showModeGate, hideModeGate, chooseMode, switchFormMode };`
+    `${SOURCE}\nreturn { getFormMode, setFormMode, hasFormMode, clearFormMode, applyFormMode };`
   )
   return {
     api: fn(mockDoc, { addEventListener: noop }, localStorageMock, () => true),

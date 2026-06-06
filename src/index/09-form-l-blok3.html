@@ -92,18 +92,17 @@
       </div>
       <div class="form-group">
         <label class="field-label">6a. Bahan lantai utama</label>
-        <select id="l3_lantai_bahan" onchange="handleLantaiBahanL()">
-          <option value="">-- Pilih --</option>
-          <option value="1">1. Marmer/granit</option>
-          <option value="2">2. Keramik</option>
-          <option value="3">3. Parket/vinil/karpet</option>
-          <option value="4">4. Ubin/tegel/teraso</option>
-          <option value="5">5. Kayu/papan</option>
-          <option value="6">6. Semen/bata merah</option>
-          <option value="7">7. Bambu</option>
-          <option value="8">8. Tanah</option>
-          <option value="9">9. Lainnya</option>
-        </select>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l3_lantai_bahan" value="1" onchange="handleLantaiBahanL()"/> <span>1. Marmer/granit</span></label>
+          <label class="radio-item"><input type="radio" name="l3_lantai_bahan" value="2" onchange="handleLantaiBahanL()"/> <span>2. Keramik</span></label>
+          <label class="radio-item"><input type="radio" name="l3_lantai_bahan" value="3" onchange="handleLantaiBahanL()"/> <span>3. Parket/vinil/karpet</span></label>
+          <label class="radio-item"><input type="radio" name="l3_lantai_bahan" value="4" onchange="handleLantaiBahanL()"/> <span>4. Ubin/tegel/teraso</span></label>
+          <label class="radio-item"><input type="radio" name="l3_lantai_bahan" value="5" onchange="handleLantaiBahanL()"/> <span>5. Kayu/papan</span></label>
+          <label class="radio-item"><input type="radio" name="l3_lantai_bahan" value="6" onchange="handleLantaiBahanL()"/> <span>6. Semen/bata merah</span></label>
+          <label class="radio-item"><input type="radio" name="l3_lantai_bahan" value="7" onchange="handleLantaiBahanL()"/> <span>7. Bambu</span></label>
+          <label class="radio-item"><input type="radio" name="l3_lantai_bahan" value="8" onchange="handleLantaiBahanL()"/> <span>8. Tanah</span></label>
+          <label class="radio-item"><input type="radio" name="l3_lantai_bahan" value="9" onchange="handleLantaiBahanL()"/> <span>9. Lainnya</span></label>
+        </div>
       </div>
       <div id="l3_lantai_kondisi_wrap" class="form-group">
         <label class="field-label">6b. Kondisi lantai</label>
@@ -116,16 +115,15 @@
       </div>
       <div class="form-group">
         <label class="field-label">7a. Bahan dinding utama</label>
-        <select id="l3_dinding_bahan" onchange="handleDindingBahanL()">
-          <option value="">-- Pilih --</option>
-          <option value="1">1. Tembok</option>
-          <option value="2">2. Plesteran anyaman bambu/kawat</option>
-          <option value="3">3. Kayu/papan/gipsum/GRC</option>
-          <option value="4">4. Anyaman bambu</option>
-          <option value="5">5. Batang kayu</option>
-          <option value="6">6. Bambu</option>
-          <option value="7">7. Lainnya</option>
-        </select>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l3_dinding_bahan" value="1" onchange="handleDindingBahanL()"/> <span>1. Tembok</span></label>
+          <label class="radio-item"><input type="radio" name="l3_dinding_bahan" value="2" onchange="handleDindingBahanL()"/> <span>2. Plesteran anyaman bambu/kawat</span></label>
+          <label class="radio-item"><input type="radio" name="l3_dinding_bahan" value="3" onchange="handleDindingBahanL()"/> <span>3. Kayu/papan/gipsum/GRC</span></label>
+          <label class="radio-item"><input type="radio" name="l3_dinding_bahan" value="4" onchange="handleDindingBahanL()"/> <span>4. Anyaman bambu</span></label>
+          <label class="radio-item"><input type="radio" name="l3_dinding_bahan" value="5" onchange="handleDindingBahanL()"/> <span>5. Batang kayu</span></label>
+          <label class="radio-item"><input type="radio" name="l3_dinding_bahan" value="6" onchange="handleDindingBahanL()"/> <span>6. Bambu</span></label>
+          <label class="radio-item"><input type="radio" name="l3_dinding_bahan" value="7" onchange="handleDindingBahanL()"/> <span>7. Lainnya</span></label>
+        </div>
       </div>
       <div id="l3_dinding_kondisi_wrap" class="form-group">
         <label class="field-label">7b. Kondisi dinding</label>
@@ -138,17 +136,16 @@
       </div>
       <div class="form-group">
         <label class="field-label">8a. Bahan atap utama</label>
-        <select id="l3_atap_bahan" onchange="handleAtapBahanL()">
-          <option value="">-- Pilih --</option>
-          <option value="1">1. Beton</option>
-          <option value="2">2. Genteng</option>
-          <option value="3">3. Seng</option>
-          <option value="4">4. Asbes</option>
-          <option value="5">5. Bambu</option>
-          <option value="6">6. Kayu/sirap</option>
-          <option value="7">7. Jerami/ijuk/daun/rumbia</option>
-          <option value="8">8. Lainnya</option>
-        </select>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="l3_atap_bahan" value="1" onchange="handleAtapBahanL()"/> <span>1. Beton</span></label>
+          <label class="radio-item"><input type="radio" name="l3_atap_bahan" value="2" onchange="handleAtapBahanL()"/> <span>2. Genteng</span></label>
+          <label class="radio-item"><input type="radio" name="l3_atap_bahan" value="3" onchange="handleAtapBahanL()"/> <span>3. Seng</span></label>
+          <label class="radio-item"><input type="radio" name="l3_atap_bahan" value="4" onchange="handleAtapBahanL()"/> <span>4. Asbes</span></label>
+          <label class="radio-item"><input type="radio" name="l3_atap_bahan" value="5" onchange="handleAtapBahanL()"/> <span>5. Bambu</span></label>
+          <label class="radio-item"><input type="radio" name="l3_atap_bahan" value="6" onchange="handleAtapBahanL()"/> <span>6. Kayu/sirap</span></label>
+          <label class="radio-item"><input type="radio" name="l3_atap_bahan" value="7" onchange="handleAtapBahanL()"/> <span>7. Jerami/ijuk/daun/rumbia</span></label>
+          <label class="radio-item"><input type="radio" name="l3_atap_bahan" value="8" onchange="handleAtapBahanL()"/> <span>8. Lainnya</span></label>
+        </div>
       </div>
       <div id="l3_atap_kondisi_wrap" class="form-group">
         <label class="field-label">8b. Kondisi atap</label>
