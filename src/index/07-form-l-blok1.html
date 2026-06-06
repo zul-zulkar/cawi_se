@@ -11,18 +11,18 @@
     </div>
   </div>
 
-  <!-- L1.1 Kepala Keluarga -->
-  <div class="section-card">
+  <!-- L1.1 Kepala Keluarga — DUPLIKAT Blok P (disembunyikan di unified; diisi via syncPIdentityToL) -->
+  <div class="section-card dup-of-p">
     <div class="section-header" id="sec-L1-1">1. Kepala Keluarga</div>
     <div class="section-body">
       <div class="form-group">
         <label class="field-label">a. Nama Kepala Keluarga <span class="req">*</span></label>
-        <input type="text" id="l1_nama_kk" placeholder="Nama lengkap kepala keluarga" oninput="if(typeof syncKepalaKeluargaNama==='function')syncKepalaKeluargaNama()"/>
+        <input type="text" id="l1_nama_kk" placeholder="Nama lengkap kepala keluarga" oninput="if(typeof syncKepalaKeluargaIdentity==='function')syncKepalaKeluargaIdentity()"/>
       </div>
       <div class="inline-fields">
         <div class="form-group">
           <label class="field-label">b. NIK Kepala Keluarga <span class="req">*</span></label>
-          <input type="text" id="l1_nik_kk" maxlength="16" placeholder="16 digit NIK"/>
+          <input type="text" id="l1_nik_kk" maxlength="16" placeholder="16 digit NIK" oninput="if(typeof syncKepalaKeluargaIdentity==='function')syncKepalaKeluargaIdentity()"/>
         </div>
         <div class="form-group">
           <label class="field-label">c. Nomor KK <span class="req">*</span></label>
@@ -102,7 +102,8 @@
         <label class="field-label">i. Alamat (Jalan/Gang/Nomor/RT/RW) <span class="req">*</span></label>
         <input type="text" id="l1_alamat_detail" placeholder="Detail alamat lengkap"/>
       </div>
-      <div class="inline-fields">
+      <!-- DUPLIKAT Blok P (pmt_jalan/pmt_blok) — disembunyikan di unified -->
+      <div class="inline-fields dup-of-p">
         <div class="form-group">
           <label class="field-label">j. Nama Jalan</label>
           <input type="text" id="l1_nama_jalan" placeholder="Nama Jalan (atau '-' jika tidak ada)"/>
@@ -115,8 +116,8 @@
     </div>
   </div>
 
-  <!-- L1.4 Kesesuaian KK -->
-  <div class="section-card">
+  <!-- L1.4 Kesesuaian KK — DUPLIKAT Blok P (pmt_sesuai_kk); disembunyikan di unified -->
+  <div class="section-card dup-of-p">
     <div class="section-header" id="sec-L1-4">4. Kesesuaian Alamat dengan KK</div>
     <div class="section-body">
       <div class="form-group">

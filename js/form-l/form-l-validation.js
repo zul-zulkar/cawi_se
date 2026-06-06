@@ -19,16 +19,23 @@ function collectAllProblemsL() {
   const w = (label, text, blok, field) => warnings.push({label, text, blok, field: field || null});
   const k = (label, text, blok, field) => kosong.push({label, text, blok, field: field || null});
 
+  // Unified (SE2026-P): identitas KK + alamat jalan/no + kesesuaian KK adalah
+  // SUMBER TUNGGAL Blok P (divalidasi di collectAllProblemsP, dialirkan ke L1).
+  // Lewati di sini agar tidak dobel-error pada field L1 yang disembunyikan.
+  const _unifiedP = (typeof isUnifiedMode === 'function' && isUnifiedMode());
+
   /* === BLOK I: Keluarga (header) === */
-  if (!getVal('l1_nama_kk')) e('Rincian 1: Nama Kepala Keluarga', 'Harus diisi', 1, 'l1_nama_kk');
-  const nikKK = getVal('l1_nik_kk');
-  if (!nikKK) e('Rincian 1: NIK Kepala Keluarga', 'Harus diisi', 1, 'l1_nik_kk');
-  else if (nikKK.length !== 16) e('Rincian 1: NIK Kepala Keluarga', 'Harus tepat 16 digit', 1, 'l1_nik_kk');
-  else if (!/^\d{16}$/.test(nikKK)) e('Rincian 1: NIK Kepala Keluarga', 'NIK hanya boleh berisi angka', 1, 'l1_nik_kk');
-  const noKK = getVal('l1_no_kk');
-  if (!noKK) e('Rincian 1: Nomor KK', 'Harus diisi', 1, 'l1_no_kk');
-  else if (noKK.length !== 16) e('Rincian 1: Nomor KK', 'Harus tepat 16 digit', 1, 'l1_no_kk');
-  else if (!/^\d{16}$/.test(noKK)) e('Rincian 1: Nomor KK', 'Nomor KK hanya boleh berisi angka', 1, 'l1_no_kk');
+  if (!_unifiedP) {
+    if (!getVal('l1_nama_kk')) e('Rincian 1: Nama Kepala Keluarga', 'Harus diisi', 1, 'l1_nama_kk');
+    const nikKK = getVal('l1_nik_kk');
+    if (!nikKK) e('Rincian 1: NIK Kepala Keluarga', 'Harus diisi', 1, 'l1_nik_kk');
+    else if (nikKK.length !== 16) e('Rincian 1: NIK Kepala Keluarga', 'Harus tepat 16 digit', 1, 'l1_nik_kk');
+    else if (!/^\d{16}$/.test(nikKK)) e('Rincian 1: NIK Kepala Keluarga', 'NIK hanya boleh berisi angka', 1, 'l1_nik_kk');
+    const noKK = getVal('l1_no_kk');
+    if (!noKK) e('Rincian 1: Nomor KK', 'Harus diisi', 1, 'l1_no_kk');
+    else if (noKK.length !== 16) e('Rincian 1: Nomor KK', 'Harus tepat 16 digit', 1, 'l1_no_kk');
+    else if (!/^\d{16}$/.test(noKK)) e('Rincian 1: Nomor KK', 'Nomor KK hanya boleh berisi angka', 1, 'l1_no_kk');
+  }
   const jmlAng = parseInt(getVal('l1_jml_kk_anggota'));
   if (!getVal('l1_jml_kk_anggota')) e('Rincian 2a: Jumlah Anggota Keluarga', 'Harus diisi', 1, 'l1_jml_kk_anggota');
   else if (isNaN(jmlAng) || jmlAng < 1) e('Rincian 2a: Jumlah Anggota Keluarga', 'Minimal 1 anggota', 1, 'l1_jml_kk_anggota');
@@ -44,9 +51,11 @@ function collectAllProblemsL() {
   if (!getVal('l1_kode_sls')) k('Rincian 3: Kode SLS', 'Tidak diisi (opsional)', 1, 'l1_kode_sls');
   if (!getVal('l1_nama_sls')) k('Rincian 3: Nama SLS', 'Tidak diisi (opsional)', 1, 'l1_nama_sls');
   if (!getVal('l1_alamat_detail')) e('Rincian 3: Alamat Detail', 'Harus diisi', 1, 'l1_alamat_detail');
-  if (!getVal('l1_nama_jalan')) e('Rincian 3: Nama Jalan', 'Harus diisi (isi "-" jika tidak ada)', 1, 'l1_nama_jalan');
-  if (!getVal('l1_no_rumah')) e('Rincian 3: Nomor Rumah', 'Harus diisi (isi "-" jika tidak ada)', 1, 'l1_no_rumah');
-  if (!getRadio('l1_sesuai_kk')) e('Rincian 4: Kesesuaian dengan KK', 'Belum dipilih', 1, 'l1_sesuai_kk');
+  if (!_unifiedP) {
+    if (!getVal('l1_nama_jalan')) e('Rincian 3: Nama Jalan', 'Harus diisi (isi "-" jika tidak ada)', 1, 'l1_nama_jalan');
+    if (!getVal('l1_no_rumah')) e('Rincian 3: Nomor Rumah', 'Harus diisi (isi "-" jika tidak ada)', 1, 'l1_no_rumah');
+    if (!getRadio('l1_sesuai_kk')) e('Rincian 4: Kesesuaian dengan KK', 'Belum dipilih', 1, 'l1_sesuai_kk');
+  }
 
   /* === BLOK I: Per Anggota === */
   const capped = Math.min(Math.max(jmlAng || 0, 0), 30);

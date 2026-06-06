@@ -26,6 +26,27 @@ function collectAllProblemsP() {
   reqVal('pmt_no_bgn', 'Nomor urut bangunan');
   if (!isBangunan) reqVal('pmt_no_kel', 'Nomor urut keluarga');
 
+  // Identitas keluarga = SUMBER TUNGGAL Blok P (dialirkan ke Blok L1 + anggota #1).
+  // Wajib hanya bila kuesioner keluarga akan tampil (kode bangunan 2/3) DAN
+  // keluarga ditemukan/baru (keberadaan 1/2). NIK/No KK boleh kode khusus.
+  const _kode = val('pmt_kode_bangunan');
+  const _stageKeluarga = (_kode === '2' || _kode === '3');
+  const _keb0 = rad('pmt_keberadaan');
+  const _kebFull = (_keb0 === '1' || _keb0 === '2');
+  if (_stageKeluarga && _kebFull) {
+    const nik = val('pmt_nik');
+    if (!nik) pushErr('pmt_nik', 'NIK kepala keluarga');
+    else if (!/^(9999|7777)$/.test(nik) && !/^\d{16}$/.test(nik))
+      errors.push({ field: 'pmt_nik', label: 'Blok P', text: 'NIK harus 16 digit (atau 9999/7777)', blok: 'P' });
+    const nokk = val('pmt_nomor_kk');
+    if (!nokk) pushErr('pmt_nomor_kk', 'Nomor Kartu Keluarga');
+    else if (!/^(9999|8888|7777)$/.test(nokk) && !/^\d{16}$/.test(nokk))
+      errors.push({ field: 'pmt_nomor_kk', label: 'Blok P', text: 'Nomor KK harus 16 digit (atau 9999/8888/7777)', blok: 'P' });
+    reqRad('pmt_sesuai_kk', 'Kesesuaian alamat dengan KK');
+    reqVal('pmt_jalan', 'Alamat — nama jalan/gang (isi "-" bila tidak ada)');
+    reqVal('pmt_blok', 'Alamat — blok/nomor (isi "-" bila tidak ada)');
+  }
+
   // Geotag wajib kecuali keberadaan tidak ditemukan(0)/meninggal(3)/khusus(6)
   const keb = rad('pmt_keberadaan');
   const geoExempt = (keb === '0' || keb === '3' || keb === '6');

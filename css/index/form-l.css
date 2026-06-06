@@ -26,6 +26,9 @@ body.mode-unified.stage-usaha .sidebar-blok-group.sb-l[data-lblok="3"]{display:n
 body.mode-unified.stage-usaha #blokL1,
 body.mode-unified.stage-usaha #blokL3{display:none}
 /* stage none → kuesioner lanjutan tetap tersembunyi (cukup Blok P) */
+/* Sumber tunggal: field identitas KK + alamat jalan/no + kesesuaian KK DUPLIKAT
+   Blok P → disembunyikan di Blok L1 (diisi otomatis via syncPIdentityToL). */
+body.mode-unified .dup-of-p{display:none !important}
 
 /* Petunjuk lanjutan di Blok P */
 .pmt-stage-hint{margin-top:10px;padding:10px 12px;border-radius:8px;background:#ebf4ff;border:1px solid #bee3f8;color:#2b6cb0;font-size:12.5px;line-height:1.5}

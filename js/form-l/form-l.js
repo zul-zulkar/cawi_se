@@ -191,16 +191,38 @@ function ensureKepalaKeluarga() {
   if (typeof updateProgress === 'function') updateProgress();
 }
 
-// Sinkron nama anggota #1 dengan Nama Kepala Keluarga (Blok I) selama
-// hubungan anggota #1 masih "Kepala Keluarga". Dipanggil saat l1_nama_kk berubah.
-function syncKepalaKeluargaNama() {
-  const kk  = document.getElementById('l1_nama_kk');
+// Sinkron IDENTITAS anggota #1 (Kepala Keluarga): nama + NIK dari Blok I
+// (yang di unified bersumber dari Blok P) selama hubungan anggota #1 masih
+// "Kepala Keluarga". Dipanggil saat l1_nama_kk / l1_nik_kk berubah atau dari
+// syncPIdentityToL (Blok P). Anggota #1 jadi read-only di unified (sumber tunggal).
+function syncKepalaKeluargaIdentity() {
   const ang = document.getElementById('l_ang_1_nama');
   const hub = document.getElementById('l_ang_1_hubungan');
-  if (!kk || !ang) return;
+  if (!ang) return;
   if (hub && hub.value && hub.value !== '1') return; // anggota #1 bukan KK → jangan timpa
-  ang.value = kk.value;
+  const kk = document.getElementById('l1_nama_kk');
+  if (kk) ang.value = kk.value;
+  const kkNik  = document.getElementById('l1_nik_kk');
+  const angNik = document.getElementById('l_ang_1_nik');
+  if (kkNik && angNik) angNik.value = kkNik.value;
+  _lockKKMemberFields();
   if (document.getElementById('l_ang_row_1')) renderAnggotaRosterRow(1);
+  if (typeof updateAnggotaNamePreview === 'function') updateAnggotaNamePreview(1);
+}
+// Alias backward-compat (dipanggil dari oninput l1_nama_kk).
+function syncKepalaKeluargaNama() { syncKepalaKeluargaIdentity(); }
+
+// Anggota #1 = Kepala Keluarga: nama + NIK bersumber dari Blok P (unified) →
+// jadikan read-only agar tidak diisi ganda. Mode legacy (non-unified): editable.
+function _lockKKMemberFields() {
+  const lock = !!(document.body && document.body.classList.contains('mode-unified'));
+  ['l_ang_1_nama', 'l_ang_1_nik'].forEach(function (id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.readOnly = lock;
+    el.classList.toggle('input-muted', lock);
+    el.title = lock ? 'Diisi otomatis dari Blok P (Kepala Keluarga)' : '';
+  });
 }
 
 function initAnggotaSearchable(i) {

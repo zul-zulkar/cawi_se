@@ -194,6 +194,37 @@ function seedPrelistP(entry) {
   refreshDynamicSidebar();
 }
 
+/* ---- Sumber tunggal identitas keluarga: Blok P → Blok L1 + anggota #1 ----
+ * (unified) Field identitas KK & alamat hanya diisi di Blok P; nilainya
+ * dialirkan SATU-ARAH ke Blok L1 (yang disembunyikan via .dup-of-p) dan ke
+ * anggota #1 (Kepala Keluarga). Mencegah pengisian informasi yang sama ganda.
+ * Idempotent — aman dipanggil tiap perubahan field Blok P.
+ */
+function syncPIdentityToL() {
+  if (!isUnifiedMode()) return;
+  var map = {
+    l1_nama_kk:    'pmt_nama',
+    l1_nik_kk:     'pmt_nik',
+    l1_no_kk:      'pmt_nomor_kk',
+    l1_nama_jalan: 'pmt_jalan',
+    l1_no_rumah:   'pmt_blok'
+  };
+  Object.keys(map).forEach(function (lid) {
+    var src = document.getElementById(map[lid]);
+    var dst = document.getElementById(lid);
+    if (src && dst) dst.value = src.value;
+  });
+  // Kesesuaian KK: radio Blok P (pmt_sesuai_kk) → radio Blok L1 (l1_sesuai_kk).
+  var sk = (typeof getRadio === 'function') ? getRadio('pmt_sesuai_kk') : '';
+  if (sk) {
+    var r = document.querySelector('input[name="l1_sesuai_kk"][value="' + sk + '"]');
+    if (r) r.checked = true;
+  }
+  // Anggota #1 (Kepala Keluarga): pastikan ada lalu sinkron nama + NIK.
+  if (typeof ensureKepalaKeluarga === 'function') ensureKepalaKeluarga();
+  if (typeof syncKepalaKeluargaIdentity === 'function') syncKepalaKeluargaIdentity();
+}
+
 /* Navigasi ke Blok P (panel #blokP1). Dipakai sidebar grup .sb-p. */
 function goBlokP() {
   // Simpan dulu isian blok saat ini (persist ke draft assignment).
@@ -272,6 +303,8 @@ function initFormP() {
   if (typeof handlePmtJenisEntitas === 'function') handlePmtJenisEntitas();
   // Hitung stage awal (mis. dari draft yang sudah berisi pmt_kode_bangunan).
   refreshDynamicSidebar();
+  // Alirkan identitas keluarga Blok P → Blok L1 + anggota #1 (sumber tunggal).
+  syncPIdentityToL();
   // Prefill referensi nomor urut terbesar (async, best-effort).
   _prefillNoUrutMax();
 }
@@ -288,6 +321,7 @@ if (typeof window !== 'undefined') {
   window._fillPWilayah        = _fillPWilayah;
   window.ambilLokasiP         = ambilLokasiP;
   window.seedPrelistP         = seedPrelistP;
+  window.syncPIdentityToL     = syncPIdentityToL;
   window.initFormP            = initFormP;
   window.isUnifiedMode        = isUnifiedMode;
   window.goBlokP              = goBlokP;

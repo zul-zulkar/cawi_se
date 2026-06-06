@@ -26,6 +26,15 @@ function calcProgressP() {
   const opsional = ['pmt_jml_usaha', 'pmt_no_kel', 'pmt_jalan'];
   opsional.forEach((id) => { total++; if (val(id)) filled++; });
 
+  // Identitas keluarga (Blok P sumber tunggal) — dihitung saat kuesioner keluarga
+  // aktif (kode 2/3) & keluarga ditemukan/baru (keberadaan 1/2). Selaras validasi.
+  const kode = val('pmt_kode_bangunan');
+  const kebFull = (keb === '1' || keb === '2');
+  if ((kode === '2' || kode === '3') && kebFull) {
+    ['pmt_nik', 'pmt_nomor_kk', 'pmt_blok'].forEach((id) => { total++; if (val(id)) filled++; });
+    cRad('pmt_sesuai_kk');
+  }
+
   const pct = total ? Math.round(filled / total * 100) : 0;
   return { pct, filled, total };
 }

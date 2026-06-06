@@ -29,6 +29,9 @@ const VALID = {
   pmt_kode_bangunan: '3',
   pmt_no_bgn: '7', pmt_no_kel: '12',
   pmt_lat: '-8.1', pmt_lng: '115.1',
+  // Identitas keluarga (sumber tunggal Blok P, wajib saat kode 2/3 + ditemukan)
+  pmt_nik: '1234567890123456', pmt_nomor_kk: '1234567890123456',
+  pmt_sesuai_kk: '1', pmt_jalan: 'Jl. Anggur', pmt_blok: 'A1',
 }
 
 describe('collectAllProblemsP — field wajib', () => {
@@ -49,6 +52,51 @@ describe('collectAllProblemsP — field wajib', () => {
   it('setiap error punya blok "P" (untuk navigasi)', () => {
     const r = runP()
     expect(r.errors.every(e => e.blok === 'P')).toBe(true)
+  })
+})
+
+describe('collectAllProblemsP — identitas keluarga (sumber tunggal Blok P)', () => {
+  it('kode 3 + ditemukan, NIK & No KK kosong → error', () => {
+    const r = runP({
+      pmt_nama: 'X', pmt_keberadaan: '1', pmt_kode_bangunan: '3',
+      pmt_no_bgn: '1', pmt_no_kel: '1', pmt_lat: '-8.1', pmt_lng: '115.1',
+      pmt_sesuai_kk: '1', pmt_jalan: '-', pmt_blok: '-',
+    })
+    const f = r.errors.map(e => e.field)
+    expect(f).toContain('pmt_nik')
+    expect(f).toContain('pmt_nomor_kk')
+  })
+
+  it('NIK bukan 16 digit → error format', () => {
+    const r = runP({ ...VALID, pmt_nik: '123' })
+    expect(r.errors.some(e => e.field === 'pmt_nik')).toBe(true)
+  })
+
+  it('NIK kode khusus 9999 → diterima', () => {
+    const r = runP({ ...VALID, pmt_nik: '9999' })
+    expect(r.errors.some(e => e.field === 'pmt_nik')).toBe(false)
+  })
+
+  it('No KK kode khusus 8888 → diterima', () => {
+    const r = runP({ ...VALID, pmt_nomor_kk: '8888' })
+    expect(r.errors.some(e => e.field === 'pmt_nomor_kk')).toBe(false)
+  })
+
+  it('bangunan lainnya (kode 1, jenis=2) → identitas keluarga TIDAK wajib', () => {
+    const r = runP({
+      pmt_jenis_entitas: '2', pmt_nama: 'Usaha', pmt_keberadaan: '1',
+      pmt_kode_bangunan: '1', pmt_no_bgn: '1', pmt_lat: '-8.1', pmt_lng: '115.1',
+    })
+    const f = r.errors.map(e => e.field)
+    expect(f).not.toContain('pmt_nik')
+    expect(f).not.toContain('pmt_nomor_kk')
+  })
+
+  it('keluarga tidak ditemukan (keberadaan 0) → identitas keluarga TIDAK wajib', () => {
+    const r = runP({ pmt_nama: 'X', pmt_keberadaan: '0', pmt_kode_bangunan: '3', pmt_no_bgn: '1', pmt_no_kel: '1' })
+    const f = r.errors.map(e => e.field)
+    expect(f).not.toContain('pmt_nik')
+    expect(f).not.toContain('pmt_nomor_kk')
   })
 })
 

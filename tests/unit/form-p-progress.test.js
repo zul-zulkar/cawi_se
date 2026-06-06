@@ -62,6 +62,9 @@ describe('calcProgressP — penghitungan', () => {
       pmt_lat: '-8.1', pmt_lng: '115.1',
       pmt_jml_usaha: '1', pmt_idsbr: '123', pmt_jml_kk: '4',
       pmt_no_kel: '1', pmt_no_bgn: '1', pmt_jalan: 'Jl. Melati',
+      // Identitas keluarga (slot tambahan saat kode 2/3 + ditemukan)
+      pmt_nik: '1234567890123456', pmt_nomor_kk: '1234567890123456',
+      pmt_blok: 'A1', pmt_sesuai_kk: '1',
     })
     expect(r.pct).toBe(100)
     expect(r.filled).toBe(r.total)

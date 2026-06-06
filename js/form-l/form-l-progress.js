@@ -29,10 +29,16 @@ function calcProgressL() {
   let t = 0, f = 0;
   const c = ok => { t++; if (ok) f++; };
 
+  // Unified (SE2026-P): identitas KK + alamat jalan/no + kesesuaian KK dihitung
+  // di calcProgressP (sumber tunggal Blok P) → jangan dobel-hitung di sini.
+  const _unifiedP = (typeof isUnifiedMode === 'function' && isUnifiedMode());
+
   /* === BLOK I: Keluarga (header) === */
-  c(!!getVal('l1_nama_kk'));
-  c(getVal('l1_nik_kk').length === 16);
-  c(getVal('l1_no_kk').length === 16);
+  if (!_unifiedP) {
+    c(!!getVal('l1_nama_kk'));
+    c(getVal('l1_nik_kk').length === 16);
+    c(getVal('l1_no_kk').length === 16);
+  }
   const nAng = parseInt(getVal('l1_jml_kk_anggota')) || 0;
   c(nAng > 0 && nAng <= 30);
   c(!!getVal('l1_alamat_provinsi'));
@@ -42,9 +48,11 @@ function calcProgressL() {
   c(!!getRadio('l1_klasifikasi'));
   c(getVal('l1_kodepos').length === 5);
   c(!!getVal('l1_alamat_detail'));
-  c(!!getVal('l1_nama_jalan'));
-  c(!!getVal('l1_no_rumah'));
-  c(!!getRadio('l1_sesuai_kk'));
+  if (!_unifiedP) {
+    c(!!getVal('l1_nama_jalan'));
+    c(!!getVal('l1_no_rumah'));
+    c(!!getRadio('l1_sesuai_kk'));
+  }
 
   /* === BLOK I: Per Anggota (dynamic) === */
   const capped = Math.min(Math.max(nAng, 0), 30);
