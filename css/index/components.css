@@ -114,12 +114,8 @@ select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='ht
 .submit-alert{margin-top:14px}
 .submit-section{margin-top:20px}
 
-/* ====== LOKASI GPS ====== */
-.lokasi-row{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap}
-#lokasiBtn{display:flex;align-items:center;gap:8px;padding:10px 20px;background:#fc6c00;color:#fff;border:none;border-radius:7px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0;transition:background .2s}
-.lokasi-result{flex:1;min-width:200px;background:#f7f4f0;border:1.5px solid #e8e3de;border-radius:7px;padding:10px 14px;font-size:12.5px;color:#888;line-height:1.7}
-.lokasi-map-wrap{margin-top:14px;border-radius:10px;overflow:hidden;border:1.5px solid #68d391;box-shadow:0 2px 10px rgba(0,0,0,.1)}
-.lokasi-map{height:240px;width:100%}
+/* ====== LOKASI GPS (L.UB) DIHAPUS bersama retire subsistem L.UB.
+   Geotag Blok P memakai #pmtLokasiBtn / .geo-btn-text (lihat css form-p). ====== */
 
 /* ====== BUTTONS ====== */
 .btn{padding:10px 26px;border:none;border-radius:6px;cursor:pointer;font-size:13.5px;font-weight:700;transition:all .2s;letter-spacing:.3px}

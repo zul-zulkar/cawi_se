@@ -1,5 +1,5 @@
 function goBlok(n) {
-  const mode = (typeof getFormMode === 'function') ? getFormMode() : 'lub';
+  const mode = (typeof getFormMode === 'function') ? getFormMode() : 'l';
   const prefix = (mode === 'l') ? 'blokL' : 'blok';
   const tabPrefix = (mode === 'l') ? 'sidebarTabL' : 'sidebarTab';
   document.querySelectorAll('.blok-panel').forEach(p => p.classList.remove('active'));
@@ -17,18 +17,11 @@ function goBlok(n) {
 }
 
 /* ====== Desktop topbar — sync title with active blok ====== */
-function updateDeskTopbar(n, mode) {
+function updateDeskTopbar(n) {
   const titleEl = document.getElementById('deskTopbarTitle');
   const subEl   = document.getElementById('deskTopbarSub');
   if (!titleEl || !subEl) return;
-  mode = mode || ((typeof getFormMode === 'function') ? getFormMode() : 'lub');
-  const isL = mode === 'l';
-  const head = isL ? 'Kuesioner SE2026-L' : 'Kuesioner SE2026-L.UB';
-  const lubBloks = {
-    1: 'BLOK I — Identitas Usaha/Perusahaan',
-    2: 'BLOK II — Catatan Kunjungan',
-    3: 'BLOK III — Identitas Responden',
-  };
+  // L.UB di-retire — hanya kuesioner L (unified P memakai blok L yang sama).
   const lBloks = {
     1: 'BLOK I — Keluarga & Anggota',
     2: 'BLOK II — Usaha / Perusahaan',
@@ -36,9 +29,8 @@ function updateDeskTopbar(n, mode) {
     4: 'BLOK IV — Catatan Pendata',
     5: 'BLOK V — Petugas & Responden',
   };
-  const map = isL ? lBloks : lubBloks;
-  titleEl.textContent = head;
-  subEl.textContent   = map[n] || ('BLOK ' + n);
+  titleEl.textContent = 'Kuesioner SE2026-L';
+  subEl.textContent   = lBloks[n] || ('BLOK ' + n);
 }
 
 

@@ -79,17 +79,12 @@
         throw new Error('Field wajib kosong: ' + required[i]);
       }
     }
-    // Jenis: L (rumah tangga), LUB (usaha besar), UNIFIED (SE2026-P pemutakhiran).
-    // Selain ketiganya → default 'LUB' (backward-compat).
-    var jenis;
-    if (data.jenis === 'L') jenis = 'L';
-    else if (data.jenis === 'UNIFIED' || data.jenis === 'P') jenis = 'UNIFIED';
-    else jenis = 'LUB';
+    // Jenis: L (rumah tangga) atau UNIFIED (SE2026-P pemutakhiran).
+    // L.UB di-retire — 'LUB'/'P'/nilai lain di-default ke UNIFIED.
+    var jenis = (data.jenis === 'L') ? 'L' : 'UNIFIED';
     var id    = generateId();
     var now   = new Date().toISOString();
-    var draftPrefix = (jenis === 'L') ? 'cawi_l_draft_'
-                    : (jenis === 'UNIFIED') ? 'cawi_u_draft_'
-                    : 'cawi_draft_';
+    var draftPrefix = (jenis === 'L') ? 'cawi_l_draft_' : 'cawi_u_draft_';
     var draftKey = draftPrefix + id;
     return {
       id: id,
@@ -151,7 +146,7 @@
     if (f.kecamatan)    arr = arr.filter(function (a) { return a.kecamatan    === f.kecamatan; });
     if (f.kabupaten)    arr = arr.filter(function (a) { return a.kabupaten    === f.kabupaten; });
     if (f.petugas_nama) arr = arr.filter(function (a) { return a.petugas_nama === f.petugas_nama; });
-    if (f.jenis && (f.jenis === 'L' || f.jenis === 'LUB' || f.jenis === 'UNIFIED')) {
+    if (f.jenis && (f.jenis === 'L' || f.jenis === 'UNIFIED')) {
       arr = arr.filter(function (a) { return a.jenis === f.jenis; });
     }
     return arr;

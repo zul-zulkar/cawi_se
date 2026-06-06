@@ -1,6 +1,6 @@
 # CAWI SE2026 — BPS
 
-Aplikasi web formulir **Sensus Ekonomi 2026** berbasis CAWI (Computer Assisted Web Interviewing). Mendukung dua jenis kuesioner: **L.UB** (usaha/perusahaan besar) dan **L** (rumah tangga). Data dikirim ke Google Sheets via Google Apps Script.
+Aplikasi web formulir **Sensus Ekonomi 2026** berbasis CAWI (Computer Assisted Web Interviewing). Arsitektur **SE2026-P (Pemutakhiran/unified)**: satu kuesioner Blok **P** (listing per bangunan) yang—sesuai Kode Penggunaan Bangunan—mengarah ke kuesioner **L** (keluarga & usaha rumah tangga). Data dikirim ke Google Sheets via Google Apps Script. _(Subsistem **L.UB** lama telah di-retire.)_
 
 Repo ini dirancang agar BPS daerah lain bisa **duplikasi dengan cepat** — cukup ganti backend Sheet, data wilayah, dan password.
 
@@ -16,7 +16,7 @@ Endpoint default sudah aktif (sandbox publik). Buka `index.html` di browser — 
 | Daftar (`daftar.html`) | `Daftar08!` |
 | Admin (`admin.html`) | `Admin08!` |
 
-> Kuesioner berada di `kuesioner.html` dan dilindungi guard: hanya bisa dibuka via `?draft=<key>&mode=L|LUB` yang cocok dengan assignment milik petugas login.
+> Kuesioner berada di `kuesioner.html` dan dilindungi guard: hanya bisa dibuka via `?draft=<key>&mode=P|L` yang cocok dengan assignment milik petugas login.
 
 > ⚠️ Endpoint default menulis ke sheet publik — hanya untuk demo. Untuk operasi resmi, ikuti **Duplikasi** di bawah.
 
@@ -42,7 +42,7 @@ cd cawi_se
    - Who has access: **Anyone**
 6. Salin **Web app URL** (yang berakhir `/exec`).
 
-Tab `SE2026_Responses`, `SE2026_LKP`, `SE2026_L_Responses`, `SE2026_L_Anggota`, dan `CAWI_Config` akan dibuat otomatis saat submit pertama.
+Tab `SE2026_L_Responses`, `SE2026_L_Anggota`, `SE2026_P_Responses`, dan `CAWI_Config` akan dibuat otomatis saat submit pertama. _(Sheet L.UB lama `SE2026_Responses` & `SE2026_LKP` tidak lagi ditulis/dibaca setelah L.UB di-retire.)_
 
 ### 3. Hubungkan URL ke Aplikasi
 
@@ -86,7 +86,7 @@ cawi_se/
 ├── master/           # KBLI 2025 + Halal/BPOM CSV
 ├── src/index/        # Partial HTML — gabungkan via `npm run build:html`
 ├── css/              # core/ (token+primitif) + per-halaman
-├── js/               # config, data, auth, form-lub, form-l, pages, shared
+├── js/               # config, data, auth, form-l, form-p, pages, shared
 ├── tests/            # Unit test (Vitest)
 └── tools/            # build-html.js
 ```

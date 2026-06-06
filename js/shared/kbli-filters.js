@@ -92,7 +92,7 @@
   // Apply on page load (in case a draft has a KBLI already selected)
   document.addEventListener('DOMContentLoaded', async () => {
     await load();
-    const mode = (typeof getFormMode === 'function') ? getFormMode() : 'lub';
+    const mode = (typeof getFormMode === 'function') ? getFormMode() : 'l';
     const kodeEl = document.getElementById(mode === 'l' ? 'l2_kbli_kode' : 'q9g_kbli_kode');
     apply(kodeEl ? kodeEl.value : '');
   });

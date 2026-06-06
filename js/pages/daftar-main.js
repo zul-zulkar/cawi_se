@@ -301,56 +301,15 @@ function viewSectionsP(r) {
 }
 
 function viewSectionsLUB(r) {
+  // Kuesioner L.UB di-retire — viewer rinci dihapus. Tampilkan ringkasan minimal
+  // agar record legacy (bila ada) tetap dapat diidentifikasi & dihapus.
   return [
-    { title: 'Petugas Pendata', fields: [
-      ['Nama Petugas', r.petugas_nama],
-      ['NIP / ID', r.petugas_nip],
-      ['HP Petugas', r.petugas_hp],
-    ]},
-    { title: 'Lokasi', fields: [
-      ['Provinsi', r.provinsi],
-      ['Kabupaten/Kota', r.kabupaten],
-      ['Kecamatan', r.kecamatan],
-      ['Kelurahan/Desa', r.kelurahan],
-    ]},
-    { title: 'Identitas Usaha', fields: [
+    { title: 'Record L.UB (legacy — di-retire)', fields: [
       ['Nama Perusahaan', r.nama_perusahaan],
       ['Nama Komersial', r.nama_komersial],
-      ['Alamat', r.alamat],
-      ['Email', r.email_perusahaan],
-      ['Website', r.website],
-      ['Telepon', r.telepon],
-      ['HP/WA', r.hp],
-    ]},
-    { title: 'NIB & Badan Usaha', fields: [
-      ['Punya NIB', r.punya_nib],
-      ['No. NIB', r.nib],
-      ['Status Badan Usaha', r.badan_usaha],
-    ]},
-    { title: 'Pengusaha', fields: [
-      ['Nama Pengusaha', r.nama_pengusaha],
-      ['Jenis Kelamin', r.jenis_kelamin_pengusaha],
-      ['Umur', r.umur_pengusaha],
-      ['NIK', r.nik_pengusaha],
-    ]},
-    { title: 'Kegiatan Usaha', fields: [
-      ['Kegiatan Utama', r.kegiatan_utama],
-      ['KBLI', r.kbli_judul],
-      ['Kode KBLI', r.kbli_kode],
-      ['Kategori KBLI', r.kbli_kategori],
-    ]},
-    { title: 'Tenaga Kerja & Keuangan', fields: [
-      ['Pekerja Laki-laki', r.pekerja_laki],
-      ['Pekerja Perempuan', r.pekerja_perempuan],
-      ['Total Pekerja', r.pekerja_total],
-      ['Pendapatan Total', r.pendapatan_total ? 'Rp ' + Number(r.pendapatan_total).toLocaleString('id-ID') : ''],
-      ['Aset Total', r.aset_total ? 'Rp ' + Number(r.aset_total).toLocaleString('id-ID') : ''],
-    ]},
-    { title: 'Responden', fields: [
-      ['Nama Responden', r.responden_nama],
-      ['HP Responden', r.responden_hp],
-      ['Email Responden', r.responden_email],
-      ['Tanggal Pelaksanaan', r.tanggal_pelaksanaan],
+      ['Kecamatan', r.kecamatan],
+      ['Petugas', r.petugas_nama],
+      ['Catatan', 'Kuesioner L.UB telah di-retire; rincian penuh tidak ditampilkan.'],
     ]},
   ];
 }

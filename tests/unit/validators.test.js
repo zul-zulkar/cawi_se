@@ -1,7 +1,7 @@
 import { extractFrom } from '../helpers/load-source.js'
 
 const { isValidHP, isValidEmail, parseCurrency } =
-  extractFrom('js/form-lub/form.js', 'isValidHP', 'isValidEmail', 'parseCurrency')
+  extractFrom('js/shared/form-core.js', 'isValidHP', 'isValidEmail', 'parseCurrency')
 
 /* ─────────────── isValidHP() ─────────────── */
 describe('isValidHP()', () => {

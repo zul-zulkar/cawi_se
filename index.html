@@ -377,7 +377,6 @@
         <option value="">Semua Jenis</option>
         <option value="UNIFIED">P (Pemutakhiran)</option>
         <option value="L">L</option>
-        <option value="LUB">L.UB</option>
       </select>
       <div class="filter-actions">
         <button id="btnResetFilter" class="btn btn-ghost">Reset</button>
@@ -989,10 +988,9 @@
     var url;
     if (it.jenis === 'L') {
       url = 'kuesioner.html?mode=L&draft=' + encodeURIComponent(it.draft_key);
-    } else if (it.jenis === 'UNIFIED') {
-      url = 'kuesioner.html?mode=P&draft=' + encodeURIComponent(it.draft_key);
     } else {
-      url = 'kuesioner.html?mode=LUB&draft=' + encodeURIComponent(it.draft_key);
+      // UNIFIED (default). L.UB di-retire — legacy 'LUB' pun dibuka sebagai P.
+      url = 'kuesioner.html?mode=P&draft=' + encodeURIComponent(it.draft_key);
     }
     window.location.href = url;
   }
@@ -1030,9 +1028,8 @@
     var radios = document.getElementsByName('addJenis');
     for (var i = 0; i < radios.length; i++) if (radios[i].checked) jenis = radios[i].value;
     var label, ph;
-    if (jenis === 'L')        { label = 'Nama Kepala Keluarga';            ph = 'Nama lengkap kepala keluarga…'; }
-    else if (jenis === 'LUB') { label = 'Nama Usaha / Perusahaan';         ph = 'Nama usaha atau perusahaan…'; }
-    else                      { label = 'Nama Keluarga / Usaha / Bangunan'; ph = 'Nama keluarga, usaha, atau bangunan…'; }
+    if (jenis === 'L') { label = 'Nama Kepala Keluarga'; ph = 'Nama lengkap kepala keluarga…'; }
+    else               { label = 'Nama Keluarga / Usaha / Bangunan'; ph = 'Nama keluarga, usaha, atau bangunan…'; }
     $('addNamaRespLabel').textContent = label;
     $('addNamaResp').placeholder = ph;
   }

@@ -213,14 +213,15 @@ describe('createAssignment', () => {
     expect(a.draft_key).toBe('cawi_l_draft_' + a.id)
   })
 
-  it('draft_key untuk L.UB mengikuti pola cawi_draft_<id>', () => {
+  it('legacy jenis "LUB" dinormalisasi ke UNIFIED + draft_key cawi_u_draft_<id> (L.UB di-retire)', () => {
     const a = PM.createAssignment(validData({ jenis: 'LUB' }), activePPL)
-    expect(a.draft_key).toBe('cawi_draft_' + a.id)
+    expect(a.jenis).toBe('UNIFIED')
+    expect(a.draft_key).toBe('cawi_u_draft_' + a.id)
   })
 
-  it('normalisasi jenis selain "L" menjadi "LUB"', () => {
+  it('normalisasi jenis selain "L" menjadi "UNIFIED"', () => {
     const a = PM.createAssignment(validData({ jenis: 'LUB' }), activePPL)
-    expect(a.jenis).toBe('LUB')
+    expect(a.jenis).toBe('UNIFIED')
   })
 
   it('jenis UNIFIED → jenis "UNIFIED" + draft_key cawi_u_draft_<id>', () => {
@@ -240,9 +241,9 @@ describe('createAssignment', () => {
     expect(a.p_jenis_bangunan).toBeNull()
   })
 
-  it('jenis tak dikenal → default LUB (backward-compat)', () => {
+  it('jenis tak dikenal → default UNIFIED', () => {
     const a = PM.createAssignment(validData({ jenis: 'XYZ' }), activePPL)
-    expect(a.jenis).toBe('LUB')
+    expect(a.jenis).toBe('UNIFIED')
   })
 
   it('throw error saat field wajib kosong', () => {
@@ -409,10 +410,10 @@ describe('filterAssignments', () => {
     expect(out.map(x => x.id).sort()).toEqual(['1', '4'])
   })
 
-  it('filter by jenis LUB', () => {
-    const out = PM.filterAssignments(list, { jenis: 'LUB' }, activePML1, PPL_FIXTURES)
-    expect(out.length).toBe(1)
-    expect(out[0].id).toBe('2')
+  it('filter jenis "LUB" diabaikan (L.UB di-retire) → setara tanpa filter jenis', () => {
+    const withLub  = PM.filterAssignments(list, { jenis: 'LUB' }, activePML1, PPL_FIXTURES)
+    const noFilter = PM.filterAssignments(list, {}, activePML1, PPL_FIXTURES)
+    expect(withLub.map(x => x.id).sort()).toEqual(noFilter.map(x => x.id).sort())
   })
 
   it('filter by jenis UNIFIED (SE2026-P)', () => {

@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Inject identitas pendata (login) ke field hidden + auto-fill nama petugas
   injectPetugasIdentity();
 
-  // Apply current mode early (so form-l/form-lub visibility is correct)
+  // Apply current mode early (so form-l visibility is correct)
   if (typeof applyFormMode === 'function') applyFormMode(getFormMode());
 
   // Unified mode (SE2026-P): Blok P sebagai entri (di-set oleh guard via ?mode=P|UNIFIED)
@@ -105,22 +105,14 @@ document.addEventListener('DOMContentLoaded', () => {
       updateProgress();
     });
   });
-  // Signature canvas — update after each stroke
-  const sigEl = document.getElementById('sigCanvas');
-  if (sigEl) {
-    sigEl.addEventListener('mouseup', updateProgress);
-    sigEl.addEventListener('touchend', updateProgress);
-  }
   // Run once on load to reflect any pre-filled defaults
   updateProgress();
 
-  // === FORM MODE (legacy L / L.UB, non-unified) ===
-  // Pre-selector 2-gate (pemilih L vs L.UB) sudah dihapus: assignment baru memakai
-  // unified P; assignment legacy mendapat mode deterministik dari guard
-  // (?mode=L|LUB → FORM_MODE_KEY) lalu di-apply saat restore draft. Sebagai jaring
-  // pengaman, terapkan body-class mode untuk jalur legacy non-unified pada load.
+  // === FORM MODE (legacy L, non-unified) ===
+  // L.UB di-retire — satu-satunya mode legacy kini L. Untuk jalur non-unified,
+  // terapkan body-class mode-l pada load (unified diatur oleh form-p).
   if (!window.__cawiUnified && typeof applyFormMode === 'function') {
-    applyFormMode(typeof getFormMode === 'function' ? getFormMode() : 'lub');
+    applyFormMode();
   }
 
   // === EDIT MODE (dari daftar.html) ===
@@ -326,17 +318,11 @@ function showUsahaDetailScreen(idx) {
  * cabang) agar petugas tak salah mengisi. Dipanggil saat buka layar & saat nama
  * diketik (lewat listener input global di bawah). */
 function _setRosterOwnerTitle(type, idx) {
-  const titleId = type === 'ang' ? 'screen-ang-title'
-                : type === 'usaha' ? 'screen-usaha-title'
-                : 'screen-lkp-title';
+  const titleId = type === 'ang' ? 'screen-ang-title' : 'screen-usaha-title';
   const el = document.getElementById(titleId);
   if (!el) return;
-  const label = type === 'ang' ? ('Anggota #' + idx)
-              : type === 'usaha' ? ('Usaha #' + idx)
-              : ('Cabang/Unit #' + idx);
-  const nameId = type === 'ang' ? ('l_ang_' + idx + '_nama')
-               : type === 'usaha' ? 'l2_nama_usaha'
-               : ('lkp_' + idx + '_nama');
+  const label = type === 'ang' ? ('Anggota #' + idx) : ('Usaha #' + idx);
+  const nameId = type === 'ang' ? ('l_ang_' + idx + '_nama') : 'l2_nama_usaha';
   const nmEl = document.getElementById(nameId);
   let nm = (nmEl && nmEl.value ? String(nmEl.value) : '').trim();
   const esc = (s) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -352,7 +338,6 @@ document.addEventListener('input', function (ev) {
   if (!t || !t.id) return;
   const want = _activeScreen === 'ang' ? ('l_ang_' + _activeScreenIdx + '_nama')
              : _activeScreen === 'usaha' ? 'l2_nama_usaha'
-             : _activeScreen === 'lkp' ? ('lkp_' + _activeScreenIdx + '_nama')
              : null;
   if (want && t.id === want) _setRosterOwnerTitle(_activeScreen, _activeScreenIdx);
 });
@@ -372,11 +357,6 @@ function _stashActiveDetail() {
     if (typeof serializeCurrentUsahaForm === 'function') serializeCurrentUsahaForm(_activeScreenIdx);
     if (typeof renderUsahaRosterRow === 'function') renderUsahaRosterRow(_activeScreenIdx);
     if (typeof updateSidebarUsaha === 'function') updateSidebarUsaha();
-  } else if (_activeScreen === 'lkp') {
-    const card = document.getElementById('lkp_card_' + _activeScreenIdx);
-    const pool = document.getElementById('lkp-pool');
-    if (card && pool) pool.appendChild(card);
-    if (typeof renderLkpRosterRow === 'function') renderLkpRosterRow(_activeScreenIdx);
   }
 }
 
@@ -394,32 +374,11 @@ function exitUsahaDetail() {
   showMainScreen();
 }
 
-function showLkpDetailScreen(idx) {
-  _activeScreenIdx = idx;
-  // Pindahkan card cabang dari pool ke screen-lkp-body
-  const pool = document.getElementById('lkp-pool');
-  const body = document.getElementById('screen-lkp-body');
-  if (pool && body) {
-    const card = document.getElementById('lkp_card_' + idx);
-    if (card) body.appendChild(card);
-  }
-  _setRosterOwnerTitle('lkp', idx);
-  _showScreen('lkp');
-  _updateRosterNav();
-  history.pushState({ screen: 'lkp', idx }, '', '#lkp-' + idx);
-}
+/* showLkpDetailScreen/exitLkpDetail (layar detail cabang L.KP) DIHAPUS: subsistem L.UB di-retire. */
 
-function exitLkpDetail() {
-  _stashActiveDetail();
-  if (typeof updateProgress === 'function') updateProgress();
-  _saveDraftSilent();
-  showMainScreen();
-}
-
-// Jumlah entri roster per tipe layar (ang/usaha/lkp).
+// Jumlah entri roster per tipe layar (ang/usaha).
 function _rosterCount(type) {
   if (type === 'ang')   return (typeof _getAnggotaCount === 'function') ? _getAnggotaCount() : 0;
-  if (type === 'lkp')   return (typeof _getCabangCount === 'function') ? _getCabangCount() : 0;
   if (type === 'usaha') { const el = document.getElementById('l_usaha_count'); return el ? (parseInt(el.value) || 0) : 0; }
   return 0;
 }
@@ -429,14 +388,13 @@ function _rosterCount(type) {
 function navRosterDetail(delta) {
   if (_activeScreenIdx == null) return;
   const type = _activeScreen;
-  if (type !== 'ang' && type !== 'usaha' && type !== 'lkp') return;
+  if (type !== 'ang' && type !== 'usaha') return;
   const n = _rosterCount(type);
   const target = _activeScreenIdx + delta;
   if (target < 1 || target > n) return;
   _stashActiveDetail();
   if (type === 'ang')        showAngDetailScreen(target);
   else if (type === 'usaha') showUsahaDetailScreen(target);
-  else if (type === 'lkp')   showLkpDetailScreen(target);
   _saveDraftSilent();
 }
 
@@ -490,21 +448,16 @@ function _handleHashNav() {
   const hash = location.hash;
   const angM = hash.match(/^#ang-(\d+)$/);
   const usahaM = hash.match(/^#usaha-(\d+)$/);
-  const lkpM = hash.match(/^#lkp-(\d+)$/);
   if (angM) {
     const idx = parseInt(angM[1]);
     if (_activeScreen !== 'ang' || _activeScreenIdx !== idx) showAngDetailScreen(idx);
   } else if (usahaM) {
     const idx = parseInt(usahaM[1]);
     if (_activeScreen !== 'usaha' || _activeScreenIdx !== idx) showUsahaDetailScreen(idx);
-  } else if (lkpM) {
-    const idx = parseInt(lkpM[1]);
-    if (_activeScreen !== 'lkp' || _activeScreenIdx !== idx) showLkpDetailScreen(idx);
   } else {
     // Navigasi ke hash kosong = kembali ke main
     if (_activeScreen === 'ang')   exitAnggotaDetail();
     else if (_activeScreen === 'usaha') exitUsahaDetail();
-    else if (_activeScreen === 'lkp')   exitLkpDetail();
   }
 }
 window.addEventListener('popstate', _handleHashNav);
@@ -589,7 +542,7 @@ function _setSearchableDisplay(selectId) {
 
 async function applyAssignmentPrefill(a) {
   if (!a) return;
-  const mode = (typeof getFormMode === 'function') ? getFormMode() : 'lub';
+  const mode = (typeof getFormMode === 'function') ? getFormMode() : 'l';
 
   // Kalau wilayah di luar yang sudah ter-cache di regional.js, lazy-load
   // kamus wilayah Bali penuh dulu — supaya cascade dropdown bisa di-match.

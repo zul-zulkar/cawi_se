@@ -1,9 +1,7 @@
 /* ====== MODE-AWARE FORM CONTAINERS ====== */
 #form-l{display:none}
-body.mode-l #form-lub{display:none}
 body.mode-l #form-l{display:block}
 .sidebar-blok-group.sb-l{display:none}
-body.mode-l .sidebar-blok-group.sb-lub{display:none}
 body.mode-l .sidebar-blok-group.sb-l{display:block}
 
 /* ====== UNIFIED MODE (SE2026-P) — additif, aktif hanya bila body.mode-unified ====== */
@@ -11,11 +9,8 @@ body.mode-l .sidebar-blok-group.sb-l{display:block}
 .sidebar-blok-group.sb-p{display:none}
 body.mode-unified #form-p{display:block}
 body.mode-unified .sidebar-blok-group.sb-p{display:block}
-/* Default unified: kuesioner lanjutan tersembunyi sampai gate me-reveal.
-   L.UB dilebur ke Blok II usaha (form L) → #form-lub & sb-lub selalu disembunyikan. */
-body.mode-unified #form-lub{display:none}
+/* Default unified: kuesioner lanjutan (form L) tersembunyi sampai gate me-reveal. */
 body.mode-unified #form-l{display:none}
-body.mode-unified .sidebar-blok-group.sb-lub{display:none}
 body.mode-unified .sidebar-blok-group.sb-l{display:none}
 /* Sembunyikan label "NAVIGASI BLOK" generik di unified (sidebar P/L/L.KP sendiri) */
 body.mode-unified .sidebar-mode-row{display:none}

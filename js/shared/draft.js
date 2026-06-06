@@ -18,13 +18,10 @@ function saveDraft() {
     document.querySelectorAll('input[type=checkbox][id]').forEach(el => {
       vals['_c_' + el.id] = el.checked ? '1' : '0';
     });
-    if (typeof hasSig !== 'undefined' && hasSig) {
-      try { vals['_sig'] = canvas.toDataURL('image/png'); } catch(e) {}
-    }
     if (typeof l5HasSig !== 'undefined' && l5HasSig && typeof l5Canvas !== 'undefined' && l5Canvas) {
       try { vals['_sig_l'] = l5Canvas.toDataURL('image/png'); } catch(e) {}
     }
-    vals['_formMode'] = (typeof getFormMode === 'function') ? getFormMode() : 'lub';
+    vals['_formMode'] = (typeof getFormMode === 'function') ? getFormMode() : 'l';
     vals['_ts'] = new Date().toISOString();
     // Snapshot progress agar portal (index.html) bisa tampilkan % tanpa load form
     try {
@@ -64,11 +61,6 @@ function restoreDraft() {
       const inp = document.getElementById('l1_jml_kk_anggota');
       if (inp) { inp.value = vals['l1_jml_kk_anggota']; renderAnggotaCards(); }
     }
-    // L.UB mode: pastikan kartu cabang L.KP ada di pool sebelum isi field lkp_*
-    if (vals['_formMode'] !== 'l' && vals['q10b_jumlah'] && typeof _ensureLkpCard === 'function') {
-      const nCab = Math.min(parseInt(vals['q10b_jumlah']) || 0, 50);
-      for (let i = 1; i <= nCab; i++) _ensureLkpCard(i);
-    }
     // Restore inputs / selects / textareas
     Object.keys(vals).forEach(key => {
       if (key.startsWith('_r_')) {
@@ -94,13 +86,7 @@ function restoreDraft() {
         }
       }
     });
-    // Restore KBLI chip & kbliFilters untuk L.UB mode
-    const savedKode = vals['q9g_kbli_kode'];
-    if (savedKode && typeof kbliData !== 'undefined' && kbliData.length) {
-      const entry = kbliData.find(d => d.kode === savedKode);
-      if (entry && typeof selectKBLI === 'function') selectKBLI(entry);
-    }
-    // Restore KBLI chip & kbliFilters untuk L mode
+    // Restore KBLI chip & kbliFilters (form L)
     const savedKodeL = vals['l2_kbli_kode'];
     if (savedKodeL && typeof kbliData !== 'undefined' && kbliData.length) {
       const entryL = kbliData.find(d => d.kode === savedKodeL);
@@ -113,8 +99,7 @@ function restoreDraft() {
     // 2) Setelah CSV selesai dimuat, panggil lagi agar kode yg ADA di daftar Halal/BPOM
     //    ditampilkan kembali dengan benar (singleton load() mencegah double-fetch).
     (function() {
-      const restMode = vals['_formMode'] || 'lub';
-      const restKbli = restMode === 'l' ? savedKodeL : savedKode;
+      const restKbli = savedKodeL;
       if (restKbli && window.kbliFilters) {
         window.kbliFilters.apply(restKbli);                              // (1) langsung
         window.kbliFilters.load().then(function() {                      // (2) setelah load
@@ -131,20 +116,12 @@ function restoreDraft() {
       const opt = Array.from(sel.options).find(o => o.value === sel.value);
       if (opt) { inp.value = opt.text; inp.classList.add('has-value'); }
     });
-    // Restore L.UB signature
-    if (vals['_sig']) {
-      const img = new Image();
-      img.onload = () => { ctx.clearRect(0,0,canvas.width,canvas.height); ctx.drawImage(img,0,0); hasSig=true; updateProgress(); };
-      img.src = vals['_sig'];
-    }
     // Restore L mode signature
     if (vals['_sig_l'] && typeof l5Canvas !== 'undefined' && l5Canvas && typeof l5Ctx !== 'undefined' && l5Ctx) {
       const imgL = new Image();
       imgL.onload = () => { l5Ctx.clearRect(0,0,l5Canvas.width,l5Canvas.height); l5Ctx.drawImage(imgL,0,0); l5HasSig=true; updateProgress(); };
       imgL.src = vals['_sig_l'];
     }
-    const hint = document.getElementById('sig-hint');
-    if (hint && vals['_sig']) hint.textContent = 'Tanda tangan dimuat dari draft';
     const hintL = document.getElementById('l5_sig_hint');
     if (hintL && vals['_sig_l']) hintL.textContent = 'Tanda tangan dimuat dari draft';
     dismissRestore();
@@ -153,11 +130,6 @@ function restoreDraft() {
     if (typeof renderUsahaRoster   === 'function') renderUsahaRoster();
     // L mode: pastikan anggota #1 = Kepala Keluarga (skip bila draft sudah punya anggota)
     if (vals['_formMode'] === 'l' && typeof ensureKepalaKeluarga === 'function') ensureKepalaKeluarga();
-    // L.UB mode: tampilkan section L.KP (bila Kantor pusat) + render roster cabang
-    if (typeof renderLkpRoster === 'function') {
-      if (getRadio('q10a') === '2') { const lkp = document.getElementById('lkp_section'); if (lkp) lkp.classList.remove('hidden'); }
-      renderLkpRoster();
-    }
     updateProgress();
     const txt = document.getElementById('autosaveText');
     if (txt) txt.textContent = 'Draft dimuat';
@@ -198,13 +170,10 @@ function saveAsDraft() {
     document.querySelectorAll('input[type=checkbox][id]').forEach(el => {
       raw['_c_' + el.id] = el.checked ? '1' : '0';
     });
-    if (typeof hasSig !== 'undefined' && hasSig) {
-      try { raw['_sig'] = canvas.toDataURL('image/png'); } catch(e) {}
-    }
     if (typeof l5HasSig !== 'undefined' && l5HasSig && typeof l5Canvas !== 'undefined' && l5Canvas) {
       try { raw['_sig_l'] = l5Canvas.toDataURL('image/png'); } catch(e) {}
     }
-    const mode = (typeof getFormMode === 'function') ? getFormMode() : 'lub';
+    const mode = (typeof getFormMode === 'function') ? getFormMode() : 'l';
     raw['_formMode'] = mode;
     raw['_ts'] = new Date().toISOString();
     // Snapshot progress agar portal (index.html) bisa tampilkan % tanpa load form
@@ -219,8 +188,8 @@ function saveAsDraft() {
 
     const id = _currentDraftId || ('draft_' + Date.now());
     let draft;
-    if (mode === 'l') {
-      // L mode: summary uses Kepala Keluarga + Nama Usaha
+    {
+      // Ringkasan draft form L (Kepala Keluarga + Nama Usaha). L.UB di-retire.
       const kecInpL = document.getElementById('l1_alamat_kec_inp');
       // Count anggota with filled nama
       let jmlTerdata = 0;
@@ -247,22 +216,6 @@ function saveAsDraft() {
         nama_komersial:  raw['l1_nama_kk']     || '',
         _raw:            raw
       };
-    } else {
-      const kecInp = document.getElementById('q3_kecamatan_inp');
-      draft = {
-        _draftId:        id,
-        _ts:             raw['_ts'],
-        _isDraft:        true,
-        _formMode:       'lub',
-        nama_perusahaan: raw['q5a_nama_perusahaan'] || '',
-        nama_komersial:  raw['q5b_nama_komersial']  || '',
-        kecamatan:       kecInp ? kecInp.value.trim() : '',
-        kecamatan_kd:    raw['q3_kecamatan']         || '',
-        petugas_nama:    raw['p_nama']               || '',
-        kbli_kode:       raw['q9g_kbli_kode']        || '',
-        kbli_judul:      raw['q9g_kbli_search']      || '',
-        _raw:            raw
-      };
     }
 
     const list = getDraftList();
@@ -276,9 +229,7 @@ function saveAsDraft() {
     if (txt) txt.textContent = 'Draft tersimpan';
     const dot = document.getElementById('autosaveDot');
     if (dot) { dot.style.background = '#fc6c00'; setTimeout(() => { dot.style.background = 'rgba(255,255,255,.2)'; }, 3000); }
-    const toastLabel = (mode === 'l')
-      ? (draft.nama_kk || draft.nama_usaha || 'Draft Rumah Tangga')
-      : (draft.nama_perusahaan || 'Draft baru');
+    const toastLabel = draft.nama_kk || draft.nama_usaha || 'Draft Rumah Tangga';
     _showDraftToast(toastLabel);
     return true;
   } catch(e) {
