@@ -105,10 +105,40 @@ function _renderStageHint(stage) {
   el.classList.toggle('stage-hint-none', stage === 'none');
 }
 
+/* Cermin nilai radio Kode Penggunaan Bangunan → select tersembunyi #pmt_kode_bangunan
+ * supaya getVal('pmt_kode_bangunan') (gate/validasi/collect) tetap bekerja. */
+function _syncPmtKodeFromRadio() {
+  var r = document.querySelector('input[name="pmt_kode_bangunan_r"]:checked');
+  var sel = document.getElementById('pmt_kode_bangunan');
+  if (sel) sel.value = r ? r.value : '';
+}
+/* Sebaliknya: set radio dari nilai select (saat restore draft yang menyimpan select). */
+function _syncPmtRadioFromKode() {
+  var sel = document.getElementById('pmt_kode_bangunan');
+  var v = sel ? String(sel.value || '') : '';
+  if (!v) return;
+  var r = document.querySelector('input[name="pmt_kode_bangunan_r"][value="' + v + '"]');
+  if (r) r.checked = true;
+}
+
 /* Handler input field penentu — dipanggil dari oninput/onchange Blok P. */
-function handlePmtKodeBangunan() { refreshDynamicSidebar(); if (typeof scheduleAutosave === 'function') scheduleAutosave(); }
+function handlePmtKodeBangunan() { _syncPmtKodeFromRadio(); refreshDynamicSidebar(); if (typeof scheduleAutosave === 'function') scheduleAutosave(); }
 function handlePmtJmlUsaha()     { refreshDynamicSidebar(); if (typeof scheduleAutosave === 'function') scheduleAutosave(); }
 function handlePmtSkala()        { refreshDynamicSidebar(); if (typeof scheduleAutosave === 'function') scheduleAutosave(); }
+
+/* Jenis entitas: 1=Keluarga, 2=Bangunan lainnya. Toggle field khusus keluarga
+ * (.pmt-keluarga-only) via body class + sesuaikan label nama/keberadaan. */
+function handlePmtJenisEntitas() {
+  var r = document.querySelector('input[name="pmt_jenis_entitas"]:checked');
+  var v = r ? r.value : '';
+  var isBangunan = (v === '2');
+  document.body.classList.toggle('pmt-bangunan', isBangunan);
+  var namaLbl = document.getElementById('pmt_nama_label');
+  if (namaLbl) namaLbl.innerHTML = (isBangunan ? 'Nama Usaha / Bangunan' : 'Nama Kepala Keluarga') + ' <span class="req">*</span>';
+  var kebLbl = document.getElementById('pmt_keberadaan_label');
+  if (kebLbl) kebLbl.innerHTML = (isBangunan ? 'Keberadaan Bangunan' : 'Keberadaan Keluarga') + ' <span class="req">*</span>';
+  if (typeof scheduleAutosave === 'function') scheduleAutosave();
+}
 
 /* ---- Geotag Blok P (pmt_lat/lng/akurasi) ----
  * Ringan & self-contained (tidak menyentuh map.js milik L.UB).
@@ -117,19 +147,23 @@ function handlePmtSkala()        { refreshDynamicSidebar(); if (typeof scheduleA
 function ambilLokasiP() {
   var btn = document.getElementById('pmtLokasiBtn');
   var res = document.getElementById('pmtLokasiResult');
+  var txt = btn ? btn.querySelector('.geo-btn-text') : null;
   if (!navigator.geolocation) { if (res) res.textContent = 'GPS tidak didukung perangkat ini.'; return; }
   if (res) res.textContent = 'Mengambil lokasi…';
+  if (txt) txt.textContent = 'Mengambil…';
   navigator.geolocation.getCurrentPosition(function (pos) {
     var lat = pos.coords.latitude.toFixed(7);
     var lng = pos.coords.longitude.toFixed(7);
     var akr = Math.round(pos.coords.accuracy);
     _pSet('pmt_lat', lat); _pSet('pmt_lng', lng); _pSet('pmt_akurasi', akr);
-    if (res) res.innerHTML = '📍 ' + lat + ', ' + lng + ' <span class="lokasi-akurasi">(±' + akr + ' m)</span>';
-    if (btn) { btn.dataset.done = '1'; btn.style.background = '#276749'; }
+    if (res) { res.classList.add('done'); res.innerHTML = '📍 ' + lat + ', ' + lng + ' &nbsp;(±' + akr + ' m)'; }
+    if (btn) { btn.dataset.done = '1'; btn.classList.add('done'); }
+    if (txt) txt.textContent = 'Perbarui Lokasi ✓';
     if (typeof scheduleAutosave === 'function') scheduleAutosave();
     if (typeof updateProgress === 'function') updateProgress();
   }, function (err) {
-    if (res) res.textContent = 'Gagal mengambil lokasi: ' + (err && err.message ? err.message : 'tidak diketahui');
+    if (res) { res.classList.remove('done'); res.textContent = 'Gagal mengambil lokasi: ' + (err && err.message ? err.message : 'tidak diketahui'); }
+    if (txt) txt.textContent = 'Ambil Lokasi GPS';
   }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
 }
 
@@ -179,11 +213,67 @@ function goBlokP() {
   if (typeof closeSidebar === 'function') closeSidebar();
 }
 
+/* Isi tampilan Identitas Wilayah (readonly) dari assignment aktif.
+ * SLS & SubSLS ditampilkan terpisah agar lebih bersih. */
+function _fillPWilayah(a) {
+  a = a || (typeof window !== 'undefined' && window.__cawiActiveAssignment) || {};
+  var lbl = (typeof _wilLabel === 'function')
+    ? _wilLabel
+    : function (lv, full, nama) { return nama || '—'; };
+  var set = function (id, txt) { var el = document.getElementById(id); if (el) el.textContent = txt || '—'; };
+  set('pmt_w_prov', lbl('prov', a.provinsi_kd, a.provinsi));
+  set('pmt_w_kab',  lbl('kab',  a.kabupaten_kd, a.kabupaten));
+  set('pmt_w_kec',  lbl('kec',  a.kecamatan_kd, a.kecamatan));
+  set('pmt_w_desa', lbl('desa', a.desa_kd, a.desa));
+  var sls = a.sls_nama ? ('[' + (a.sls_kd || '----') + '] ' + a.sls_nama) : (a.sls_kd ? ('[' + a.sls_kd + ']') : '—');
+  set('pmt_w_sls', sls);
+  var sub = a.subsls_kd || '00';
+  set('pmt_w_subsls', sub === '00' ? '00 (SLS tidak terbagi)' : sub);
+}
+
+/* Prefill (readonly) nomor urut keluarga & bangunan TERBESAR yang sudah ada di
+ * SubSLS ini — referensi untuk pengisian nomor urut berikutnya. Sumber: getPRecords
+ * (GAS), difilter per kelurahan+SLS+SubSLS. Best-effort (gagal → biarkan kosong). */
+function _prefillNoUrutMax(a) {
+  a = a || (typeof window !== 'undefined' && window.__cawiActiveAssignment) || {};
+  var setMax = function (id, v) { var el = document.getElementById(id); if (el) el.value = (v > 0 ? String(v) : ''); };
+  var urlFn = (typeof getScriptUrl === 'function') ? getScriptUrl : null;
+  if (!urlFn) return;
+  try {
+    fetch(urlFn(), { method: 'POST', body: JSON.stringify({ action: 'getPRecords' }) })
+      .then(function (r) { return r.json(); })
+      .then(function (j) {
+        if (!j || j.status !== 'ok' || j.kind !== 'precords' || !Array.isArray(j.data)) return;
+        var maxKel = 0, maxBgn = 0;
+        j.data.forEach(function (rec) {
+          // Cocokkan SubSLS: kelurahan + SLS (+ subsls bila ada di record)
+          var sameDesa = !a.desa_kd || String(rec.kelurahan_kd || '') === String(a.desa_kd);
+          var sameSls  = !a.sls_kd  || String(rec.kode_sls || '') === String(a.sls_kd);
+          var sameSub  = (rec.pmt_subsls == null || a.subsls_kd == null) ? true
+                       : String(rec.pmt_subsls) === String(a.subsls_kd);
+          if (!(sameDesa && sameSls && sameSub)) return;
+          var k = parseInt(rec.pmt_no_kel, 10); if (!isNaN(k) && k > maxKel) maxKel = k;
+          var b = parseInt(rec.pmt_no_bgn, 10); if (!isNaN(b) && b > maxBgn) maxBgn = b;
+        });
+        setMax('pmt_no_kel_max', maxKel);
+        setMax('pmt_no_bgn_max', maxBgn);
+      })
+      .catch(function () {});
+  } catch (e) {}
+}
+
 /* ---- Init ---- */
 function initFormP() {
   if (!isUnifiedMode()) return;
+  _fillPWilayah();
+  // Restore: selaraskan radio kode bangunan & toggle jenis entitas dari draft.
+  _syncPmtRadioFromKode();
+  _syncPmtKodeFromRadio();
+  if (typeof handlePmtJenisEntitas === 'function') handlePmtJenisEntitas();
   // Hitung stage awal (mis. dari draft yang sudah berisi pmt_kode_bangunan).
   refreshDynamicSidebar();
+  // Prefill referensi nomor urut terbesar (async, best-effort).
+  _prefillNoUrutMax();
 }
 
 // Ekspor ke window (non-module; dipakai inline handler & init).
@@ -194,6 +284,8 @@ if (typeof window !== 'undefined') {
   window.handlePmtKodeBangunan = handlePmtKodeBangunan;
   window.handlePmtJmlUsaha    = handlePmtJmlUsaha;
   window.handlePmtSkala       = handlePmtSkala;
+  window.handlePmtJenisEntitas = handlePmtJenisEntitas;
+  window._fillPWilayah        = _fillPWilayah;
   window.ambilLokasiP         = ambilLokasiP;
   window.seedPrelistP         = seedPrelistP;
   window.initFormP            = initFormP;

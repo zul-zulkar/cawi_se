@@ -1042,7 +1042,12 @@ const P_HEADERS = [
   // Geotag (pindahan dari L.UB)
   "Latitude", "Longitude", "Akurasi (m)",
   // Tautan ke kuesioner lanjutan
-  "Jenis Lanjutan", "Record ID Lanjutan"
+  "Jenis Lanjutan", "Record ID Lanjutan",
+  // Tambahan restruktur SE2026-P (keluarga/bangunan) — di-append agar indeks lama stabil
+  "Jenis Entitas (1=Keluarga/2=Bangunan)",
+  "Nomor KK", "NIK Kepala Keluarga", "Nama Anggota Lainnya",
+  "No Urut Keluarga Terbesar (ref)", "No Urut Bangunan Terbesar (ref)",
+  "SubSLS"
 ];
 
 // Urutan HARUS sama persis dengan P_HEADERS
@@ -1064,7 +1069,11 @@ const P_FIELD_NAMES = [
   "pmt_jml_usaha", "pmt_idsbr",
   "pmt_jml_kk", "pmt_jml_menetap",
   "pmt_lat", "pmt_lng", "pmt_akurasi",
-  "jenis_lanjutan", "record_id_lanjutan"
+  "jenis_lanjutan", "record_id_lanjutan",
+  "pmt_jenis_entitas",
+  "pmt_nomor_kk", "pmt_nik", "pmt_nama_anggota",
+  "pmt_no_kel_max", "pmt_no_bgn_max",
+  "pmt_subsls"
 ];
 
 function buildRowP(d) {

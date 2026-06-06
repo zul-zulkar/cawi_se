@@ -50,10 +50,10 @@ describe('calcProgressP — penghitungan', () => {
     expect(geo.filled).toBe(base.filled + 1)
   })
 
-  it('keberadaan pindah/fiktif (2/3) mengurangi total (geotag tak dihitung)', () => {
+  it('keberadaan tidak ditemukan/meninggal/khusus (0/3/6) mengurangi total (geotag tak dihitung)', () => {
     const found = runP({ pmt_keberadaan: '1' })
-    const moved = runP({ pmt_keberadaan: '2' })
-    expect(found.total - moved.total).toBe(1)
+    const stop  = runP({ pmt_keberadaan: '0' })
+    expect(found.total - stop.total).toBe(1)
   })
 
   it('100% saat semua slot terisi', () => {

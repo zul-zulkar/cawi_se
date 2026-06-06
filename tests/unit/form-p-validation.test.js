@@ -21,11 +21,13 @@ function runP(fields = {}) {
   )
 }
 
-// Field minimal yang membuat Blok P valid (tanpa error)
+// Field minimal yang membuat Blok P valid (tanpa error).
+// keberadaan dibaca via getRadio()||getVal() → cukup di-set lewat getVal (fields).
 const VALID = {
   pmt_nama: 'Keluarga Wayan',
   pmt_keberadaan: '1',
   pmt_kode_bangunan: '3',
+  pmt_no_bgn: '7', pmt_no_kel: '12',
   pmt_lat: '-8.1', pmt_lng: '115.1',
 }
 
@@ -51,18 +53,28 @@ describe('collectAllProblemsP — field wajib', () => {
 })
 
 describe('collectAllProblemsP — geotag conditional', () => {
-  it('keberadaan=2 (pindah) → geotag TIDAK wajib', () => {
-    const r = runP({ pmt_nama: 'X', pmt_keberadaan: '2', pmt_kode_bangunan: '3' })
+  it('keberadaan=0 (tidak ditemukan) → geotag TIDAK wajib', () => {
+    const r = runP({ pmt_nama: 'X', pmt_keberadaan: '0', pmt_kode_bangunan: '3', pmt_no_bgn: '1', pmt_no_kel: '1' })
     expect(r.errors.some(e => e.field === 'pmt_lat')).toBe(false)
   })
 
-  it('keberadaan=3 (fiktif) → geotag TIDAK wajib', () => {
-    const r = runP({ pmt_nama: 'X', pmt_keberadaan: '3', pmt_kode_bangunan: '6' })
+  it('keberadaan=3 (meninggal) → geotag TIDAK wajib', () => {
+    const r = runP({ pmt_nama: 'X', pmt_keberadaan: '3', pmt_kode_bangunan: '3', pmt_no_bgn: '1', pmt_no_kel: '1' })
+    expect(r.errors.some(e => e.field === 'pmt_lat')).toBe(false)
+  })
+
+  it('keberadaan=6 (keluarga khusus) → geotag TIDAK wajib', () => {
+    const r = runP({ pmt_nama: 'X', pmt_keberadaan: '6', pmt_kode_bangunan: '8', pmt_no_bgn: '1', pmt_no_kel: '1' })
     expect(r.errors.some(e => e.field === 'pmt_lat')).toBe(false)
   })
 
   it('keberadaan=1 (ditemukan) tanpa koordinat → error geotag', () => {
-    const r = runP({ pmt_nama: 'X', pmt_keberadaan: '1', pmt_kode_bangunan: '3' })
+    const r = runP({ pmt_nama: 'X', pmt_keberadaan: '1', pmt_kode_bangunan: '3', pmt_no_bgn: '1', pmt_no_kel: '1' })
+    expect(r.errors.some(e => e.field === 'pmt_lat')).toBe(true)
+  })
+
+  it('keberadaan=2 (keluarga baru) tanpa koordinat → error geotag (wajib)', () => {
+    const r = runP({ pmt_nama: 'X', pmt_keberadaan: '2', pmt_kode_bangunan: '3', pmt_no_bgn: '1', pmt_no_kel: '1' })
     expect(r.errors.some(e => e.field === 'pmt_lat')).toBe(true)
   })
 })

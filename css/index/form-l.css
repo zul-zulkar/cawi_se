@@ -37,6 +37,32 @@ body.mode-unified.stage-usaha #blokL3{display:none}
 .pmt-stage-hint{margin-top:10px;padding:10px 12px;border-radius:8px;background:#ebf4ff;border:1px solid #bee3f8;color:#2b6cb0;font-size:12.5px;line-height:1.5}
 .pmt-stage-hint.stage-hint-none{background:#fff8e6;border-color:#fde68a;color:#b45309}
 
+/* ====== BLOK P (SE2026-P) — identitas wilayah, referensi, jenis entitas, geotag ====== */
+.pmt-wil-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px}
+.pmt-wil-item{display:flex;flex-direction:column;gap:1px;padding:8px 10px;background:#f7f9fc;border:1px solid #e8e3de;border-radius:8px}
+.pmt-wil-item.pmt-wil-sls{background:#ecfeff;border-color:#a5f3fc}
+.pmt-wil-label{font-size:10.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#9aa3b0}
+.pmt-wil-val{font-size:13px;font-weight:700;color:#1a2332}
+@media(max-width:560px){ .pmt-wil-grid{grid-template-columns:1fr} }
+
+.pmt-ref-box{background:#fffaf0;border:1px solid #fde68a;border-radius:8px;padding:10px 12px;margin-bottom:12px}
+.pmt-ref-title{font-size:11.5px;font-weight:800;letter-spacing:.3px;text-transform:uppercase;color:#b45309;margin-bottom:6px}
+
+/* Jenis entitas: sembunyikan field khusus keluarga saat "Bangunan lainnya" */
+body.pmt-bangunan .pmt-keluarga-only{display:none!important}
+
+/* Geotag panel — tombol besar mudah dijangkau */
+.geo-panel{display:flex;flex-direction:column;gap:10px}
+.geo-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;min-height:54px;padding:14px 18px;border:none;border-radius:12px;background:linear-gradient(135deg,#fc6c00,#e05600);color:#fff;font-family:inherit;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 8px 20px -6px rgba(252,108,0,.5);transition:transform .08s,box-shadow .15s,background .15s}
+.geo-btn:hover{box-shadow:0 10px 26px -6px rgba(252,108,0,.6)}
+.geo-btn:active{transform:translateY(1px)}
+.geo-btn.done{background:linear-gradient(135deg,#16a34a,#15803d);box-shadow:0 8px 20px -6px rgba(22,163,74,.5)}
+.geo-btn-icon{font-size:22px;line-height:1}
+.geo-result{font-size:13px;color:#4a5568;padding:10px 12px;background:#f7f9fc;border:1px solid #e8e3de;border-radius:8px;line-height:1.5;text-align:center}
+.geo-result.done{background:#f0fff4;border-color:#9ae6b4;color:#276749;font-weight:600}
+
+.visually-hidden{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
 /* Navigasi prev/next antar entri roster (layar detail anggota/usaha/cabang) */
 .roster-nav{align-items:center}
 .roster-nav-pos{font-size:12px;color:#888;font-weight:700;white-space:nowrap}

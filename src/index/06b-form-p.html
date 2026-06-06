@@ -1,7 +1,8 @@
 <!-- ==================== FORM P (Pemutakhiran / Listing SE2026-P) ==================== -->
-<!-- Tampil pertama di unified mode. Field penentu (pmt_kode_bangunan + pmt_skala)
-     me-reveal kuesioner lanjutan L / L.UB via PMT_GATE_RULES (js/form-p/form-p.js).
-     Container #form-p disembunyikan oleh CSS kecuali body.mode-unified. -->
+<!-- Struktur mengikuti materi SE2026-P: Blok Identitas Wilayah → Jenis Entitas
+     (Keluarga / Bangunan Lainnya) → Blok Keluarga → Keberadaan & Alamat →
+     Nomor Urut & Penggunaan Bangunan → Geotag. Field penentu pmt_kode_bangunan
+     me-reveal kuesioner lanjutan L (keluarga/usaha) via PMT_GATE_RULES. -->
 <div id="form-p">
 
 <div class="blok-panel active" id="blokP1">
@@ -9,151 +10,198 @@
   <div class="blok-banner">
     <div class="blok-badge">BLOK P</div>
     <div>
-      <div class="blok-title-text">Pemutakhiran Keluarga / Bangunan</div>
-      <div class="blok-title-sub">Listing SE2026-P — verifikasi keberadaan, geotag, lalu lanjut sesuai jenis bangunan</div>
+      <div class="blok-title-text">Pemutakhiran SE2026-P</div>
+      <div class="blok-title-sub">Identifikasi keluarga / bangunan per SLS — verifikasi, nomor urut, geotag</div>
     </div>
   </div>
 
-  <!-- Identitas entitas -->
+  <!-- ============ IDENTITAS WILAYAH (readonly, dari assignment) ============ -->
   <div class="section-card">
-    <div class="section-header" id="sec-P-identitas">Identitas Keluarga / Bangunan</div>
+    <div class="section-header" id="sec-P-wilayah">Identitas Wilayah</div>
+    <div class="section-body">
+      <div class="pmt-wil-grid">
+        <div class="pmt-wil-item"><span class="pmt-wil-label">Provinsi</span><span class="pmt-wil-val" id="pmt_w_prov">—</span></div>
+        <div class="pmt-wil-item"><span class="pmt-wil-label">Kabupaten/Kota</span><span class="pmt-wil-val" id="pmt_w_kab">—</span></div>
+        <div class="pmt-wil-item"><span class="pmt-wil-label">Kecamatan</span><span class="pmt-wil-val" id="pmt_w_kec">—</span></div>
+        <div class="pmt-wil-item"><span class="pmt-wil-label">Desa/Kelurahan</span><span class="pmt-wil-val" id="pmt_w_desa">—</span></div>
+        <div class="pmt-wil-item pmt-wil-sls"><span class="pmt-wil-label">SLS</span><span class="pmt-wil-val" id="pmt_w_sls">—</span></div>
+        <div class="pmt-wil-item pmt-wil-sls"><span class="pmt-wil-label">SubSLS</span><span class="pmt-wil-val" id="pmt_w_subsls">—</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ JENIS ENTITAS (penentu blok: keluarga vs bangunan lainnya) ============ -->
+  <div class="section-card">
+    <div class="section-header" id="sec-P-jenis">Jenis yang Didata</div>
+    <div class="section-body">
+      <div class="form-group">
+        <label class="field-label">Entitas yang didata pada bangunan ini <span class="req">*</span></label>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="pmt_jenis_entitas" value="1" onchange="handlePmtJenisEntitas()"/> <span>1. Keluarga (bangunan tempat tinggal / campuran)</span></label>
+          <label class="radio-item"><input type="radio" name="pmt_jenis_entitas" value="2" onchange="handlePmtJenisEntitas()"/> <span>2. Bangunan lainnya (bukan tempat tinggal — usaha/pemerintah/dll)</span></label>
+        </div>
+        <div class="hint">Menentukan isian berikutnya: keluarga mengisi data KK &amp; anggota; bangunan lainnya cukup data bangunan &amp; usaha.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ IDENTITAS KELUARGA (hanya bila jenis = Keluarga) ============ -->
+  <div class="section-card pmt-keluarga-only" id="sec-card-P-keluarga">
+    <div class="section-header" id="sec-P-keluarga">Identitas Keluarga</div>
     <div class="section-body">
       <div class="inline-fields">
         <div class="form-group">
-          <label class="field-label">No. Urut Keluarga</label>
-          <input type="number" id="pmt_no_kel" min="0" placeholder="mis. 12"/>
+          <label class="field-label">Nomor Kartu Keluarga (KK)</label>
+          <input type="text" id="pmt_nomor_kk" maxlength="16" placeholder="16 digit (atau 9999/8888/7777)"/>
+          <div class="hint">9999: tak dapat info · 8888: belum punya KK · 7777: tak punya KK 16 digit.</div>
         </div>
         <div class="form-group">
-          <label class="field-label">No. Urut Bangunan</label>
-          <input type="number" id="pmt_no_bgn" min="0" placeholder="mis. 7"/>
+          <label class="field-label">NIK Kepala Keluarga</label>
+          <input type="text" id="pmt_nik" maxlength="16" placeholder="16 digit (atau 9999/7777)"/>
         </div>
       </div>
       <div class="form-group">
-        <label class="field-label">Nama Kepala Keluarga / Usaha / Bangunan <span class="req">*</span></label>
+        <label class="field-label" id="pmt_nama_label">Nama Kepala Keluarga <span class="req">*</span></label>
         <input type="text" id="pmt_nama" placeholder="Nama yang terdaftar / ditemukan di lapangan"/>
       </div>
-      <div class="form-group">
-        <label class="field-label">IDSBR (bila usaha terdaftar)</label>
-        <input type="text" id="pmt_idsbr" placeholder="ID dari prelist SBR (opsional)"/>
+      <div class="form-group pmt-keluarga-only">
+        <label class="field-label">Nama Anggota Keluarga Lainnya (penanda)</label>
+        <input type="text" id="pmt_nama_anggota" placeholder="mis. nama pasangan/anggota untuk identifikasi"/>
       </div>
-      <div class="inline-fields">
+      <div class="inline-fields pmt-keluarga-only">
         <div class="form-group">
-          <label class="field-label">Alamat (Jalan)</label>
-          <input type="text" id="pmt_jalan" placeholder="Nama jalan / dusun"/>
-        </div>
-        <div class="form-group">
-          <label class="field-label">Blok / No.</label>
-          <input type="text" id="pmt_blok" placeholder="Blok / nomor"/>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Keberadaan & SLS -->
-  <div class="section-card">
-    <div class="section-header" id="sec-P-keberadaan">Keberadaan &amp; SLS</div>
-    <div class="section-body">
-      <div class="form-group">
-        <label class="field-label">Keberadaan keluarga/bangunan <span class="req">*</span></label>
-        <select id="pmt_keberadaan">
-          <option value="">— pilih —</option>
-          <option value="1">1. Ditemukan</option>
-          <option value="2">2. Pindah ke luar SLS</option>
-          <option value="3">3. Tidak ditemukan / fiktif</option>
-          <option value="4">4. Bangunan baru (belum terdaftar)</option>
-          <option value="5">5. Bergabung dengan keluarga lain</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label class="field-label">Alamat domisili sesuai KK?</label>
-        <select id="pmt_sesuai_kk">
-          <option value="">— pilih —</option>
-          <option value="1">1. Ya</option>
-          <option value="2">2. Tidak</option>
-        </select>
-      </div>
-      <div class="inline-fields">
-        <div class="form-group">
-          <label class="field-label">Ada perubahan SLS? (R108)</label>
-          <select id="pmt_sls_berubah">
-            <option value="">— pilih —</option>
-            <option value="1">1. Tidak berubah</option>
-            <option value="2">2. Berubah</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="field-label">Nama SLS / Non-SLS (R109)</label>
-          <input type="text" id="pmt_sls_nama" placeholder="Nama SLS bila berbeda"/>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Geotag -->
-  <div class="section-card">
-    <div class="section-header" id="sec-P-lokasi">Lokasi / Geotag <span class="req">*</span></div>
-    <div class="section-body">
-      <div class="form-group">
-        <label class="field-label">Koordinat GPS <span class="req">*</span></label>
-        <div class="lokasi-row">
-          <button type="button" id="pmtLokasiBtn" onclick="ambilLokasiP()"
-            onmouseover="this.style.background='#e06000'" onmouseout="this.style.background=this.dataset.done==='1'?'#276749':'#fc6c00'">
-            &#128205; Ambil Lokasi GPS
-          </button>
-          <div id="pmtLokasiResult" class="lokasi-result">Belum mengambil lokasi — tekan tombol untuk mulai.</div>
-        </div>
-        <input type="hidden" id="pmt_lat"/>
-        <input type="hidden" id="pmt_lng"/>
-        <input type="hidden" id="pmt_akurasi"/>
-        <div class="hint">Geotag per bangunan untuk verifikasi kunjungan lapangan. Pastikan GPS aktif.</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Penentu kuesioner lanjutan (GATE) -->
-  <div class="section-card">
-    <div class="section-header" id="sec-P-gate">Penggunaan Bangunan &amp; Usaha</div>
-    <div class="section-body">
-      <div class="form-group">
-        <label class="field-label">Kode Penggunaan Bangunan <span class="req">*</span></label>
-        <select id="pmt_kode_bangunan" oninput="handlePmtKodeBangunan()" onchange="handlePmtKodeBangunan()">
-          <option value="">— pilih —</option>
-          <option value="1">1. Khusus Tempat Usaha</option>
-          <option value="2">2. Campuran (tempat tinggal + usaha)</option>
-          <option value="3">3. Tempat Tinggal</option>
-          <option value="4">4. Tempat Ibadah / Organisasi</option>
-          <option value="5">5. Kantor Pemerintah &amp; Konsulat</option>
-          <option value="6">6. Tidak Dicakup</option>
-          <option value="7">7. Kantor Virtual (Virtual Office)</option>
-          <option value="8">8. Panti / Lapas / Asrama</option>
-        </select>
-        <div class="hint">Menentukan kuesioner lanjutan (L / L.UB) yang muncul di bawah.</div>
-      </div>
-      <div class="inline-fields">
-        <div class="form-group">
-          <label class="field-label">Skala Usaha</label>
-          <select id="pmt_skala" onchange="handlePmtSkala()">
-            <option value="">— pilih —</option>
-            <option value="umkm">UMKM (Mikro/Kecil/Menengah)</option>
-            <option value="ub">Usaha Besar (UB)</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label class="field-label">Jumlah Usaha</label>
-          <input type="number" id="pmt_jml_usaha" min="0" placeholder="0" oninput="handlePmtJmlUsaha()"/>
-        </div>
-      </div>
-      <div class="inline-fields">
-        <div class="form-group">
-          <label class="field-label">Jumlah Anggota (KK)</label>
+          <label class="field-label">Jumlah Anggota Keluarga (sesuai KK)</label>
           <input type="number" id="pmt_jml_kk" min="0" placeholder="0"/>
         </div>
         <div class="form-group">
-          <label class="field-label">Jumlah Anggota Menetap</label>
+          <label class="field-label">Jumlah Anggota Menetap (&ge; 1 tahun)</label>
           <input type="number" id="pmt_jml_menetap" min="0" placeholder="0"/>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- ============ KEBERADAAN & ALAMAT ============ -->
+  <div class="section-card">
+    <div class="section-header" id="sec-P-keberadaan">Keberadaan &amp; Alamat</div>
+    <div class="section-body">
+      <div class="form-group">
+        <label class="field-label" id="pmt_keberadaan_label">Keberadaan Keluarga <span class="req">*</span></label>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="pmt_keberadaan" value="1"/> <span>1. Ditemukan</span></label>
+          <label class="radio-item"><input type="radio" name="pmt_keberadaan" value="2"/> <span>2. Keluarga baru (belum di daftar)</span></label>
+          <label class="radio-item"><input type="radio" name="pmt_keberadaan" value="0"/> <span>0. Tidak ditemukan</span></label>
+          <label class="radio-item"><input type="radio" name="pmt_keberadaan" value="3"/> <span>3. Seluruh anggota meninggal</span></label>
+          <label class="radio-item pmt-keluarga-only"><input type="radio" name="pmt_keberadaan" value="4"/> <span>4. Tidak eligible (mis. ODGJ)</span></label>
+          <label class="radio-item pmt-keluarga-only"><input type="radio" name="pmt_keberadaan" value="5"/> <span>5. Tidak dapat ditemui sampai akhir</span></label>
+          <label class="radio-item pmt-keluarga-only"><input type="radio" name="pmt_keberadaan" value="6"/> <span>6. Keluarga khusus (panti/lapas/asrama)</span></label>
+        </div>
+        <div class="hint">Kode 0/3/6 → cukup sampai rincian ini. Kode 4/5 → isi sampai geotag + foto.</div>
+      </div>
+      <div class="form-group pmt-keluarga-only">
+        <label class="field-label">Alamat domisili sesuai KK?</label>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="pmt_sesuai_kk" value="1"/> <span>1. Ya, sesuai KK</span></label>
+          <label class="radio-item"><input type="radio" name="pmt_sesuai_kk" value="2"/> <span>2. Tidak sesuai KK</span></label>
+        </div>
+      </div>
+      <div class="inline-fields">
+        <div class="form-group">
+          <label class="field-label">Alamat — Nama Jalan/Gang</label>
+          <input type="text" id="pmt_jalan" placeholder="mis. Jl. Anggur / Kavling DKI"/>
+        </div>
+        <div class="form-group">
+          <label class="field-label">Alamat — Blok / Nomor</label>
+          <input type="text" id="pmt_blok" placeholder="mis. Blok A8 No. 19"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="field-label">Ada perubahan SLS? (R108)</label>
+        <div class="radio-group">
+          <label class="radio-item"><input type="radio" name="pmt_sls_berubah" value="1"/> <span>1. Tidak berubah</span></label>
+          <label class="radio-item"><input type="radio" name="pmt_sls_berubah" value="2"/> <span>2. Berubah</span></label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="field-label">Nama SLS / Non-SLS bila berubah (R109)</label>
+        <input type="text" id="pmt_sls_nama" placeholder="Isi bila SLS berubah"/>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ NOMOR URUT & PENGGUNAAN BANGUNAN ============ -->
+  <div class="section-card">
+    <div class="section-header" id="sec-P-urut">Nomor Urut &amp; Penggunaan Bangunan</div>
+    <div class="section-body">
+      <div class="pmt-ref-box">
+        <div class="pmt-ref-title">Referensi — terbesar saat ini di SubSLS ini</div>
+        <div class="inline-fields">
+          <div class="form-group">
+            <label class="field-label field-label-sm">No. Urut Keluarga Terbesar</label>
+            <input type="text" id="pmt_no_kel_max" class="input-muted" readonly placeholder="—"/>
+          </div>
+          <div class="form-group">
+            <label class="field-label field-label-sm">No. Urut Bangunan Terbesar</label>
+            <input type="text" id="pmt_no_bgn_max" class="input-muted" readonly placeholder="—"/>
+          </div>
+        </div>
+        <div class="hint">Otomatis dari data terkirim pada SubSLS ini. Nomor urut keluarga harus lebih besar dari nilai terbesar di atas.</div>
+      </div>
+      <div class="inline-fields">
+        <div class="form-group pmt-keluarga-only">
+          <label class="field-label">Nomor Urut Keluarga <span class="req">*</span></label>
+          <input type="number" id="pmt_no_kel" min="1" placeholder="mis. 12"/>
+        </div>
+        <div class="form-group">
+          <label class="field-label">Nomor Urut Bangunan <span class="req">*</span></label>
+          <input type="number" id="pmt_no_bgn" min="1" placeholder="mis. 7"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="field-label">Kode Penggunaan Bangunan <span class="req">*</span></label>
+        <div class="radio-group" id="pmt_kode_bangunan_group">
+          <label class="radio-item"><input type="radio" name="pmt_kode_bangunan_r" value="3" oninput="handlePmtKodeBangunan()" onchange="handlePmtKodeBangunan()"/> <span>3. Tempat Tinggal</span></label>
+          <label class="radio-item"><input type="radio" name="pmt_kode_bangunan_r" value="2" oninput="handlePmtKodeBangunan()" onchange="handlePmtKodeBangunan()"/> <span>2. Campuran (tinggal + usaha)</span></label>
+          <label class="radio-item"><input type="radio" name="pmt_kode_bangunan_r" value="1" oninput="handlePmtKodeBangunan()" onchange="handlePmtKodeBangunan()"/> <span>1. Khusus Tempat Usaha</span></label>
+          <label class="radio-item"><input type="radio" name="pmt_kode_bangunan_r" value="7" oninput="handlePmtKodeBangunan()" onchange="handlePmtKodeBangunan()"/> <span>7. Kantor Virtual (Virtual Office)</span></label>
+          <label class="radio-item"><input type="radio" name="pmt_kode_bangunan_r" value="4" oninput="handlePmtKodeBangunan()" onchange="handlePmtKodeBangunan()"/> <span>4. Tempat Ibadah / Organisasi</span></label>
+          <label class="radio-item"><input type="radio" name="pmt_kode_bangunan_r" value="5" oninput="handlePmtKodeBangunan()" onchange="handlePmtKodeBangunan()"/> <span>5. Kantor Pemerintah &amp; Konsulat</span></label>
+          <label class="radio-item"><input type="radio" name="pmt_kode_bangunan_r" value="8" oninput="handlePmtKodeBangunan()" onchange="handlePmtKodeBangunan()"/> <span>8. Panti / Lapas / Asrama</span></label>
+          <label class="radio-item"><input type="radio" name="pmt_kode_bangunan_r" value="6" oninput="handlePmtKodeBangunan()" onchange="handlePmtKodeBangunan()"/> <span>6. Tidak Dicakup</span></label>
+        </div>
+        <!-- Nilai gate dicerminkan ke select tersembunyi agar getVal('pmt_kode_bangunan') tetap bekerja -->
+        <select id="pmt_kode_bangunan" class="visually-hidden" tabindex="-1" aria-hidden="true">
+          <option value="">—</option>
+          <option value="1">1</option><option value="2">2</option><option value="3">3</option>
+          <option value="4">4</option><option value="5">5</option><option value="6">6</option>
+          <option value="7">7</option><option value="8">8</option>
+        </select>
+        <div class="hint">Menentukan kuesioner lanjutan: 2/3 → L keluarga+usaha · 1/7 → L usaha · 4/5/6/8 → cukup listing.</div>
+      </div>
+      <div class="form-group">
+        <label class="field-label">Jumlah Usaha pada Keluarga/Bangunan ini</label>
+        <input type="number" id="pmt_jml_usaha" min="0" placeholder="0" oninput="handlePmtJmlUsaha()"/>
+      </div>
+      <input type="hidden" id="pmt_idsbr"/>
       <div id="pmt_stage_hint" class="pmt-stage-hint">Pilih Kode Penggunaan Bangunan untuk menentukan kuesioner lanjutan.</div>
+    </div>
+  </div>
+
+  <!-- ============ GEOTAG ============ -->
+  <div class="section-card">
+    <div class="section-header" id="sec-P-lokasi">Geotag Bangunan <span class="req">*</span></div>
+    <div class="section-body">
+      <div class="geo-panel" id="pmtGeoPanel">
+        <button type="button" class="geo-btn" id="pmtLokasiBtn" onclick="ambilLokasiP()">
+          <span class="geo-btn-icon">&#128205;</span>
+          <span class="geo-btn-text">Ambil Lokasi GPS</span>
+        </button>
+        <div id="pmtLokasiResult" class="geo-result">Belum mengambil lokasi — tekan tombol untuk mulai.</div>
+      </div>
+      <input type="hidden" id="pmt_lat"/>
+      <input type="hidden" id="pmt_lng"/>
+      <input type="hidden" id="pmt_akurasi"/>
+      <div class="hint">Geotag per bangunan untuk verifikasi kunjungan lapangan. Pastikan GPS/lokasi perangkat aktif.</div>
     </div>
   </div>
 

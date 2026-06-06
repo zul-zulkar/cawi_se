@@ -496,23 +496,30 @@ function collectDataP() {
     petugas_email_login: getVal('petugas_email_login'),
     petugas_peran_login: getVal('petugas_peran_login'),
     petugas_nama: getVal('p_nama') || getVal('l5_petugas_nama') || (a.petugas_nama || ''),
-    // No urut + identitas entitas
+    // Jenis entitas (1=keluarga, 2=bangunan lainnya) + identitas
+    pmt_jenis_entitas: (typeof getRadio === 'function') ? getRadio('pmt_jenis_entitas') : '',
     pmt_no_kel: getVal('pmt_no_kel'),
     pmt_no_bgn: getVal('pmt_no_bgn'),
+    pmt_no_kel_max: getVal('pmt_no_kel_max'),
+    pmt_no_bgn_max: getVal('pmt_no_bgn_max'),
     pmt_nama: getVal('pmt_nama'),
+    pmt_nama_anggota: getVal('pmt_nama_anggota'),
+    pmt_nomor_kk: getVal('pmt_nomor_kk'),
+    pmt_nik: getVal('pmt_nik'),
     pmt_jalan: getVal('pmt_jalan'),
     pmt_blok: getVal('pmt_blok'),
-    // Wilayah dari assignment (scope SLS)
+    // Wilayah dari assignment (scope SLS) — SubSLS terpisah
     provinsi: a.provinsi || '', provinsi_kd: a.provinsi_kd || '',
     kabupaten: a.kabupaten || '', kabupaten_kd: a.kabupaten_kd || '',
     kecamatan: a.kecamatan || '', kecamatan_kd: a.kecamatan_kd || '',
     kelurahan: a.desa || '', kelurahan_kd: a.desa_kd || '',
     kode_sls: a.sls_full_kd || a.sls_kd || '', nama_sls: a.sls_nama || '',
-    // Pemutakhiran
-    pmt_sls_berubah: getVal('pmt_sls_berubah'),
+    pmt_subsls: a.subsls_kd || '',
+    // Pemutakhiran (field pilihan = radio → getRadio)
+    pmt_sls_berubah: (typeof getRadio === 'function') ? getRadio('pmt_sls_berubah') : '',
     pmt_sls_nama: getVal('pmt_sls_nama'),
-    pmt_keberadaan: getVal('pmt_keberadaan'),
-    pmt_sesuai_kk: getVal('pmt_sesuai_kk'),
+    pmt_keberadaan: (typeof getRadio === 'function') ? getRadio('pmt_keberadaan') : '',
+    pmt_sesuai_kk: (typeof getRadio === 'function') ? getRadio('pmt_sesuai_kk') : '',
     pmt_kode_bangunan: getVal('pmt_kode_bangunan'),
     pmt_skala: getVal('pmt_skala'),
     pmt_jml_usaha: getVal('pmt_jml_usaha'),
