@@ -1,4 +1,7 @@
 function goBlok(n) {
+  // Bila sedang di layar detail roster (anggota/usaha), pulang dulu ke layar
+  // utama (simpan entri aktif) supaya panel blok kembali terlihat.
+  if (typeof _returnToMainScreen === 'function') _returnToMainScreen();
   const mode = (typeof getFormMode === 'function') ? getFormMode() : 'l';
   const prefix = (mode === 'l') ? 'blokL' : 'blok';
   const tabPrefix = (mode === 'l') ? 'sidebarTabL' : 'sidebarTab';

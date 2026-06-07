@@ -166,7 +166,10 @@
       }
       // Gunakan origSetItem agar TIDAK kena proxy mirror
       origSetItem.call(localStorage, ASSIGNMENT_KEY, JSON.stringify(list));
-      origRemoveItem.call(localStorage, draftKey);
+      // JANGAN hapus draft_key per-assignment: dipertahankan sebagai snapshot
+      // hasil submit supaya assignment yang dibuka lagi ter-restore PENUH
+      // (bukan kosong). Hanya global key yang dibuang (di-rebuild dari draft_key
+      // saat reopen). Re-submit menimpa baris yang sama via cawi_id/record_id.
       origRemoveItem.call(localStorage, GLOBAL_DRAFT_KEY);
     } catch (e) {}
     setTimeout(backToPortal, 1500);

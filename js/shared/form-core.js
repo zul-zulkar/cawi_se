@@ -85,6 +85,20 @@ function goBlokAndScroll(blokNum, qId) {
   setTimeout(() => scrollToQuestion(qId), 280);
 }
 
+/* Klik header blok di sidebar: navigasi ke blok SEKALIGUS buka daftar
+ * pertanyaannya (termasuk grup roster anggota/usaha) agar petugas bisa langsung
+ * melihat & melompat ke pertanyaan / masuk ke roster. */
+function goBlokOpen(blokNum) {
+  goBlok(blokNum);
+  const mode = (typeof getFormMode === 'function') ? getFormMode() : 'l';
+  const list = document.getElementById((mode === 'l' ? 'sidebarQListL' : 'sidebarQList') + blokNum);
+  const btn  = document.getElementById((mode === 'l' ? 'sidebarExpandBtnL' : 'sidebarExpandBtn') + blokNum);
+  if (list && list.classList.contains('hidden')) {
+    list.classList.remove('hidden');
+    if (btn) btn.classList.add('open');
+  }
+}
+
 function scrollToId(id) {
   const el = document.getElementById(id);
   if (!el) return;

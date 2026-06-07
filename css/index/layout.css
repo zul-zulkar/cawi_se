@@ -128,12 +128,15 @@
 
 /* ====== RESPONSIVE ====== */
 @media(max-width:767px){
-  .sidebar{transform:translateX(-100%)}
+  .sidebar{transform:translateX(-100%);width:86vw;max-width:340px}
   .sidebar.open{transform:translateX(0)}
   .main-content{margin-left:0}
   .mobile-topbar{display:flex}
   .header-main{display:none}
   .restore-banner{left:0}
+  /* Daftar pertanyaan/roster di sidebar: beri ruang lebih tinggi di layar HP
+     supaya lebih banyak pertanyaan & entri roster terlihat tanpa scroll ganda. */
+  .sidebar-q-list{max-height:62vh}
 }
 @media(max-width:640px){
   .header-inner{flex-direction:column;text-align:center;gap:8px}

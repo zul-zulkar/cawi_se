@@ -245,6 +245,8 @@ function syncPIdentityToL() {
 
 /* Navigasi ke Blok P (panel #blokP1). Dipakai sidebar grup .sb-p. */
 function goBlokP() {
+  // Bila sedang di layar detail roster, pulang dulu ke layar utama (simpan entri).
+  if (typeof _returnToMainScreen === 'function') _returnToMainScreen();
   // Simpan dulu isian blok saat ini (persist ke draft assignment).
   try { if (typeof saveDraft === 'function') saveDraft(); } catch (e) {}
   var panels = document.querySelectorAll('.blok-panel');

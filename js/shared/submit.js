@@ -394,6 +394,14 @@ async function submitForm() {
     }
     _editRecordId = null;
     cancelEditMode();
+    // Snapshot final state ke draft per-assignment SEBELUM clear global. Saat
+    // assignment dibuka lagi (cek/edit hasil submit), guard (01b) memulihkan
+    // draft_key ini → form ter-restore PENUH, bukan kosong. clearDraft() hanya
+    // membuang global key (di-rebuild dari draft_key saat reopen); re-submit
+    // tetap menimpa baris yang sama via cawi_id/record_id.
+    if (window.__cawiActiveAssignment && typeof saveDraft === 'function') {
+      try { saveDraft(); } catch(_e) {}
+    }
     clearDraft();
     if (_currentDraftId) { deleteDraftById(_currentDraftId); }
     // Mark form clean so leave-guard / beforeunload don't prompt after submit

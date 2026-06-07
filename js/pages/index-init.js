@@ -268,7 +268,26 @@ function showMainScreen() {
   if (location.hash) history.pushState(null, '', location.pathname + location.search);
 }
 
+/* Pulang ke layar utama dari layar detail roster (anggota/usaha) SAMBIL menyimpan
+ * isian entri yang sedang dibuka. Dipanggil oleh navigasi sidebar (goBlok/goBlokP/
+ * goBlokAndScroll) supaya tombol blok tetap berfungsi & menampilkan pertanyaan
+ * meskipun petugas sedang berada di dalam roster. Return true bila berpindah. */
+function _returnToMainScreen() {
+  if (typeof _activeScreen === 'undefined' || _activeScreen === 'main') return false;
+  _stashActiveDetail();
+  if (typeof updateProgress === 'function') updateProgress();
+  _showScreen('main');
+  _activeScreenIdx = null;
+  if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+  return true;
+}
+
 function showAngDetailScreen(idx) {
+  // Simpan dulu entri yang sedang aktif (anggota/usaha lain) agar tak hilang
+  // saat berpindah langsung antar entri lewat sidebar.
+  if (typeof _activeScreen !== 'undefined' && _activeScreen !== 'main' && _activeScreenIdx != null) {
+    _stashActiveDetail();
+  }
   _activeScreenIdx = idx;
   // Pindahkan card dari pool ke screen-ang-body
   const pool = document.getElementById('anggota-pool');
@@ -284,6 +303,10 @@ function showAngDetailScreen(idx) {
 }
 
 function showUsahaDetailScreen(idx) {
+  // Simpan dulu entri yang sedang aktif (usaha/anggota lain) sebelum pindah.
+  if (typeof _activeScreen !== 'undefined' && _activeScreen !== 'main' && _activeScreenIdx != null) {
+    _stashActiveDetail();
+  }
   _activeScreenIdx = idx;
   // Load data usaha N ke form l2_* dulu, baru set judul (baca l2_nama_usaha terbaru)
   if (typeof loadUsahaIntoForm === 'function') loadUsahaIntoForm(idx);
