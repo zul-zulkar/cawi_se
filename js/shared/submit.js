@@ -304,7 +304,11 @@ async function submitUnified() {
     pd.record_id_lanjutan = (stageRecordId != null) ? String(stageRecordId) : '';
     const pRecordId = await _postData(pd);
 
-    // Sukses — bersihkan draft & beri tahu guard (status submitted + redirect)
+    // Sukses — snapshot final form ke draft per-assignment SEBELUM clear, supaya
+    // buka-lagi entri yang sudah disubmit me-restore PENUH (bukan autosave basi).
+    if (window.__cawiActiveAssignment && typeof saveDraft === 'function') {
+      try { saveDraft(); } catch (_e) {}
+    }
     clearDraft();
     if (_currentDraftId) { deleteDraftById(_currentDraftId); }
     if (typeof _formDirty !== 'undefined') _formDirty = false;

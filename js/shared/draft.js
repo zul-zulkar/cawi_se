@@ -21,10 +21,16 @@ function saveDraft() {
   try {
     _syncActiveRosterForms();
     const vals = {};
+    const _roIds = [];
     document.querySelectorAll('input[id]:not([type=radio]):not([type=checkbox]),textarea[id],select[id]').forEach(el => {
-      if (!el.id || el.readOnly) return;
+      if (!el.id) return;
+      // Field readonly/derived (umur, nama+NIK kepala keluarga terkunci, dll) tetap
+      // disimpan sebagai safety-net: kalau derivasi gagal saat restore, nilainya
+      // tak hilang. Ditandai di _ro agar restore boleh mengisinya langsung.
+      if (el.readOnly) { if (el.value) { vals[el.id] = el.value; _roIds.push(el.id); } return; }
       vals[el.id] = el.value;
     });
+    if (_roIds.length) vals['_ro'] = _roIds;
     document.querySelectorAll('input[type=radio]:checked').forEach(el => {
       vals['_r_' + el.name] = el.value;
     });
@@ -164,6 +170,18 @@ function restoreDraft() {
       }
     }
     if (typeof restoreFotoPreviews === 'function') restoreFotoPreviews();
+    // Safety-net: isi field readonly/derived dari snapshot HANYA bila derivasi
+    // (sync identitas, hitung umur, dll) belum mengisinya. Set langsung tanpa
+    // memicu event agar tak ter-clear oleh handler.
+    if (Array.isArray(vals['_ro'])) {
+      vals['_ro'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el && (el.value == null || el.value === '') && vals[id] != null && vals[id] !== '') {
+          el.value = vals[id];
+          el.classList.add('has-value');
+        }
+      });
+    }
     updateProgress();
     const txt = document.getElementById('autosaveText');
     if (txt) txt.textContent = 'Draft dimuat';
@@ -192,10 +210,13 @@ function saveAsDraft() {
     // Sync usaha yang sedang aktif di form ke store sebelum serialize
     _syncActiveRosterForms();
     const raw = {};
+    const _roIds = [];
     document.querySelectorAll('input[id]:not([type=radio]):not([type=checkbox]),textarea[id],select[id]').forEach(el => {
-      if (!el.id || el.readOnly) return;
+      if (!el.id) return;
+      if (el.readOnly) { if (el.value) { raw[el.id] = el.value; _roIds.push(el.id); } return; }
       raw[el.id] = el.value;
     });
+    if (_roIds.length) raw['_ro'] = _roIds;
     document.querySelectorAll('input[type=radio]:checked').forEach(el => {
       raw['_r_' + el.name] = el.value;
     });
