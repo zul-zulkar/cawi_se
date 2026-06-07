@@ -163,6 +163,7 @@ function restoreDraft() {
         }
       }
     }
+    if (typeof restoreFotoPreviews === 'function') restoreFotoPreviews();
     updateProgress();
     const txt = document.getElementById('autosaveText');
     if (txt) txt.textContent = 'Draft dimuat';

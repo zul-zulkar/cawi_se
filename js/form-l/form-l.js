@@ -265,6 +265,46 @@ function _lockKKMemberFields() {
   });
 }
 
+/* ---- Foto Rumah (Blok III R19): kompres di klien → simpan data URL di hidden field ----
+ * File input tak bisa dipulihkan dari draft, jadi hasil kompresi disimpan di hidden
+ * (#<hiddenId>) yang ikut draft. Saat submit, GAS meng-upload base64 ini ke Drive. */
+function handleFotoChange(input, hiddenId, previewId) {
+  var file = input && input.files && input.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function (e) {
+    var img = new Image();
+    img.onload = function () {
+      var maxDim = 1280;
+      var w = img.width, h = img.height;
+      if (w > h && w > maxDim) { h = Math.round(h * maxDim / w); w = maxDim; }
+      else if (h >= w && h > maxDim) { w = Math.round(w * maxDim / h); h = maxDim; }
+      var canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      var dataUrl = canvas.toDataURL('image/jpeg', 0.6);
+      var hidden = document.getElementById(hiddenId);
+      if (hidden) hidden.value = dataUrl;
+      var prev = document.getElementById(previewId);
+      if (prev) { prev.src = dataUrl; prev.style.display = 'block'; }
+      if (typeof updateProgress === 'function') updateProgress();
+      if (typeof saveDraft === 'function') saveDraft(); // persist foto segera
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+/* Pulihkan pratinjau foto dari hidden field (data URL) setelah draft di-restore. */
+function restoreFotoPreviews() {
+  [['l3_foto_depan_data', 'l3_foto_depan_prev'],
+   ['l3_foto_ruang_tamu_data', 'l3_foto_ruang_tamu_prev']].forEach(function (pair) {
+    var hidden = document.getElementById(pair[0]);
+    var prev = document.getElementById(pair[1]);
+    if (hidden && prev && hidden.value) { prev.src = hidden.value; prev.style.display = 'block'; }
+  });
+}
+
 function initAnggotaSearchable(i) {
   if (typeof makeSearchable !== 'function') return;
   makeSearchable(`l_ang_${i}_hubungan`, 'hubungan keluarga');

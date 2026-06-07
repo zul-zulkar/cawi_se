@@ -1926,15 +1926,19 @@
   <div class="section-card">
     <div class="section-header" id="sec-L3-19">19. Foto Rumah</div>
     <div class="section-body">
-      <div class="hint">Unggah 2 foto: (a) tampak depan — atap &amp; dinding terlihat, (b) ruang tamu — dinding &amp; lantai terlihat.</div>
+      <div class="hint">Unggah 2 foto: (a) tampak depan — atap &amp; dinding terlihat, (b) ruang tamu — dinding &amp; lantai terlihat. Foto otomatis dikompres lalu disimpan ke Google Drive.</div>
       <div class="inline-fields">
         <div class="form-group">
           <label class="field-label">a. Foto tampak depan</label>
-          <input type="file" id="l3_foto_depan" accept="image/*"/>
+          <input type="file" id="l3_foto_depan" accept="image/*" capture="environment" onchange="handleFotoChange(this,'l3_foto_depan_data','l3_foto_depan_prev')"/>
+          <input type="hidden" id="l3_foto_depan_data"/>
+          <img id="l3_foto_depan_prev" class="foto-preview" alt="Pratinjau foto depan" style="display:none"/>
         </div>
         <div class="form-group">
           <label class="field-label">b. Foto ruang tamu</label>
-          <input type="file" id="l3_foto_ruang_tamu" accept="image/*"/>
+          <input type="file" id="l3_foto_ruang_tamu" accept="image/*" capture="environment" onchange="handleFotoChange(this,'l3_foto_ruang_tamu_data','l3_foto_ruang_tamu_prev')"/>
+          <input type="hidden" id="l3_foto_ruang_tamu_data"/>
+          <img id="l3_foto_ruang_tamu_prev" class="foto-preview" alt="Pratinjau foto ruang tamu" style="display:none"/>
         </div>
       </div>
     </div>

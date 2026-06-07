@@ -19,6 +19,7 @@ const CONFIG_SHEET_NAME = "CAWI_Config";
 // L MODE (Rumah Tangga / SE2026-L) — sheet baru, dibuat otomatis bila belum ada
 const L_SHEET_NAME       = "SE2026_L_Responses";
 const L_ANGGOTA_SHEET    = "SE2026_L_Anggota";
+const L_USAHA_SHEET      = "SE2026_L_Usaha";   // sheet rinci per-usaha (pecahan usaha_data JSON)
 
 // P MODE (Pemutakhiran / listing SE2026-P) — sheet baru, dibuat otomatis bila belum ada
 const P_SHEET_NAME       = "SE2026_P_Responses";
@@ -396,7 +397,9 @@ const L_HEADERS = [
   "Tanggal Pelaksanaan",
   "Tanda Tangan (base64)",
   "CAWI ID",
-  "Petugas Email (login)", "Petugas Peran (login)"
+  "Petugas Email (login)", "Petugas Peran (login)",
+  // Foto Rumah (Blok III R19) — URL Google Drive (di-upload dari base64 terkompres)
+  "Foto Depan (URL)", "Foto Ruang Tamu (URL)"
 ];
 
 // Urutan HARUS sama persis dengan L_HEADERS — dipakai untuk parse balik di getRecordsResponse
@@ -442,7 +445,8 @@ const L_FIELD_NAMES = [
   "tanggal_pelaksanaan",
   "tanda_tangan",
   "cawi_id",
-  "petugas_email_login", "petugas_peran_login"
+  "petugas_email_login", "petugas_peran_login",
+  "foto_depan", "foto_ruang_tamu"
 ];
 
 function buildRowL(d) {
@@ -538,6 +542,94 @@ function deleteLAnggota(mainSheet, mainId) {
   }
 }
 
+/* ====== FOTO RUMAH → Google Drive ======
+ * Frontend mengirim foto sebagai data URL JPEG terkompres. Di sini di-upload ke
+ * folder Drive lalu kolom sheet diisi URL-nya (bukan base64). Idempotent: bila
+ * nilai sudah berupa URL (edit ulang), dikembalikan apa adanya. */
+function _uploadFotoToDrive(dataUrl, namePrefix, kkName) {
+  if (!dataUrl || String(dataUrl).indexOf('data:') !== 0) return dataUrl || '';
+  try {
+    var m = String(dataUrl).match(/^data:([^;]+);base64,(.*)$/);
+    if (!m) return '';
+    var folder = getOrCreateFolder('CAWI_SE2026_Foto_Rumah');
+    var blob = Utilities.newBlob(Utilities.base64Decode(m[2]), m[1],
+      namePrefix + '_' + (kkName || 'KK') + '_' + Date.now() + '.jpg');
+    var file = folder.createFile(blob);
+    try { file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW); } catch (e) {}
+    return file.getUrl();
+  } catch (e) { return ''; }
+}
+
+// Ganti d.foto_* (base64) → URL Drive SEBELUM buildRowL menulisnya ke sheet.
+function _processFotoL(d) {
+  if (d.foto_depan)      d.foto_depan      = _uploadFotoToDrive(d.foto_depan, 'depan', d.nama_kk);
+  if (d.foto_ruang_tamu) d.foto_ruang_tamu = _uploadFotoToDrive(d.foto_ruang_tamu, 'ruangtamu', d.nama_kk);
+}
+
+/* ====== SHEET RINCI PER-USAHA (pecahan usaha_data JSON) ====== */
+const L_USAHA_HEADERS = [
+  "Record ID", "Timestamp", "Nama KK", "No Usaha",
+  "Nama Usaha", "Nama Komersial", "Alamat", "RT", "RW", "Kode Pos", "Email", "Website", "HP",
+  "Kawasan", "Nama Kawasan", "Jenis Usaha", "Lokasi Alamat", "Lokasi Provinsi", "Lokasi Kab",
+  "Punya NIB", "NIB", "Badan Usaha",
+  "Pengusaha Nama", "Pengusaha JK", "Pengusaha Umur", "Pengusaha NIK",
+  "Kegiatan Utama", "Input", "Proses", "Produk Utama", "KBLI Kode", "KBLI Kategori",
+  "Jaringan", "Jumlah Cabang",
+  "Internet", "Teknologi Digital", "Ramah Lingkungan", "Produk Kreatif",
+  "Sertifikat Halal", "Izin BPOM", "Mitra KDKMP", "Program MBG",
+  "Pekerja Laki", "Pekerja Perempuan", "Pekerja Dibayar", "Pekerja Tidak Dibayar", "Tahun Operasi",
+  "Data Lengkap (JSON)"
+];
+
+function getOrInitLUsahaSheet(ss) {
+  var sheet = ss.getSheetByName(L_USAHA_SHEET);
+  if (!sheet) {
+    sheet = ss.insertSheet(L_USAHA_SHEET);
+    sheet.appendRow(L_USAHA_HEADERS);
+    sheet.getRange(1, 1, 1, L_USAHA_HEADERS.length)
+      .setFontWeight("bold").setBackground("#2b6cb0").setFontColor("#ffffff");
+    sheet.setFrozenRows(1);
+  }
+  return sheet;
+}
+
+// Pecah usaha_data JSON jadi satu baris per usaha (kolom terbaca + JSON lengkap).
+function saveLUsaha(mainSheet, mainId, d) {
+  if (!d.usaha_data) return;
+  var arr;
+  try { arr = JSON.parse(d.usaha_data); } catch (e) { return; }
+  if (!arr || !arr.length) return;
+  var sheet = getOrInitLUsahaSheet(mainSheet.getParent());
+  arr.forEach(function (u, i) {
+    u = u || {};
+    var g = function (k) { return (u[k] == null) ? '' : u[k]; };           // text/select
+    var r = function (k) { return (u['_r_' + k] == null) ? '' : u['_r_' + k]; }; // radio
+    sheet.appendRow([
+      mainId, d.timestamp || '', d.nama_kk || '', i + 1,
+      g('l2_nama_usaha'), g('l2_nama_komersial'), g('l2_alamat'), g('l2_rt'), g('l2_rw'), g('l2_kodepos'), g('l2_email'), g('l2_website'), g('l2_hp'),
+      r('l2_kawasan'), g('l2_nama_kawasan'), r('l2_jenis_usaha'), g('l2_lokasi_alamat'), g('l2_lokasi_provinsi'), g('l2_lokasi_kab'),
+      r('l2_punya_nib'), g('l2_nib'), r('l2_badan_usaha'),
+      g('l2_pengusaha_nama'), r('l2_pengusaha_jk'), g('l2_pengusaha_umur'), g('l2_pengusaha_nik'),
+      g('l2_kegiatan_utama'), g('l2_input'), g('l2_proses'), g('l2_produk_utama'), g('l2_kbli_kode'), g('l2_kbli_kategori'),
+      r('l2_jaringan'), g('l2_jml_cabang'),
+      r('l2_internet'), r('l2_teknologi'), r('l2_ramah_a'), r('l2_kreatif'),
+      r('l2_halal'), r('l2_bpom'), r('l2_mitra_kdkmp'), r('l2_mbg'),
+      g('l2_pekerja_l'), g('l2_pekerja_p'), g('l2_pekerja_dibayar'), g('l2_pekerja_tidak_dibayar'), g('l2_tahun_operasi'),
+      JSON.stringify(u)
+    ]);
+  });
+}
+
+function deleteLUsaha(mainSheet, mainId) {
+  var sheet = mainSheet.getParent().getSheetByName(L_USAHA_SHEET);
+  if (!sheet || sheet.getLastRow() <= 1) return;
+  var lastRow = sheet.getLastRow();
+  var ids = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+  for (var i = ids.length - 1; i >= 0; i--) {
+    if (String(ids[i][0]) === String(mainId)) sheet.deleteRow(i + 2);
+  }
+}
+
 // Simpan TTD L mode ke folder Drive berbeda (opsional, pola sama dgn L.UB)
 function saveTandaTanganL(d) {
   if (!d.tanda_tangan || d.tanda_tangan.length < 100) return;
@@ -553,10 +645,12 @@ function insertLRecord(d) {
   var ss = SpreadsheetApp.openById(SHEET_ID);
   var sheet = getOrInitLSheet(ss);
   ensureCawiIdColumn(sheet);
+  _processFotoL(d); // foto base64 → URL Drive sebelum ditulis
   sheet.appendRow(buildRowL(d));
   var newId = sheet.getLastRow() - 1;
   applyTextFormatL(sheet, sheet.getLastRow(), d); // jaga angka nol di depan (HP, NIK, dll)
   saveLAnggota(sheet, newId, d);
+  saveLUsaha(sheet, newId, d);
   if (d.tanda_tangan && d.tanda_tangan.length > 100) {
     try { saveTandaTanganL(d); } catch(e) { Logger.log("Gagal simpan TTD L: " + e.message); }
   }
@@ -572,10 +666,13 @@ function updateLRecord(d, editId) {
   if (targetRow < 2 || targetRow > sheet.getLastRow()) {
     return jsonResponse({ status: "error", message: "Rekaman L tidak ditemukan (id=" + editId + ")" });
   }
+  _processFotoL(d); // foto base64 → URL Drive sebelum ditulis
   sheet.getRange(targetRow, 1, 1, L_HEADERS.length).setValues([buildRowL(d)]);
   applyTextFormatL(sheet, targetRow, d); // jaga angka nol di depan (HP, NIK, dll)
   deleteLAnggota(sheet, editId);
   saveLAnggota(sheet, editId, d);
+  deleteLUsaha(sheet, editId);
+  saveLUsaha(sheet, editId, d);
   if (d.tanda_tangan && d.tanda_tangan.length > 100) {
     try { saveTandaTanganL(d); } catch(e) { Logger.log("Gagal simpan TTD L: " + e.message); }
   }
@@ -592,6 +689,7 @@ function deleteLRecord(deleteId) {
     return jsonResponse({ status: "error", message: "Rekaman L tidak ditemukan (id=" + deleteId + ")" });
   }
   deleteLAnggota(sheet, deleteId);
+  deleteLUsaha(sheet, deleteId);
   sheet.deleteRow(targetRow);
   return jsonResponse({ status: "ok", message: "Rekaman L berhasil dihapus", mode: "l" });
 }

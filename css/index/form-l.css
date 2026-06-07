@@ -30,6 +30,9 @@ body.mode-unified.stage-usaha #blokL3{display:none}
    Blok P → disembunyikan di Blok L1 (diisi otomatis via syncPIdentityToL). */
 body.mode-unified .dup-of-p{display:none !important}
 
+/* Pratinjau Foto Rumah (Blok III R19) */
+.foto-preview{margin-top:8px;max-width:100%;max-height:180px;border-radius:8px;border:1px solid #e8e3de;object-fit:cover;display:block}
+
 /* Petunjuk lanjutan di Blok P */
 .pmt-stage-hint{margin-top:10px;padding:10px 12px;border-radius:8px;background:#ebf4ff;border:1px solid #bee3f8;color:#2b6cb0;font-size:12.5px;line-height:1.5}
 .pmt-stage-hint.stage-hint-none{background:#fff8e6;border-color:#fde68a;color:#b45309}

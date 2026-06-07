@@ -151,6 +151,9 @@ function collectDataL() {
     aset_tanah_nilai:  parseCurrency(getVal('l3_aset_tanah_nilai')),
     aset_rumah:        getVal('l3_aset_rumah'),
     aset_rumah_nilai:  parseCurrency(getVal('l3_aset_rumah_nilai')),
+    // Foto Rumah (R19) — data URL JPEG terkompres; GAS upload ke Drive → URL
+    foto_depan:        getVal('l3_foto_depan_data'),
+    foto_ruang_tamu:   getVal('l3_foto_ruang_tamu_data'),
     // === BLOK IV: Catatan ===
     catatan_pendata:   getVal('l4_catatan'),
     // === BLOK V: Responden ===
