@@ -77,41 +77,52 @@ function restoreDraft() {
       if (typeof applyFormMode === 'function') applyFormMode(vals['_formMode']);
     }
     // L mode: ensure anggota cards rendered before populating per-anggota fields
-    if (vals['_formMode'] === 'l' && vals['l1_jml_kk_anggota'] && typeof renderAnggotaCards === 'function') {
-      const inp = document.getElementById('l1_jml_kk_anggota');
-      if (inp) { inp.value = vals['l1_jml_kk_anggota']; renderAnggotaCards(); }
-    }
-    // Restore inputs / selects / textareas
+    try {
+      if (vals['_formMode'] === 'l' && vals['l1_jml_kk_anggota'] && typeof renderAnggotaCards === 'function') {
+        const inp = document.getElementById('l1_jml_kk_anggota');
+        if (inp) { inp.value = vals['l1_jml_kk_anggota']; renderAnggotaCards(); }
+      }
+    } catch (e) { console.error('restore render anggota gagal:', e); }
+    // Restore inputs / selects / textareas.
+    // PENTING: tiap field dibungkus try/catch sendiri. Handler change/input
+    // sebuah field (mis. updateProgress→calcProgressL pada form yang masih
+    // setengah terbangun) bisa melempar exception; tanpa isolasi ini, satu
+    // field gagal akan MENGGUGURKAN restore SELURUH field sesudahnya (gejala:
+    // hanya Blok P awal yang ke-restore, sisanya kosong).
     Object.keys(vals).forEach(key => {
-      if (key.startsWith('_r_')) {
-        const name = key.slice(3);
-        const radio = document.querySelector(`input[name="${name}"][value="${vals[key]}"]`);
-        if (radio) { radio.checked = true; radio.dispatchEvent(new Event('change', {bubbles:true})); }
-      } else if (key.startsWith('_c_')) {
-        const id = key.slice(3);
-        const cb = document.getElementById(id);
-        if (cb && cb.type === 'checkbox') cb.checked = (vals[key] === '1');
-      } else if (!key.startsWith('_')) {
-        const el = document.getElementById(key);
-        if (el && !el.readOnly && !el.disabled) {
-          el.value = vals[key];
-          el.dispatchEvent(new Event('input', {bubbles:true}));
-          el.dispatchEvent(new Event('change', {bubbles:true}));
-        } else if (!el && vals[key]) {
-          // Backward-compat: key may belong to a radio group (e.g. field converted from select→radio)
-          if (!document.querySelector(`input[type=radio][name="${key}"]:checked`)) {
-            const radio = document.querySelector(`input[type=radio][name="${key}"][value="${vals[key]}"]`);
-            if (radio) { radio.checked = true; radio.dispatchEvent(new Event('change', {bubbles:true})); }
+      try {
+        if (key.startsWith('_r_')) {
+          const name = key.slice(3);
+          const radio = document.querySelector(`input[name="${name}"][value="${vals[key]}"]`);
+          if (radio) { radio.checked = true; radio.dispatchEvent(new Event('change', {bubbles:true})); }
+        } else if (key.startsWith('_c_')) {
+          const id = key.slice(3);
+          const cb = document.getElementById(id);
+          if (cb && cb.type === 'checkbox') cb.checked = (vals[key] === '1');
+        } else if (!key.startsWith('_')) {
+          const el = document.getElementById(key);
+          if (el && !el.readOnly && !el.disabled) {
+            el.value = vals[key];
+            el.dispatchEvent(new Event('input', {bubbles:true}));
+            el.dispatchEvent(new Event('change', {bubbles:true}));
+          } else if (!el && vals[key]) {
+            // Backward-compat: key may belong to a radio group (e.g. field converted from select→radio)
+            if (!document.querySelector(`input[type=radio][name="${key}"]:checked`)) {
+              const radio = document.querySelector(`input[type=radio][name="${key}"][value="${vals[key]}"]`);
+              if (radio) { radio.checked = true; radio.dispatchEvent(new Event('change', {bubbles:true})); }
+            }
           }
         }
-      }
+      } catch (e) { /* lanjut ke field berikutnya — jangan gugurkan sisa restore */ }
     });
     // Restore KBLI chip & kbliFilters (form L)
     const savedKodeL = vals['l2_kbli_kode'];
-    if (savedKodeL && typeof kbliData !== 'undefined' && kbliData.length) {
-      const entryL = kbliData.find(d => d.kode === savedKodeL);
-      if (entryL && typeof selectKBLIL === 'function') selectKBLIL(entryL);
-    }
+    try {
+      if (savedKodeL && typeof kbliData !== 'undefined' && kbliData.length) {
+        const entryL = kbliData.find(d => d.kode === savedKodeL);
+        if (entryL && typeof selectKBLIL === 'function') selectKBLIL(entryL);
+      }
+    } catch (e) { console.error('restore KBLI gagal:', e); }
     // Re-apply kbliFilters setelah restore.
     // 1) Panggil apply() SEGERA (sinkron) agar seksi Halal/BPOM langsung tersembunyi
     //    tanpa menunggu CSV selesai dimuat (aman karena untuk KBLI di luar Halal/BPOM
@@ -129,60 +140,73 @@ function restoreDraft() {
     })();
     // Resync SEMUA searchable select display texts (L.UB + L mode + anggota cards)
     // Tangani seluruh select[data-ss-init] sekaligus — profesi, hubungan, provinsi, dll.
-    document.querySelectorAll('select[data-ss-init]').forEach(sel => {
-      if (!sel.value) return;
-      const inp = document.getElementById(sel.id + '_inp');
-      if (!inp) return;
-      const opt = Array.from(sel.options).find(o => o.value === sel.value);
-      if (opt) { inp.value = opt.text; inp.classList.add('has-value'); }
-    });
+    try {
+      document.querySelectorAll('select[data-ss-init]').forEach(sel => {
+        if (!sel.value) return;
+        const inp = document.getElementById(sel.id + '_inp');
+        if (!inp) return;
+        const opt = Array.from(sel.options).find(o => o.value === sel.value);
+        if (opt) { inp.value = opt.text; inp.classList.add('has-value'); }
+      });
+    } catch (e) { console.error('restore searchable select gagal:', e); }
     // Restore L mode signature
-    if (vals['_sig_l'] && typeof l5Canvas !== 'undefined' && l5Canvas && typeof l5Ctx !== 'undefined' && l5Ctx) {
-      const imgL = new Image();
-      imgL.onload = () => { l5Ctx.clearRect(0,0,l5Canvas.width,l5Canvas.height); l5Ctx.drawImage(imgL,0,0); l5HasSig=true; updateProgress(); };
-      imgL.src = vals['_sig_l'];
-    }
+    try {
+      if (vals['_sig_l'] && typeof l5Canvas !== 'undefined' && l5Canvas && typeof l5Ctx !== 'undefined' && l5Ctx) {
+        const imgL = new Image();
+        imgL.onload = () => { l5Ctx.clearRect(0,0,l5Canvas.width,l5Canvas.height); l5Ctx.drawImage(imgL,0,0); l5HasSig=true; updateProgress(); };
+        imgL.src = vals['_sig_l'];
+      }
+    } catch (e) { console.error('restore signature gagal:', e); }
     const hintL = document.getElementById('l5_sig_hint');
     if (hintL && vals['_sig_l']) hintL.textContent = 'Tanda tangan dimuat dari draft';
     dismissRestore();
     // L mode: rebuild usaha roster dari hidden input #l_usaha_all_data (restored above)
-    if (typeof syncUsahaStoreFromDom === 'function') syncUsahaStoreFromDom();
-    if (typeof renderUsahaRoster   === 'function') renderUsahaRoster();
+    try {
+      if (typeof syncUsahaStoreFromDom === 'function') syncUsahaStoreFromDom();
+      if (typeof renderUsahaRoster   === 'function') renderUsahaRoster();
+    } catch (e) { console.error('restore usaha roster gagal:', e); }
     // L mode: pastikan anggota #1 = Kepala Keluarga (skip bila draft sudah punya anggota)
-    if (vals['_formMode'] === 'l' && typeof ensureKepalaKeluarga === 'function') ensureKepalaKeluarga();
+    try {
+      if (vals['_formMode'] === 'l' && typeof ensureKepalaKeluarga === 'function') ensureKepalaKeluarga();
+    } catch (e) { console.error('restore kepala keluarga gagal:', e); }
     // L mode: pulihkan pilihan "Pemberi Jawaban" (Blok V) — opsi anggota sudah
     // dibangun oleh renderAnggotaRoster. Default ke "Orang lain" bila draft lama
     // hanya menyimpan nama tanpa pilihan eksplisit.
-    if (vals['_formMode'] === 'l' && typeof _populateRespondenSelect === 'function') {
-      _populateRespondenSelect();
-      const _rp = document.getElementById('l5_responden_pilih');
-      if (_rp) {
-        let pv = vals['l5_responden_pilih'] || '';
-        if (!pv && (vals['l5_responden_nama'] || '')) pv = '__luar__';
-        _rp.value = pv;
-        if (typeof handleRespondenPilih === 'function') handleRespondenPilih();
-        // handleRespondenPilih mengosongkan nama saat orang lain dipilih tanpa nama;
-        // kembalikan nama dari draft bila ada.
-        if (pv === '__luar__' && vals['l5_responden_nama']) {
-          const _rn = document.getElementById('l5_responden_nama');
-          if (_rn) _rn.value = vals['l5_responden_nama'];
+    try {
+      if (vals['_formMode'] === 'l' && typeof _populateRespondenSelect === 'function') {
+        _populateRespondenSelect();
+        const _rp = document.getElementById('l5_responden_pilih');
+        if (_rp) {
+          let pv = vals['l5_responden_pilih'] || '';
+          if (!pv && (vals['l5_responden_nama'] || '')) pv = '__luar__';
+          _rp.value = pv;
+          if (typeof handleRespondenPilih === 'function') handleRespondenPilih();
+          // handleRespondenPilih mengosongkan nama saat orang lain dipilih tanpa nama;
+          // kembalikan nama dari draft bila ada.
+          if (pv === '__luar__' && vals['l5_responden_nama']) {
+            const _rn = document.getElementById('l5_responden_nama');
+            if (_rn) _rn.value = vals['l5_responden_nama'];
+          }
         }
       }
-    }
-    if (typeof restoreFotoPreviews === 'function') restoreFotoPreviews();
+    } catch (e) { console.error('restore responden gagal:', e); }
+    try { if (typeof restoreFotoPreviews === 'function') restoreFotoPreviews(); }
+    catch (e) { console.error('restore foto gagal:', e); }
     // Safety-net: isi field readonly/derived dari snapshot HANYA bila derivasi
     // (sync identitas, hitung umur, dll) belum mengisinya. Set langsung tanpa
     // memicu event agar tak ter-clear oleh handler.
-    if (Array.isArray(vals['_ro'])) {
-      vals['_ro'].forEach(id => {
-        const el = document.getElementById(id);
-        if (el && (el.value == null || el.value === '') && vals[id] != null && vals[id] !== '') {
-          el.value = vals[id];
-          el.classList.add('has-value');
-        }
-      });
-    }
-    updateProgress();
+    try {
+      if (Array.isArray(vals['_ro'])) {
+        vals['_ro'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el && (el.value == null || el.value === '') && vals[id] != null && vals[id] !== '') {
+            el.value = vals[id];
+            el.classList.add('has-value');
+          }
+        });
+      }
+    } catch (e) { console.error('restore field readonly gagal:', e); }
+    try { updateProgress(); } catch (e) {}
     const txt = document.getElementById('autosaveText');
     if (txt) txt.textContent = 'Draft dimuat';
   } catch(e) { console.error('Gagal load draft:', e); }
