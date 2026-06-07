@@ -34,6 +34,7 @@ function addAnggota() {
   if (typeof updateProgress === 'function') updateProgress();
   // Langsung buka form detail anggota baru
   if (typeof showAngDetailScreen === 'function') showAngDetailScreen(newIdx);
+  if (typeof saveDraft === 'function') saveDraft(); // persist daftar roster segera
 }
 
 // Hapus anggota ke-i dan geser indeks
@@ -52,6 +53,7 @@ function deleteAnggota(i) {
   updateSidebarAnggota(total - 1);
   updateJmlPendataan();
   if (typeof updateProgress === 'function') updateProgress();
+  if (typeof saveDraft === 'function') saveDraft(); // persist daftar roster segera
 }
 
 // Copy semua field dari anggota `src` ke anggota `dst`
@@ -1125,6 +1127,7 @@ function addUsaha() {
   // Buka detail usaha baru
   const newIdx = _usahaDataStore.length;
   if (typeof showUsahaDetailScreen === 'function') showUsahaDetailScreen(newIdx);
+  if (typeof saveDraft === 'function') saveDraft(); // persist daftar roster usaha segera
 }
 
 function deleteUsaha(idx) {
@@ -1139,6 +1142,7 @@ function deleteUsaha(idx) {
   _saveUsahaStoreToDom();
   renderUsahaRoster();
   if (typeof updateProgress === 'function') updateProgress();
+  if (typeof saveDraft === 'function') saveDraft(); // persist daftar roster usaha segera
 }
 
 /* ---- Roster rendering ---- */

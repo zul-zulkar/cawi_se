@@ -4,8 +4,22 @@ const LS_DRAFTS = 'cawi_se2026_drafts_v1';
 let _autosaveTimer  = null;
 let _currentDraftId = null; // ID draft yang sedang dilanjutkan
 
+/* Tulis isian roster yang SEDANG diedit ke penyimpanannya sebelum draft di-serialize.
+ * Tanpa ini, autosave/_saveDraftSilent menyimpan store usaha yang basi → isian
+ * roster usaha (+ cabang L.KP) yang sedang diketik hilang. Anggota tidak perlu
+ * di-sync (input l_ang_* adalah DOM nyata di pool/layar → tertangkap langsung). */
+function _syncActiveRosterForms() {
+  try {
+    if (typeof _activeUsahaIdx !== 'undefined' && _activeUsahaIdx != null
+        && typeof serializeCurrentUsahaForm === 'function') {
+      serializeCurrentUsahaForm(_activeUsahaIdx); // → _usahaDataStore + #l_usaha_all_data
+    }
+  } catch (e) {}
+}
+
 function saveDraft() {
   try {
+    _syncActiveRosterForms();
     const vals = {};
     document.querySelectorAll('input[id]:not([type=radio]):not([type=checkbox]),textarea[id],select[id]').forEach(el => {
       if (!el.id || el.readOnly) return;
@@ -175,9 +189,7 @@ function getDraftList() {
 function saveAsDraft() {
   try {
     // Sync usaha yang sedang aktif di form ke store sebelum serialize
-    if (typeof _activeUsahaIdx !== 'undefined' && _activeUsahaIdx != null) {
-      if (typeof serializeCurrentUsahaForm === 'function') serializeCurrentUsahaForm(_activeUsahaIdx);
-    }
+    _syncActiveRosterForms();
     const raw = {};
     document.querySelectorAll('input[id]:not([type=radio]):not([type=checkbox]),textarea[id],select[id]').forEach(el => {
       if (!el.id || el.readOnly) return;
