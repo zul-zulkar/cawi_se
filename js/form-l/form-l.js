@@ -110,6 +110,44 @@ function renderAnggotaRoster() {
   }
   if (empty) empty.style.display = n > 0 ? 'none' : '';
   if (countEl) countEl.textContent = n + ' anggota';
+  // Selaraskan opsi "Pemberi Jawaban" (Blok V) tiap roster berubah.
+  if (typeof _populateRespondenSelect === 'function') _populateRespondenSelect();
+}
+
+/* ---- Blok V: Pemberi Jawaban / Responden = pilih anggota keluarga atau orang lain ----
+ * Select #l5_responden_pilih: value = nomor anggota (1..n) | "__luar__" | "".
+ * Anggota → nama terisi otomatis dari Blok I & dikunci read-only.
+ * Orang lain → field nama tampil & dapat diisi manual. (HP/email/tanggal tetap manual.) */
+function _populateRespondenSelect() {
+  const sel = document.getElementById('l5_responden_pilih');
+  if (!sel) return;
+  const prev = sel.value;
+  const n = _getAnggotaCount();
+  let html = '<option value="">— pilih anggota keluarga / orang lain —</option>';
+  for (let i = 1; i <= Math.min(n, 30); i++) {
+    const nama = getVal('l_ang_' + i + '_nama') || ('Anggota #' + i);
+    html += '<option value="' + i + '">' + _sbEsc(nama) + (i === 1 ? ' (Kepala Keluarga)' : '') + '</option>';
+  }
+  html += '<option value="__luar__">Orang lain (bukan anggota keluarga)</option>';
+  sel.innerHTML = html;
+  if (prev) sel.value = prev;
+}
+
+function handleRespondenPilih() {
+  const sel = document.getElementById('l5_responden_pilih');
+  if (!sel) return;
+  const namaInp = document.getElementById('l5_responden_nama');
+  const v = sel.value;
+  const isLuar = (v === '__luar__');
+  const isMember = !!v && !isLuar;
+  if (namaInp) namaInp.classList.toggle('hidden', !isLuar); // input manual hanya utk orang lain
+  if (isMember) {
+    if (namaInp) { namaInp.value = getVal('l_ang_' + parseInt(v, 10) + '_nama'); }
+  } else if (!v) {
+    if (namaInp) namaInp.value = ''; // belum dipilih → kosongkan
+  }
+  // isLuar: biarkan nilai l5_responden_nama apa adanya untuk diisi/diedit manual.
+  if (typeof updateProgress === 'function') updateProgress();
 }
 
 function _anggotaRosterRowHTML(i) {
@@ -671,7 +709,9 @@ function _wilShortKode(level, full) {
 /* Label opsi wilayah: "[kode] NAMA" (kode pendek per level). */
 function _wilLabel(level, full, nama) {
   const sk = _wilShortKode(level, full);
-  return sk ? '[' + sk + '] ' + (nama || '') : (nama || '');
+  // Strip prefix "[kode] " bila nama sudah ber-label (assignment lama) → cegah ganda.
+  const clean = String(nama == null ? '' : nama).replace(/^\[[^\]]*\]\s*/, '');
+  return sk ? '[' + sk + '] ' + clean : clean;
 }
 /* Urut ascending berdasarkan kode (id gabungan numerik). */
 function _byKode(a, b) {
@@ -848,8 +888,72 @@ function loadUsahaIntoForm(idx) {
   if (!idx || idx < 1) return;
   _activeUsahaIdx = idx;
   const obj = _usahaDataStore[idx - 1] || {};
+  _populatePengusahaSelect();   // opsi anggota siap SEBELUM _applyL2Fields set value
   _applyL2Fields(obj);
   rehydrateUsahaConditionals();
+  handlePengusahaPilih();        // terapkan auto-fill / readonly sesuai pilihan tersimpan
+}
+
+/* ---- Rincian 12: Pengusaha = pilih dari anggota keluarga (auto-isi) atau orang luar (manual) ----
+ * Select #l2_pengusaha_pilih: value = nomor anggota (1..n) | "__luar__" | "".
+ * Anggota → nama/JK/umur/NIK terisi dari Blok I & dikunci read-only.
+ * Orang luar → field nama tampil & semua dapat diisi manual. */
+function _populatePengusahaSelect() {
+  const sel = document.getElementById('l2_pengusaha_pilih');
+  if (!sel) return;
+  const prev = sel.value;
+  const n = _getAnggotaCount();
+  let html = '<option value="">— pilih anggota keluarga / orang luar —</option>';
+  for (let i = 1; i <= Math.min(n, 30); i++) {
+    const nama = getVal('l_ang_' + i + '_nama') || ('Anggota #' + i);
+    html += '<option value="' + i + '">' + _sbEsc(nama) + (i === 1 ? ' (Kepala Keluarga)' : '') + '</option>';
+  }
+  html += '<option value="__luar__">Orang luar (bukan anggota keluarga)</option>';
+  sel.innerHTML = html;
+  if (prev) sel.value = prev;
+  // Reset read-only agar _clearL2Fields/_applyL2Fields bisa menulis ulang nilainya.
+  ['l2_pengusaha_umur', 'l2_pengusaha_nik'].forEach(function (id) {
+    const el = document.getElementById(id);
+    if (el) { el.readOnly = false; el.classList.remove('input-muted'); }
+  });
+}
+
+function _setPengusahaJk(v) {
+  document.querySelectorAll('input[name="l2_pengusaha_jk"]').forEach(function (r) {
+    r.checked = (!!v && r.value === v);
+  });
+}
+
+function handlePengusahaPilih() {
+  const sel = document.getElementById('l2_pengusaha_pilih');
+  if (!sel) return;
+  const namaInp = document.getElementById('l2_pengusaha_nama');
+  const umurInp = document.getElementById('l2_pengusaha_umur');
+  const nikInp  = document.getElementById('l2_pengusaha_nik');
+  const v = sel.value;
+  const isLuar = (v === '__luar__');
+  const isMember = !!v && !isLuar;
+  // Input nama manual hanya tampil untuk orang luar.
+  if (namaInp) namaInp.classList.toggle('hidden', !isLuar);
+  if (isMember) {
+    const i = parseInt(v, 10);
+    if (namaInp) namaInp.value = getVal('l_ang_' + i + '_nama');
+    if (umurInp) umurInp.value = getVal('l_ang_' + i + '_umur');
+    if (nikInp)  nikInp.value  = getVal('l_ang_' + i + '_nik');
+    _setPengusahaJk(getRadio('l_ang_' + i + '_jk'));
+    // Kunci field yang terisi otomatis (umur & NIK; JK ikut anggota).
+    [umurInp, nikInp].forEach(function (el) { if (el) { el.readOnly = true; el.classList.add('input-muted'); } });
+  } else {
+    // Orang luar / belum dipilih → editable.
+    [umurInp, nikInp].forEach(function (el) { if (el) { el.readOnly = false; el.classList.remove('input-muted'); } });
+    if (!v) { // belum dipilih → kosongkan agar tidak ada sisa data anggota lama
+      if (namaInp) namaInp.value = '';
+      if (umurInp) umurInp.value = '';
+      if (nikInp)  nikInp.value  = '';
+      _setPengusahaJk('');
+    }
+  }
+  if (typeof updateProgress === 'function') updateProgress();
 }
 
 function _collectL2Fields() {
@@ -859,7 +963,7 @@ function _collectL2Fields() {
     'l2_nama_usaha','l2_nama_komersial','l2_alamat','l2_rt','l2_rw','l2_kodepos',
     'l2_email','l2_website','l2_hp','l2_nama_kawasan','l2_lokasi_alamat',
     'l2_lokasi_provinsi','l2_lokasi_kab','l2_nib','l2_nib_alasan_lain',
-    'l2_pengusaha_nama','l2_pengusaha_umur','l2_pengusaha_nik','l2_kegiatan_utama',
+    'l2_pengusaha_pilih','l2_pengusaha_nama','l2_pengusaha_umur','l2_pengusaha_nik','l2_kegiatan_utama',
     'l2_input','l2_proses','l2_produk_utama','l2_kbli_kode','l2_kbli_search',
     'l2_kbli_kategori','l2_kbli_kategori_display','l2_jml_cabang',
     'l2_kp_nama','l2_kp_negara','l2_kp_alamat','l2_kp_email','l2_kp_provinsi','l2_kp_kab',

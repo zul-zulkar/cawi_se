@@ -15,8 +15,14 @@
     <div class="section-header" id="sec-L5-responden">Data Responden</div>
     <div class="section-body">
       <div class="form-group">
-        <label class="field-label">Nama Responden <span class="req">*</span></label>
-        <input type="text" id="l5_responden_nama" placeholder="Nama lengkap responden"/>
+        <label class="field-label">Nama Responden / Pemberi Jawaban <span class="req">*</span></label>
+        <select id="l5_responden_pilih" onchange="handleRespondenPilih()">
+          <option value="">— pilih anggota keluarga / orang lain —</option>
+          <!-- opsi anggota keluarga di-inject otomatis -->
+          <option value="__luar__">Orang lain (bukan anggota keluarga)</option>
+        </select>
+        <input type="text" id="l5_responden_nama" class="hidden" style="margin-top:6px" placeholder="Nama lengkap responden (orang lain)"/>
+        <div class="hint">Pilih dari anggota keluarga, atau “Orang lain” untuk mengisi nama secara manual.</div>
       </div>
       <div class="form-group">
         <label class="field-label">Nomor HP/Telepon <span class="req">*</span></label>
@@ -52,7 +58,7 @@
   </div>
 
   <div class="nav-actions">
-    <button class="btn btn-secondary" onclick="goBlok(4)">&lsaquo; Kembali: BLOK IV</button>
+    <button class="btn btn-secondary" onclick="goBlokPrev()">&lsaquo; Kembali</button>
     <button type="button" class="btn-nav-draft" onclick="saveAsDraft()">&#128190; Simpan Draft</button>
     <div></div>
   </div>

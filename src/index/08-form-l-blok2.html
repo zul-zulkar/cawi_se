@@ -198,7 +198,16 @@
   <div class="section-card">
     <div class="section-header" id="sec-L2-12">12. Keterangan Pengusaha / Penanggung Jawab</div>
     <div class="section-body">
-      <div class="form-group"><label class="field-label">a. Nama <span class="req">*</span></label><input type="text" id="l2_pengusaha_nama" placeholder="Nama lengkap"/></div>
+      <div class="form-group">
+        <label class="field-label">a. Nama <span class="req">*</span></label>
+        <select id="l2_pengusaha_pilih" onchange="handlePengusahaPilih()">
+          <option value="">— pilih anggota keluarga / orang luar —</option>
+          <!-- opsi anggota keluarga di-inject otomatis saat membuka usaha -->
+          <option value="__luar__">Orang luar (bukan anggota keluarga)</option>
+        </select>
+        <input type="text" id="l2_pengusaha_nama" class="hidden" style="margin-top:6px" placeholder="Nama lengkap pengusaha (orang luar)"/>
+        <div class="hint">Pilih dari anggota keluarga → JK, umur, &amp; NIK terisi otomatis. Pilih “Orang luar” untuk mengisi manual.</div>
+      </div>
       <div class="form-group">
         <div class="subsection-label">b. Jenis Kelamin <span class="req">*</span></div>
         <div class="radio-group">
@@ -707,8 +716,8 @@
   </div>
 
   <div class="nav-actions">
-    <button class="btn btn-secondary" onclick="goBlok(1)">&lsaquo; Kembali: BLOK I</button>
+    <button class="btn btn-secondary" onclick="goBlokPrev()">&lsaquo; Kembali</button>
     <button type="button" class="btn-nav-draft" onclick="saveAsDraft()">&#128190; Simpan Draft</button>
-    <button class="btn btn-primary" onclick="goBlok(3)">Lanjut: BLOK III &rsaquo;</button>
+    <button class="btn btn-primary" onclick="goBlokNext()">Lanjut &rsaquo;</button>
   </div>
 </div>

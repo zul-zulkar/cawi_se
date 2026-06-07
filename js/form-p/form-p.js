@@ -159,7 +159,10 @@ function ambilLokasiP() {
     if (res) { res.classList.add('done'); res.innerHTML = '📍 ' + lat + ', ' + lng + ' &nbsp;(±' + akr + ' m)'; }
     if (btn) { btn.dataset.done = '1'; btn.classList.add('done'); }
     if (txt) txt.textContent = 'Perbarui Lokasi ✓';
-    if (typeof scheduleAutosave === 'function') scheduleAutosave();
+    // Simpan SEGERA (bukan hanya scheduleAutosave 60s) agar geotag tak hilang
+    // bila petugas langsung menutup/refresh halaman sesudah mengambil lokasi.
+    if (typeof saveDraft === 'function') saveDraft();
+    else if (typeof scheduleAutosave === 'function') scheduleAutosave();
     if (typeof updateProgress === 'function') updateProgress();
   }, function (err) {
     if (res) { res.classList.remove('done'); res.textContent = 'Gagal mengambil lokasi: ' + (err && err.message ? err.message : 'tidak diketahui'); }
@@ -170,6 +173,21 @@ function ambilLokasiP() {
 function _pSet(id, val) {
   var el = document.getElementById(id);
   if (el) el.value = val;
+}
+
+/* Pulihkan tampilan hasil geotag dari nilai tersimpan (draft) saat halaman dibuka,
+ * agar petugas tahu lokasi sudah terambil (bukan terlihat "belum"). */
+function _restoreGeoDisplayP() {
+  var lat = _pVal('pmt_lat');
+  var lng = _pVal('pmt_lng');
+  if (!lat || !lng) return;
+  var akr = _pVal('pmt_akurasi');
+  var res = document.getElementById('pmtLokasiResult');
+  var btn = document.getElementById('pmtLokasiBtn');
+  var txt = btn ? btn.querySelector('.geo-btn-text') : null;
+  if (res) { res.classList.add('done'); res.innerHTML = '📍 ' + lat + ', ' + lng + (akr ? ' &nbsp;(±' + akr + ' m)' : ''); }
+  if (btn) { btn.dataset.done = '1'; btn.classList.add('done'); }
+  if (txt) txt.textContent = 'Perbarui Lokasi ✓';
 }
 
 /* ---- Prelist seeding (G-3: wilayah + nama + skala) ----
@@ -244,6 +262,41 @@ function goBlokP() {
   if (typeof closeSidebar === 'function') closeSidebar();
 }
 
+/* ---- Navigasi blok stage-aware (back/next antar blok & antar kuesioner) ----
+ * Urutan blok yang TERLIHAT bergantung stage (unified) atau mode (legacy):
+ *   keluarga : P → L1 → L2 → L3 → L4 → L5
+ *   usaha    : P → L2 → L4 → L5   (L1 & L3 keluarga disembunyikan)
+ *   none     : P
+ *   legacy L : L1 → … → L5
+ * goBlokPrev/goBlokNext melompati blok tersembunyi sesuai stage.
+ */
+function _blokSeq() {
+  if (isUnifiedMode()) {
+    var stage = (typeof window !== 'undefined' && window.__cawiStage) || 'none';
+    if (stage === 'keluarga') return ['blokP1', 'blokL1', 'blokL2', 'blokL3', 'blokL4', 'blokL5'];
+    if (stage === 'usaha')    return ['blokP1', 'blokL2', 'blokL4', 'blokL5'];
+    return ['blokP1'];
+  }
+  return ['blokL1', 'blokL2', 'blokL3', 'blokL4', 'blokL5'];
+}
+function _goBlokId(id) {
+  if (id === 'blokP1') { if (typeof goBlokP === 'function') goBlokP(); return; }
+  var n = parseInt(String(id).replace('blokL', ''), 10);
+  if (!isNaN(n) && typeof goBlok === 'function') goBlok(n);
+}
+function _curBlokIdx(seq) {
+  var cur = document.querySelector('.blok-panel.active');
+  return cur ? seq.indexOf(cur.id) : -1;
+}
+function goBlokPrev() {
+  var seq = _blokSeq(), i = _curBlokIdx(seq);
+  if (i > 0) _goBlokId(seq[i - 1]);
+}
+function goBlokNext() {
+  var seq = _blokSeq(), i = _curBlokIdx(seq);
+  if (i >= 0 && i < seq.length - 1) _goBlokId(seq[i + 1]);
+}
+
 /* Isi tampilan Identitas Wilayah (readonly) dari assignment aktif.
  * SLS & SubSLS ditampilkan terpisah agar lebih bersih. */
 function _fillPWilayah(a) {
@@ -256,7 +309,8 @@ function _fillPWilayah(a) {
   set('pmt_w_kab',  lbl('kab',  a.kabupaten_kd, a.kabupaten));
   set('pmt_w_kec',  lbl('kec',  a.kecamatan_kd, a.kecamatan));
   set('pmt_w_desa', lbl('desa', a.desa_kd, a.desa));
-  var sls = a.sls_nama ? ('[' + (a.sls_kd || '----') + '] ' + a.sls_nama) : (a.sls_kd ? ('[' + a.sls_kd + ']') : '—');
+  var slsNama = String(a.sls_nama == null ? '' : a.sls_nama).replace(/^\[[^\]]*\]\s*/, '');
+  var sls = slsNama ? ('[' + (a.sls_kd || '----') + '] ' + slsNama) : (a.sls_kd ? ('[' + a.sls_kd + ']') : '—');
   set('pmt_w_sls', sls);
   var sub = a.subsls_kd || '00';
   set('pmt_w_subsls', sub === '00' ? '00 (SLS tidak terbagi)' : sub);
@@ -296,6 +350,14 @@ function _prefillNoUrutMax(a) {
 /* ---- Init ---- */
 function initFormP() {
   if (!isUnifiedMode()) return;
+  // Unified: Blok P tampil pertama. HTML statis menandai #blokP1 DAN #blokL1
+  // sama-sama .active (warisan mode L) → keduanya bisa tampil bersamaan saat
+  // stage me-reveal #form-l. Pastikan HANYA #blokP1 aktif di awal.
+  document.querySelectorAll('.blok-panel.active').forEach(function (p) {
+    if (p.id !== 'blokP1') p.classList.remove('active');
+  });
+  var bp1 = document.getElementById('blokP1');
+  if (bp1) bp1.classList.add('active');
   _fillPWilayah();
   // Restore: selaraskan radio kode bangunan & toggle jenis entitas dari draft.
   _syncPmtRadioFromKode();
@@ -305,6 +367,8 @@ function initFormP() {
   refreshDynamicSidebar();
   // Alirkan identitas keluarga Blok P → Blok L1 + anggota #1 (sumber tunggal).
   syncPIdentityToL();
+  // Pulihkan tampilan geotag bila draft sudah berisi koordinat.
+  _restoreGeoDisplayP();
   // Prefill referensi nomor urut terbesar (async, best-effort).
   _prefillNoUrutMax();
 }
@@ -325,4 +389,6 @@ if (typeof window !== 'undefined') {
   window.initFormP            = initFormP;
   window.isUnifiedMode        = isUnifiedMode;
   window.goBlokP              = goBlokP;
+  window.goBlokPrev           = goBlokPrev;
+  window.goBlokNext           = goBlokNext;
 }

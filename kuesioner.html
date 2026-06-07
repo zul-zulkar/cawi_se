@@ -679,7 +679,7 @@
   <div class="nav-actions">
     <div></div>
     <button type="button" class="btn-nav-draft" onclick="saveAsDraft()">&#128190; Simpan Draft</button>
-    <button type="button" class="btn btn-primary" id="pmtLanjutBtn" onclick="goBlok(1)">Lanjut: Kuesioner &rsaquo;</button>
+    <button type="button" class="btn btn-primary" id="pmtLanjutBtn" onclick="goBlokNext()">Lanjut: Kuesioner &rsaquo;</button>
   </div>
 </div><!-- end blokP1 -->
 
@@ -834,9 +834,9 @@
   </div>
 
   <div class="nav-actions">
-    <div></div>
+    <button class="btn btn-secondary" onclick="goBlokPrev()">&lsaquo; Kembali</button>
     <button type="button" class="btn-nav-draft" onclick="saveAsDraft()">&#128190; Simpan Draft</button>
-    <button class="btn btn-primary" onclick="goBlok(2)">Lanjut: BLOK II &rsaquo;</button>
+    <button class="btn btn-primary" onclick="goBlokNext()">Lanjut &rsaquo;</button>
   </div>
 </div>
 
@@ -1040,7 +1040,16 @@
   <div class="section-card">
     <div class="section-header" id="sec-L2-12">12. Keterangan Pengusaha / Penanggung Jawab</div>
     <div class="section-body">
-      <div class="form-group"><label class="field-label">a. Nama <span class="req">*</span></label><input type="text" id="l2_pengusaha_nama" placeholder="Nama lengkap"/></div>
+      <div class="form-group">
+        <label class="field-label">a. Nama <span class="req">*</span></label>
+        <select id="l2_pengusaha_pilih" onchange="handlePengusahaPilih()">
+          <option value="">— pilih anggota keluarga / orang luar —</option>
+          <!-- opsi anggota keluarga di-inject otomatis saat membuka usaha -->
+          <option value="__luar__">Orang luar (bukan anggota keluarga)</option>
+        </select>
+        <input type="text" id="l2_pengusaha_nama" class="hidden" style="margin-top:6px" placeholder="Nama lengkap pengusaha (orang luar)"/>
+        <div class="hint">Pilih dari anggota keluarga → JK, umur, &amp; NIK terisi otomatis. Pilih “Orang luar” untuk mengisi manual.</div>
+      </div>
       <div class="form-group">
         <div class="subsection-label">b. Jenis Kelamin <span class="req">*</span></div>
         <div class="radio-group">
@@ -1549,9 +1558,9 @@
   </div>
 
   <div class="nav-actions">
-    <button class="btn btn-secondary" onclick="goBlok(1)">&lsaquo; Kembali: BLOK I</button>
+    <button class="btn btn-secondary" onclick="goBlokPrev()">&lsaquo; Kembali</button>
     <button type="button" class="btn-nav-draft" onclick="saveAsDraft()">&#128190; Simpan Draft</button>
-    <button class="btn btn-primary" onclick="goBlok(3)">Lanjut: BLOK III &rsaquo;</button>
+    <button class="btn btn-primary" onclick="goBlokNext()">Lanjut &rsaquo;</button>
   </div>
 </div>
 <div class="blok-panel" id="blokL3">
@@ -1932,9 +1941,9 @@
   </div>
 
   <div class="nav-actions">
-    <button class="btn btn-secondary" onclick="goBlok(2)">&lsaquo; Kembali: BLOK II</button>
+    <button class="btn btn-secondary" onclick="goBlokPrev()">&lsaquo; Kembali</button>
     <button type="button" class="btn-nav-draft" onclick="saveAsDraft()">&#128190; Simpan Draft</button>
-    <button class="btn btn-primary" onclick="goBlok(4)">Lanjut: BLOK IV &rsaquo;</button>
+    <button class="btn btn-primary" onclick="goBlokNext()">Lanjut &rsaquo;</button>
   </div>
 </div>
 
@@ -1957,9 +1966,9 @@
     </div>
   </div>
   <div class="nav-actions">
-    <button class="btn btn-secondary" onclick="goBlok(3)">&lsaquo; Kembali: BLOK III</button>
+    <button class="btn btn-secondary" onclick="goBlokPrev()">&lsaquo; Kembali</button>
     <button type="button" class="btn-nav-draft" onclick="saveAsDraft()">&#128190; Simpan Draft</button>
-    <button class="btn btn-primary" onclick="goBlok(5)">Lanjut: BLOK V &rsaquo;</button>
+    <button class="btn btn-primary" onclick="goBlokNext()">Lanjut &rsaquo;</button>
   </div>
 </div>
 
@@ -1981,8 +1990,14 @@
     <div class="section-header" id="sec-L5-responden">Data Responden</div>
     <div class="section-body">
       <div class="form-group">
-        <label class="field-label">Nama Responden <span class="req">*</span></label>
-        <input type="text" id="l5_responden_nama" placeholder="Nama lengkap responden"/>
+        <label class="field-label">Nama Responden / Pemberi Jawaban <span class="req">*</span></label>
+        <select id="l5_responden_pilih" onchange="handleRespondenPilih()">
+          <option value="">— pilih anggota keluarga / orang lain —</option>
+          <!-- opsi anggota keluarga di-inject otomatis -->
+          <option value="__luar__">Orang lain (bukan anggota keluarga)</option>
+        </select>
+        <input type="text" id="l5_responden_nama" class="hidden" style="margin-top:6px" placeholder="Nama lengkap responden (orang lain)"/>
+        <div class="hint">Pilih dari anggota keluarga, atau “Orang lain” untuk mengisi nama secara manual.</div>
       </div>
       <div class="form-group">
         <label class="field-label">Nomor HP/Telepon <span class="req">*</span></label>
@@ -2018,7 +2033,7 @@
   </div>
 
   <div class="nav-actions">
-    <button class="btn btn-secondary" onclick="goBlok(4)">&lsaquo; Kembali: BLOK IV</button>
+    <button class="btn btn-secondary" onclick="goBlokPrev()">&lsaquo; Kembali</button>
     <button type="button" class="btn-nav-draft" onclick="saveAsDraft()">&#128190; Simpan Draft</button>
     <div></div>
   </div>

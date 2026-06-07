@@ -177,12 +177,20 @@ function collectAllProblemsL() {
     if (!d['_r_l2_ramah_a'])     e(pre + 'Produk Ramah Lingkungan (17a)', 'Belum dipilih', 2, 'l2_ramah_a');
     if (!d['_r_l2_ramah_b'])     e(pre + 'Input Perlindungan Lingkungan (17b)', 'Belum dipilih', 2, 'l2_ramah_b');
     if (!d['_r_l2_kreatif'])     e(pre + 'Produk Kreatif/Seni (18)', 'Belum dipilih', 2, 'l2_kreatif');
-    if (!d['_r_l2_halal'])       e(pre + 'Sertifikat Halal (19a)', 'Belum dipilih', 2, 'l2_halal');
+    // Halal (19) & BPOM (20) hanya relevan untuk KBLI tertentu (master CSV).
+    // Saat KBLI usaha BUKAN kategori halal/bpom, kbliFilters menyembunyikan +
+    // mengosongkan section → JANGAN wajibkan (kalau tidak, submit terblokir oleh
+    // field tersembunyi). Sub-rincian b/c tetap wajib bila jawaban = "1" (punya).
+    const _kf = (typeof window !== 'undefined' && window.kbliFilters) ? window.kbliFilters : null;
+    const _kbli = d.l2_kbli_kode || '';
+    const _halalReq = _kf ? _kf.isHalal(_kbli) : false;
+    const _bpomReq  = _kf ? _kf.isBPOM(_kbli)  : false;
+    if (_halalReq && !d['_r_l2_halal']) e(pre + 'Sertifikat Halal (19a)', 'Belum dipilih', 2, 'l2_halal');
     if (d['_r_l2_halal'] === '1') {
       if (!d.l2_halal_b && d.l2_halal_b !== '0') e(pre + 'Jumlah Varian Halal (19b)', 'Harus diisi', 2, 'l2_halal_b');
       if (!d.l2_halal_c && d.l2_halal_c !== '0') e(pre + 'Jumlah Varian Belum Halal (19c)', 'Harus diisi', 2, 'l2_halal_c');
     }
-    if (!d['_r_l2_bpom'])        e(pre + 'Izin Edar BPOM (20a)', 'Belum dipilih', 2, 'l2_bpom');
+    if (_bpomReq && !d['_r_l2_bpom']) e(pre + 'Izin Edar BPOM (20a)', 'Belum dipilih', 2, 'l2_bpom');
     if (d['_r_l2_bpom'] === '1') {
       if (!d.l2_bpom_b && d.l2_bpom_b !== '0') e(pre + 'Jumlah Varian BPOM (20b)', 'Harus diisi', 2, 'l2_bpom_b');
       if (!d.l2_bpom_c && d.l2_bpom_c !== '0') e(pre + 'Jumlah Varian Belum BPOM (20c)', 'Harus diisi', 2, 'l2_bpom_c');

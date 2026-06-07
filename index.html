@@ -635,7 +635,8 @@
   // Fallback ke nama saja bila kode kosong (mis. assignment lama).
   function wilayahLabel(level, full, nama) {
     var k = shortKode(level, full);
-    var n = String(nama == null ? '' : nama).trim();
+    // Strip prefix "[kode] " bila nama sudah ber-label (assignment lama) → cegah ganda.
+    var n = String(nama == null ? '' : nama).replace(/^\[[^\]]*\]\s*/, '').trim();
     if (!n) return k ? ('[' + k + ']') : '';
     return k ? ('[' + k + '] ' + n) : n;
   }
@@ -937,10 +938,11 @@
       detail.push(dRow('Kecamatan', esc(wilayahLabel('kec',  it.kecamatan_kd, it.kecamatan))));
       detail.push(dRow('Desa/Kel.', esc(wilayahLabel('desa', it.desa_kd,      it.desa))));
       if (it.sls_nama || it.sls_kd) {
-        var slsDet = wilayahLabel('sls', it.sls_kd, it.sls_nama);
-        if (it.subsls_kd && it.subsls_kd !== '00') slsDet += ' · SubSLS ' + it.subsls_kd;
-        detail.push(dRow('SLS', esc(slsDet)));
+        detail.push(dRow('SLS', esc(wilayahLabel('sls', it.sls_kd, it.sls_nama))));
       }
+      // SubSLS sebagai baris terpisah (00 = SLS tidak terbagi).
+      detail.push(dRow('SubSLS', esc(!it.subsls_kd || it.subsls_kd === '00'
+        ? '00 (SLS tidak terbagi)' : it.subsls_kd)));
       detail.push(dRow('Petugas', esc(it.petugas_nama)));
       detail.push(dRow('Dibuat', esc(fmtDateTime(it.created_at))));
 
@@ -1198,7 +1200,10 @@
     var sel = $(selectId);
     if (!sel || sel.selectedIndex < 0) return '';
     var opt = sel.options[sel.selectedIndex];
-    return (opt && opt.value) ? opt.text : '';
+    if (!opt || !opt.value) return '';
+    // Simpan NAMA POLOS (buang prefix "[kode] ") agar tidak tercetak ganda saat
+    // ditampilkan ulang via wilayahLabel/_wilLabel di portal & kuesioner.
+    return opt.text.replace(/^\[[^\]]*\]\s*/, '');
   }
 
   function saveAssignment() {

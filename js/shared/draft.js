@@ -130,6 +130,25 @@ function restoreDraft() {
     if (typeof renderUsahaRoster   === 'function') renderUsahaRoster();
     // L mode: pastikan anggota #1 = Kepala Keluarga (skip bila draft sudah punya anggota)
     if (vals['_formMode'] === 'l' && typeof ensureKepalaKeluarga === 'function') ensureKepalaKeluarga();
+    // L mode: pulihkan pilihan "Pemberi Jawaban" (Blok V) — opsi anggota sudah
+    // dibangun oleh renderAnggotaRoster. Default ke "Orang lain" bila draft lama
+    // hanya menyimpan nama tanpa pilihan eksplisit.
+    if (vals['_formMode'] === 'l' && typeof _populateRespondenSelect === 'function') {
+      _populateRespondenSelect();
+      const _rp = document.getElementById('l5_responden_pilih');
+      if (_rp) {
+        let pv = vals['l5_responden_pilih'] || '';
+        if (!pv && (vals['l5_responden_nama'] || '')) pv = '__luar__';
+        _rp.value = pv;
+        if (typeof handleRespondenPilih === 'function') handleRespondenPilih();
+        // handleRespondenPilih mengosongkan nama saat orang lain dipilih tanpa nama;
+        // kembalikan nama dari draft bila ada.
+        if (pv === '__luar__' && vals['l5_responden_nama']) {
+          const _rn = document.getElementById('l5_responden_nama');
+          if (_rn) _rn.value = vals['l5_responden_nama'];
+        }
+      }
+    }
     updateProgress();
     const txt = document.getElementById('autosaveText');
     if (txt) txt.textContent = 'Draft dimuat';

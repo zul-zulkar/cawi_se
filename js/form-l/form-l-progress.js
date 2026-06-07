@@ -139,12 +139,16 @@ function calcProgressL() {
     c(!!d['_r_l2_ramah_a']);
     c(!!d['_r_l2_ramah_b']);
     c(!!d['_r_l2_kreatif']);
-    c(!!d['_r_l2_halal']);
+    // Halal/BPOM hanya dihitung bila KBLI usaha termasuk kategorinya (selaras
+    // validasi & visibilitas section) → progress tak macet <100% utk KBLI lain.
+    const _kf = (typeof window !== 'undefined' && window.kbliFilters) ? window.kbliFilters : null;
+    const _kbli = d.l2_kbli_kode || '';
+    if (_kf && _kf.isHalal(_kbli)) c(!!d['_r_l2_halal']);
     if (d['_r_l2_halal'] === '1') {
       c(d.l2_halal_b !== '' && d.l2_halal_b !== undefined);
       c(d.l2_halal_c !== '' && d.l2_halal_c !== undefined);
     }
-    c(!!d['_r_l2_bpom']);
+    if (_kf && _kf.isBPOM(_kbli)) c(!!d['_r_l2_bpom']);
     if (d['_r_l2_bpom'] === '1') {
       c(d.l2_bpom_b !== '' && d.l2_bpom_b !== undefined);
       c(d.l2_bpom_c !== '' && d.l2_bpom_c !== undefined);
