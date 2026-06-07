@@ -1,10 +1,13 @@
 let records    = [];
 let _activeTab = 'all';
+let _assignments  = [];   // registry assignment+progress dari server (SE2026_Assignments)
+let _activePetugas = null; // identitas dari sesi portal (untuk filter peran)
+let _pplList      = [];    // bawahan PML (untuk filter peran)
 
 /* ====== TAB & SIDEBAR ====== */
 function setActiveTab(tab) {
   _activeTab = tab;
-  ['all', 'submitted', 'draft'].forEach(t => {
+  ['all', 'submitted', 'draft', 'assign'].forEach(t => {
     const cap = t.charAt(0).toUpperCase() + t.slice(1);
     const sb  = document.getElementById('sidebarTab' + cap);
     const tb  = document.getElementById('tabBar'     + cap);
@@ -32,6 +35,109 @@ function getLocalDrafts() {
   catch(e) { return []; }
 }
 
+/* ====== ASSIGNMENT REGISTRY (server) + PROGRESS ======
+ * Ambil daftar assignment dari Sheet (diisi portal & kuesioner), filter per peran
+ * memakai identitas sesi portal: PPL → miliknya; PML → bawahannya. Bila tidak ada
+ * identitas (daftar dibuka tanpa login portal), tampilkan semua (sudah lolos sandi). */
+function _loadActivePetugas() {
+  try {
+    const a = JSON.parse(sessionStorage.getItem('cawi_petugas_aktif') || 'null');
+    if (a && a.email) return a;
+  } catch (e) {}
+  return null;
+}
+
+async function fetchAssignments() {
+  try {
+    _activePetugas = _loadActivePetugas();
+    _pplList = [];
+    if (_activePetugas && _activePetugas.peran === 'PML' && _activePetugas.email) {
+      try {
+        const r = await fetch(getScriptUrl(), {
+          method: 'POST', body: JSON.stringify({ action: 'getPplUnderPml', pml_email: _activePetugas.email })
+        });
+        const j = await r.json();
+        if (j && j.status === 'ok' && Array.isArray(j.data)) _pplList = j.data;
+      } catch (e) { /* abaikan */ }
+    }
+    const resp = await fetch(getScriptUrl(), {
+      method: 'POST', body: JSON.stringify({ action: 'getAssignmentsMeta' })
+    });
+    const json = await resp.json();
+    let all = (json && json.status === 'ok' && json.kind === 'assignments' && Array.isArray(json.data))
+      ? json.data : [];
+    // Filter per peran bila identitas tersedia & PetugasManager dimuat.
+    if (_activePetugas && _activePetugas.email && typeof PetugasManager !== 'undefined') {
+      all = PetugasManager.filterAssignments(all, {}, _activePetugas, _pplList);
+    }
+    // Urutkan: terbaru diperbarui di atas.
+    all.sort((a, b) => String(b.updated_at || '').localeCompare(String(a.updated_at || '')));
+    _assignments = all;
+  } catch (e) { _assignments = []; }
+}
+
+function getFilteredAssignments() {
+  const q = (document.getElementById('searchBox').value || '').toLowerCase().trim();
+  const p = document.getElementById('filterPetugas').value;
+  return _assignments.filter(a => {
+    const okP = !p || a.petugas_nama === p;
+    const hay = [a.nama_responden, a.petugas_nama, a.kecamatan, a.desa, a.sls_nama]
+      .map(x => (x || '').toLowerCase()).join(' ');
+    const okQ = !q || hay.includes(q);
+    return okP && okQ;
+  });
+}
+
+function renderAssignments() {
+  const container = document.getElementById('tableContainer');
+  const list = getFilteredAssignments();
+  document.getElementById('listMeta').textContent = _assignments.length
+    ? `${list.length} penugasan ditampilkan` : 'Belum ada penugasan tersinkron';
+
+  if (!_assignments.length) {
+    container.innerHTML = `<div class="empty-state">
+      <div class="empty-icon">&#128203;</div>
+      <div class="empty-text">Belum ada penugasan tersinkron ke server.<br/>
+        Penugasan muncul setelah dibuat di Portal atau mulai diisi petugas.
+        ${_activePetugas ? '' : '<br/><small>Masuk lewat Portal Petugas dulu agar daftar bisa difilter per peran.</small>'}
+      </div></div>`;
+    return;
+  }
+  if (!list.length) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">&#128269;</div>
+      <div class="empty-text">Tidak ada penugasan yang cocok dengan filter.</div></div>`;
+    return;
+  }
+
+  let html = `<table><thead><tr>
+    <th>No</th><th>Status</th><th>Nama / Wilayah</th><th>Petugas</th>
+    <th>Progress Pengisian</th><th>Diperbarui</th>
+  </tr></thead><tbody>`;
+  list.forEach((a, idx) => {
+    const pct = Math.max(0, Math.min(100, parseInt(a.progress) || 0));
+    const st  = String(a.status || 'assigned');
+    const chip = st === 'submitted' ? '<span class="asg-chip asg-done">Selesai</span>'
+              : st === 'draft'     ? '<span class="asg-chip asg-draft">Proses</span>'
+              :                       '<span class="asg-chip asg-new">Ditugaskan</span>';
+    const ft = (a.filled !== '' && a.total !== '' && a.total) ? ` · ${esc(a.filled)}/${esc(a.total)} field` : '';
+    const wil = [a.kecamatan, a.desa, a.sls_nama].filter(Boolean).map(esc).join(' · ');
+    const peran = a.petugas_peran ? `<small>${esc(a.petugas_peran)}</small>` : '';
+    html += `<tr>
+      <td style="text-align:center;color:#aaa;font-size:12px">${idx + 1}</td>
+      <td>${chip}</td>
+      <td class="cell-company">${esc(a.nama_responden) || '<em style="color:#bbb">Tanpa nama</em>'}${wil ? `<small>${wil}</small>` : ''}</td>
+      <td class="cell-petugas">${esc(a.petugas_nama || '—')}${peran}</td>
+      <td style="min-width:160px"><div class="asg-prog">
+        <div class="asg-prog-bar"><span style="width:${pct}%"></span></div>
+        <div class="asg-prog-txt">${pct}%${ft}</div>
+      </div></td>
+      <td style="font-size:12px;color:#888;white-space:nowrap">${fmtDate(a.updated_at)}</td>
+    </tr>`;
+  });
+  html += `</tbody></table>`;
+  container.innerHTML = html;
+}
+
 /* ====== FETCH DATA ====== */
 async function fetchRecords() {
   setLoading(true);
@@ -57,6 +163,7 @@ async function fetchRecords() {
       } catch (e) { /* GAS lama / offline → abaikan record P */ }
       const draftRecs  = getLocalDrafts();
       records = [...draftRecs, ...serverRecs, ...pRecs];
+      await fetchAssignments();   // registry assignment+progress (terpisah dari records)
       buildPetugasFilter();
       updateStats();
       renderTable();
@@ -156,6 +263,8 @@ function updateStats() {
   _setCount('tabBarAllCount',           records.length,      null);
   _setCount('tabBarSubmittedCount',     serverRecs.length,   null);
   _setCount('tabBarDraftCount',         draftRecs.length,    null);
+  _setCount('sidebarTabAssignCount',    _assignments.length, 'penugasan');
+  _setCount('tabBarAssignCount',        _assignments.length, null);
 }
 
 function _setCount(id, n, suffix) {
@@ -165,6 +274,7 @@ function _setCount(id, n, suffix) {
 
 /* ====== RENDER TABLE ====== */
 function renderTable() {
+  if (_activeTab === 'assign') { renderAssignments(); return; }
   const filtered   = getFiltered();
   const container  = document.getElementById('tableContainer');
   const totalServer = records.filter(r => !r._isDraft).length;

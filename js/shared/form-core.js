@@ -85,6 +85,17 @@ function goBlokAndScroll(blokNum, qId) {
   setTimeout(() => scrollToQuestion(qId), 280);
 }
 
+/* Expand/collapse daftar entri roster (anggota/usaha) di sidebar. Memberi area
+ * scroll tersendiri untuk roster panjang. Item entri tetap bisa diklik untuk
+ * masuk ke layar detail (showAngDetailScreen / showUsahaDetailScreen). */
+function toggleSidebarRoster(headEl) {
+  if (!headEl) return;
+  const items = headEl.nextElementSibling;
+  if (!items) return;
+  const collapsed = items.classList.toggle('sb-roster-collapsed');
+  headEl.classList.toggle('open', !collapsed);
+}
+
 /* Klik header blok di sidebar: navigasi ke blok SEKALIGUS buka daftar
  * pertanyaannya (termasuk grup roster anggota/usaha) agar petugas bisa langsung
  * melihat & melompat ke pertanyaan / masuk ke roster. */

@@ -30,6 +30,11 @@ const PRELIST_SHEET_NAME = "SE2026_Prelist";
 const PPL_SHEET_NAME = "PPL";
 const PML_SHEET_NAME = "PML";
 
+// Registry assignment + progress (1 baris per assignment, key = cawi_id).
+// Diisi otomatis: portal saat assignment dibuat, kuesioner saat autosave/submit.
+// Dibaca daftar.html untuk monitoring lintas perangkat (difilter per peran di klien).
+const ASSIGN_SHEET = "SE2026_Assignments";
+
 // LKP_HEADERS, HEADERS, & buildRow (kolom/baris L.UB) DIHAPUS: subsistem L.UB di-retire.
 
 function doPost(e) {
@@ -44,6 +49,10 @@ function doPost(e) {
     if (d.action === "getPplUnderPml")    return getPplUnderPmlResponse(d.pml_email);
     if (d.action === "getPrelist")  return getPrelistResponse(d.sls_kd || d.kode_sls || d.sls || '');
     if (d.action === "getPRecords") return getPRecordsResponse();
+    // Registry assignment + progress (untuk daftar.html — monitoring lintas perangkat)
+    if (d.action === "saveAssignmentMeta") return saveAssignmentMetaResponse(d);
+    if (d.action === "getAssignmentsMeta") return getAssignmentsMetaResponse();
+    if (d.action === "deleteAssignmentMeta") return deleteAssignmentMetaResponse(d.cawi_id);
 
     // === P MODE (Pemutakhiran / listing) → sheet SE2026_P_Responses ===
     // Self-contained: resolusi cawi_id, insert/update/delete sendiri (1 baris per entitas).
@@ -256,6 +265,7 @@ function doGet(e) {
       return getPrelistResponse(e.parameter.sls_kd || e.parameter.kode_sls || e.parameter.sls || '');
     }
     if (action === "getPRecords") return getPRecordsResponse();
+    if (action === "getAssignmentsMeta") return getAssignmentsMetaResponse();
     return getRecordsResponse();
   } catch(err) {
     return jsonResponse({ status: "error", message: err.message });
@@ -867,6 +877,120 @@ function readPRecords() {
 function getPRecordsResponse() {
   try { return jsonResponse({ status: "ok", kind: "precords", data: readPRecords() }); }
   catch (err) { return jsonResponse({ status: "error", message: err.message }); }
+}
+
+// ============================================================
+// ASSIGNMENT REGISTRY + PROGRESS — sheet SE2026_Assignments
+// ============================================================
+// Satu baris per assignment (key = cawi_id). Di-upsert oleh portal (saat dibuat)
+// & kuesioner (autosave/submit). daftar.html membacanya untuk monitoring; filter
+// per peran (PPL = miliknya, PML = bawahannya) dilakukan di klien (PetugasManager).
+const ASSIGN_HEADERS = [
+  "CAWI ID", "Jenis", "Status", "Progress (%)", "Filled", "Total",
+  "Petugas Nama", "Petugas Email", "Peran", "PML Email",
+  "Nama Responden",
+  "Provinsi", "Kode Provinsi", "Kabupaten", "Kode Kabupaten",
+  "Kecamatan", "Kode Kecamatan", "Desa/Kel", "Kode Desa",
+  "Nama SLS", "Kode SLS", "Kode SLS Lengkap", "SubSLS",
+  "Dibuat", "Diperbarui"
+];
+const ASSIGN_FIELDS = [
+  "cawi_id", "jenis", "status", "progress", "filled", "total",
+  "petugas_nama", "petugas_email", "petugas_peran", "pml_email",
+  "nama_responden",
+  "provinsi", "provinsi_kd", "kabupaten", "kabupaten_kd",
+  "kecamatan", "kecamatan_kd", "desa", "desa_kd",
+  "sls_nama", "sls_kd", "sls_full_kd", "subsls_kd",
+  "created_at", "updated_at"
+];
+
+function getOrInitAssignSheet(ss) {
+  var sheet = ss.getSheetByName(ASSIGN_SHEET);
+  if (!sheet) {
+    sheet = ss.insertSheet(ASSIGN_SHEET);
+    sheet.appendRow(ASSIGN_HEADERS);
+    sheet.getRange(1, 1, 1, ASSIGN_HEADERS.length)
+      .setFontWeight("bold").setBackground("#6b46c1").setFontColor("#ffffff");
+    sheet.setFrozenRows(1);
+  }
+  return sheet;
+}
+
+// Cari row (1-based) berdasarkan cawi_id pada kolom pertama. -1 bila tak ada.
+function _findAssignRow(sheet, cawiId) {
+  var lastRow = sheet.getLastRow();
+  if (lastRow < 2) return -1;
+  var col = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+  var target = String(cawiId).trim();
+  for (var i = 0; i < col.length; i++) {
+    if (String(col[i][0]).trim() === target) return i + 2;
+  }
+  return -1;
+}
+
+// Upsert satu assignment (key cawi_id). created_at dipertahankan saat update.
+function saveAssignmentMetaResponse(d) {
+  try {
+    if (!d || !d.cawi_id) throw new Error("cawi_id diperlukan");
+    var ss = SpreadsheetApp.openById(SHEET_ID);
+    var sheet = getOrInitAssignSheet(ss);
+    var nowIso = new Date().toISOString();
+    var rowNum = _findAssignRow(sheet, d.cawi_id);
+    var existing = {};
+    if (rowNum > 0) {
+      var cur = sheet.getRange(rowNum, 1, 1, ASSIGN_HEADERS.length).getValues()[0];
+      ASSIGN_FIELDS.forEach(function (k, i) { existing[k] = cur[i]; });
+    }
+    var rec = {};
+    ASSIGN_FIELDS.forEach(function (k) {
+      // Nilai baru menimpa; bila tak dikirim, pertahankan nilai lama.
+      rec[k] = (d[k] !== undefined && d[k] !== null && d[k] !== '')
+        ? d[k] : (existing[k] != null ? existing[k] : '');
+    });
+    rec.created_at = (existing.created_at && String(existing.created_at).trim()) ? existing.created_at : nowIso;
+    rec.updated_at = nowIso;
+    var row = ASSIGN_FIELDS.map(function (k) { return rec[k] == null ? '' : rec[k]; });
+    if (rowNum > 0) {
+      sheet.getRange(rowNum, 1, 1, row.length).setValues([row]);
+    } else {
+      sheet.appendRow(row);
+    }
+    return jsonResponse({ status: "ok", message: "assignment meta tersimpan", cawi_id: d.cawi_id });
+  } catch (err) {
+    return jsonResponse({ status: "error", message: err.message });
+  }
+}
+
+function getAssignmentsMetaResponse() {
+  try {
+    var ss = SpreadsheetApp.openById(SHEET_ID);
+    var sheet = ss.getSheetByName(ASSIGN_SHEET);
+    if (!sheet || sheet.getLastRow() <= 1) return jsonResponse({ status: "ok", kind: "assignments", data: [] });
+    var values = sheet.getDataRange().getValues();
+    var out = values.slice(1).map(function (row) {
+      var o = {};
+      ASSIGN_FIELDS.forEach(function (k, i) { o[k] = cellStr(row[i]); });
+      return o;
+    }).filter(function (o) { return o.cawi_id; });
+    return jsonResponse({ status: "ok", kind: "assignments", data: out });
+  } catch (err) {
+    return jsonResponse({ status: "error", message: err.message });
+  }
+}
+
+function deleteAssignmentMetaResponse(cawiId) {
+  try {
+    if (!cawiId) throw new Error("cawi_id diperlukan");
+    var ss = SpreadsheetApp.openById(SHEET_ID);
+    var sheet = ss.getSheetByName(ASSIGN_SHEET);
+    if (sheet) {
+      var rowNum = _findAssignRow(sheet, cawiId);
+      if (rowNum > 0) sheet.deleteRow(rowNum);
+    }
+    return jsonResponse({ status: "ok", message: "assignment meta dihapus" });
+  } catch (err) {
+    return jsonResponse({ status: "error", message: err.message });
+  }
 }
 
 // ============================================================

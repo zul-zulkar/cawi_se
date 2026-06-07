@@ -17,6 +17,56 @@ function _syncActiveRosterForms() {
   } catch (e) {}
 }
 
+/* Identitas petugas aktif untuk registry assignment (server). Utamakan sesi
+ * portal (sessionStorage), fallback ke field assignment. */
+function _activePetugasMeta() {
+  try {
+    const a = JSON.parse(sessionStorage.getItem('cawi_petugas_aktif') || 'null');
+    if (a && a.email) return a;
+  } catch (e) {}
+  const asg = (typeof window !== 'undefined' && window.__cawiActiveAssignment) || {};
+  return {
+    nama: asg.petugas_nama || '', email: asg.petugas_email || '',
+    peran: asg.petugas_peran || 'PPL', pml_email: asg.pml_email || ''
+  };
+}
+
+/* Kirim metadata + progress assignment ke Sheet (fire-and-forget) supaya pegawai
+ * bisa memantau lewat daftar.html lintas perangkat. Tidak memblokir UI; gagal =
+ * diabaikan (draft lokal tetap jalan). Hanya untuk alur assignment (ada cawi_id). */
+function _pushAssignmentMeta(status) {
+  try {
+    const asg = (typeof window !== 'undefined' && window.__cawiActiveAssignment) || null;
+    if (!asg || !asg.id) return;
+    const who = _activePetugasMeta();
+    const pp = (typeof calcProgress === 'function') ? calcProgress() : { pct: 0, filled: 0, total: 0 };
+    const url = (typeof getScriptUrl === 'function') ? getScriptUrl() : null;
+    if (!url) return;
+    const payload = {
+      action: 'saveAssignmentMeta',
+      cawi_id: asg.id,
+      jenis: asg.jenis || 'UNIFIED',
+      status: status || 'draft',
+      progress: pp.pct || 0, filled: pp.filled || 0, total: pp.total || 0,
+      petugas_nama: who.nama || asg.petugas_nama || '',
+      petugas_email: who.email || asg.petugas_email || '',
+      petugas_peran: who.peran || asg.petugas_peran || 'PPL',
+      pml_email: who.pml_email || asg.pml_email || '',
+      nama_responden: asg.nama_responden || '',
+      provinsi: asg.provinsi || '', provinsi_kd: asg.provinsi_kd || '',
+      kabupaten: asg.kabupaten || '', kabupaten_kd: asg.kabupaten_kd || '',
+      kecamatan: asg.kecamatan || '', kecamatan_kd: asg.kecamatan_kd || '',
+      desa: asg.desa || '', desa_kd: asg.desa_kd || '',
+      sls_nama: asg.sls_nama || '', sls_kd: asg.sls_kd || '',
+      sls_full_kd: asg.sls_full_kd || '', subsls_kd: asg.subsls_kd || ''
+    };
+    fetch(url, {
+      method: 'POST', headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(payload), keepalive: true
+    }).catch(function () {});
+  } catch (e) {}
+}
+
 function saveDraft() {
   try {
     _syncActiveRosterForms();
@@ -58,6 +108,8 @@ function saveDraft() {
     const txt = document.getElementById('autosaveText');
     if (dot) { dot.style.background = '#68d391'; setTimeout(() => { dot.style.background='rgba(255,255,255,.2)'; }, 2000); }
     if (txt) { const t=new Date(); txt.textContent='Tersimpan '+String(t.getHours()).padStart(2,'0')+':'+String(t.getMinutes()).padStart(2,'0'); }
+    // Sinkron metadata+progress ke server (fire-and-forget) untuk monitoring pegawai.
+    _pushAssignmentMeta('draft');
   } catch(e) { console.error('Gagal simpan draft:', e); }
 }
 

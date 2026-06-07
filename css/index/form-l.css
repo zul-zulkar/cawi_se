@@ -188,7 +188,22 @@ body.pmt-bangunan .pmt-keluarga-only{display:none!important}
 .screen-title .screen-title-name.is-empty { color: #b0a8a0; font-weight: 600; font-style: italic; }
 
 /* ====== ITEM ROSTER DI SIDEBAR (anggota/usaha — nama digenerate) ====== */
-.sidebar-roster-head { font-weight: 700; color: #c05621; }
+.sidebar-roster-head {
+  font-weight: 700; color: #c05621;
+  display: flex; align-items: center; justify-content: space-between; gap: 6px;
+}
+/* Caret penanda expand/collapse grup roster */
+.sidebar-roster-head::after {
+  content: '\25BE'; font-size: 10px; color: #c05621; flex-shrink: 0;
+  transition: transform .2s ease;
+}
+.sidebar-roster-head:not(.open)::after { transform: rotate(-90deg); }
+/* Area entri roster: scroll sendiri agar roster panjang tetap mudah dinavigasi */
+.sidebar-roster-items {
+  max-height: 34vh; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 1px;
+}
+.sidebar-roster-items.sb-roster-collapsed { display: none; }
 .sidebar-roster-item { display: flex; align-items: center; gap: 8px; }
 .sidebar-roster-item .sb-roster-no {
   flex-shrink: 0; font-size: 10px; font-weight: 800; color: #2b6cb0;

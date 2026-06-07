@@ -569,6 +569,38 @@
     localStorage.setItem(LK_ASSIGN, JSON.stringify(list || []));
   }
 
+  // Daftarkan/perbarui assignment ke Sheet (SE2026_Assignments) agar terlihat di
+  // daftar.html lintas perangkat. Fire-and-forget; gagal = diabaikan (data lokal
+  // tetap jalan). progress 0 saat baru dibuat (belum diisi).
+  function pushAssignmentMeta(a, status) {
+    try {
+      if (!a || !a.id) return;
+      var payload = {
+        action: 'saveAssignmentMeta',
+        cawi_id: a.id, jenis: a.jenis || 'UNIFIED', status: status || 'assigned',
+        progress: 0, filled: 0, total: 0,
+        petugas_nama: a.petugas_nama || '', petugas_email: a.petugas_email || '',
+        petugas_peran: a.petugas_peran || 'PPL', pml_email: a.pml_email || '',
+        nama_responden: a.nama_responden || '',
+        provinsi: a.provinsi || '', provinsi_kd: a.provinsi_kd || '',
+        kabupaten: a.kabupaten || '', kabupaten_kd: a.kabupaten_kd || '',
+        kecamatan: a.kecamatan || '', kecamatan_kd: a.kecamatan_kd || '',
+        desa: a.desa || '', desa_kd: a.desa_kd || '',
+        sls_nama: a.sls_nama || '', sls_kd: a.sls_kd || '',
+        sls_full_kd: a.sls_full_kd || '', subsls_kd: a.subsls_kd || ''
+      };
+      fetch(getScriptUrl(), { method: 'POST', headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify(payload), keepalive: true }).catch(function () {});
+    } catch (e) {}
+  }
+  function deleteAssignmentMeta(id) {
+    try {
+      if (!id) return;
+      fetch(getScriptUrl(), { method: 'POST', headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ action: 'deleteAssignmentMeta', cawi_id: id }), keepalive: true }).catch(function () {});
+    } catch (e) {}
+  }
+
   function fmtDateTime(iso) {
     if (!iso) return '';
     try {
@@ -1001,6 +1033,7 @@
     if (!window.confirm('Hapus assignment ini? Tindakan ini tidak bisa dibatalkan.')) return;
     var list = PM.deleteAssignment(id, getAssignments());
     setAssignments(list);
+    deleteAssignmentMeta(id);   // hapus juga dari registry server
     populateFilters();
     renderAssignList();
   }
@@ -1234,6 +1267,7 @@
       var list   = getAssignments();
       list.push(entry);
       setAssignments(list);
+      pushAssignmentMeta(entry, 'assigned');   // daftarkan ke server (monitoring pegawai)
       closeModal();
       populateFilters();
       renderAssignList();

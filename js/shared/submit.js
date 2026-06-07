@@ -309,6 +309,7 @@ async function submitUnified() {
     if (window.__cawiActiveAssignment && typeof saveDraft === 'function') {
       try { saveDraft(); } catch (_e) {}
     }
+    if (typeof _pushAssignmentMeta === 'function') _pushAssignmentMeta('submitted');
     clearDraft();
     if (_currentDraftId) { deleteDraftById(_currentDraftId); }
     if (typeof _formDirty !== 'undefined') _formDirty = false;
@@ -406,6 +407,7 @@ async function submitForm() {
     if (window.__cawiActiveAssignment && typeof saveDraft === 'function') {
       try { saveDraft(); } catch(_e) {}
     }
+    if (typeof _pushAssignmentMeta === 'function') _pushAssignmentMeta('submitted');
     clearDraft();
     if (_currentDraftId) { deleteDraftById(_currentDraftId); }
     // Mark form clean so leave-guard / beforeunload don't prompt after submit

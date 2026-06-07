@@ -12,6 +12,17 @@
 <link rel="stylesheet" href="css/daftar/index.css"/>
 <link rel="stylesheet" href="css/core/design-system.css"/>
 <link rel="stylesheet" href="css/daftar/design.css"/>
+<style>
+  /* Tab Penugasan — chip status & bar progress */
+  .asg-chip{display:inline-block;font-size:11px;font-weight:800;padding:3px 9px;border-radius:20px;white-space:nowrap}
+  .asg-chip.asg-done{background:#e6f4ea;color:#1e7e34}
+  .asg-chip.asg-draft{background:#fff3e0;color:#c05621}
+  .asg-chip.asg-new{background:#eef2ff;color:#3949ab}
+  .asg-prog{display:flex;flex-direction:column;gap:4px}
+  .asg-prog-bar{height:7px;background:#eee;border-radius:999px;overflow:hidden}
+  .asg-prog-bar>span{display:block;height:100%;background:linear-gradient(90deg,#fc6c00,#ff9a3c);border-radius:999px;transition:width .4s}
+  .asg-prog-txt{font-size:11px;color:#666;font-weight:600}
+</style>
 </head>
 <body>
 
@@ -85,6 +96,13 @@
     <div class="sidebar-item-info">
       <div>Draft Lokal</div>
       <div class="sidebar-item-sub" id="sidebarTabDraftCount">—</div>
+    </div>
+  </div>
+  <div class="sidebar-item" id="sidebarTabAssign" onclick="setActiveTab('assign')">
+    <div class="sidebar-item-icon"><i class="bi bi-clipboard-check-fill"></i></div>
+    <div class="sidebar-item-info">
+      <div>Penugasan &amp; Progres</div>
+      <div class="sidebar-item-sub" id="sidebarTabAssignCount">—</div>
     </div>
   </div>
 
@@ -176,6 +194,10 @@
         <span>Draft Lokal</span>
         <span class="tab-count tc-draft" id="tabBarDraftCount">—</span>
       </div>
+      <div class="tab-item" id="tabBarAssign" onclick="setActiveTab('assign')">
+        <span>Penugasan</span>
+        <span class="tab-count" id="tabBarAssignCount">—</span>
+      </div>
     </div>
     <div class="table-wrap">
       <div id="loadingWrap" class="loading-wrap">
@@ -239,6 +261,7 @@
 <script src="js/config.js"></script>
 <script src="js/shared/utils.js"></script>
 <script src="js/auth/auth-daftar.js"></script>
+<script src="js/pages/petugas.js"></script>
 <script src="js/shared/backup.js"></script>
 <script src="js/pages/daftar-main.js"></script>
 </body>
