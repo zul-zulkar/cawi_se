@@ -104,6 +104,19 @@ function collectAllProblemsL() {
       if (!getRadio('l_ang_' + i + '_18b')) e(prefix + ': Pendapatan Keuntungan Usaha', 'Belum dipilih', 1, 'l_ang_' + i + '_18b');
       if (!getRadio('l_ang_' + i + '_18c')) e(prefix + ': Penerimaan Transfer/Pasif', 'Belum dipilih', 1, 'l_ang_' + i + '_18c');
     }
+    // Konsistensi (materi SE2026-L R17/R18/R19): kode 9 "Tidak Tahu" hanya WAJAR
+    // bila anggota tidak tinggal bersama keluarga (keberadaan R9a berkode 3/4).
+    // Bila dipakai untuk anggota yang tinggal di rumah ini / anggota baru →
+    // warning verifikasi (bukan error; tidak memblokir submit).
+    if (keb !== '3' && keb !== '4') {
+      const tt = [];
+      if (getRadio('l_ang_' + i + '_kedudukan') === '9') tt.push('Kedudukan (17)');
+      if (getRadio('l_ang_' + i + '_18a') === '9') tt.push('Pendapatan Pekerjaan (18a)');
+      if (getRadio('l_ang_' + i + '_18b') === '9') tt.push('Pendapatan Usaha (18b)');
+      if (getRadio('l_ang_' + i + '_18c') === '9') tt.push('Penerimaan Transfer (18c)');
+      if (getRadio('l_ang_' + i + '_rekening') === '9') tt.push('Rekening (19)');
+      if (tt.length) w(prefix + ': "Tidak Tahu" (kode 9)', tt.join(', ') + ' — kode 9 hanya wajar bila anggota tidak tinggal bersama (keberadaan 3/4)', 1, 'l_ang_' + i + '_keberadaan');
+    }
     // Disabilitas & penyakit kronis — bila kosong, dianggap "TT/Tidak Tahu" — log ke kosong saja
     const disK = ['a','b','c','d','e','f'].filter(k => !getRadio('l_ang_' + i + '_disab_' + k));
     if (disK.length > 0) k(prefix + ': Disabilitas', disK.length + ' kategori belum diisi (boleh dilewat)', 1, 'l_ang_' + i + '_disab_a');
@@ -225,8 +238,14 @@ function collectAllProblemsL() {
   }
 
   const _usahaList = (typeof _usahaDataStore !== 'undefined') ? _usahaDataStore : [];
+  // Usaha OPSIONAL untuk keluarga/tempat tinggal — sebuah keluarga boleh tidak
+  // punya usaha sama sekali. WAJIB minimal 1 hanya bila bangunan KHUSUS USAHA
+  // (stage 'usaha', kode penggunaan 1/7) yang memang tak punya blok keluarga.
+  const _lscope = (typeof window !== 'undefined' && window.__cawiLScope) || 'full';
   if (_usahaList.length === 0) {
-    e('BLOK II: Daftar Usaha', 'Harus ada minimal 1 usaha', 2, null);
+    if (_lscope === 'usaha') {
+      e('BLOK II: Daftar Usaha', 'Bangunan khusus usaha — minimal 1 usaha', 2, null);
+    }
   } else {
     const activeIdx = (typeof _activeUsahaIdx !== 'undefined') ? _activeUsahaIdx : null;
     _usahaList.forEach((u, i) => {

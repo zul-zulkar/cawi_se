@@ -187,17 +187,27 @@ body.pmt-bangunan .pmt-keluarga-only{display:none!important}
 }
 .screen-title .screen-title-name.is-empty { color: #b0a8a0; font-weight: 600; font-style: italic; }
 
-/* ====== ITEM ROSTER DI SIDEBAR (anggota/usaha — nama digenerate) ====== */
+/* ====== ITEM ROSTER DI SIDEBAR (anggota/usaha — nama digenerate) ======
+ * Header roster = label (klik → scroll/masuk ke seksi roster di main) + caret
+ * (klik → expand/collapse daftar entri). Entri di-scroll sendiri. */
 .sidebar-roster-head {
   font-weight: 700; color: #c05621;
-  display: flex; align-items: center; justify-content: space-between; gap: 6px;
+  display: flex; align-items: center; gap: 2px;
 }
-/* Caret penanda expand/collapse grup roster */
-.sidebar-roster-head::after {
-  content: '\25BE'; font-size: 10px; color: #c05621; flex-shrink: 0;
-  transition: transform .2s ease;
+.sidebar-roster-label {
+  flex: 1; min-width: 0; cursor: pointer; font-size: 11px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  padding: 7px 6px 7px 14px; border-radius: 0 5px 5px 0;
+  transition: background .12s, color .12s;
 }
-.sidebar-roster-head:not(.open)::after { transform: rotate(-90deg); }
+.sidebar-roster-label:hover { background: #fff5eb; color: #d95a00; }
+.sidebar-roster-caret {
+  flex-shrink: 0; background: none; border: none; cursor: pointer;
+  color: #c05621; font-size: 10px; line-height: 1; padding: 6px 8px;
+  border-radius: 4px; transition: transform .2s ease, background .12s;
+}
+.sidebar-roster-caret:hover { background: rgba(192,86,33,.12); }
+.sidebar-roster-caret:not(.open) { transform: rotate(-90deg); }
 /* Area entri roster: scroll sendiri agar roster panjang tetap mudah dinavigasi */
 .sidebar-roster-items {
   max-height: 34vh; overflow-y: auto;

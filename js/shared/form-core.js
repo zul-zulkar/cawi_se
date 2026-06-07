@@ -87,13 +87,19 @@ function goBlokAndScroll(blokNum, qId) {
 
 /* Expand/collapse daftar entri roster (anggota/usaha) di sidebar. Memberi area
  * scroll tersendiri untuk roster panjang. Item entri tetap bisa diklik untuk
- * masuk ke layar detail (showAngDetailScreen / showUsahaDetailScreen). */
-function toggleSidebarRoster(headEl) {
-  if (!headEl) return;
-  const items = headEl.nextElementSibling;
+ * masuk ke layar detail (showAngDetailScreen / showUsahaDetailScreen).
+ * `el` boleh head lama (nextSibling=items) atau tombol caret di dalam header row
+ * (cari items via grup terdekat). */
+function toggleSidebarRoster(el) {
+  if (!el) return;
+  let items = el.nextElementSibling;
+  if (!items || !items.classList || !items.classList.contains('sidebar-roster-items')) {
+    const grp = (el.closest && el.closest('[id$="Group"]')) || el.parentElement;
+    items = grp ? grp.querySelector('.sidebar-roster-items') : null;
+  }
   if (!items) return;
   const collapsed = items.classList.toggle('sb-roster-collapsed');
-  headEl.classList.toggle('open', !collapsed);
+  el.classList.toggle('open', !collapsed);
 }
 
 /* Klik header blok di sidebar: navigasi ke blok SEKALIGUS buka daftar

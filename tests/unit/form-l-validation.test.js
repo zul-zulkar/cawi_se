@@ -19,7 +19,7 @@ function buildUsahaStoreV(fields, radios) {
   return [obj]  // always 1 entry; may be empty object
 }
 
-function makeCollect({ fields = {}, radios = {}, elements = {}, l5HasSig = false, usahaStore = null } = {}) {
+function makeCollect({ fields = {}, radios = {}, elements = {}, l5HasSig = false, usahaStore = null, lscope = null } = {}) {
   const dom = { ...elements }
   const noop = () => {}
   const mockDoc = {
@@ -29,6 +29,8 @@ function makeCollect({ fields = {}, radios = {}, elements = {}, l5HasSig = false
     createElement: () => ({}),
   }
   const store = usahaStore !== null ? usahaStore : buildUsahaStoreV(fields, radios)
+  const win = { addEventListener: noop }
+  if (lscope) win.__cawiLScope = lscope
   const fn = new Function(
     'document', 'window',
     'getVal', 'getRadio',
@@ -38,7 +40,7 @@ function makeCollect({ fields = {}, radios = {}, elements = {}, l5HasSig = false
     `${SOURCE}\nreturn { collectAllProblemsL };`
   )
   return fn(
-    mockDoc, { addEventListener: noop },
+    mockDoc, win,
     id   => String(fields[id]  ?? ''),
     name => String(radios[name] ?? ''),
     hp    => /^(\+62|62|0)[0-9]{8,13}$/.test(hp.replace(/[\s-]/g, '')),
@@ -766,5 +768,54 @@ describe('collectAllProblemsL — new B2 fields: bulk fill', () => {
     ]
     const foundErrors = newRequiredFields.filter(f => r.errors.some(e => e.field === f))
     expect(foundErrors.length).toBe(newRequiredFields.length)
+  })
+})
+
+// ─── Usaha OPSIONAL untuk keluarga (materi: keluarga boleh tanpa usaha) ──────
+describe('collectAllProblemsL — usaha opsional untuk keluarga', () => {
+  const noUsahaErr = r => r.errors.some(e => e.label === 'BLOK II: Daftar Usaha')
+
+  it('keluarga (scope default/full) tanpa usaha → TIDAK wajib minimal 1 usaha', () => {
+    expect(noUsahaErr(collect({ usahaStore: [] }))).toBe(false)
+  })
+
+  it('scope "full" eksplisit tanpa usaha → tetap tidak wajib', () => {
+    expect(noUsahaErr(collect({ usahaStore: [], lscope: 'full' }))).toBe(false)
+  })
+
+  it('bangunan khusus usaha (scope "usaha") tanpa usaha → WAJIB minimal 1 usaha', () => {
+    const r = collect({ usahaStore: [], lscope: 'usaha' })
+    expect(noUsahaErr(r)).toBe(true)
+    expect(r.errors.find(x => x.label === 'BLOK II: Daftar Usaha')?.blok).toBe(2)
+  })
+})
+
+// ─── Konsistensi kode 9 "Tidak Tahu" (materi SE2026-L R17/R18/R19) ───────────
+describe('collectAllProblemsL — konsistensi kode 9 "Tidak Tahu"', () => {
+  const baseAng = (keb) => ({
+    fields: {
+      l1_jml_kk_anggota: '1', l_ang_1_nama: 'A', l_ang_1_hubungan: '1',
+      l_ang_1_tgl_lahir: '1990-01-01', l_ang_1_umur: '35',
+      l_ang_1_dn_provinsi: '51', l_ang_1_ln_negara: 'Malaysia',
+    },
+    radios: {
+      l_ang_1_keberadaan: keb, l_ang_1_kawin: '2', l_ang_1_jk: '1',
+      l_ang_1_sekolah: '1', l_ang_1_ijazah: '3',
+      l_ang_1_kedudukan: '9', l_ang_1_18a: '9', l_ang_1_18b: '9',
+      l_ang_1_18c: '9', l_ang_1_rekening: '9',
+    },
+  })
+  const kode9Warn = r => r.warnings.find(w => /kode 9/.test(w.text) && w.field === 'l_ang_1_keberadaan')
+
+  it('keberadaan=1 (tinggal) + kode 9 → warning verifikasi', () => {
+    expect(kode9Warn(collect(baseAng('1')))).toBeTruthy()
+  })
+
+  it('keberadaan=3 (pindah DN) + kode 9 → TIDAK ada warning kode 9 (wajar)', () => {
+    expect(kode9Warn(collect(baseAng('3')))).toBeFalsy()
+  })
+
+  it('keberadaan=4 (pindah LN) + kode 9 → TIDAK ada warning kode 9 (wajar)', () => {
+    expect(kode9Warn(collect(baseAng('4')))).toBeFalsy()
   })
 })
