@@ -90,6 +90,7 @@ function refreshDynamicSidebar() {
 
   if (typeof updateProgress === 'function') updateProgress();
   _renderStageHint(stage);
+  updatePReqMarks();
   return stage;
 }
 
@@ -137,7 +138,20 @@ function handlePmtJenisEntitas() {
   if (namaLbl) namaLbl.innerHTML = (isBangunan ? 'Nama Usaha / Bangunan' : 'Nama Kepala Keluarga') + ' <span class="req">*</span>';
   var kebLbl = document.getElementById('pmt_keberadaan_label');
   if (kebLbl) kebLbl.innerHTML = (isBangunan ? 'Keberadaan Bangunan' : 'Keberadaan Keluarga') + ' <span class="req">*</span>';
+  updatePReqMarks();
   if (typeof scheduleAutosave === 'function') scheduleAutosave();
+}
+
+/* Tampilkan bintang wajib DINAMIS pada field identitas keluarga + alamat (NIK,
+ * No KK, sesuai KK, jalan, blok) HANYA saat kuesioner keluarga aktif (kode 2/3)
+ * & keluarga ditemukan/baru (keberadaan 1/2) — selaras collectAllProblemsP. */
+function updatePReqMarks() {
+  var kode = _pVal('pmt_kode_bangunan');
+  var kebEl = document.querySelector('input[name="pmt_keberadaan"]:checked');
+  var keb = kebEl ? kebEl.value : '';
+  var on = (kode === '2' || kode === '3') && (keb === '1' || keb === '2');
+  var marks = document.querySelectorAll('.preq-dyn');
+  for (var i = 0; i < marks.length; i++) marks[i].style.display = on ? '' : 'none';
 }
 
 /* ---- Geotag Blok P (pmt_lat/lng/akurasi) ----
@@ -365,6 +379,10 @@ function initFormP() {
   _syncPmtRadioFromKode();
   _syncPmtKodeFromRadio();
   if (typeof handlePmtJenisEntitas === 'function') handlePmtJenisEntitas();
+  // Marker wajib dinamis ikut ter-update saat keberadaan berubah (radio tanpa onchange inline).
+  document.addEventListener('change', function (e) {
+    if (e && e.target && e.target.name === 'pmt_keberadaan') updatePReqMarks();
+  });
   // Hitung stage awal (mis. dari draft yang sudah berisi pmt_kode_bangunan).
   refreshDynamicSidebar();
   // Alirkan identitas keluarga Blok P → Blok L1 + anggota #1 (sumber tunggal).
@@ -384,6 +402,7 @@ if (typeof window !== 'undefined') {
   window.handlePmtJmlUsaha    = handlePmtJmlUsaha;
   window.handlePmtSkala       = handlePmtSkala;
   window.handlePmtJenisEntitas = handlePmtJenisEntitas;
+  window.updatePReqMarks      = updatePReqMarks;
   window._fillPWilayah        = _fillPWilayah;
   window.ambilLokasiP         = ambilLokasiP;
   window.seedPrelistP         = seedPrelistP;

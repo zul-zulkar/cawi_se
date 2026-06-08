@@ -606,12 +606,12 @@
     <div class="section-body">
       <div class="inline-fields">
         <div class="form-group">
-          <label class="field-label">Nomor Kartu Keluarga (KK)</label>
+          <label class="field-label">Nomor Kartu Keluarga (KK) <span class="req preq-dyn" style="display:none">*</span></label>
           <input type="text" id="pmt_nomor_kk" maxlength="16" placeholder="16 digit (atau 9999/8888/7777)" oninput="if(typeof syncPIdentityToL==='function')syncPIdentityToL()"/>
           <div class="hint">9999: tak dapat info · 8888: belum punya KK · 7777: tak punya KK 16 digit.</div>
         </div>
         <div class="form-group">
-          <label class="field-label">NIK Kepala Keluarga</label>
+          <label class="field-label">NIK Kepala Keluarga <span class="req preq-dyn" style="display:none">*</span></label>
           <input type="text" id="pmt_nik" maxlength="16" placeholder="16 digit (atau 9999/7777)" oninput="if(typeof syncPIdentityToL==='function')syncPIdentityToL()"/>
         </div>
       </div>
@@ -654,7 +654,7 @@
         <div class="hint">Kode 0/3/6 → cukup sampai rincian ini. Kode 4/5 → isi sampai geotag + foto.</div>
       </div>
       <div class="form-group pmt-keluarga-only">
-        <label class="field-label">Alamat domisili sesuai KK?</label>
+        <label class="field-label">Alamat domisili sesuai KK? <span class="req preq-dyn" style="display:none">*</span></label>
         <div class="radio-group">
           <label class="radio-item"><input type="radio" name="pmt_sesuai_kk" value="1" onchange="if(typeof syncPIdentityToL==='function')syncPIdentityToL()"/> <span>1. Ya, sesuai KK</span></label>
           <label class="radio-item"><input type="radio" name="pmt_sesuai_kk" value="2" onchange="if(typeof syncPIdentityToL==='function')syncPIdentityToL()"/> <span>2. Tidak sesuai KK</span></label>
@@ -662,11 +662,11 @@
       </div>
       <div class="inline-fields">
         <div class="form-group">
-          <label class="field-label">Alamat — Nama Jalan/Gang</label>
+          <label class="field-label">Alamat — Nama Jalan/Gang <span class="req preq-dyn" style="display:none">*</span></label>
           <input type="text" id="pmt_jalan" placeholder="mis. Jl. Anggur / Kavling DKI" oninput="if(typeof syncPIdentityToL==='function')syncPIdentityToL()"/>
         </div>
         <div class="form-group">
-          <label class="field-label">Alamat — Blok / Nomor</label>
+          <label class="field-label">Alamat — Blok / Nomor <span class="req preq-dyn" style="display:none">*</span></label>
           <input type="text" id="pmt_blok" placeholder="mis. Blok A8 No. 19" oninput="if(typeof syncPIdentityToL==='function')syncPIdentityToL()"/>
         </div>
       </div>
@@ -1740,7 +1740,7 @@
         <input type="number" id="l3_luas_lantai" min="0" placeholder="0"/>
       </div>
       <div class="form-group">
-        <label class="field-label">6a. Bahan lantai utama</label>
+        <label class="field-label">6a. Bahan lantai utama <span class="req">*</span></label>
         <div class="radio-group">
           <label class="radio-item"><input type="radio" name="l3_lantai_bahan" value="1" onchange="handleLantaiBahanL()"/> <span>1. Marmer/granit</span></label>
           <label class="radio-item"><input type="radio" name="l3_lantai_bahan" value="2" onchange="handleLantaiBahanL()"/> <span>2. Keramik</span></label>
@@ -1763,7 +1763,7 @@
         </div>
       </div>
       <div class="form-group">
-        <label class="field-label">7a. Bahan dinding utama</label>
+        <label class="field-label">7a. Bahan dinding utama <span class="req">*</span></label>
         <div class="radio-group">
           <label class="radio-item"><input type="radio" name="l3_dinding_bahan" value="1" onchange="handleDindingBahanL()"/> <span>1. Tembok</span></label>
           <label class="radio-item"><input type="radio" name="l3_dinding_bahan" value="2" onchange="handleDindingBahanL()"/> <span>2. Plesteran anyaman bambu/kawat</span></label>
@@ -1784,7 +1784,7 @@
         </div>
       </div>
       <div class="form-group">
-        <label class="field-label">8a. Bahan atap utama</label>
+        <label class="field-label">8a. Bahan atap utama <span class="req">*</span></label>
         <div class="radio-group">
           <label class="radio-item"><input type="radio" name="l3_atap_bahan" value="1" onchange="handleAtapBahanL()"/> <span>1. Beton</span></label>
           <label class="radio-item"><input type="radio" name="l3_atap_bahan" value="2" onchange="handleAtapBahanL()"/> <span>2. Genteng</span></label>
@@ -1876,7 +1876,7 @@
     <div class="section-header" id="sec-L3-13">13-15. Penerangan, Listrik &amp; Pulsa</div>
     <div class="section-body">
       <div class="form-group">
-        <div class="subsection-label">13. Sumber penerangan utama</div>
+        <div class="subsection-label">13. Sumber penerangan utama <span class="req">*</span></div>
         <div class="radio-group">
           <label class="radio-item"><input type="radio" name="l3_listrik" value="1" onchange="handleListrikL()"/> <span>1. PLN dengan meteran</span></label>
           <label class="radio-item"><input type="radio" name="l3_listrik" value="2" onchange="handleListrikL()"/> <span>2. PLN tanpa meteran</span></label>
@@ -1914,19 +1914,19 @@
     <div class="section-header" id="sec-L3-16">16. Pengeluaran Makanan &amp; Bukan Makanan</div>
     <div class="section-body">
       <div class="form-group">
-        <label class="field-label">a. Makanan keluarga / minggu</label>
+        <label class="field-label">a. Makanan keluarga / minggu <span class="req">*</span></label>
         <div class="currency-input-wrap"><span class="currency-prefix">Rp</span>
           <input type="text" id="l3_makanan_mgg" class="currency-field" oninput="formatCurrency(this)" placeholder="0"/>
         </div>
       </div>
       <div class="form-group">
-        <label class="field-label">b. Bukan makanan rutin keluarga / bulan</label>
+        <label class="field-label">b. Bukan makanan rutin keluarga / bulan <span class="req">*</span></label>
         <div class="currency-input-wrap"><span class="currency-prefix">Rp</span>
           <input type="text" id="l3_nonmakanan_bln" class="currency-field" oninput="formatCurrency(this)" placeholder="0"/>
         </div>
       </div>
       <div class="form-group">
-        <label class="field-label">c. Bukan makanan rutin keluarga / tahun</label>
+        <label class="field-label">c. Bukan makanan rutin keluarga / tahun <span class="req">*</span></label>
         <div class="currency-input-wrap"><span class="currency-prefix">Rp</span>
           <input type="text" id="l3_nonmakanan_thn" class="currency-field" oninput="formatCurrency(this)" placeholder="0"/>
         </div>
@@ -1939,18 +1939,18 @@
     <div class="section-header" id="sec-L3-17">17. Kepemilikan Aset</div>
     <div class="section-body">
       <div class="inline-fields">
-        <div class="form-group"><label class="field-label">a. Tabung gas 3 kg</label><input type="number" id="l3_aset_gas3" min="0" placeholder="0"/></div>
-        <div class="form-group"><label class="field-label">b. Tabung gas 5.5 kg+</label><input type="number" id="l3_aset_gas5" min="0" placeholder="0"/></div>
-        <div class="form-group"><label class="field-label">c. Kulkas</label><input type="number" id="l3_aset_kulkas" min="0" placeholder="0"/></div>
+        <div class="form-group"><label class="field-label">a. Tabung gas 3 kg <span class="req">*</span></label><input type="number" id="l3_aset_gas3" min="0" placeholder="0"/></div>
+        <div class="form-group"><label class="field-label">b. Tabung gas 5.5 kg+ <span class="req">*</span></label><input type="number" id="l3_aset_gas5" min="0" placeholder="0"/></div>
+        <div class="form-group"><label class="field-label">c. Kulkas <span class="req">*</span></label><input type="number" id="l3_aset_kulkas" min="0" placeholder="0"/></div>
       </div>
       <div class="inline-fields">
-        <div class="form-group"><label class="field-label">d. AC</label><input type="number" id="l3_aset_ac" min="0" placeholder="0"/></div>
-        <div class="form-group"><label class="field-label">e. Emas/perhiasan (gram)</label><input type="number" id="l3_aset_emas" min="0" placeholder="0"/></div>
-        <div class="form-group"><label class="field-label">f. Komputer/laptop/tablet</label><input type="number" id="l3_aset_komputer" min="0" placeholder="0"/></div>
+        <div class="form-group"><label class="field-label">d. AC <span class="req">*</span></label><input type="number" id="l3_aset_ac" min="0" placeholder="0"/></div>
+        <div class="form-group"><label class="field-label">e. Emas/perhiasan (gram) <span class="req">*</span></label><input type="number" id="l3_aset_emas" min="0" placeholder="0"/></div>
+        <div class="form-group"><label class="field-label">f. Komputer/laptop/tablet <span class="req">*</span></label><input type="number" id="l3_aset_komputer" min="0" placeholder="0"/></div>
       </div>
       <div class="inline-fields">
         <div class="form-group">
-          <label class="field-label">g.i. Sepeda motor</label>
+          <label class="field-label">g.i. Sepeda motor <span class="req">*</span></label>
           <input type="number" id="l3_aset_motor" min="0" placeholder="0" oninput="handleAsetMotorL()"/>
         </div>
         <div class="form-group hidden" id="l3_motor_nilai_wrap">
@@ -1962,7 +1962,7 @@
       </div>
       <div class="inline-fields">
         <div class="form-group">
-          <label class="field-label">h.i. Mobil</label>
+          <label class="field-label">h.i. Mobil <span class="req">*</span></label>
           <input type="number" id="l3_aset_mobil" min="0" placeholder="0" oninput="handleAsetMobilL()"/>
         </div>
         <div class="form-group hidden" id="l3_mobil_nilai_wrap">
@@ -1981,7 +1981,7 @@
     <div class="section-body">
       <div class="inline-fields">
         <div class="form-group">
-          <label class="field-label">a.i. Jumlah tanah/lahan lain</label>
+          <label class="field-label">a.i. Jumlah tanah/lahan lain <span class="req">*</span></label>
           <input type="number" id="l3_aset_tanah" min="0" placeholder="0" oninput="handleAsetTanahL()"/>
         </div>
         <div class="form-group hidden" id="l3_tanah_nilai_wrap">
@@ -1993,7 +1993,7 @@
       </div>
       <div class="inline-fields">
         <div class="form-group">
-          <label class="field-label">b.i. Jumlah rumah/bangunan lain</label>
+          <label class="field-label">b.i. Jumlah rumah/bangunan lain <span class="req">*</span></label>
           <input type="number" id="l3_aset_rumah" min="0" placeholder="0" oninput="handleAsetRumahL()"/>
         </div>
         <div class="form-group hidden" id="l3_rumah_nilai_wrap">

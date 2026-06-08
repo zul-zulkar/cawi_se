@@ -224,6 +224,51 @@ body.pmt-bangunan .pmt-keluarga-only{display:none!important}
 }
 .sidebar-roster-item .sb-roster-nm.is-empty { color: #9aa3b0; font-style: italic; }
 
+/* ====== ENTRI ROSTER EXPANDABLE (header + daftar field) ====== */
+.sb-roster-entry { border-radius: 5px; }
+.sb-roster-entry-head {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 8px; cursor: default; border-radius: 5px;
+}
+.sb-roster-entry-head:hover { background: rgba(43,108,176,.06); }
+.sb-roster-entry-head .sb-roster-no {
+  flex-shrink: 0; font-size: 10px; font-weight: 800; color: #2b6cb0;
+  background: #e6f0ff; border-radius: 4px; padding: 1px 6px;
+}
+.sb-roster-entry-head .sb-roster-nm {
+  flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  cursor: pointer; font-size: 12.5px;
+}
+.sb-roster-entry-head .sb-roster-nm.is-empty { color: #9aa3b0; font-style: italic; }
+.sb-roster-fcaret {
+  flex-shrink: 0; background: none; border: none; cursor: pointer;
+  color: #2b6cb0; font-size: 10px; line-height: 1; padding: 4px 6px;
+  border-radius: 4px; transition: transform .2s ease, background .12s;
+}
+.sb-roster-fcaret:hover { background: rgba(43,108,176,.14); }
+.sb-roster-fcaret.open { transform: rotate(90deg); }
+.sb-roster-fields {
+  display: flex; flex-direction: column;
+  margin: 2px 0 4px 18px; padding-left: 8px; border-left: 2px solid #e3ebf5;
+}
+.sb-roster-fields.sb-roster-collapsed { display: none; }
+.sb-roster-field {
+  font-size: 11.5px; color: #5a6675; padding: 3px 8px;
+  border-radius: 4px; cursor: pointer; white-space: nowrap;
+  overflow: hidden; text-overflow: ellipsis;
+}
+.sb-roster-field:hover { background: #eef4ff; color: #2b6cb0; }
+
+/* Kilatan sorotan saat lompat ke field dari sidebar */
+.field-flash {
+  animation: fieldFlash 1.6s ease;
+  border-radius: 8px;
+}
+@keyframes fieldFlash {
+  0%, 18% { background: #fff3cd; box-shadow: 0 0 0 4px #fff3cd; }
+  100%    { background: transparent; box-shadow: 0 0 0 0 transparent; }
+}
+
 /* ====== L.KP CABANG CARDS (inline di detail usaha) ====== */
 .l2cab-card { margin-top: 10px; border: 1.5px solid #ffd9bf; border-left: 3px solid #fc6c00; border-radius: 8px; padding: 12px 14px; background: #fffaf6; }
 .l2cab-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }

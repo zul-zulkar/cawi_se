@@ -56,17 +56,32 @@ describe('calcProgressP — penghitungan', () => {
     expect(found.total - stop.total).toBe(1)
   })
 
-  it('100% saat semua slot terisi', () => {
+  it('100% saat semua slot WAJIB terisi (opsional spt jml_usaha/idsbr tak dihitung)', () => {
     const r = runP({
+      pmt_jenis_entitas: '1',
       pmt_nama: 'X', pmt_keberadaan: '1', pmt_kode_bangunan: '3',
       pmt_lat: '-8.1', pmt_lng: '115.1',
-      pmt_jml_usaha: '1', pmt_idsbr: '123', pmt_jml_kk: '4',
       pmt_no_kel: '1', pmt_no_bgn: '1', pmt_jalan: 'Jl. Melati',
       // Identitas keluarga (slot tambahan saat kode 2/3 + ditemukan)
       pmt_nik: '1234567890123456', pmt_nomor_kk: '1234567890123456',
       pmt_blok: 'A1', pmt_sesuai_kk: '1',
+      // Opsional — TIDAK menambah/mengurangi 100%
+      pmt_jml_usaha: '1', pmt_idsbr: '123', pmt_jml_kk: '4',
     })
     expect(r.pct).toBe(100)
     expect(r.filled).toBe(r.total)
+  })
+
+  it('jml_usaha opsional tidak menambah total (bukan field wajib)', () => {
+    const base = runP({ pmt_jenis_entitas: '1', pmt_keberadaan: '1' })
+    const withJU = runP({ pmt_jenis_entitas: '1', pmt_keberadaan: '1', pmt_jml_usaha: '3' })
+    expect(withJU.total).toBe(base.total)
+    expect(withJU.filled).toBe(base.filled)
+  })
+
+  it('entitas bangunan (jenis=2) → no urut keluarga tidak dihitung', () => {
+    const keluarga = runP({ pmt_jenis_entitas: '1', pmt_keberadaan: '1' })
+    const bangunan = runP({ pmt_jenis_entitas: '2', pmt_keberadaan: '1' })
+    expect(keluarga.total - bangunan.total).toBe(1)
   })
 })

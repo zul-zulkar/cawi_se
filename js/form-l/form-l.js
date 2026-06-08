@@ -374,7 +374,7 @@ function anggotaCardHTML(i) {
 
     <div class="anggota-after-r9">
     <div class="form-group hidden" id="l_ang_${i}_alamat_dom_wrap">
-      <label class="field-label">9b. Alamat domisili</label>
+      <label class="field-label">9b. Alamat domisili <span class="req">*</span></label>
       <div class="radio-group">
         <label class="radio-item"><input type="radio" name="l_ang_${i}_alamat_dom" value="1"/> <span>1. Sesuai KK &amp; KTP</span></label>
         <label class="radio-item"><input type="radio" name="l_ang_${i}_alamat_dom" value="2"/> <span>2. Hanya sesuai KK</span></label>
@@ -402,7 +402,7 @@ function anggotaCardHTML(i) {
       <input type="text" id="l_ang_${i}_ln_negara" placeholder="Nama negara"/>
     </div>
     <div class="form-group">
-      <label class="field-label">11. Status Perkawinan</label>
+      <label class="field-label">11. Status Perkawinan <span class="req">*</span></label>
       <div class="radio-group">
         <label class="radio-item"><input type="radio" name="l_ang_${i}_kawin" value="1"/> <span>1. Belum kawin</span></label>
         <label class="radio-item"><input type="radio" name="l_ang_${i}_kawin" value="2"/> <span>2. Kawin/nikah</span></label>
@@ -431,7 +431,7 @@ function anggotaCardHTML(i) {
     <div class="anggota-subsection-label">B. Sosial Ekonomi (r14-r21)</div>
     <div id="l_ang_${i}_sosek5plus_wrap">
       <div class="form-group">
-        <label class="field-label">14. Partisipasi sekolah (≥5 thn)</label>
+        <label class="field-label">14. Partisipasi sekolah (≥5 thn) <span class="req">*</span></label>
         <div class="radio-group">
           <label class="radio-item"><input type="radio" name="l_ang_${i}_sekolah" value="0" onchange="handleSekolahAnggota(${i})"/> <span>0. Tidak/belum pernah</span></label>
           <label class="radio-item"><input type="radio" name="l_ang_${i}_sekolah" value="1" onchange="handleSekolahAnggota(${i})"/> <span>1. Masih sekolah</span></label>
@@ -440,7 +440,7 @@ function anggotaCardHTML(i) {
       </div>
       <div id="l_ang_${i}_ijazah_wrap">
       <div class="form-group">
-        <label class="field-label">15. Ijazah Tertinggi (≥5 thn)</label>
+        <label class="field-label">15. Ijazah Tertinggi (≥5 thn) <span class="req">*</span></label>
         <div class="radio-group">
           <label class="radio-item"><input type="radio" name="l_ang_${i}_ijazah" value="0"/> <span>0. Tidak punya ijazah SD</span></label>
           <label class="radio-item"><input type="radio" name="l_ang_${i}_ijazah" value="1"/> <span>1. SD/sederajat</span></label>
@@ -455,7 +455,7 @@ function anggotaCardHTML(i) {
     </div>
     <div id="l_ang_${i}_sosek10plus_wrap">
       <div class="form-group">
-        <label class="field-label">16. Profesi Pekerjaan Utama (≥10 thn)</label>
+        <label class="field-label">16. Profesi Pekerjaan Utama (≥10 thn) <span class="req">*</span></label>
         <select id="l_ang_${i}_profesi" onchange="handleProfesiAnggota(${i})">
           <option value="">-- Pilih --</option>
           ${profesiOpts}
@@ -463,7 +463,7 @@ function anggotaCardHTML(i) {
       </div>
       <div id="l_ang_${i}_kedudukan_wrap">
       <div class="form-group">
-        <label class="field-label">17. Status Kedudukan (≥10 thn)</label>
+        <label class="field-label">17. Status Kedudukan (≥10 thn) <span class="req">*</span></label>
         <div class="radio-group">
           <label class="radio-item"><input type="radio" name="l_ang_${i}_kedudukan" value="1"/> <span>1. Berusaha sendiri</span></label>
           <label class="radio-item"><input type="radio" name="l_ang_${i}_kedudukan" value="2"/> <span>2. Berusaha dibantu buruh</span></label>
@@ -476,7 +476,7 @@ function anggotaCardHTML(i) {
       </div>
       </div>
       <div class="form-group">
-        <label class="field-label">18a. Pendapatan dari Pekerjaan <span style="font-weight:400;color:#666">(per bulan)</span></label>
+        <label class="field-label">18a. Pendapatan dari Pekerjaan <span style="font-weight:400;color:#666">(per bulan)</span> <span class="req">*</span></label>
         <div class="radio-group">
           <label class="radio-item"><input type="radio" name="l_ang_${i}_18a" value="1" onchange="handlePendapatanAnggota(${i},'18a')"/> <span>1. Ya</span></label>
           <label class="radio-item"><input type="radio" name="l_ang_${i}_18a" value="2" onchange="handlePendapatanAnggota(${i},'18a')"/> <span>2. Tidak</span></label>
@@ -489,7 +489,7 @@ function anggotaCardHTML(i) {
         </div>
       </div>
       <div class="form-group">
-        <label class="field-label">18b. Pendapatan Keuntungan Usaha <span style="font-weight:400;color:#666">(per bulan)</span></label>
+        <label class="field-label">18b. Pendapatan Keuntungan Usaha <span style="font-weight:400;color:#666">(per bulan)</span> <span class="req">*</span></label>
         <div class="radio-group">
           <label class="radio-item"><input type="radio" name="l_ang_${i}_18b" value="1" onchange="handlePendapatanAnggota(${i},'18b')"/> <span>1. Ya</span></label>
           <label class="radio-item"><input type="radio" name="l_ang_${i}_18b" value="2" onchange="handlePendapatanAnggota(${i},'18b')"/> <span>2. Tidak</span></label>
@@ -502,7 +502,7 @@ function anggotaCardHTML(i) {
         </div>
       </div>
       <div class="form-group">
-        <label class="field-label">18c. Penerimaan Transfer/Passive (pensiun, kupon SBN) <span style="font-weight:400;color:#666">(per bulan)</span></label>
+        <label class="field-label">18c. Penerimaan Transfer/Passive (pensiun, kupon SBN) <span style="font-weight:400;color:#666">(per bulan)</span> <span class="req">*</span></label>
         <div class="radio-group">
           <label class="radio-item"><input type="radio" name="l_ang_${i}_18c" value="1" onchange="handlePendapatanAnggota(${i},'18c')"/> <span>1. Ya</span></label>
           <label class="radio-item"><input type="radio" name="l_ang_${i}_18c" value="2" onchange="handlePendapatanAnggota(${i},'18c')"/> <span>2. Tidak</span></label>
@@ -517,7 +517,7 @@ function anggotaCardHTML(i) {
     </div>
     <div id="l_ang_${i}_sosek5plus_wrap2">
       <div class="form-group">
-        <label class="field-label">19. Rekening Aktif / Dompet Digital (≥5 thn)</label>
+        <label class="field-label">19. Rekening Aktif / Dompet Digital (≥5 thn) <span class="req">*</span></label>
         <div class="radio-group">
           <label class="radio-item"><input type="radio" name="l_ang_${i}_rekening" value="1"/> <span>1. Ya untuk usaha</span></label>
           <label class="radio-item"><input type="radio" name="l_ang_${i}_rekening" value="2"/> <span>2. Ya untuk pribadi</span></label>
@@ -594,23 +594,91 @@ function updateAnggotaNamePreview(i) {
   if (document.getElementById('l_ang_row_' + i)) renderAnggotaRosterRow(i);
 }
 
+/* Daftar field per-roster untuk sidebar (key = suffix id/nama, label = teks).
+ * Anggota: suffix dipakai sbg `l_ang_{i}_{suffix}` (id utk text/select, name utk radio).
+ * Usaha:   suffix dipakai sbg `l2_{suffix}` pada form detail usaha aktif. */
+var _SB_ANG_FIELDS = [
+  ['nama', '5 · Nama'], ['nik', '7 · NIK'], ['hubungan', '8 · Hubungan'],
+  ['keberadaan', '9 · Keberadaan'], ['kawin', '11 · Status Kawin'], ['jk', '12 · Jenis Kelamin'],
+  ['tgl_lahir', '13 · Tgl Lahir / Umur'], ['sekolah', '14 · Partisipasi Sekolah'], ['ijazah', '15 · Ijazah'],
+  ['profesi', '16 · Profesi'], ['kedudukan', '17 · Kedudukan'], ['18a', '18 · Pendapatan'],
+  ['rekening', '19 · Rekening'], ['disab_a', '20 · Disabilitas'], ['kronis_a', '21 · Penyakit Kronis']
+];
+var _SB_USAHA_FIELDS = [
+  ['nama_usaha', '8 · Nama & Alamat'], ['jenis_usaha', '9 · Jenis Usaha'], ['punya_nib', '10 · NIB'],
+  ['badan_usaha', '11 · Badan Usaha'], ['pengusaha_nama', '12 · Pengusaha'], ['kegiatan_utama', '13 · Kegiatan & KBLI'],
+  ['jaringan', '14 · Jaringan'], ['internet', '16 · Internet'], ['ramah_a', '17 · Ramah Lingkungan'],
+  ['kreatif', '18 · Produk Kreatif'], ['halal', '19 · Halal'], ['bpom', '20 · BPOM'],
+  ['mitra_kdkmp', '21 · Mitra KDKMP'], ['mbg', '22 · MBG'], ['pekerja_l', '24 · Pekerja'], ['tahun_operasi', '25 · Tahun Beroperasi']
+];
+
+function _sbRosterFieldsHtml(kind, i) {
+  var list = (kind === 'ang') ? _SB_ANG_FIELDS : _SB_USAHA_FIELDS;
+  var fn   = (kind === 'ang') ? 'gotoAngField' : 'gotoUsahaField';
+  return list.map(function (f) {
+    return '<div class="sb-roster-field" onclick="' + fn + '(' + i + ',\'' + f[0] + '\')">' + _sbEsc(f[1]) + '</div>';
+  }).join('');
+}
+
+/* Markup satu entri roster: header (nomor + nama + caret) + daftar field collapsible. */
+function _sbRosterEntryHtml(kind, i, nm, openFn) {
+  return '<div class="sb-roster-entry">'
+    + '<div class="sb-roster-entry-head">'
+    +   '<span class="sb-roster-no">#' + i + '</span>'
+    +   '<span class="sb-roster-nm' + (nm ? '' : ' is-empty') + '" onclick="if(typeof ' + openFn + "==='function')" + openFn + '(' + i + ')">'
+    +     (nm ? _sbEsc(nm) : 'belum diisi') + '</span>'
+    +   '<button type="button" class="sb-roster-fcaret" onclick="toggleSidebarEntry(this)" title="Lihat field entri ini">&#9656;</button>'
+    + '</div>'
+    + '<div class="sb-roster-fields sb-roster-collapsed">' + _sbRosterFieldsHtml(kind, i) + '</div>'
+  + '</div>';
+}
+
+/* Toggle expand/collapse daftar field di satu entri roster. */
+function toggleSidebarEntry(btn) {
+  if (!btn) return;
+  var entry = btn.closest ? btn.closest('.sb-roster-entry') : null;
+  if (!entry) return;
+  var fields = entry.querySelector('.sb-roster-fields');
+  if (!fields) return;
+  var collapsed = fields.classList.toggle('sb-roster-collapsed');
+  btn.classList.toggle('open', !collapsed);
+}
+
+/* Scroll ke field tertentu di layar detail roster + kilatkan sorotan.
+ * `base` = id (text/select) atau name (radio). */
+function _rosterScrollTo(base) {
+  var el = document.getElementById(base);
+  if (!el) el = document.querySelector('[name="' + base + '"]');
+  if (!el) return;
+  var tgt = (el.closest && el.closest('.form-group')) || el;
+  try { tgt.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) { tgt.scrollIntoView(); }
+  tgt.classList.add('field-flash');
+  setTimeout(function () { tgt.classList.remove('field-flash'); }, 1600);
+}
+
+/* Buka layar detail anggota/usaha lalu scroll ke field yang diklik di sidebar. */
+function gotoAngField(i, suffix) {
+  if (typeof showAngDetailScreen === 'function') showAngDetailScreen(i);
+  setTimeout(function () { _rosterScrollTo('l_ang_' + i + '_' + suffix); }, 90);
+}
+function gotoUsahaField(i, suffix) {
+  if (typeof showUsahaDetailScreen === 'function') showUsahaDetailScreen(i);
+  setTimeout(function () { _rosterScrollTo('l2_' + suffix); }, 140);
+}
+
 function updateSidebarAnggota(count) {
   const group = document.getElementById('sidebarAnggotaGroup');
   const items = document.getElementById('sidebarAnggotaItems');
   if (!group || !items) return;
   if (count <= 0) { group.classList.add('hidden'); items.innerHTML = ''; return; }
   group.classList.remove('hidden');
-  items.innerHTML = '';
+  let html = '';
   for (let i = 1; i <= count; i++) {
     const nmEl = document.getElementById('l_ang_' + i + '_nama');
     const nm = (nmEl && nmEl.value ? String(nmEl.value) : '').trim();
-    const div = document.createElement('div');
-    div.className = 'sidebar-q-item sidebar-q-sub sidebar-roster-item';
-    div.setAttribute('onclick', `if(typeof showAngDetailScreen==='function')showAngDetailScreen(${i})`);
-    div.innerHTML = '<span class="sb-roster-no">#' + i + '</span><span class="sb-roster-nm'
-      + (nm ? '' : ' is-empty') + '">' + (nm ? _sbEsc(nm) : 'belum diisi') + '</span>';
-    items.appendChild(div);
+    html += _sbRosterEntryHtml('ang', i, nm, 'showAngDetailScreen');
   }
+  items.innerHTML = html;
 }
 
 /* Generate item roster USAHA di sidebar (Blok II L) — nama dari _usahaDataStore. */
@@ -622,17 +690,13 @@ function updateSidebarUsaha(count) {
           : (typeof _usahaDataStore !== 'undefined' ? _usahaDataStore.length : 0);
   if (n <= 0) { group.classList.add('hidden'); items.innerHTML = ''; return; }
   group.classList.remove('hidden');
-  items.innerHTML = '';
+  let html = '';
   for (let i = 1; i <= n; i++) {
     const d = (typeof _usahaDataStore !== 'undefined' && _usahaDataStore[i - 1]) || {};
     const nm = String(d['l2_nama_usaha'] || '').trim();
-    const div = document.createElement('div');
-    div.className = 'sidebar-q-item sidebar-q-sub sidebar-roster-item';
-    div.setAttribute('onclick', `if(typeof showUsahaDetailScreen==='function')showUsahaDetailScreen(${i})`);
-    div.innerHTML = '<span class="sb-roster-no">#' + i + '</span><span class="sb-roster-nm'
-      + (nm ? '' : ' is-empty') + '">' + (nm ? _sbEsc(nm) : 'belum diisi') + '</span>';
-    items.appendChild(div);
+    html += _sbRosterEntryHtml('usaha', i, nm, 'showUsahaDetailScreen');
   }
+  items.innerHTML = html;
 }
 
 function _sbEsc(s) {

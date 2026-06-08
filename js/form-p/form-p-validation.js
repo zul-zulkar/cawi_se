@@ -18,6 +18,7 @@ function collectAllProblemsP() {
   function reqVal(id, label) { if (!val(id)) pushErr(id, label); }
   function reqRad(id, label) { if (!rad(id)) pushErr(id, label); }
 
+  reqRad('pmt_jenis_entitas', 'Jenis entitas yang didata');
   const isBangunan = (rad('pmt_jenis_entitas') === '2');
 
   reqVal('pmt_nama', isBangunan ? 'Nama usaha/bangunan' : 'Nama kepala keluarga');

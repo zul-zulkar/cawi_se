@@ -24,6 +24,7 @@ function runP(fields = {}) {
 // Field minimal yang membuat Blok P valid (tanpa error).
 // keberadaan dibaca via getRadio()||getVal() → cukup di-set lewat getVal (fields).
 const VALID = {
+  pmt_jenis_entitas: '1',
   pmt_nama: 'Keluarga Wayan',
   pmt_keberadaan: '1',
   pmt_kode_bangunan: '3',
@@ -35,9 +36,10 @@ const VALID = {
 }
 
 describe('collectAllProblemsP — field wajib', () => {
-  it('kosong → error untuk nama, keberadaan, kode bangunan, dan geotag', () => {
+  it('kosong → error untuk jenis entitas, nama, keberadaan, kode bangunan, dan geotag', () => {
     const r = runP()
     const fields = r.errors.map(e => e.field)
+    expect(fields).toContain('pmt_jenis_entitas')
     expect(fields).toContain('pmt_nama')
     expect(fields).toContain('pmt_keberadaan')
     expect(fields).toContain('pmt_kode_bangunan')

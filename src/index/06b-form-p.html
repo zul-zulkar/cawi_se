@@ -51,12 +51,12 @@
     <div class="section-body">
       <div class="inline-fields">
         <div class="form-group">
-          <label class="field-label">Nomor Kartu Keluarga (KK)</label>
+          <label class="field-label">Nomor Kartu Keluarga (KK) <span class="req preq-dyn" style="display:none">*</span></label>
           <input type="text" id="pmt_nomor_kk" maxlength="16" placeholder="16 digit (atau 9999/8888/7777)" oninput="if(typeof syncPIdentityToL==='function')syncPIdentityToL()"/>
           <div class="hint">9999: tak dapat info · 8888: belum punya KK · 7777: tak punya KK 16 digit.</div>
         </div>
         <div class="form-group">
-          <label class="field-label">NIK Kepala Keluarga</label>
+          <label class="field-label">NIK Kepala Keluarga <span class="req preq-dyn" style="display:none">*</span></label>
           <input type="text" id="pmt_nik" maxlength="16" placeholder="16 digit (atau 9999/7777)" oninput="if(typeof syncPIdentityToL==='function')syncPIdentityToL()"/>
         </div>
       </div>
@@ -99,7 +99,7 @@
         <div class="hint">Kode 0/3/6 → cukup sampai rincian ini. Kode 4/5 → isi sampai geotag + foto.</div>
       </div>
       <div class="form-group pmt-keluarga-only">
-        <label class="field-label">Alamat domisili sesuai KK?</label>
+        <label class="field-label">Alamat domisili sesuai KK? <span class="req preq-dyn" style="display:none">*</span></label>
         <div class="radio-group">
           <label class="radio-item"><input type="radio" name="pmt_sesuai_kk" value="1" onchange="if(typeof syncPIdentityToL==='function')syncPIdentityToL()"/> <span>1. Ya, sesuai KK</span></label>
           <label class="radio-item"><input type="radio" name="pmt_sesuai_kk" value="2" onchange="if(typeof syncPIdentityToL==='function')syncPIdentityToL()"/> <span>2. Tidak sesuai KK</span></label>
@@ -107,11 +107,11 @@
       </div>
       <div class="inline-fields">
         <div class="form-group">
-          <label class="field-label">Alamat — Nama Jalan/Gang</label>
+          <label class="field-label">Alamat — Nama Jalan/Gang <span class="req preq-dyn" style="display:none">*</span></label>
           <input type="text" id="pmt_jalan" placeholder="mis. Jl. Anggur / Kavling DKI" oninput="if(typeof syncPIdentityToL==='function')syncPIdentityToL()"/>
         </div>
         <div class="form-group">
-          <label class="field-label">Alamat — Blok / Nomor</label>
+          <label class="field-label">Alamat — Blok / Nomor <span class="req preq-dyn" style="display:none">*</span></label>
           <input type="text" id="pmt_blok" placeholder="mis. Blok A8 No. 19" oninput="if(typeof syncPIdentityToL==='function')syncPIdentityToL()"/>
         </div>
       </div>
