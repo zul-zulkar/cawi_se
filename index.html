@@ -421,11 +421,11 @@
 <!-- ============================================================
      Modal Lihat Isian (snapshot jawaban draft — untuk PML memeriksa)
      ============================================================ -->
-<div id="contentViewModal" class="modal-backdrop" onclick="if(event.target===this)closeContentView()">
+<div id="contentViewModal" class="modal-backdrop">
   <div class="modal" style="max-width:560px">
     <div class="modal-header">
       <h3 id="cvTitle">Isian Penugasan</h3>
-      <button class="modal-close" type="button" onclick="closeContentView()">&times;</button>
+      <button class="modal-close" type="button" id="cvCloseBtn">&times;</button>
     </div>
     <div class="modal-body">
       <div id="cvSubtitle" style="font-size:12px;color:var(--muted);margin-bottom:10px"></div>
@@ -1283,6 +1283,11 @@
     $('modalSaveBtn').addEventListener('click', saveAssignment);
     $('modalAdd').addEventListener('click', function (e) {
       if (e.target.id === 'modalAdd') closeModal();
+    });
+    // Modal "Lihat Isian" (viewer snapshot jawaban) — tutup via tombol & klik backdrop.
+    $('cvCloseBtn').addEventListener('click', closeContentView);
+    $('contentViewModal').addEventListener('click', function (e) {
+      if (e.target.id === 'contentViewModal') closeContentView();
     });
     // Cascade wilayah
     $('addProvinsi').addEventListener('change',  onProvChange);
