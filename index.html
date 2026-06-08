@@ -134,6 +134,11 @@
   .modal-note   { background: #f0fdfa; border: 1px solid #99f6e4; color: #0f766e; font-size: 12.5px; line-height: 1.5; padding: 9px 12px; border-radius: 8px; }
   .badge-draft  { background: #fef3c7; color: var(--amber); }
   .badge-done   { background: #dcfce7; color: var(--green); }
+  .badge-new    { background: #e2e8f0; color: #475569; }
+  .badge-edit   { background: #fee2e2; color: #b91c1c; }
+  .badge-kat-keluarga { background: #e0e7ff; color: #3730a3; }
+  .badge-kat-usaha    { background: #fce7f3; color: #9d174d; }
+  .badge-kat-lainnya  { background: #f1f5f9; color: #475569; }
 
   /* Petugas aktif header */
   .active-header {
@@ -373,10 +378,18 @@
       <select id="fltKecamatan"><option value="">Semua Kecamatan</option></select>
       <select id="fltKabupaten"><option value="">Semua Kabupaten</option></select>
       <select id="fltPetugas"><option value="">Semua Petugas</option></select>
-      <select id="fltJenis">
-        <option value="">Semua Jenis</option>
-        <option value="UNIFIED">P (Pemutakhiran)</option>
-        <option value="L">L</option>
+      <select id="fltKategori">
+        <option value="">Semua Kategori</option>
+        <option value="keluarga">Keluarga</option>
+        <option value="usaha">Usaha</option>
+        <option value="lainnya">Bangunan Lainnya</option>
+      </select>
+      <select id="fltStatus">
+        <option value="">Semua Status</option>
+        <option value="assigned">Ditugaskan</option>
+        <option value="draft">Draft</option>
+        <option value="editing">Editing</option>
+        <option value="submitted">Selesai</option>
       </select>
       <div class="filter-actions">
         <button id="btnResetFilter" class="btn btn-ghost">Reset</button>
@@ -577,7 +590,8 @@
       if (!a || !a.id) return;
       var payload = {
         action: 'saveAssignmentMeta',
-        cawi_id: a.id, jenis: a.jenis || 'UNIFIED', status: status || 'assigned',
+        cawi_id: a.id, jenis: a.jenis || 'UNIFIED', kategori: a.kategori || '',
+        status: status || 'assigned',
         progress: 0, filled: 0, total: 0,
         petugas_nama: a.petugas_nama || '', petugas_email: a.petugas_email || '',
         petugas_peran: a.petugas_peran || 'PPL', pml_email: a.pml_email || '',
@@ -599,6 +613,25 @@
       fetch(getScriptUrl(), { method: 'POST', headers: { 'Content-Type': 'text/plain' },
         body: JSON.stringify({ action: 'deleteAssignmentMeta', cawi_id: id }), keepalive: true }).catch(function () {});
     } catch (e) {}
+  }
+
+  // Tarik registry assignment milik petugas ini dari Sheet lalu gabung ke lokal,
+  // agar status (Ditugaskan/Draft/Selesai) + progress terlihat LINTAS PERANGKAT.
+  // Server sudah memfilter per peran (PPL = miliknya, PML = + bawahan). Hasil
+  // disimpan kembali ke localStorage. Return Promise<bool> = true bila ada perubahan.
+  function syncAssignmentsFromServer(active) {
+    if (!active || !active.email) return Promise.resolve(false);
+    return fetch(getScriptUrl(), {
+      method: 'POST', headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ action: 'getAssignmentsMeta',
+        petugas_email: active.email, peran: active.peran || 'PPL' })
+    }).then(function (r) { return r.json(); }).then(function (json) {
+      if (!json || json.status !== 'ok' || !Array.isArray(json.data)) return false;
+      var before = JSON.stringify(getAssignments());
+      var merged = PM.mergeAssignments(getAssignments(), json.data);
+      setAssignments(merged);
+      return JSON.stringify(merged) !== before;
+    }).catch(function () { return false; });
   }
 
   function fmtDateTime(iso) {
@@ -818,7 +851,7 @@
     $('btnLogout2').addEventListener('click', doLogout);
     $('btnAddAssignment').addEventListener('click', openModal);
     $('btnResetFilter').addEventListener('click', resetFilters);
-    ['fltDesa','fltKecamatan','fltKabupaten','fltPetugas','fltJenis'].forEach(function (id) {
+    ['fltDesa','fltKecamatan','fltKabupaten','fltPetugas','fltKategori','fltStatus'].forEach(function (id) {
       $(id).addEventListener('change', renderAssignList);
     });
   }
@@ -839,11 +872,14 @@
       : '<span class="badge badge-ppl">PPL</span>';
 
     // PPL hanya melihat assignment miliknya sendiri — tidak butuh daftar
-    // PPL lain. Render langsung tanpa fetch tambahan.
+    // PPL lain. Render cepat dari lokal, lalu sinkron status lintas device.
     if (a.peran !== 'PML') {
       _pplList = [];
       populateFilters();
       renderAssignList();
+      syncAssignmentsFromServer(a).then(function (changed) {
+        if (changed) { populateFilters(); renderAssignList(); }
+      });
       return;
     }
 
@@ -857,6 +893,10 @@
       renderAssignList();
     }).catch(function (err) {
       console.warn('Gagal memuat daftar PPL bawahan:', err);
+    });
+    // Sinkron registry assignment (miliknya + bawahan) lintas device.
+    syncAssignmentsFromServer(a).then(function (changed) {
+      if (changed) { populateFilters(); renderAssignList(); }
     });
   }
 
@@ -895,7 +935,7 @@
   }
 
   function resetFilters() {
-    ['fltDesa','fltKecamatan','fltKabupaten','fltPetugas','fltJenis'].forEach(function (id) {
+    ['fltDesa','fltKecamatan','fltKabupaten','fltPetugas','fltKategori','fltStatus'].forEach(function (id) {
       $(id).value = '';
     });
     renderAssignList();
@@ -909,7 +949,8 @@
       kecamatan:    $('fltKecamatan').value,
       kabupaten:    $('fltKabupaten').value,
       petugas_nama: $('fltPetugas').value,
-      jenis:        $('fltJenis').value
+      kategori:     $('fltKategori').value,
+      status:       $('fltStatus').value
     };
     var list = PM.filterAssignments(getAssignments(), filters, a, _pplList);
     var box  = $('assignList');
@@ -924,14 +965,17 @@
       return (y.updated_at || '').localeCompare(x.updated_at || '');
     });
     box.innerHTML = list.map(function (it) {
-      var jenisBadge = it.jenis === 'L'
-        ? '<span class="badge badge-l">L</span>'
-        : it.jenis === 'UNIFIED'
-        ? '<span class="badge badge-p">P</span>'
-        : '<span class="badge badge-lub">L.UB</span>';
+      var katMap = { keluarga: 'Keluarga', usaha: 'Usaha', lainnya: 'Bangunan Lainnya' };
+      var jenisBadge = it.kategori && katMap[it.kategori]
+        ? '<span class="badge badge-kat badge-kat-' + it.kategori + '">' + katMap[it.kategori] + '</span>'
+        : '<span class="badge badge-p">P</span>';
       var statusBadge = it.status === 'submitted'
         ? '<span class="badge badge-done">Selesai</span>'
-        : '<span class="badge badge-draft">Draft</span>';
+        : it.status === 'editing'
+        ? '<span class="badge badge-edit">Editing</span>'
+        : it.status === 'draft'
+        ? '<span class="badge badge-draft">Draft</span>'
+        : '<span class="badge badge-new">Ditugaskan</span>';
       var showPetugas = (a.peran === 'PML' && (it.petugas_email || '').toLowerCase() !== (a.email || '').toLowerCase());
       var dm = getDraftMeta(it.draft_key);
 
@@ -940,10 +984,18 @@
       // Progress (hanya draft): bar % bila tersnapshot, else status ringkas
       var progHtml = '';
       if (it.status !== 'submitted') {
+        var srvPct = parseInt(it.progress);
         if (dm && dm.progress != null) {
           var ftxt = (dm.filled != null && dm.total != null) ? (dm.filled + '/' + dm.total + ' field') : 'isian';
           progHtml = '<div class="assign-prog"><div class="assign-prog-bar"><span style="width:' +
             dm.progress + '%"></span></div><div class="assign-prog-txt">' + dm.progress + '% · ' + ftxt + '</div></div>';
+        } else if (it.progress !== '' && it.progress != null && !isNaN(srvPct)) {
+          // Progress tersnapshot di server (draft dikerjakan di perangkat lain).
+          var sp   = Math.max(0, Math.min(100, srvPct));
+          var sft  = (it.filled !== '' && it.total !== '' && it.total) ? (it.filled + '/' + it.total + ' field') : 'isian';
+          progHtml = '<div class="assign-prog"><div class="assign-prog-bar"><span style="width:' +
+            sp + '%"></span></div><div class="assign-prog-txt">' + sp + '% · ' + sft +
+            ' <span class="assign-prog-muted">· device lain</span></div></div>';
         } else if (dm) {
           progHtml = '<div class="assign-prog-txt assign-prog-muted">Sedang dikerjakan</div>';
         } else {
@@ -993,15 +1045,17 @@
           'Detail wilayah &amp; isian <span class="assign-card-caret">▾</span>' +
         '</button>' +
         '<div class="assign-card-detail hidden">' + detail.join('') + '</div>' +
-        '<div class="assign-card-actions">' +
-          '<button class="btn btn-primary" data-act="open">Buka Kuesioner</button>' +
-          '<button class="btn btn-danger"  data-act="del">Hapus</button>' +
-        '</div>' +
+        '<div class="assign-card-actions">' + buildCardActions(it) + '</div>' +
       '</div>';
     }).join('');
     Array.prototype.forEach.call(box.querySelectorAll('.assign-card'), function (card) {
       var id = card.getAttribute('data-id');
-      card.querySelector('[data-act="open"]').addEventListener('click', function () { openKuesioner(id); });
+      var bOpen = card.querySelector('[data-act="open"]');
+      if (bOpen) bOpen.addEventListener('click', function () { openKuesioner(id); });
+      var bEditOn = card.querySelector('[data-act="edit-on"]');
+      if (bEditOn) bEditOn.addEventListener('click', function () { setAssignmentStatus(id, 'editing'); });
+      var bLock = card.querySelector('[data-act="lock"]');
+      if (bLock) bLock.addEventListener('click', function () { setAssignmentStatus(id, 'submitted'); });
       card.querySelector('[data-act="del"]').addEventListener('click',  function () { deleteAssignment(id); });
       var tg = card.querySelector('[data-act="toggle"]');
       if (tg) tg.addEventListener('click', function () {
@@ -1012,6 +1066,48 @@
         card.classList.toggle('expanded');
       });
     });
+  }
+
+  // Tombol aksi kartu sesuai status. Assignment "Selesai" hanya bisa DILIHAT;
+  // untuk mengedit, petugas wajib "Aktifkan Edit" (status → editing) dulu.
+  function buildCardActions(it) {
+    if (it.status === 'submitted') {
+      return '<button class="btn btn-primary" data-act="open">Lihat (terkunci)</button>' +
+             '<button class="btn btn-ghost"   data-act="edit-on">Aktifkan Edit</button>' +
+             '<button class="btn btn-danger"  data-act="del">Hapus</button>';
+    }
+    if (it.status === 'editing') {
+      return '<button class="btn btn-primary" data-act="open">Buka Kuesioner</button>' +
+             '<button class="btn btn-ghost"   data-act="lock">Kunci lagi</button>' +
+             '<button class="btn btn-danger"  data-act="del">Hapus</button>';
+    }
+    return '<button class="btn btn-primary" data-act="open">Buka Kuesioner</button>' +
+           '<button class="btn btn-danger"  data-act="del">Hapus</button>';
+  }
+
+  // Push HANYA perubahan status (cawi_id + status) — progress/field lain di server
+  // DIPERTAHANKAN (tidak ikut ter-reset). Dipakai aksi Aktifkan Edit / Kunci lagi.
+  function pushAssignmentStatus(id, status) {
+    try {
+      if (!id) return;
+      fetch(getScriptUrl(), { method: 'POST', headers: { 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ action: 'saveAssignmentMeta', cawi_id: id, status: status }),
+        keepalive: true }).catch(function () {});
+    } catch (e) {}
+  }
+
+  // Ubah status assignment (lokal + server) lalu render ulang. Untuk membuka kunci
+  // assignment "Selesai" (→ editing) atau menguncinya lagi (→ submitted).
+  function setAssignmentStatus(id, status) {
+    var list = getAssignments();
+    var it = null;
+    for (var i = 0; i < list.length; i++) if (list[i].id === id) { it = list[i]; break; }
+    if (!it) return;
+    it.status     = status;
+    it.updated_at = new Date().toISOString();
+    setAssignments(list);
+    pushAssignmentStatus(id, status);
+    renderAssignList();
   }
 
   function openKuesioner(id) {

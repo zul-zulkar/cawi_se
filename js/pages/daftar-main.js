@@ -79,12 +79,18 @@ async function fetchAssignments() {
 function getFilteredAssignments() {
   const q = (document.getElementById('searchBox').value || '').toLowerCase().trim();
   const p = document.getElementById('filterPetugas').value;
+  const stEl = document.getElementById('filterAsgStatus');
+  const ktEl = document.getElementById('filterAsgKategori');
+  const st = stEl ? stEl.value : '';
+  const kt = ktEl ? ktEl.value : '';
   return _assignments.filter(a => {
-    const okP = !p || a.petugas_nama === p;
+    const okP  = !p  || a.petugas_nama === p;
+    const okSt = !st || (a.status || 'assigned') === st;
+    const okKt = !kt || (a.kategori || '') === kt;
     const hay = [a.nama_responden, a.petugas_nama, a.kecamatan, a.desa, a.sls_nama]
       .map(x => (x || '').toLowerCase()).join(' ');
     const okQ = !q || hay.includes(q);
-    return okP && okQ;
+    return okP && okSt && okKt && okQ;
   });
 }
 
@@ -117,15 +123,19 @@ function renderAssignments() {
     const pct = Math.max(0, Math.min(100, parseInt(a.progress) || 0));
     const st  = String(a.status || 'assigned');
     const chip = st === 'submitted' ? '<span class="asg-chip asg-done">Selesai</span>'
+              : st === 'editing'   ? '<span class="asg-chip asg-edit">Editing</span>'
               : st === 'draft'     ? '<span class="asg-chip asg-draft">Proses</span>'
               :                       '<span class="asg-chip asg-new">Ditugaskan</span>';
+    const katMap = { keluarga: 'Keluarga', usaha: 'Usaha', lainnya: 'Bangunan Lainnya' };
+    const katTag = (a.kategori && katMap[a.kategori])
+      ? `<br/><span class="asg-kat kat-${esc(a.kategori)}">${katMap[a.kategori]}</span>` : '';
     const ft = (a.filled !== '' && a.total !== '' && a.total) ? ` · ${esc(a.filled)}/${esc(a.total)} field` : '';
     const wil = [a.kecamatan, a.desa, a.sls_nama].filter(Boolean).map(esc).join(' · ');
     const peran = a.petugas_peran ? `<small>${esc(a.petugas_peran)}</small>` : '';
     html += `<tr>
       <td style="text-align:center;color:#aaa;font-size:12px">${idx + 1}</td>
       <td>${chip}</td>
-      <td class="cell-company">${esc(a.nama_responden) || '<em style="color:#bbb">Tanpa nama</em>'}${wil ? `<small>${wil}</small>` : ''}</td>
+      <td class="cell-company">${esc(a.nama_responden) || '<em style="color:#bbb">Tanpa nama</em>'}${wil ? `<small>${wil}</small>` : ''}${katTag}</td>
       <td class="cell-petugas">${esc(a.petugas_nama || '—')}${peran}</td>
       <td style="min-width:160px"><div class="asg-prog">
         <div class="asg-prog-bar"><span style="width:${pct}%"></span></div>

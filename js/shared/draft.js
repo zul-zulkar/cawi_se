@@ -31,11 +31,30 @@ function _activePetugasMeta() {
   };
 }
 
+/* Kategori bangunan (keluarga/usaha/lainnya) untuk filter & monitoring. Utamakan
+ * window.__cawiStage (hasil gate Blok P: 'keluarga'|'usaha'|'none'); fallback baca
+ * Kode Penggunaan Bangunan langsung. Selaras PetugasManager.kategoriFromKode. */
+function _deriveKategori() {
+  try {
+    const stg = (typeof window !== 'undefined' && window.__cawiStage) || '';
+    if (stg === 'keluarga' || stg === 'usaha') return stg;
+    if (stg === 'none') return 'lainnya';
+    const kb = (typeof getVal === 'function') ? getVal('pmt_kode_bangunan') : '';
+    if (kb === '2' || kb === '3') return 'keluarga';
+    if (kb === '1' || kb === '7') return 'usaha';
+    if (kb === '4' || kb === '5' || kb === '6' || kb === '8') return 'lainnya';
+  } catch (e) {}
+  return '';
+}
+
 /* Kirim metadata + progress assignment ke Sheet (fire-and-forget) supaya pegawai
  * bisa memantau lewat daftar.html lintas perangkat. Tidak memblokir UI; gagal =
  * diabaikan (draft lokal tetap jalan). Hanya untuk alur assignment (ada cawi_id). */
 function _pushAssignmentMeta(status) {
   try {
+    // Mode LIHAT (assignment sudah submitted, dibuka tanpa Editing): jangan kirim
+    // apa pun supaya status "submitted" + progress tidak ter-downgrade ke "draft".
+    if (typeof window !== 'undefined' && window.__cawiReadOnly) return;
     const asg = (typeof window !== 'undefined' && window.__cawiActiveAssignment) || null;
     if (!asg || !asg.id) return;
     const who = _activePetugasMeta();
@@ -46,6 +65,7 @@ function _pushAssignmentMeta(status) {
       action: 'saveAssignmentMeta',
       cawi_id: asg.id,
       jenis: asg.jenis || 'UNIFIED',
+      kategori: _deriveKategori(),
       status: status || 'draft',
       progress: pp.pct || 0, filled: pp.filled || 0, total: pp.total || 0,
       petugas_nama: who.nama || asg.petugas_nama || '',

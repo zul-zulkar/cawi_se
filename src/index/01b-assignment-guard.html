@@ -174,5 +174,80 @@
     } catch (e) {}
     setTimeout(backToPortal, 1500);
   });
+
+  // ============================================================
+  // 8) READ-ONLY LOCK untuk assignment ber-status "submitted".
+  //    Hanya bisa DILIHAT. Untuk mengedit, petugas mengubah status ke
+  //    "Editing" di Portal (status 'editing'/'draft' → tidak terkunci).
+  // ============================================================
+  function _notifyLocked() {
+    alert('Kuesioner ini sudah DIKIRIM dan terkunci.\n\n' +
+      'Untuk mengubah: buka Portal Petugas, lalu klik "Aktifkan Edit" pada ' +
+      'assignment ini (statusnya akan menjadi "Editing").');
+  }
+
+  function _injectReadonlyBanner() {
+    if (document.getElementById('cawiReadonlyBanner')) return;
+    // Blokir interaksi pada area form (termasuk widget kustom: searchable-select,
+    // tanda tangan, unggah foto, tombol roster) — readOnly saja tak cukup untuk
+    // widget berbasis JS. Navigasi sidebar (di luar form) tetap berfungsi.
+    var st = document.createElement('style');
+    st.id = 'cawiReadonlyStyle';
+    st.textContent = 'body.cawi-readonly #form-l, body.cawi-readonly #form-p{pointer-events:none}' +
+      'body.cawi-readonly #form-l input, body.cawi-readonly #form-l select, body.cawi-readonly #form-l textarea,' +
+      'body.cawi-readonly #form-p input, body.cawi-readonly #form-p select, body.cawi-readonly #form-p textarea{background:#f8fafc;color:#334155}';
+    document.head.appendChild(st);
+    var bar = document.createElement('div');
+    bar.id = 'cawiReadonlyBanner';
+    bar.setAttribute('style', 'position:sticky;top:0;z-index:1300;background:#b91c1c;' +
+      'color:#fff;padding:9px 14px;font-size:13px;font-weight:600;text-align:center;' +
+      'box-shadow:0 2px 8px rgba(0,0,0,.25)');
+    bar.innerHTML = '🔒 Mode LIHAT — kuesioner sudah dikirim. ' +
+      'Untuk mengedit, aktifkan <b>Editing</b> di Portal Petugas.';
+    if (document.body) document.body.insertBefore(bar, document.body.firstChild);
+  }
+
+  function _lockScope(scope) {
+    if (!scope) return;
+    var els = scope.querySelectorAll('input, select, textarea');
+    for (var i = 0; i < els.length; i++) {
+      var el = els[i];
+      var t = (el.type || '').toLowerCase();
+      if (el.tagName === 'SELECT' || t === 'radio' || t === 'checkbox' || t === 'file') {
+        el.disabled = true;
+      } else {
+        el.readOnly = true;
+      }
+    }
+  }
+
+  var _submitNeutralized = false;
+  function applyReadOnlyLock() {
+    if (!found || found.status !== 'submitted') return;
+    window.__cawiReadOnly = true;                 // dibaca draft.js (cegah downgrade status)
+    if (document.body) document.body.classList.add('cawi-readonly');
+    _lockScope(document.getElementById('form-l'));
+    _lockScope(document.getElementById('form-p'));
+
+    var sb = document.getElementById('l5_submitBtn');
+    if (sb) { sb.textContent = '🔒 Sudah dikirim'; sb.disabled = true; }
+
+    // Neutralkan jalur submit (showRecap dari topbar/mobile/blok5 & confirmSubmit).
+    if (!_submitNeutralized) {
+      if (typeof window.showRecap === 'function')    window.showRecap    = _notifyLocked;
+      if (typeof window.confirmSubmit === 'function') window.confirmSubmit = _notifyLocked;
+      _submitNeutralized = true;
+    }
+    _injectReadonlyBanner();
+  }
+
+  if (window.addEventListener) {
+    window.addEventListener('load', function () {
+      // Setelah init + restoreDraft selesai. Ulangi sekali untuk menangkap
+      // render roster (anggota/usaha) yang berjalan asinkron.
+      setTimeout(applyReadOnlyLock, 250);
+      setTimeout(applyReadOnlyLock, 1200);
+    });
+  }
 })();
 </script>

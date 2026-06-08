@@ -18,6 +18,10 @@
   .asg-chip.asg-done{background:#e6f4ea;color:#1e7e34}
   .asg-chip.asg-draft{background:#fff3e0;color:#c05621}
   .asg-chip.asg-new{background:#eef2ff;color:#3949ab}
+  .asg-chip.asg-edit{background:#fde8e8;color:#b91c1c}
+  .asg-kat{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;margin-top:3px;background:#f1f5f9;color:#475569}
+  .asg-kat.kat-keluarga{background:#e0e7ff;color:#3730a3}
+  .asg-kat.kat-usaha{background:#fce7f3;color:#9d174d}
   .asg-prog{display:flex;flex-direction:column;gap:4px}
   .asg-prog-bar{height:7px;background:#eee;border-radius:999px;overflow:hidden}
   .asg-prog-bar>span{display:block;height:100%;background:linear-gradient(90deg,#fc6c00,#ff9a3c);border-radius:999px;transition:width .4s}
@@ -156,6 +160,19 @@
         <option value="">— Semua Jenis —</option>
         <option value="p">Pemutakhiran (P)</option>
         <option value="l">Rumah Tangga (L)</option>
+      </select>
+      <select class="filter-select" id="filterAsgStatus" onchange="onFilter()" title="Filter status penugasan (tab Penugasan)">
+        <option value="">— Semua Status —</option>
+        <option value="assigned">Ditugaskan</option>
+        <option value="draft">Draft</option>
+        <option value="editing">Editing</option>
+        <option value="submitted">Selesai</option>
+      </select>
+      <select class="filter-select" id="filterAsgKategori" onchange="onFilter()" title="Filter kategori bangunan (tab Penugasan)">
+        <option value="">— Semua Kategori —</option>
+        <option value="keluarga">Keluarga</option>
+        <option value="usaha">Usaha</option>
+        <option value="lainnya">Bangunan Lainnya</option>
       </select>
       <button class="btn btn-secondary" onclick="fetchRecords()" title="Muat ulang data dari server" style="flex-shrink:0">&#8635; Refresh</button>
     </div>

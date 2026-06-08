@@ -91,6 +91,9 @@
       petugas_nama:  petugasAktif.nama  || '',
       petugas_email: petugasAktif.email,
       petugas_peran: petugasAktif.peran === 'PML' ? 'PML' : 'PPL',
+      // Email PML penyelia — disimpan di assignment agar PML bisa memfilter
+      // bawahannya langsung (lintas device) tanpa harus memuat daftar PPL.
+      pml_email:     petugasAktif.pml_email || '',
       jenis: jenis,
       // Nama tampilan wilayah (yang dipakai filter & kartu)
       provinsi:       String(data.provinsi).trim(),
@@ -109,7 +112,9 @@
       subsls_kd:      String(data.subsls_kd    || '00').trim(),     // 2-digit; "00" = tanpa sub
       nama_responden: String(data.nama_responden).trim(),
       draft_key: draftKey,
-      status: 'draft',
+      // 'assigned' = baru ditugaskan (belum dibuka). Berubah jadi 'draft' saat
+      // petugas menyimpan isian, lalu 'submitted' saat dikirim (lihat draft.js/submit.js).
+      status: 'assigned',
       // SE2026-P (unified): status pemutakhiran + jenis bangunan (diisi runtime)
       p_status: 'open',
       p_jenis_bangunan: null,
@@ -127,6 +132,9 @@
     if (!myEmail) return false;
     if (assignEmail === myEmail) return true;
     if (petugasAktif.peran !== 'PML') return false;
+    // Utamakan kolom pml_email pada assignment (di-set saat dibuat) — andal lintas
+    // device tanpa perlu daftar PPL. Fallback ke pplList untuk assignment lama.
+    if (normalize(assignment.pml_email) && normalize(assignment.pml_email) === myEmail) return true;
     if (!pplList || !pplList.length) return false;
     for (var i = 0; i < pplList.length; i++) {
       if (normalize(pplList[i].email) === assignEmail &&
@@ -149,11 +157,87 @@
     if (f.jenis && (f.jenis === 'L' || f.jenis === 'UNIFIED')) {
       arr = arr.filter(function (a) { return a.jenis === f.jenis; });
     }
+    // Kategori bangunan (dari Blok P): keluarga | usaha | lainnya.
+    if (f.kategori && (f.kategori === 'keluarga' || f.kategori === 'usaha' || f.kategori === 'lainnya')) {
+      arr = arr.filter(function (a) { return (a.kategori || '') === f.kategori; });
+    }
+    // Status pengisian: assigned | draft | editing | submitted.
+    if (f.status) {
+      arr = arr.filter(function (a) { return (a.status || 'assigned') === f.status; });
+    }
     return arr;
   }
 
   function deleteAssignment(id, list) {
     return (list || []).filter(function (a) { return a.id !== id; });
+  }
+
+  // Kategori bangunan dari Kode Penggunaan Bangunan (Blok P). Selaras dengan
+  // PMT_GATE_RULES di form-p.js: 2/3 = keluarga, 1/7 = usaha, 4/5/6/8 = lainnya.
+  // '' bila belum dipilih/tak dikenal. Murni — dipakai untuk filter & monitoring.
+  function kategoriFromKode(kode) {
+    var k = String(kode == null ? '' : kode).trim();
+    if (k === '2' || k === '3') return 'keluarga';
+    if (k === '1' || k === '7') return 'usaha';
+    if (k === '4' || k === '5' || k === '6' || k === '8') return 'lainnya';
+    return '';
+  }
+
+  // Konversi satu baris registry server (SE2026_Assignments) ke bentuk assignment
+  // portal. draft_key direkonstruksi dari jenis+cawi_id (pola createAssignment)
+  // sehingga entri yang dibuat di device lain tetap bisa dibuka di sini.
+  function reconstructFromServer(row) {
+    if (!row || !row.cawi_id) return null;
+    var jenis  = (row.jenis === 'L') ? 'L' : 'UNIFIED';
+    var prefix = (jenis === 'L') ? 'cawi_l_draft_' : 'cawi_u_draft_';
+    return {
+      id:             String(row.cawi_id),
+      petugas_nama:   row.petugas_nama  || '',
+      petugas_email:  row.petugas_email || '',
+      petugas_peran:  row.petugas_peran || 'PPL',
+      pml_email:      row.pml_email     || '',
+      jenis:          jenis,
+      provinsi:       row.provinsi    || '', provinsi_kd:  row.provinsi_kd  || '',
+      kabupaten:      row.kabupaten   || '', kabupaten_kd: row.kabupaten_kd || '',
+      kecamatan:      row.kecamatan   || '', kecamatan_kd: row.kecamatan_kd || '',
+      desa:           row.desa        || '', desa_kd:      row.desa_kd      || '',
+      sls_nama:       row.sls_nama     || '', sls_kd:       row.sls_kd       || '',
+      sls_full_kd:    row.sls_full_kd  || '', subsls_kd:    row.subsls_kd    || '00',
+      nama_responden: row.nama_responden || '',
+      kategori:       row.kategori  || '',
+      draft_key:      prefix + row.cawi_id,
+      status:         row.status   || 'assigned',
+      progress:       row.progress || '', filled: row.filled || '', total: row.total || '',
+      created_at:     row.created_at || '', updated_at: row.updated_at || ''
+    };
+  }
+
+  // Gabungkan assignment lokal (localStorage) dengan registry server. Server jadi
+  // sumber kebenaran untuk status/progress/updated_at (sinkron lintas device);
+  // field lokal yang sudah terisi dipertahankan, entri server-only ditambahkan.
+  // Murni — tidak menyentuh storage; pemanggil yang menyimpan hasilnya.
+  function mergeAssignments(local, serverRows) {
+    var byId = {};
+    (local || []).forEach(function (a) { if (a && a.id) byId[String(a.id)] = a; });
+    (serverRows || []).forEach(function (row) {
+      var srv = reconstructFromServer(row);
+      if (!srv) return;
+      var loc = byId[srv.id];
+      if (loc) {
+        if (srv.status) loc.status = srv.status;
+        loc.progress   = srv.progress;
+        loc.filled     = srv.filled;
+        loc.total      = srv.total;
+        if (srv.updated_at) loc.updated_at = srv.updated_at;
+        // Lengkapi field yang masih kosong di lokal dari server (tanpa menimpa).
+        Object.keys(srv).forEach(function (k) {
+          if ((loc[k] == null || loc[k] === '') && srv[k] != null && srv[k] !== '') loc[k] = srv[k];
+        });
+      } else {
+        byId[srv.id] = srv;
+      }
+    });
+    return Object.keys(byId).map(function (k) { return byId[k]; });
   }
 
   function getDistinctValues(list, field) {
@@ -180,6 +264,9 @@
     filterAssignments: filterAssignments,
     canViewAssignment: canViewAssignment,
     deleteAssignment:  deleteAssignment,
+    kategoriFromKode:  kategoriFromKode,
+    reconstructFromServer: reconstructFromServer,
+    mergeAssignments:  mergeAssignments,
     generateId:        generateId,
     getDistinctValues: getDistinctValues
   };

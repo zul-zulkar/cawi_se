@@ -51,7 +51,7 @@ function doPost(e) {
     if (d.action === "getPRecords") return getPRecordsResponse();
     // Registry assignment + progress (untuk daftar.html — monitoring lintas perangkat)
     if (d.action === "saveAssignmentMeta") return saveAssignmentMetaResponse(d);
-    if (d.action === "getAssignmentsMeta") return getAssignmentsMetaResponse();
+    if (d.action === "getAssignmentsMeta") return getAssignmentsMetaResponse({ petugas_email: d.petugas_email, peran: d.peran });
     if (d.action === "deleteAssignmentMeta") return deleteAssignmentMetaResponse(d.cawi_id);
 
     // === P MODE (Pemutakhiran / listing) → sheet SE2026_P_Responses ===
@@ -265,7 +265,9 @@ function doGet(e) {
       return getPrelistResponse(e.parameter.sls_kd || e.parameter.kode_sls || e.parameter.sls || '');
     }
     if (action === "getPRecords") return getPRecordsResponse();
-    if (action === "getAssignmentsMeta") return getAssignmentsMetaResponse();
+    if (action === "getAssignmentsMeta") {
+      return getAssignmentsMetaResponse({ petugas_email: e.parameter.petugas_email, peran: e.parameter.peran });
+    }
     return getRecordsResponse();
   } catch(err) {
     return jsonResponse({ status: "error", message: err.message });
@@ -885,6 +887,8 @@ function getPRecordsResponse() {
 // Satu baris per assignment (key = cawi_id). Di-upsert oleh portal (saat dibuat)
 // & kuesioner (autosave/submit). daftar.html membacanya untuk monitoring; filter
 // per peran (PPL = miliknya, PML = bawahannya) dilakukan di klien (PetugasManager).
+// "Kategori" (keluarga/usaha/lainnya) di-APPEND di akhir agar aman untuk sheet
+// SE2026_Assignments yang sudah berisi data (tidak menggeser kolom lama).
 const ASSIGN_HEADERS = [
   "CAWI ID", "Jenis", "Status", "Progress (%)", "Filled", "Total",
   "Petugas Nama", "Petugas Email", "Peran", "PML Email",
@@ -892,7 +896,7 @@ const ASSIGN_HEADERS = [
   "Provinsi", "Kode Provinsi", "Kabupaten", "Kode Kabupaten",
   "Kecamatan", "Kode Kecamatan", "Desa/Kel", "Kode Desa",
   "Nama SLS", "Kode SLS", "Kode SLS Lengkap", "SubSLS",
-  "Dibuat", "Diperbarui"
+  "Dibuat", "Diperbarui", "Kategori"
 ];
 const ASSIGN_FIELDS = [
   "cawi_id", "jenis", "status", "progress", "filled", "total",
@@ -901,7 +905,7 @@ const ASSIGN_FIELDS = [
   "provinsi", "provinsi_kd", "kabupaten", "kabupaten_kd",
   "kecamatan", "kecamatan_kd", "desa", "desa_kd",
   "sls_nama", "sls_kd", "sls_full_kd", "subsls_kd",
-  "created_at", "updated_at"
+  "created_at", "updated_at", "kategori"
 ];
 
 function getOrInitAssignSheet(ss) {
@@ -912,6 +916,11 @@ function getOrInitAssignSheet(ss) {
     sheet.getRange(1, 1, 1, ASSIGN_HEADERS.length)
       .setFontWeight("bold").setBackground("#6b46c1").setFontColor("#ffffff");
     sheet.setFrozenRows(1);
+  } else if (sheet.getLastColumn() < ASSIGN_HEADERS.length) {
+    // Auto-heal header bila ada kolom baru (mis. "Kategori") pada sheet existing.
+    sheet.getRange(1, 1, 1, ASSIGN_HEADERS.length).setValues([ASSIGN_HEADERS]);
+    sheet.getRange(1, 1, 1, ASSIGN_HEADERS.length)
+      .setFontWeight("bold").setBackground("#6b46c1").setFontColor("#ffffff");
   }
   return sheet;
 }
@@ -961,7 +970,14 @@ function saveAssignmentMetaResponse(d) {
   }
 }
 
-function getAssignmentsMetaResponse() {
+// Baca registry assignment. Filter per peran bersifat OPSIONAL & dikontrol oleh
+// argumen (petugas_email + peran):
+//  - tanpa petugas_email  → kembalikan SEMUA (dipakai daftar.html untuk pegawai)
+//  - peran "PML"          → assignment miliknya + bawahan (kolom pml_email = email PML)
+//  - selain itu (PPL)     → hanya assignment miliknya
+// Penyaringan di server menjamin PPL/PML hanya menerima data yang berhak dilihat,
+// bukan sekadar disembunyikan di klien.
+function getAssignmentsMetaResponse(opts) {
   try {
     var ss = SpreadsheetApp.openById(SHEET_ID);
     var sheet = ss.getSheetByName(ASSIGN_SHEET);
@@ -972,6 +988,17 @@ function getAssignmentsMetaResponse() {
       ASSIGN_FIELDS.forEach(function (k, i) { o[k] = cellStr(row[i]); });
       return o;
     }).filter(function (o) { return o.cawi_id; });
+
+    var email = (opts && opts.petugas_email) ? String(opts.petugas_email).trim().toLowerCase() : '';
+    var peran = (opts && opts.peran) ? String(opts.peran).trim().toUpperCase() : '';
+    if (email) {
+      out = out.filter(function (o) {
+        var owner = String(o.petugas_email || '').trim().toLowerCase();
+        if (owner === email) return true;
+        if (peran === 'PML' && String(o.pml_email || '').trim().toLowerCase() === email) return true;
+        return false;
+      });
+    }
     return jsonResponse({ status: "ok", kind: "assignments", data: out });
   } catch (err) {
     return jsonResponse({ status: "error", message: err.message });
