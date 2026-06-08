@@ -117,7 +117,7 @@ function renderAssignments() {
 
   let html = `<table><thead><tr>
     <th>No</th><th>Status</th><th>Nama / Wilayah</th><th>Petugas</th>
-    <th>Progress Pengisian</th><th>Diperbarui</th>
+    <th>Progress Pengisian</th><th>Diperbarui</th><th>Aksi</th>
   </tr></thead><tbody>`;
   list.forEach((a, idx) => {
     const pct = Math.max(0, Math.min(100, parseInt(a.progress) || 0));
@@ -142,6 +142,9 @@ function renderAssignments() {
         <div class="asg-prog-txt">${pct}%${ft}</div>
       </div></td>
       <td style="font-size:12px;color:#888;white-space:nowrap">${fmtDate(a.updated_at)}</td>
+      <td><button class="btn btn-sm btn-info" title="Periksa isian jawaban"
+        data-nm="${esc(a.nama_responden || '')}"
+        onclick="viewAssignmentContent('${esc(a.cawi_id)}', this.dataset.nm)">&#128065; Lihat Isian</button></td>
     </tr>`;
   });
   html += `</tbody></table>`;
@@ -531,9 +534,16 @@ function viewRecord(id, mode) {
   const sections = (recMode === 'p') ? viewSectionsP(r)
                  : (recMode === 'l') ? viewSectionsL(r)
                  : viewSectionsLUB(r);
+  openViewerWithSections(titleName, document.getElementById('viewSubtitle').textContent, sections);
+}
 
+/* Render kumpulan section ke modal viewer & tampilkan. Dipakai viewRecord
+ * (record tersubmit) dan viewAssignmentContent (snapshot isian draft). */
+function openViewerWithSections(title, subtitle, sections) {
+  document.getElementById('viewTitle').textContent    = title || 'Detail';
+  document.getElementById('viewSubtitle').textContent = subtitle || '';
   let html = '';
-  sections.forEach(sec => {
+  (sections || []).forEach(sec => {
     const filled = sec.fields.filter(([,v]) => v && String(v).trim() && String(v) !== 'undefined');
     if (!filled.length) return;
     html += `<div class="view-section"><div class="view-section-title">${esc(sec.title)}</div><div class="view-grid">`;
@@ -546,8 +556,40 @@ function viewRecord(id, mode) {
     });
     html += `</div></div>`;
   });
+  if (!html) html = '<div class="empty-state"><div class="empty-text">Belum ada isian tersimpan.</div></div>';
   document.getElementById('viewBody').innerHTML = html;
   document.getElementById('viewOverlay').classList.add('open');
+}
+
+/* Tampilkan SNAPSHOT isian draft sebuah penugasan (dari SE2026_Draft_Content)
+ * memakai viewer terstruktur yang sama dengan record tersubmit. */
+async function viewAssignmentContent(cawiId, nama) {
+  if (!cawiId) return;
+  document.getElementById('viewTitle').textContent    = nama || 'Isian Penugasan';
+  document.getElementById('viewSubtitle').textContent = 'Memuat isian dari server…';
+  document.getElementById('viewBody').innerHTML = '<div class="empty-state"><div class="empty-text">Memuat…</div></div>';
+  document.getElementById('viewOverlay').classList.add('open');
+  try {
+    const resp = await fetch(getScriptUrl(), {
+      method: 'POST', body: JSON.stringify({ action: 'getDraftContent', cawi_id: cawiId })
+    });
+    const json = await resp.json();
+    const d = json && json.status === 'ok' ? json.data : null;
+    if (!d || !d.content) {
+      openViewerWithSections(nama || 'Isian Penugasan',
+        'Isian belum tersinkron — petugas belum menyimpan draft / mengirim sejak fitur ini aktif.', []);
+      return;
+    }
+    const c = d.content;
+    let sections = [];
+    if (c.p) sections = sections.concat(viewSectionsP(c.p));
+    if (c.l) sections = sections.concat(viewSectionsL(c.l));
+    const stLabel = d.status === 'submitted' ? 'Terkirim' : d.status === 'editing' ? 'Editing' : 'Draft';
+    openViewerWithSections(nama || 'Isian Penugasan',
+      `[${stLabel}] Diperbarui ${fmtDate(d.updated_at)} · isian dapat diperiksa`, sections);
+  } catch (e) {
+    openViewerWithSections(nama || 'Isian Penugasan', 'Gagal memuat isian: ' + e.message, []);
+  }
 }
 
 function closeView() {

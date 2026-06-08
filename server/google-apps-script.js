@@ -35,6 +35,11 @@ const PML_SHEET_NAME = "PML";
 // Dibaca daftar.html untuk monitoring lintas perangkat (difilter per peran di klien).
 const ASSIGN_SHEET = "SE2026_Assignments";
 
+// Isian draft (snapshot collectDataP/L tanpa lampiran base64) per assignment,
+// key = cawi_id. Diisi kuesioner saat autosave/submit; dibaca pegawai/PML untuk
+// MEMERIKSA jawaban draft lintas perangkat (tombol "Lihat Isian").
+const DRAFT_CONTENT_SHEET = "SE2026_Draft_Content";
+
 // LKP_HEADERS, HEADERS, & buildRow (kolom/baris L.UB) DIHAPUS: subsistem L.UB di-retire.
 
 function doPost(e) {
@@ -53,6 +58,8 @@ function doPost(e) {
     if (d.action === "saveAssignmentMeta") return saveAssignmentMetaResponse(d);
     if (d.action === "getAssignmentsMeta") return getAssignmentsMetaResponse({ petugas_email: d.petugas_email, peran: d.peran });
     if (d.action === "deleteAssignmentMeta") return deleteAssignmentMetaResponse(d.cawi_id);
+    if (d.action === "saveDraftContent") return saveDraftContentResponse(d);
+    if (d.action === "getDraftContent")  return getDraftContentResponse(d.cawi_id);
 
     // === P MODE (Pemutakhiran / listing) → sheet SE2026_P_Responses ===
     // Self-contained: resolusi cawi_id, insert/update/delete sendiri (1 baris per entitas).
@@ -268,6 +275,7 @@ function doGet(e) {
     if (action === "getAssignmentsMeta") {
       return getAssignmentsMetaResponse({ petugas_email: e.parameter.petugas_email, peran: e.parameter.peran });
     }
+    if (action === "getDraftContent") return getDraftContentResponse(e.parameter.cawi_id);
     return getRecordsResponse();
   } catch(err) {
     return jsonResponse({ status: "error", message: err.message });
@@ -1014,7 +1022,85 @@ function deleteAssignmentMetaResponse(cawiId) {
       var rowNum = _findAssignRow(sheet, cawiId);
       if (rowNum > 0) sheet.deleteRow(rowNum);
     }
+    // Ikut bersihkan snapshot isian draft assignment ini.
+    var dsheet = ss.getSheetByName(DRAFT_CONTENT_SHEET);
+    if (dsheet) {
+      var drow = _findDraftContentRow(dsheet, cawiId);
+      if (drow > 0) dsheet.deleteRow(drow);
+    }
     return jsonResponse({ status: "ok", message: "assignment meta dihapus" });
+  } catch (err) {
+    return jsonResponse({ status: "error", message: err.message });
+  }
+}
+
+// ============================================================
+// ISIAN DRAFT (SE2026_Draft_Content) — snapshot collectData per cawi_id
+// ============================================================
+// Satu baris per assignment. Disimpan kuesioner saat autosave/submit (tanpa
+// lampiran base64). Dibaca pegawai/PML via getDraftContent untuk memeriksa jawaban.
+const DRAFT_CONTENT_HEADERS = [
+  "CAWI ID", "Status", "Form Mode", "Petugas Email", "PML Email", "Diperbarui", "Data JSON"
+];
+
+function getOrInitDraftContentSheet(ss) {
+  var sheet = ss.getSheetByName(DRAFT_CONTENT_SHEET);
+  if (!sheet) {
+    sheet = ss.insertSheet(DRAFT_CONTENT_SHEET);
+    sheet.appendRow(DRAFT_CONTENT_HEADERS);
+    sheet.getRange(1, 1, 1, DRAFT_CONTENT_HEADERS.length)
+      .setFontWeight("bold").setBackground("#0f766e").setFontColor("#ffffff");
+    sheet.setFrozenRows(1);
+  }
+  return sheet;
+}
+
+function _findDraftContentRow(sheet, cawiId) {
+  if (!sheet) return -1;
+  var lastRow = sheet.getLastRow();
+  if (lastRow < 2) return -1;
+  var col = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+  var t = String(cawiId).trim();
+  for (var i = 0; i < col.length; i++) {
+    if (String(col[i][0]).trim() === t) return i + 2;
+  }
+  return -1;
+}
+
+function saveDraftContentResponse(d) {
+  try {
+    if (!d || !d.cawi_id) throw new Error("cawi_id diperlukan");
+    var ss = SpreadsheetApp.openById(SHEET_ID);
+    var sheet = getOrInitDraftContentSheet(ss);
+    var row = [
+      String(d.cawi_id), d.status || 'draft', d.formMode || 'p',
+      d.petugas_email || '', d.pml_email || '', new Date().toISOString(), d.data || ''
+    ];
+    var rowNum = _findDraftContentRow(sheet, d.cawi_id);
+    if (rowNum > 0) sheet.getRange(rowNum, 1, 1, row.length).setValues([row]);
+    else sheet.appendRow(row);
+    return jsonResponse({ status: "ok", message: "isian draft tersimpan", cawi_id: d.cawi_id });
+  } catch (err) {
+    return jsonResponse({ status: "error", message: err.message });
+  }
+}
+
+function getDraftContentResponse(cawiId) {
+  try {
+    if (!cawiId) throw new Error("cawi_id diperlukan");
+    var ss = SpreadsheetApp.openById(SHEET_ID);
+    var sheet = ss.getSheetByName(DRAFT_CONTENT_SHEET);
+    var rowNum = _findDraftContentRow(sheet, cawiId);
+    if (!sheet || rowNum < 0) return jsonResponse({ status: "ok", kind: "draftcontent", data: null });
+    var vals = sheet.getRange(rowNum, 1, 1, DRAFT_CONTENT_HEADERS.length).getValues()[0];
+    var dataStr = cellStr(vals[6]);
+    var parsed = null;
+    try { parsed = dataStr ? JSON.parse(dataStr) : null; } catch (e) { parsed = null; }
+    return jsonResponse({ status: "ok", kind: "draftcontent", data: {
+      cawi_id: cellStr(vals[0]), status: cellStr(vals[1]), formMode: cellStr(vals[2]),
+      petugas_email: cellStr(vals[3]), pml_email: cellStr(vals[4]),
+      updated_at: cellStr(vals[5]), content: parsed
+    }});
   } catch (err) {
     return jsonResponse({ status: "error", message: err.message });
   }

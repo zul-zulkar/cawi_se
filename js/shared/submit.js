@@ -310,6 +310,7 @@ async function submitUnified() {
       try { saveDraft(); } catch (_e) {}
     }
     if (typeof _pushAssignmentMeta === 'function') _pushAssignmentMeta('submitted');
+    if (typeof _pushDraftContent === 'function') _pushDraftContent('submitted');
     clearDraft();
     if (_currentDraftId) { deleteDraftById(_currentDraftId); }
     if (typeof _formDirty !== 'undefined') _formDirty = false;
@@ -408,6 +409,7 @@ async function submitForm() {
       try { saveDraft(); } catch(_e) {}
     }
     if (typeof _pushAssignmentMeta === 'function') _pushAssignmentMeta('submitted');
+    if (typeof _pushDraftContent === 'function') _pushDraftContent('submitted');
     clearDraft();
     if (_currentDraftId) { deleteDraftById(_currentDraftId); }
     // Mark form clean so leave-guard / beforeunload don't prompt after submit

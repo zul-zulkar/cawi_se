@@ -47,6 +47,53 @@ function _deriveKategori() {
   return '';
 }
 
+/* Buang lampiran base64 (foto rumah, tanda tangan) dari objek collectData supaya
+ * blob isian draft tetap kecil & aman di sel Sheet. Field teks (termasuk
+ * anggota_data/usaha_data yang sudah berupa JSON string) dipertahankan utuh. */
+function _stripHeavy(obj) {
+  if (!obj || typeof obj !== 'object') return obj;
+  const out = {};
+  Object.keys(obj).forEach(function (k) {
+    const v = obj[k];
+    out[k] = (typeof v === 'string' && v.indexOf('data:') === 0) ? '[lampiran ada]' : v;
+  });
+  return out;
+}
+
+/* Kirim SNAPSHOT isian (collectDataP + collectDataL) ke Sheet (fire-and-forget)
+ * supaya pegawai & PML bisa MEMERIKSA jawaban draft lintas perangkat, bukan hanya
+ * persentase. Lampiran base64 di-strip. Mode LIHAT (read-only) di-skip. */
+function _pushDraftContent(status) {
+  try {
+    if (typeof window !== 'undefined' && window.__cawiReadOnly) return;
+    const asg = (typeof window !== 'undefined' && window.__cawiActiveAssignment) || null;
+    if (!asg || !asg.id) return;
+    const url = (typeof getScriptUrl === 'function') ? getScriptUrl() : null;
+    if (!url) return;
+    const who = _activePetugasMeta();
+    const unified = (typeof isUnifiedMode === 'function') && isUnifiedMode();
+    const stage = (typeof computeStageFromP === 'function') ? computeStageFromP() : 'none';
+    const blob = { stage: stage };
+    if (unified && typeof collectDataP === 'function') blob.p = _stripHeavy(collectDataP());
+    // Sertakan kuesioner L: unified stage keluarga/usaha, atau mode L legacy.
+    const wantL = unified
+      ? (stage === 'keluarga' || stage === 'usaha')
+      : ((typeof getFormMode === 'function') ? getFormMode() === 'l' : true);
+    if (wantL && typeof collectDataL === 'function') blob.l = _stripHeavy(collectDataL());
+    const payload = {
+      action: 'saveDraftContent', cawi_id: asg.id,
+      status: status || 'draft', formMode: 'p',
+      petugas_email: who.email || asg.petugas_email || '',
+      pml_email: who.pml_email || asg.pml_email || '',
+      data: JSON.stringify(blob)
+    };
+    fetch(url, {
+      method: 'POST', headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(payload), keepalive: true
+    }).catch(function () {});
+  } catch (e) {}
+}
+
 /* Kirim metadata + progress assignment ke Sheet (fire-and-forget) supaya pegawai
  * bisa memantau lewat daftar.html lintas perangkat. Tidak memblokir UI; gagal =
  * diabaikan (draft lokal tetap jalan). Hanya untuk alur assignment (ada cawi_id). */
@@ -130,6 +177,8 @@ function saveDraft() {
     if (txt) { const t=new Date(); txt.textContent='Tersimpan '+String(t.getHours()).padStart(2,'0')+':'+String(t.getMinutes()).padStart(2,'0'); }
     // Sinkron metadata+progress ke server (fire-and-forget) untuk monitoring pegawai.
     _pushAssignmentMeta('draft');
+    // Sinkron SNAPSHOT isian agar pegawai/PML bisa memeriksa jawaban draft.
+    _pushDraftContent('draft');
   } catch(e) { console.error('Gagal simpan draft:', e); }
 }
 

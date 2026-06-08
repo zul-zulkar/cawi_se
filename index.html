@@ -251,6 +251,18 @@
   .radio-group { display: flex; gap: 16px; padding: 4px 0; }
   .radio-group label { display: flex; gap: 6px; align-items: center; font-size: 13px; cursor: pointer; }
 
+  /* Viewer isian (Lihat Isian) */
+  .cv-section { margin-bottom: 14px; }
+  .cv-section-title { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .4px; color: var(--bps-blue); margin: 0 0 6px; padding-bottom: 4px; border-bottom: 1px solid var(--border); }
+  .cv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px; }
+  .cv-field { font-size: 12.5px; }
+  .cv-label { color: var(--muted); font-size: 11px; }
+  .cv-val { font-weight: 600; color: #1e293b; word-break: break-word; }
+  .cv-val.empty { font-weight: 400; color: #cbd5e1; font-style: italic; }
+  .cv-ang { border: 1px solid var(--border); border-radius: 8px; padding: 7px 10px; margin-bottom: 6px; font-size: 12.5px; }
+  .cv-ang b { color: #1e293b; }
+  @media (max-width: 480px) { .cv-grid { grid-template-columns: 1fr; } }
+
   /* Hidden helper */
   .hidden { display: none !important; }
 
@@ -403,6 +415,22 @@
 
     <div id="assignList" class="assign-grid"></div>
     <div id="assignEmpty" class="empty hidden">Belum ada assignment. Klik <b>+ Tambah Assignment</b> untuk membuat.</div>
+  </div>
+</div>
+
+<!-- ============================================================
+     Modal Lihat Isian (snapshot jawaban draft — untuk PML memeriksa)
+     ============================================================ -->
+<div id="contentViewModal" class="modal-backdrop" onclick="if(event.target===this)closeContentView()">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-header">
+      <h3 id="cvTitle">Isian Penugasan</h3>
+      <button class="modal-close" type="button" onclick="closeContentView()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div id="cvSubtitle" style="font-size:12px;color:var(--muted);margin-bottom:10px"></div>
+      <div id="cvBody"></div>
+    </div>
   </div>
 </div>
 
@@ -1056,6 +1084,12 @@
       if (bEditOn) bEditOn.addEventListener('click', function () { setAssignmentStatus(id, 'editing'); });
       var bLock = card.querySelector('[data-act="lock"]');
       if (bLock) bLock.addEventListener('click', function () { setAssignmentStatus(id, 'submitted'); });
+      var bContent = card.querySelector('[data-act="content"]');
+      if (bContent) bContent.addEventListener('click', function () {
+        var l2 = getAssignments(), it2 = null;
+        for (var k = 0; k < l2.length; k++) if (l2[k].id === id) { it2 = l2[k]; break; }
+        viewAssignmentContent(id, it2 ? it2.nama_responden : '');
+      });
       card.querySelector('[data-act="del"]').addEventListener('click',  function () { deleteAssignment(id); });
       var tg = card.querySelector('[data-act="toggle"]');
       if (tg) tg.addEventListener('click', function () {
@@ -1071,17 +1105,21 @@
   // Tombol aksi kartu sesuai status. Assignment "Selesai" hanya bisa DILIHAT;
   // untuk mengedit, petugas wajib "Aktifkan Edit" (status → editing) dulu.
   function buildCardActions(it) {
+    var lihat = '<button class="btn btn-ghost" data-act="content">&#128065; Lihat Isian</button>';
     if (it.status === 'submitted') {
       return '<button class="btn btn-primary" data-act="open">Lihat (terkunci)</button>' +
              '<button class="btn btn-ghost"   data-act="edit-on">Aktifkan Edit</button>' +
+             lihat +
              '<button class="btn btn-danger"  data-act="del">Hapus</button>';
     }
     if (it.status === 'editing') {
       return '<button class="btn btn-primary" data-act="open">Buka Kuesioner</button>' +
              '<button class="btn btn-ghost"   data-act="lock">Kunci lagi</button>' +
+             lihat +
              '<button class="btn btn-danger"  data-act="del">Hapus</button>';
     }
     return '<button class="btn btn-primary" data-act="open">Buka Kuesioner</button>' +
+           lihat +
            '<button class="btn btn-danger"  data-act="del">Hapus</button>';
   }
 
@@ -1132,6 +1170,110 @@
     deleteAssignmentMeta(id);   // hapus juga dari registry server
     populateFilters();
     renderAssignList();
+  }
+
+  // ===== Lihat Isian (snapshot jawaban draft dari SE2026_Draft_Content) =====
+  // Memungkinkan PML memeriksa jawaban bawahan lintas perangkat tanpa membuka kuesioner.
+  function closeContentView() { $('contentViewModal').classList.remove('open'); }
+
+  var _CV_KEB = {1:'Ditemukan',2:'Pindah',3:'Tidak ditemukan',4:'Bangunan baru',5:'Anggota baru',6:'Bukan tempat tinggal',7:'Tidak teridentifikasi'};
+  var _CV_BGN = {1:'Khusus usaha',2:'Campuran',3:'Tempat tinggal',4:'Ibadah/Organisasi',5:'Kantor pemerintah',6:'Tidak dicakup',7:'Virtual office',8:'Panti/Lapas'};
+  var _CV_HUB = {1:'Kepala kel.',2:'Istri/Suami',3:'Anak',4:'Menantu',5:'Cucu',6:'Ortu/Mertua',7:'Famili lain',8:'ART',9:'Lainnya'};
+
+  function _cvField(label, val) {
+    var has = val != null && String(val).trim() !== '' && String(val) !== 'undefined';
+    return '<div class="cv-field"><div class="cv-label">' + esc(label) + '</div>' +
+      '<div class="cv-val' + (has ? '' : ' empty') + '">' + (has ? esc(String(val)) : 'kosong') + '</div></div>';
+  }
+  function _cvSection(title, rows) {
+    var any = rows.some(function (r) { return r[1] != null && String(r[1]).trim() !== ''; });
+    if (!any) return '';
+    return '<div class="cv-section"><div class="cv-section-title">' + esc(title) + '</div><div class="cv-grid">' +
+      rows.map(function (r) { return _cvField(r[0], r[1]); }).join('') + '</div></div>';
+  }
+  function _cvRenderContent(c) {
+    var html = '';
+    var p = c.p || {};
+    html += _cvSection('Blok P — Identitas & Pemutakhiran', [
+      ['Nama KK/Bangunan', p.pmt_nama],
+      ['No. Urut Keluarga', p.pmt_no_kel],
+      ['No. Urut Bangunan', p.pmt_no_bgn],
+      ['Alamat', [p.pmt_jalan, p.pmt_blok].filter(Boolean).join(' ')],
+      ['Keberadaan', _CV_KEB[p.pmt_keberadaan] || p.pmt_keberadaan],
+      ['Kode Bangunan', _CV_BGN[p.pmt_kode_bangunan] || p.pmt_kode_bangunan],
+      ['Jumlah Usaha', p.pmt_jml_usaha],
+      ['Jumlah Anggota (KK)', p.pmt_jml_kk],
+      ['IDSBR', p.pmt_idsbr],
+      ['Geotag', (p.pmt_lat && p.pmt_lng) ? (p.pmt_lat + ', ' + p.pmt_lng) : '']
+    ]);
+    var l = c.l;
+    if (l) {
+      html += _cvSection('Kuesioner L — Keluarga', [
+        ['Nama KK', l.nama_kk],
+        ['Jumlah Anggota', l.jml_anggota],
+        ['Jumlah Pendataan', l.jml_pendataan],
+        ['Klasifikasi', l.klasifikasi === '1' ? 'Perkotaan' : l.klasifikasi === '2' ? 'Perdesaan' : '']
+      ]);
+      var ang = [];
+      try { ang = l.anggota_data ? JSON.parse(l.anggota_data) : []; } catch (e) { ang = []; }
+      if (ang.length) {
+        html += '<div class="cv-section"><div class="cv-section-title">Anggota Keluarga (' + ang.length + ')</div>';
+        ang.forEach(function (a) {
+          html += '<div class="cv-ang"><b>#' + esc(a.no) + ' ' + (esc(a.nama) || '(tanpa nama)') + '</b> — ' +
+            (a.stop_state ? 'STOP · ' : '') +
+            (a.hubungan ? (esc(_CV_HUB[a.hubungan] || a.hubungan) + ' · ') : '') +
+            (a.umur ? ('Umur ' + esc(a.umur)) : '') + '</div>';
+        });
+        html += '</div>';
+      }
+      var us = [];
+      try { us = l.usaha_data ? JSON.parse(l.usaha_data) : []; } catch (e) { us = []; }
+      if (us.length) {
+        html += '<div class="cv-section"><div class="cv-section-title">Usaha (' + us.length + ')</div>';
+        us.forEach(function (u, i) {
+          var nm = u.nama_usaha || u.l2_nama_usaha || u.nama || ('Usaha #' + (i + 1));
+          var kbli = u.kbli_kode || u.l2_kbli_kode || '';
+          html += '<div class="cv-ang"><b>' + esc(nm) + '</b>' + (kbli ? ' — KBLI ' + esc(kbli) : '') + '</div>';
+        });
+        html += '</div>';
+      }
+      html += _cvSection('Perumahan & Responden', [
+        ['Status milik', l.status_milik],
+        ['Luas lantai', l.luas_lantai ? (l.luas_lantai + ' m²') : ''],
+        ['Sumber air', l.air],
+        ['Listrik', l.listrik],
+        ['Responden', l.responden_nama],
+        ['Catatan', l.catatan_pendata]
+      ]);
+    }
+    if (!html) html = '<div style="color:#94a3b8;font-size:13px">Belum ada isian.</div>';
+    return html;
+  }
+
+  function viewAssignmentContent(id, nama) {
+    if (!id) return;
+    $('cvTitle').textContent = nama || 'Isian Penugasan';
+    $('cvSubtitle').textContent = 'Memuat isian dari server…';
+    $('cvBody').innerHTML = '<div style="color:#94a3b8;font-size:13px">Memuat…</div>';
+    $('contentViewModal').classList.add('open');
+    fetch(getScriptUrl(), { method: 'POST', headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify({ action: 'getDraftContent', cawi_id: id }) })
+      .then(function (r) { return r.json(); })
+      .then(function (json) {
+        var d = (json && json.status === 'ok') ? json.data : null;
+        if (!d || !d.content) {
+          $('cvSubtitle').textContent = 'Isian belum tersinkron (petugas belum menyimpan/mengirim sejak fitur ini aktif).';
+          $('cvBody').innerHTML = '<div style="color:#94a3b8;font-size:13px">Tidak ada isian.</div>';
+          return;
+        }
+        var stLabel = d.status === 'submitted' ? 'Terkirim' : d.status === 'editing' ? 'Editing' : 'Draft';
+        $('cvSubtitle').textContent = '[' + stLabel + '] Diperbarui ' + (fmtDateTime(d.updated_at) || '-');
+        $('cvBody').innerHTML = _cvRenderContent(d.content);
+      })
+      .catch(function (e) {
+        $('cvSubtitle').textContent = 'Gagal memuat: ' + e.message;
+        $('cvBody').innerHTML = '';
+      });
   }
 
   // ===== Modal Tambah Assignment =====
